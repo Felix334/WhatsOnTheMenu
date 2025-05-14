@@ -1,4 +1,8 @@
 "use client"
+
+// Nicht den Ordner extra öffen
+
+
 import Image from "next/image";
 import Link from "next/link";
 import LoginForm from "./components/Anmelden";
@@ -15,7 +19,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import PermControleLocation from "./components/LocasionPermission";
-//
+
 export default function Home() {
   const [renderLogin, setRenderLogin] = useState(false);
 
@@ -23,7 +27,7 @@ export default function Home() {
     if (!renderLogin) {
       setRenderLogin(true);
     } else {
-      setRenderLogin(false);// Richtig
+      setRenderLogin(false);
     }
   };
   return (
