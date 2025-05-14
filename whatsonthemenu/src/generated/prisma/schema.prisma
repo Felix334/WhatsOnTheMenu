@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:Neja6.pixu6@localhost:3306/RestaurantWebseite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  email        String   @unique
+  passwordHash String
+  sessionID    String
+  session      Session  @relation(fields: [sessionID], references: [id]) // Überarbeiten?
+  role         Role
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  User
+  Admin
+  Owner
+}
+
+model Session {
+  id     String   @id @default(cuid())
+  users  User[]
+  timeIn DateTime
+}
+
+model Restaurant {
+  id              String         @id @default(cuid())
+  name            String
+  parrentCompName String
+  parrentCompID   String
+  menuId          String         @unique
+  menu            Menu?          @relation(name: "MenuRel")
+  memberSince     DateTime       @default(now())
+  locationID      String         @unique
+  location        Location[]     @relation(name: "locationRest")
+  reservierung    Reservierung[] @relation(name: "reservierung")
+}
+
+model Location {
+  id           String        @id @default(cuid())
+  street       String
+  Hausnummer   String
+  town         String
+  postcode     String
+  country      String
+  restaurantID String        @unique
+  restaurant   Restaurant    @relation(name: "locationRest", fields: [restaurantID], references: [id])
+  reservierung Reservierung? @relation(name: "reservierungLoc")
+}
+
+model Reservierung {
+  id           String     @id @default(cuid())
+  locationID   String     @unique
+  restaurantID String     @unique
+  location     Location   @relation(name: "reservierungLoc", fields: [locationID], references: [id])
+  restaurant   Restaurant @relation(name: "reservierung", fields: [restaurantID], references: [id])
+  phoneNum     String
+}
+
+model Menu {
+  id             Int         @id @default(autoincrement())
+  name           String
+  beschreibung   String?
+  kategorien     Kategorie[]
+  erstelltAm     DateTime    @default(now())
+  aktualisiertAm DateTime    @updatedAt
+  restaurantID   String      @unique
+  restaurant     Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [menuId])
+}
+
+model Kategorie {
+  id           Int       @id @default(autoincrement())
+  name         String
+  beschreibung String?
+  menuId       Int
+  menu         Menu      @relation(fields: [menuId], references: [id])
+  gerichte     Gericht[]
+}
+
+model Gericht {
+  id             Int         @id @default(autoincrement())
+  name           String
+  beschreibung   String?
+  preis          Float
+  kategorieId    Int
+  kategorie      Kategorie   @relation(fields: [kategorieId], references: [id])
+  zutaten        Zutat[]     @relation("GerichtZutaten")
+  erstelltAm     DateTime    @default(now())
+  aktualisiertAm DateTime    @updatedAt
+  Bewertung      Bewertung[]
+  img            String
+}
+
+model Zutat {
+  id          Int       @id @default(autoincrement())
+  name        String
+  istAllergen Boolean   @default(false)
+  gerichte    Gericht[] @relation("GerichtZutaten")
+}
+
+model Bewertung {
+  id             Int      @id @default(autoincrement())
+  gerichtId      Int
+  bewertung      Int      @default(0)
+  kommentar      String?
+  erstelltAm     DateTime @default(now())
+  aktualisiertAm DateTime @updatedAt
+  gericht        Gericht  @relation(fields: [gerichtId], references: [id])
+}
