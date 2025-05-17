@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
+import { Input } from "@/components/ui/input";
 // Das richtige Projekt
 // Noch nicht auf github übertragen + Datenbank nicht verbunden
 
@@ -128,7 +128,7 @@ const menuItems = [
     description: "Schnitzel mit Spätzle",
     img: "SchnitzelMitSpätzle.jpg",
     priceVal: 12.50
-  }
+  },
 ];
 
 export default function Menu() {
@@ -210,13 +210,16 @@ const Getränke = () => {
     <div className="bg-gradient-to-br min-w-1xl from-yellow-50 via-yellow-100 to-yellow-200 min-w-1xl flex flex-col items-center py-5 flex-w 100vw">
       <header className="mb-12 text-center w-full min-w-1xl">
         <h1 className="text-5xl font-serif font-semibold text-gray-900 tracking-wide">La Belle Époque</h1>
-        
         <p className="mt-2 text-gray-600 italic max-w-md mx-auto">A taste of fine dining</p>
       </header>
 
       <main className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
         <div className="mb-3">
           <h3 className="text-center text-4xl font-semibold">Hauptspeisen</h3>
+          <div className="Text">
+            Testsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss
+            <input type="text" placeholder="Test" className="bg-black-200 text-blue-100" />
+          </div>
         </div>
         <table className="w-full table-auto border-collapse">
           <thead>
@@ -233,7 +236,7 @@ const Getränke = () => {
                   <td className="px-6 py-4 font-serif text-gray-900 text-lg">{item.name}</td>
                   <td className="px-6 py-4 text-right font-mono text-gray-800">{item.price}</td>
                   <td className="px-6 py-4 text-gray-600 max-w-xs">{item.description}</td>
-                  
+                  <div className="text-blue-200">Test</div>
                 </tr>
                 {expandedIndex === index && (
                   <tr>
