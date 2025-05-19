@@ -19,8 +19,8 @@ model User {
   name         String   @unique
   email        String   @unique
   passwordHash String
-  sessionID    String
-  session      Session  @relation(fields: [sessionID], references: [id]) // Überarbeiten?
+  sessionID    String?
+  session      Session? @relation(fields: [sessionID], references: [id]) // Überarbeiten?
   role         Role
   createdAt    DateTime @default(now())
 }
@@ -38,39 +38,38 @@ model Session {
 }
 
 model Restaurant {
-  id              String    @id @default(cuid())
+  id              String         @id @default(cuid())
   name            String
   parrentCompName String
   parrentCompID   String
-  menuId          String    @unique
-  menu            Menu?     @relation(name: "MenuRel")
-  memberSince     DateTime  @default(now())
-  locationID      String    @unique
-  location      Location[] @relation(name: "locationRest")
+  menuId          String         @unique
+  menu            Menu?          @relation(name: "MenuRel")
+  memberSince     DateTime       @default(now())
+  locationID      String         @unique
+  location        Location[]     @relation(name: "locationRest")
   reservierung    Reservierung[] @relation(name: "reservierung")
 }
 
 model Location {
-  id           String     @id @default(cuid())
+  id           String        @id @default(cuid())
   street       String
   Hausnummer   String
   town         String
   postcode     String
   country      String
-  restaurantID String     @unique
-  restaurant   Restaurant  @relation(name: "locationRest", fields: [restaurantID], references: [id])
+  restaurantID String        @unique
+  restaurant   Restaurant    @relation(name: "locationRest", fields: [restaurantID], references: [id])
   reservierung Reservierung? @relation(name: "reservierungLoc")
 }
 
 model Reservierung {
   id           String     @id @default(cuid())
-  locationID   String @unique
-  restaurantID String @unique
+  locationID   String     @unique
+  restaurantID String     @unique
   location     Location   @relation(name: "reservierungLoc", fields: [locationID], references: [id])
   restaurant   Restaurant @relation(name: "reservierung", fields: [restaurantID], references: [id])
   phoneNum     String
 }
-
 
 model Menu {
   id             Int         @id @default(autoincrement())

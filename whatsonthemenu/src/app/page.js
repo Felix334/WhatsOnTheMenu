@@ -23,8 +23,12 @@ import PermControleLocation from "./components/LocasionPermission";
 
 export default function Home() {
   const [renderLogin, setRenderLogin] = useState(false);
+  const [closeInput, setCloseInput] = useState(false)
 
   const renderMLogin = () => {
+    if(closeInput){
+      setRenderLogin(false);
+    }
     if (!renderLogin) {
       setRenderLogin(true);
     } else {
@@ -37,7 +41,6 @@ export default function Home() {
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
-        <Input className="text-regal-blue"></Input>
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
@@ -117,7 +120,7 @@ export default function Home() {
         </section>
       </main>
       <div className="absolute item-center justify-center flex grid fixed">
-            {renderLogin && <LoginForm />}
+            {renderLogin && <LoginForm closeInput={renderLogin}/>}
       </div>
     </div>
   );

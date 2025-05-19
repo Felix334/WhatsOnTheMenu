@@ -209,6 +209,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
@@ -245,11 +250,6 @@ exports.Prisma.ReservierungOrderByRelevanceFieldEnum = {
   locationID: 'locationID',
   restaurantID: 'restaurantID',
   phoneNum: 'phoneNum'
-};
-
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
 };
 
 exports.Prisma.MenuOrderByRelevanceFieldEnum = {
