@@ -1,32 +1,25 @@
-"use client"
+"use client";
 
 // Nicht den Ordner extra öffen
-
 
 import Image from "next/image";
 import Link from "next/link";
 import LoginForm from "./components/Anmelden";
+import Registrieren from "./components/Registrieren";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from '@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import PermControleLocation from "./components/LocasionPermission";
 
 export default function Home() {
   const [renderLogin, setRenderLogin] = useState(false);
-  const [closeInput, setCloseInput] = useState(false)
+  const [closeInput, setCloseInput] = useState(false);
+  const [renderRegister, setRenderRegister] = useState(false);
 
-  const renderMLogin = () => {
-    if(closeInput){
+  const renderLoginW = () => {
+    if (closeInput) {
       setRenderLogin(false);
     }
     if (!renderLogin) {
@@ -35,6 +28,18 @@ export default function Home() {
       setRenderLogin(false);
     }
   };
+
+  const renderRegisterW = () => {
+    if (closeInput) {
+      setRenderRegister(false);
+    }
+    if (!renderLogin) {
+      setRenderRegister(true);
+    } else {
+      setRenderRegister(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
       <header className="mb-12 text-center align-top leading-tight grid gap-0 relative flex">
@@ -50,8 +55,19 @@ export default function Home() {
               <CardDescription>Melde dich jetzt an um all unsere Funktionen benutzen zu können</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="flex" onClick={renderMLogin}>
+              <Button className="flex" onClick={renderLoginW}>
                 Login
+              </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Registrieren</CardTitle>
+              <CardDescription>Neuen Account erstellen</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="flex" onClick={renderRegisterW}>
+                Registrieren
               </Button>
             </CardContent>
           </Card>
@@ -117,10 +133,22 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Mein Restaurant</CardTitle>
+              <CardDescription>Profil bearbeiten</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="flex">
+                <Link href="./Routes/Profil">Mein Profil</Link>
+              </Button>
+            </CardContent>
+          </Card>
         </section>
       </main>
       <div className="absolute item-center justify-center flex grid fixed">
-            {renderLogin && <LoginForm closeInput={renderLogin}/>}
+        {renderLogin && <LoginForm renderLogin={setRenderLogin} />}
+        {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
     </div>
   );

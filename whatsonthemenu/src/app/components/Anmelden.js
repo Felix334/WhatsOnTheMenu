@@ -23,13 +23,15 @@ export default function Home({renderLogin}) {
     const [submittedData, setSubmittedData] = useState(null);
   const submitToServer = async (user_data) => {
     console.log("Submitted data sending: ", user_data);
+    var { email, password } = user_data
+    console.log("Data unpacked: ", email, password)
     try{
-    const resp = await fetch("./api/login", {
+    const resp = await fetch("./api/Auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({user_data}),
+      body: JSON.stringify({email, password}),
     });
     if (resp.status === 200) {
       const data = await resp.json();

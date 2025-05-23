@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  //output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -15,14 +9,17 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  email        String   @unique
+  id           String      @id @default(cuid())
+  name         String      @unique
+  email        String      @unique
   passwordHash String
   sessionID    String?
-  session      Session? @relation(fields: [sessionID], references: [id]) // Überarbeiten?
+  session      Session?    @relation(fields: [sessionID], references: [id])
   role         Role
-  createdAt    DateTime @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now())
+  ownerID      String?     @unique
+  restaurant   Restaurant?
 }
 
 enum Role {
@@ -38,22 +35,23 @@ model Session {
 }
 
 model Restaurant {
-  id              String         @id @default(cuid())
-  name            String
-  parrentCompName String
-  parrentCompID   String
-  menuId          String         @unique
-  menu            Menu?          @relation(name: "MenuRel")
-  memberSince     DateTime       @default(now())
-  locationID      String         @unique
-  location        Location[]     @relation(name: "locationRest")
-  reservierung    Reservierung[] @relation(name: "reservierung")
+  id             String     @id @default(cuid())
+  name           String
+  parentCompName String
+  parentCompID   String
+  menuId         String     @unique
+  menu           Menu?      @relation(name: "MenuRel")
+  memberSince    DateTime   @default(now())
+  locationID     String     @unique
+  location       Location[] @relation(name: "locationRest")
+  ownerID        String     @unique
+  owner          User       @relation(fields: [ownerID], references: [ownerID])
 }
 
 model Location {
   id           String        @id @default(cuid())
   street       String
-  Hausnummer   String
+  houseNumber  String
   town         String
   postcode     String
   country      String
@@ -63,61 +61,60 @@ model Location {
 }
 
 model Reservierung {
-  id           String     @id @default(cuid())
-  locationID   String     @unique
-  restaurantID String     @unique
-  location     Location   @relation(name: "reservierungLoc", fields: [locationID], references: [id])
-  restaurant   Restaurant @relation(name: "reservierung", fields: [restaurantID], references: [id])
+  id           String   @id @default(cuid())
+  locationID   String   @unique
+  restaurantID String
+  location     Location @relation(name: "reservierungLoc", fields: [locationID], references: [id])
   phoneNum     String
 }
 
 model Menu {
-  id             Int         @id @default(autoincrement())
-  name           String
-  beschreibung   String?
-  kategorien     Kategorie[]
-  erstelltAm     DateTime    @default(now())
-  aktualisiertAm DateTime    @updatedAt
-  restaurantID   String      @unique
-  restaurant     Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [menuId])
+  id           String      @id @default(cuid())
+  name         String
+  description  String?
+  kategorien   Kategorie[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  restaurantID String      @unique
+  restaurant   Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [id])
 }
 
 model Kategorie {
-  id           Int       @id @default(autoincrement())
-  name         String
-  beschreibung String?
-  menuId       Int
-  menu         Menu      @relation(fields: [menuId], references: [id])
-  gerichte     Gericht[]
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  menuId      String
+  menu        Menu      @relation(fields: [menuId], references: [id])
+  gerichte    Gericht[]
 }
 
 model Gericht {
-  id             Int         @id @default(autoincrement())
-  name           String
-  beschreibung   String?
-  preis          Float
-  kategorieId    Int
-  kategorie      Kategorie   @relation(fields: [kategorieId], references: [id])
-  zutaten        Zutat[]     @relation("GerichtZutaten")
-  erstelltAm     DateTime    @default(now())
-  aktualisiertAm DateTime    @updatedAt
-  Bewertung      Bewertung[]
-  img            String
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  kategorieId String
+  kategorie   Kategorie   @relation(fields: [kategorieId], references: [id])
+  zutaten     Zutat[]     @relation("GerichtZutaten")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  bewertungen Bewertung[] @relation("Bewertung Gericht")
+  img         String
 }
 
 model Zutat {
-  id          Int       @id @default(autoincrement())
-  name        String
-  istAllergen Boolean   @default(false)
-  gerichte    Gericht[] @relation("GerichtZutaten")
+  id         String    @id @default(cuid())
+  name       String
+  isAllergen Boolean   @default(false)
+  gerichte   Gericht[] @relation("GerichtZutaten")
 }
 
 model Bewertung {
-  id             Int      @id @default(autoincrement())
-  gerichtId      Int
-  bewertung      Int      @default(0)
-  kommentar      String?
-  erstelltAm     DateTime @default(now())
-  aktualisiertAm DateTime @updatedAt
-  gericht        Gericht  @relation(fields: [gerichtId], references: [id])
+  id        String   @id @default(cuid())
+  gerichtId String
+  bewertung Int      @default(0)
+  kommentar String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  gericht   Gericht  @relation("Bewertung Gericht", fields: [gerichtId], references: [id])
 }

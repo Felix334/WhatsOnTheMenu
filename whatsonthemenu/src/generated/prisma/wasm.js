@@ -138,8 +138,8 @@ exports.Prisma.SessionScalarFieldEnum = {
 exports.Prisma.RestaurantScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  parrentCompName: 'parrentCompName',
-  parrentCompID: 'parrentCompID',
+  parentCompName: 'parentCompName',
+  parentCompID: 'parentCompID',
   menuId: 'menuId',
   memberSince: 'memberSince',
   locationID: 'locationID'
@@ -148,7 +148,7 @@ exports.Prisma.RestaurantScalarFieldEnum = {
 exports.Prisma.LocationScalarFieldEnum = {
   id: 'id',
   street: 'street',
-  Hausnummer: 'Hausnummer',
+  houseNumber: 'houseNumber',
   town: 'town',
   postcode: 'postcode',
   country: 'country',
@@ -165,34 +165,34 @@ exports.Prisma.ReservierungScalarFieldEnum = {
 exports.Prisma.MenuScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung',
-  erstelltAm: 'erstelltAm',
-  aktualisiertAm: 'aktualisiertAm',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   restaurantID: 'restaurantID'
 };
 
 exports.Prisma.KategorieScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung',
+  description: 'description',
   menuId: 'menuId'
 };
 
 exports.Prisma.GerichtScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung',
-  preis: 'preis',
+  description: 'description',
+  price: 'price',
   kategorieId: 'kategorieId',
-  erstelltAm: 'erstelltAm',
-  aktualisiertAm: 'aktualisiertAm',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   img: 'img'
 };
 
 exports.Prisma.ZutatScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  istAllergen: 'istAllergen'
+  isAllergen: 'isAllergen'
 };
 
 exports.Prisma.BewertungScalarFieldEnum = {
@@ -200,8 +200,8 @@ exports.Prisma.BewertungScalarFieldEnum = {
   gerichtId: 'gerichtId',
   bewertung: 'bewertung',
   kommentar: 'kommentar',
-  erstelltAm: 'erstelltAm',
-  aktualisiertAm: 'aktualisiertAm'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -229,8 +229,8 @@ exports.Prisma.SessionOrderByRelevanceFieldEnum = {
 exports.Prisma.RestaurantOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
-  parrentCompName: 'parrentCompName',
-  parrentCompID: 'parrentCompID',
+  parentCompName: 'parentCompName',
+  parentCompID: 'parentCompID',
   menuId: 'menuId',
   locationID: 'locationID'
 };
@@ -238,7 +238,7 @@ exports.Prisma.RestaurantOrderByRelevanceFieldEnum = {
 exports.Prisma.LocationOrderByRelevanceFieldEnum = {
   id: 'id',
   street: 'street',
-  Hausnummer: 'Hausnummer',
+  houseNumber: 'houseNumber',
   town: 'town',
   postcode: 'postcode',
   country: 'country',
@@ -253,27 +253,35 @@ exports.Prisma.ReservierungOrderByRelevanceFieldEnum = {
 };
 
 exports.Prisma.MenuOrderByRelevanceFieldEnum = {
+  id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung',
+  description: 'description',
   restaurantID: 'restaurantID'
 };
 
 exports.Prisma.KategorieOrderByRelevanceFieldEnum = {
+  id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung'
+  description: 'description',
+  menuId: 'menuId'
 };
 
 exports.Prisma.GerichtOrderByRelevanceFieldEnum = {
+  id: 'id',
   name: 'name',
-  beschreibung: 'beschreibung',
+  description: 'description',
+  kategorieId: 'kategorieId',
   img: 'img'
 };
 
 exports.Prisma.ZutatOrderByRelevanceFieldEnum = {
+  id: 'id',
   name: 'name'
 };
 
 exports.Prisma.BewertungOrderByRelevanceFieldEnum = {
+  id: 'id',
+  gerichtId: 'gerichtId',
   kommentar: 'kommentar'
 };
 exports.Role = exports.$Enums.Role = {

@@ -1658,12 +1658,12 @@ export namespace Prisma {
 
   export type RestaurantCountOutputType = {
     location: number
-    reservierung: number
+    reservierungen: number
   }
 
   export type RestaurantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     location?: boolean | RestaurantCountOutputTypeCountLocationArgs
-    reservierung?: boolean | RestaurantCountOutputTypeCountReservierungArgs
+    reservierungen?: boolean | RestaurantCountOutputTypeCountReservierungenArgs
   }
 
   // Custom InputTypes
@@ -1687,7 +1687,7 @@ export namespace Prisma {
   /**
    * RestaurantCountOutputType without action
    */
-  export type RestaurantCountOutputTypeCountReservierungArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RestaurantCountOutputTypeCountReservierungenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReservierungWhereInput
   }
 
@@ -1760,12 +1760,12 @@ export namespace Prisma {
 
   export type GerichtCountOutputType = {
     zutaten: number
-    Bewertung: number
+    bewertungen: number
   }
 
   export type GerichtCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     zutaten?: boolean | GerichtCountOutputTypeCountZutatenArgs
-    Bewertung?: boolean | GerichtCountOutputTypeCountBewertungArgs
+    bewertungen?: boolean | GerichtCountOutputTypeCountBewertungenArgs
   }
 
   // Custom InputTypes
@@ -1789,7 +1789,7 @@ export namespace Prisma {
   /**
    * GerichtCountOutputType without action
    */
-  export type GerichtCountOutputTypeCountBewertungArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GerichtCountOutputTypeCountBewertungenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BewertungWhereInput
   }
 
@@ -3734,8 +3734,8 @@ export namespace Prisma {
   export type RestaurantMinAggregateOutputType = {
     id: string | null
     name: string | null
-    parrentCompName: string | null
-    parrentCompID: string | null
+    parentCompName: string | null
+    parentCompID: string | null
     menuId: string | null
     memberSince: Date | null
     locationID: string | null
@@ -3744,8 +3744,8 @@ export namespace Prisma {
   export type RestaurantMaxAggregateOutputType = {
     id: string | null
     name: string | null
-    parrentCompName: string | null
-    parrentCompID: string | null
+    parentCompName: string | null
+    parentCompID: string | null
     menuId: string | null
     memberSince: Date | null
     locationID: string | null
@@ -3754,8 +3754,8 @@ export namespace Prisma {
   export type RestaurantCountAggregateOutputType = {
     id: number
     name: number
-    parrentCompName: number
-    parrentCompID: number
+    parentCompName: number
+    parentCompID: number
     menuId: number
     memberSince: number
     locationID: number
@@ -3766,8 +3766,8 @@ export namespace Prisma {
   export type RestaurantMinAggregateInputType = {
     id?: true
     name?: true
-    parrentCompName?: true
-    parrentCompID?: true
+    parentCompName?: true
+    parentCompID?: true
     menuId?: true
     memberSince?: true
     locationID?: true
@@ -3776,8 +3776,8 @@ export namespace Prisma {
   export type RestaurantMaxAggregateInputType = {
     id?: true
     name?: true
-    parrentCompName?: true
-    parrentCompID?: true
+    parentCompName?: true
+    parentCompID?: true
     menuId?: true
     memberSince?: true
     locationID?: true
@@ -3786,8 +3786,8 @@ export namespace Prisma {
   export type RestaurantCountAggregateInputType = {
     id?: true
     name?: true
-    parrentCompName?: true
-    parrentCompID?: true
+    parentCompName?: true
+    parentCompID?: true
     menuId?: true
     memberSince?: true
     locationID?: true
@@ -3869,8 +3869,8 @@ export namespace Prisma {
   export type RestaurantGroupByOutputType = {
     id: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince: Date
     locationID: string
@@ -3896,14 +3896,14 @@ export namespace Prisma {
   export type RestaurantSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    parrentCompName?: boolean
-    parrentCompID?: boolean
+    parentCompName?: boolean
+    parentCompID?: boolean
     menuId?: boolean
     memberSince?: boolean
     locationID?: boolean
     menu?: boolean | Restaurant$menuArgs<ExtArgs>
     location?: boolean | Restaurant$locationArgs<ExtArgs>
-    reservierung?: boolean | Restaurant$reservierungArgs<ExtArgs>
+    reservierungen?: boolean | Restaurant$reservierungenArgs<ExtArgs>
     _count?: boolean | RestaurantCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["restaurant"]>
 
@@ -3912,18 +3912,18 @@ export namespace Prisma {
   export type RestaurantSelectScalar = {
     id?: boolean
     name?: boolean
-    parrentCompName?: boolean
-    parrentCompID?: boolean
+    parentCompName?: boolean
+    parentCompID?: boolean
     menuId?: boolean
     memberSince?: boolean
     locationID?: boolean
   }
 
-  export type RestaurantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "parrentCompName" | "parrentCompID" | "menuId" | "memberSince" | "locationID", ExtArgs["result"]["restaurant"]>
+  export type RestaurantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "parentCompName" | "parentCompID" | "menuId" | "memberSince" | "locationID", ExtArgs["result"]["restaurant"]>
   export type RestaurantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     menu?: boolean | Restaurant$menuArgs<ExtArgs>
     location?: boolean | Restaurant$locationArgs<ExtArgs>
-    reservierung?: boolean | Restaurant$reservierungArgs<ExtArgs>
+    reservierungen?: boolean | Restaurant$reservierungenArgs<ExtArgs>
     _count?: boolean | RestaurantCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3932,13 +3932,13 @@ export namespace Prisma {
     objects: {
       menu: Prisma.$MenuPayload<ExtArgs> | null
       location: Prisma.$LocationPayload<ExtArgs>[]
-      reservierung: Prisma.$ReservierungPayload<ExtArgs>[]
+      reservierungen: Prisma.$ReservierungPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-      parrentCompName: string
-      parrentCompID: string
+      parentCompName: string
+      parentCompID: string
       menuId: string
       memberSince: Date
       locationID: string
@@ -4284,7 +4284,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     menu<T extends Restaurant$menuArgs<ExtArgs> = {}>(args?: Subset<T, Restaurant$menuArgs<ExtArgs>>): Prisma__MenuClient<$Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     location<T extends Restaurant$locationArgs<ExtArgs> = {}>(args?: Subset<T, Restaurant$locationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    reservierung<T extends Restaurant$reservierungArgs<ExtArgs> = {}>(args?: Subset<T, Restaurant$reservierungArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReservierungPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reservierungen<T extends Restaurant$reservierungenArgs<ExtArgs> = {}>(args?: Subset<T, Restaurant$reservierungenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReservierungPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4316,8 +4316,8 @@ export namespace Prisma {
   interface RestaurantFieldRefs {
     readonly id: FieldRef<"Restaurant", 'String'>
     readonly name: FieldRef<"Restaurant", 'String'>
-    readonly parrentCompName: FieldRef<"Restaurant", 'String'>
-    readonly parrentCompID: FieldRef<"Restaurant", 'String'>
+    readonly parentCompName: FieldRef<"Restaurant", 'String'>
+    readonly parentCompID: FieldRef<"Restaurant", 'String'>
     readonly menuId: FieldRef<"Restaurant", 'String'>
     readonly memberSince: FieldRef<"Restaurant", 'DateTime'>
     readonly locationID: FieldRef<"Restaurant", 'String'>
@@ -4707,9 +4707,9 @@ export namespace Prisma {
   }
 
   /**
-   * Restaurant.reservierung
+   * Restaurant.reservierungen
    */
-  export type Restaurant$reservierungArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Restaurant$reservierungenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Reservierung
      */
@@ -4762,7 +4762,7 @@ export namespace Prisma {
   export type LocationMinAggregateOutputType = {
     id: string | null
     street: string | null
-    Hausnummer: string | null
+    houseNumber: string | null
     town: string | null
     postcode: string | null
     country: string | null
@@ -4772,7 +4772,7 @@ export namespace Prisma {
   export type LocationMaxAggregateOutputType = {
     id: string | null
     street: string | null
-    Hausnummer: string | null
+    houseNumber: string | null
     town: string | null
     postcode: string | null
     country: string | null
@@ -4782,7 +4782,7 @@ export namespace Prisma {
   export type LocationCountAggregateOutputType = {
     id: number
     street: number
-    Hausnummer: number
+    houseNumber: number
     town: number
     postcode: number
     country: number
@@ -4794,7 +4794,7 @@ export namespace Prisma {
   export type LocationMinAggregateInputType = {
     id?: true
     street?: true
-    Hausnummer?: true
+    houseNumber?: true
     town?: true
     postcode?: true
     country?: true
@@ -4804,7 +4804,7 @@ export namespace Prisma {
   export type LocationMaxAggregateInputType = {
     id?: true
     street?: true
-    Hausnummer?: true
+    houseNumber?: true
     town?: true
     postcode?: true
     country?: true
@@ -4814,7 +4814,7 @@ export namespace Prisma {
   export type LocationCountAggregateInputType = {
     id?: true
     street?: true
-    Hausnummer?: true
+    houseNumber?: true
     town?: true
     postcode?: true
     country?: true
@@ -4897,7 +4897,7 @@ export namespace Prisma {
   export type LocationGroupByOutputType = {
     id: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -4924,7 +4924,7 @@ export namespace Prisma {
   export type LocationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     street?: boolean
-    Hausnummer?: boolean
+    houseNumber?: boolean
     town?: boolean
     postcode?: boolean
     country?: boolean
@@ -4938,14 +4938,14 @@ export namespace Prisma {
   export type LocationSelectScalar = {
     id?: boolean
     street?: boolean
-    Hausnummer?: boolean
+    houseNumber?: boolean
     town?: boolean
     postcode?: boolean
     country?: boolean
     restaurantID?: boolean
   }
 
-  export type LocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "street" | "Hausnummer" | "town" | "postcode" | "country" | "restaurantID", ExtArgs["result"]["location"]>
+  export type LocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "street" | "houseNumber" | "town" | "postcode" | "country" | "restaurantID", ExtArgs["result"]["location"]>
   export type LocationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     restaurant?: boolean | RestaurantDefaultArgs<ExtArgs>
     reservierung?: boolean | Location$reservierungArgs<ExtArgs>
@@ -4960,7 +4960,7 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       street: string
-      Hausnummer: string
+      houseNumber: string
       town: string
       postcode: string
       country: string
@@ -5338,7 +5338,7 @@ export namespace Prisma {
   interface LocationFieldRefs {
     readonly id: FieldRef<"Location", 'String'>
     readonly street: FieldRef<"Location", 'String'>
-    readonly Hausnummer: FieldRef<"Location", 'String'>
+    readonly houseNumber: FieldRef<"Location", 'String'>
     readonly town: FieldRef<"Location", 'String'>
     readonly postcode: FieldRef<"Location", 'String'>
     readonly country: FieldRef<"Location", 'String'>
@@ -6651,81 +6651,63 @@ export namespace Prisma {
 
   export type AggregateMenu = {
     _count: MenuCountAggregateOutputType | null
-    _avg: MenuAvgAggregateOutputType | null
-    _sum: MenuSumAggregateOutputType | null
     _min: MenuMinAggregateOutputType | null
     _max: MenuMaxAggregateOutputType | null
   }
 
-  export type MenuAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type MenuSumAggregateOutputType = {
-    id: number | null
-  }
-
   export type MenuMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
     restaurantID: string | null
   }
 
   export type MenuMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
     restaurantID: string | null
   }
 
   export type MenuCountAggregateOutputType = {
     id: number
     name: number
-    beschreibung: number
-    erstelltAm: number
-    aktualisiertAm: number
+    description: number
+    createdAt: number
+    updatedAt: number
     restaurantID: number
     _all: number
   }
 
 
-  export type MenuAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type MenuSumAggregateInputType = {
-    id?: true
-  }
-
   export type MenuMinAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
     restaurantID?: true
   }
 
   export type MenuMaxAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
     restaurantID?: true
   }
 
   export type MenuCountAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
     restaurantID?: true
     _all?: true
   }
@@ -6768,18 +6750,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: MenuAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: MenuSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: MenuMinAggregateInputType
@@ -6810,22 +6780,18 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: MenuCountAggregateInputType | true
-    _avg?: MenuAvgAggregateInputType
-    _sum?: MenuSumAggregateInputType
     _min?: MenuMinAggregateInputType
     _max?: MenuMaxAggregateInputType
   }
 
   export type MenuGroupByOutputType = {
-    id: number
+    id: string
     name: string
-    beschreibung: string | null
-    erstelltAm: Date
-    aktualisiertAm: Date
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
     restaurantID: string
     _count: MenuCountAggregateOutputType | null
-    _avg: MenuAvgAggregateOutputType | null
-    _sum: MenuSumAggregateOutputType | null
     _min: MenuMinAggregateOutputType | null
     _max: MenuMaxAggregateOutputType | null
   }
@@ -6847,9 +6813,9 @@ export namespace Prisma {
   export type MenuSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     restaurantID?: boolean
     kategorien?: boolean | Menu$kategorienArgs<ExtArgs>
     restaurant?: boolean | RestaurantDefaultArgs<ExtArgs>
@@ -6861,13 +6827,13 @@ export namespace Prisma {
   export type MenuSelectScalar = {
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     restaurantID?: boolean
   }
 
-  export type MenuOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "beschreibung" | "erstelltAm" | "aktualisiertAm" | "restaurantID", ExtArgs["result"]["menu"]>
+  export type MenuOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "createdAt" | "updatedAt" | "restaurantID", ExtArgs["result"]["menu"]>
   export type MenuInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kategorien?: boolean | Menu$kategorienArgs<ExtArgs>
     restaurant?: boolean | RestaurantDefaultArgs<ExtArgs>
@@ -6881,11 +6847,11 @@ export namespace Prisma {
       restaurant: Prisma.$RestaurantPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
-      beschreibung: string | null
-      erstelltAm: Date
-      aktualisiertAm: Date
+      description: string | null
+      createdAt: Date
+      updatedAt: Date
       restaurantID: string
     }, ExtArgs["result"]["menu"]>
     composites: {}
@@ -7258,11 +7224,11 @@ export namespace Prisma {
    * Fields of the Menu model
    */
   interface MenuFieldRefs {
-    readonly id: FieldRef<"Menu", 'Int'>
+    readonly id: FieldRef<"Menu", 'String'>
     readonly name: FieldRef<"Menu", 'String'>
-    readonly beschreibung: FieldRef<"Menu", 'String'>
-    readonly erstelltAm: FieldRef<"Menu", 'DateTime'>
-    readonly aktualisiertAm: FieldRef<"Menu", 'DateTime'>
+    readonly description: FieldRef<"Menu", 'String'>
+    readonly createdAt: FieldRef<"Menu", 'DateTime'>
+    readonly updatedAt: FieldRef<"Menu", 'DateTime'>
     readonly restaurantID: FieldRef<"Menu", 'String'>
   }
     
@@ -7655,73 +7621,51 @@ export namespace Prisma {
 
   export type AggregateKategorie = {
     _count: KategorieCountAggregateOutputType | null
-    _avg: KategorieAvgAggregateOutputType | null
-    _sum: KategorieSumAggregateOutputType | null
     _min: KategorieMinAggregateOutputType | null
     _max: KategorieMaxAggregateOutputType | null
   }
 
-  export type KategorieAvgAggregateOutputType = {
-    id: number | null
-    menuId: number | null
-  }
-
-  export type KategorieSumAggregateOutputType = {
-    id: number | null
-    menuId: number | null
-  }
-
   export type KategorieMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    menuId: number | null
+    description: string | null
+    menuId: string | null
   }
 
   export type KategorieMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    menuId: number | null
+    description: string | null
+    menuId: string | null
   }
 
   export type KategorieCountAggregateOutputType = {
     id: number
     name: number
-    beschreibung: number
+    description: number
     menuId: number
     _all: number
   }
 
 
-  export type KategorieAvgAggregateInputType = {
-    id?: true
-    menuId?: true
-  }
-
-  export type KategorieSumAggregateInputType = {
-    id?: true
-    menuId?: true
-  }
-
   export type KategorieMinAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
+    description?: true
     menuId?: true
   }
 
   export type KategorieMaxAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
+    description?: true
     menuId?: true
   }
 
   export type KategorieCountAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
+    description?: true
     menuId?: true
     _all?: true
   }
@@ -7764,18 +7708,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: KategorieAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: KategorieSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: KategorieMinAggregateInputType
@@ -7806,20 +7738,16 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: KategorieCountAggregateInputType | true
-    _avg?: KategorieAvgAggregateInputType
-    _sum?: KategorieSumAggregateInputType
     _min?: KategorieMinAggregateInputType
     _max?: KategorieMaxAggregateInputType
   }
 
   export type KategorieGroupByOutputType = {
-    id: number
+    id: string
     name: string
-    beschreibung: string | null
-    menuId: number
+    description: string | null
+    menuId: string
     _count: KategorieCountAggregateOutputType | null
-    _avg: KategorieAvgAggregateOutputType | null
-    _sum: KategorieSumAggregateOutputType | null
     _min: KategorieMinAggregateOutputType | null
     _max: KategorieMaxAggregateOutputType | null
   }
@@ -7841,7 +7769,7 @@ export namespace Prisma {
   export type KategorieSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
+    description?: boolean
     menuId?: boolean
     menu?: boolean | MenuDefaultArgs<ExtArgs>
     gerichte?: boolean | Kategorie$gerichteArgs<ExtArgs>
@@ -7853,11 +7781,11 @@ export namespace Prisma {
   export type KategorieSelectScalar = {
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
+    description?: boolean
     menuId?: boolean
   }
 
-  export type KategorieOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "beschreibung" | "menuId", ExtArgs["result"]["kategorie"]>
+  export type KategorieOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "menuId", ExtArgs["result"]["kategorie"]>
   export type KategorieInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     menu?: boolean | MenuDefaultArgs<ExtArgs>
     gerichte?: boolean | Kategorie$gerichteArgs<ExtArgs>
@@ -7871,10 +7799,10 @@ export namespace Prisma {
       gerichte: Prisma.$GerichtPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
-      beschreibung: string | null
-      menuId: number
+      description: string | null
+      menuId: string
     }, ExtArgs["result"]["kategorie"]>
     composites: {}
   }
@@ -8246,10 +8174,10 @@ export namespace Prisma {
    * Fields of the Kategorie model
    */
   interface KategorieFieldRefs {
-    readonly id: FieldRef<"Kategorie", 'Int'>
+    readonly id: FieldRef<"Kategorie", 'String'>
     readonly name: FieldRef<"Kategorie", 'String'>
-    readonly beschreibung: FieldRef<"Kategorie", 'String'>
-    readonly menuId: FieldRef<"Kategorie", 'Int'>
+    readonly description: FieldRef<"Kategorie", 'String'>
+    readonly menuId: FieldRef<"Kategorie", 'String'>
   }
     
 
@@ -8648,94 +8576,86 @@ export namespace Prisma {
   }
 
   export type GerichtAvgAggregateOutputType = {
-    id: number | null
-    preis: number | null
-    kategorieId: number | null
+    price: number | null
   }
 
   export type GerichtSumAggregateOutputType = {
-    id: number | null
-    preis: number | null
-    kategorieId: number | null
+    price: number | null
   }
 
   export type GerichtMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    preis: number | null
-    kategorieId: number | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    description: string | null
+    price: number | null
+    kategorieId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
     img: string | null
   }
 
   export type GerichtMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    beschreibung: string | null
-    preis: number | null
-    kategorieId: number | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    description: string | null
+    price: number | null
+    kategorieId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
     img: string | null
   }
 
   export type GerichtCountAggregateOutputType = {
     id: number
     name: number
-    beschreibung: number
-    preis: number
+    description: number
+    price: number
     kategorieId: number
-    erstelltAm: number
-    aktualisiertAm: number
+    createdAt: number
+    updatedAt: number
     img: number
     _all: number
   }
 
 
   export type GerichtAvgAggregateInputType = {
-    id?: true
-    preis?: true
-    kategorieId?: true
+    price?: true
   }
 
   export type GerichtSumAggregateInputType = {
-    id?: true
-    preis?: true
-    kategorieId?: true
+    price?: true
   }
 
   export type GerichtMinAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    preis?: true
+    description?: true
+    price?: true
     kategorieId?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
     img?: true
   }
 
   export type GerichtMaxAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    preis?: true
+    description?: true
+    price?: true
     kategorieId?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
     img?: true
   }
 
   export type GerichtCountAggregateInputType = {
     id?: true
     name?: true
-    beschreibung?: true
-    preis?: true
+    description?: true
+    price?: true
     kategorieId?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
     img?: true
     _all?: true
   }
@@ -8827,13 +8747,13 @@ export namespace Prisma {
   }
 
   export type GerichtGroupByOutputType = {
-    id: number
+    id: string
     name: string
-    beschreibung: string | null
-    preis: number
-    kategorieId: number
-    erstelltAm: Date
-    aktualisiertAm: Date
+    description: string | null
+    price: number
+    kategorieId: string
+    createdAt: Date
+    updatedAt: Date
     img: string
     _count: GerichtCountAggregateOutputType | null
     _avg: GerichtAvgAggregateOutputType | null
@@ -8859,15 +8779,15 @@ export namespace Prisma {
   export type GerichtSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
-    preis?: boolean
+    description?: boolean
+    price?: boolean
     kategorieId?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     img?: boolean
     kategorie?: boolean | KategorieDefaultArgs<ExtArgs>
     zutaten?: boolean | Gericht$zutatenArgs<ExtArgs>
-    Bewertung?: boolean | Gericht$BewertungArgs<ExtArgs>
+    bewertungen?: boolean | Gericht$bewertungenArgs<ExtArgs>
     _count?: boolean | GerichtCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["gericht"]>
 
@@ -8876,19 +8796,19 @@ export namespace Prisma {
   export type GerichtSelectScalar = {
     id?: boolean
     name?: boolean
-    beschreibung?: boolean
-    preis?: boolean
+    description?: boolean
+    price?: boolean
     kategorieId?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     img?: boolean
   }
 
-  export type GerichtOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "beschreibung" | "preis" | "kategorieId" | "erstelltAm" | "aktualisiertAm" | "img", ExtArgs["result"]["gericht"]>
+  export type GerichtOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "price" | "kategorieId" | "createdAt" | "updatedAt" | "img", ExtArgs["result"]["gericht"]>
   export type GerichtInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     kategorie?: boolean | KategorieDefaultArgs<ExtArgs>
     zutaten?: boolean | Gericht$zutatenArgs<ExtArgs>
-    Bewertung?: boolean | Gericht$BewertungArgs<ExtArgs>
+    bewertungen?: boolean | Gericht$bewertungenArgs<ExtArgs>
     _count?: boolean | GerichtCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8897,16 +8817,16 @@ export namespace Prisma {
     objects: {
       kategorie: Prisma.$KategoriePayload<ExtArgs>
       zutaten: Prisma.$ZutatPayload<ExtArgs>[]
-      Bewertung: Prisma.$BewertungPayload<ExtArgs>[]
+      bewertungen: Prisma.$BewertungPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
-      beschreibung: string | null
-      preis: number
-      kategorieId: number
-      erstelltAm: Date
-      aktualisiertAm: Date
+      description: string | null
+      price: number
+      kategorieId: string
+      createdAt: Date
+      updatedAt: Date
       img: string
     }, ExtArgs["result"]["gericht"]>
     composites: {}
@@ -9250,7 +9170,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     kategorie<T extends KategorieDefaultArgs<ExtArgs> = {}>(args?: Subset<T, KategorieDefaultArgs<ExtArgs>>): Prisma__KategorieClient<$Result.GetResult<Prisma.$KategoriePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     zutaten<T extends Gericht$zutatenArgs<ExtArgs> = {}>(args?: Subset<T, Gericht$zutatenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ZutatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    Bewertung<T extends Gericht$BewertungArgs<ExtArgs> = {}>(args?: Subset<T, Gericht$BewertungArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BewertungPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    bewertungen<T extends Gericht$bewertungenArgs<ExtArgs> = {}>(args?: Subset<T, Gericht$bewertungenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BewertungPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9280,13 +9200,13 @@ export namespace Prisma {
    * Fields of the Gericht model
    */
   interface GerichtFieldRefs {
-    readonly id: FieldRef<"Gericht", 'Int'>
+    readonly id: FieldRef<"Gericht", 'String'>
     readonly name: FieldRef<"Gericht", 'String'>
-    readonly beschreibung: FieldRef<"Gericht", 'String'>
-    readonly preis: FieldRef<"Gericht", 'Float'>
-    readonly kategorieId: FieldRef<"Gericht", 'Int'>
-    readonly erstelltAm: FieldRef<"Gericht", 'DateTime'>
-    readonly aktualisiertAm: FieldRef<"Gericht", 'DateTime'>
+    readonly description: FieldRef<"Gericht", 'String'>
+    readonly price: FieldRef<"Gericht", 'Float'>
+    readonly kategorieId: FieldRef<"Gericht", 'String'>
+    readonly createdAt: FieldRef<"Gericht", 'DateTime'>
+    readonly updatedAt: FieldRef<"Gericht", 'DateTime'>
     readonly img: FieldRef<"Gericht", 'String'>
   }
     
@@ -9655,9 +9575,9 @@ export namespace Prisma {
   }
 
   /**
-   * Gericht.Bewertung
+   * Gericht.bewertungen
    */
-  export type Gericht$BewertungArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Gericht$bewertungenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Bewertung
      */
@@ -9703,64 +9623,46 @@ export namespace Prisma {
 
   export type AggregateZutat = {
     _count: ZutatCountAggregateOutputType | null
-    _avg: ZutatAvgAggregateOutputType | null
-    _sum: ZutatSumAggregateOutputType | null
     _min: ZutatMinAggregateOutputType | null
     _max: ZutatMaxAggregateOutputType | null
   }
 
-  export type ZutatAvgAggregateOutputType = {
-    id: number | null
-  }
-
-  export type ZutatSumAggregateOutputType = {
-    id: number | null
-  }
-
   export type ZutatMinAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    istAllergen: boolean | null
+    isAllergen: boolean | null
   }
 
   export type ZutatMaxAggregateOutputType = {
-    id: number | null
+    id: string | null
     name: string | null
-    istAllergen: boolean | null
+    isAllergen: boolean | null
   }
 
   export type ZutatCountAggregateOutputType = {
     id: number
     name: number
-    istAllergen: number
+    isAllergen: number
     _all: number
   }
 
 
-  export type ZutatAvgAggregateInputType = {
-    id?: true
-  }
-
-  export type ZutatSumAggregateInputType = {
-    id?: true
-  }
-
   export type ZutatMinAggregateInputType = {
     id?: true
     name?: true
-    istAllergen?: true
+    isAllergen?: true
   }
 
   export type ZutatMaxAggregateInputType = {
     id?: true
     name?: true
-    istAllergen?: true
+    isAllergen?: true
   }
 
   export type ZutatCountAggregateInputType = {
     id?: true
     name?: true
-    istAllergen?: true
+    isAllergen?: true
     _all?: true
   }
 
@@ -9802,18 +9704,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: ZutatAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: ZutatSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: ZutatMinAggregateInputType
@@ -9844,19 +9734,15 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ZutatCountAggregateInputType | true
-    _avg?: ZutatAvgAggregateInputType
-    _sum?: ZutatSumAggregateInputType
     _min?: ZutatMinAggregateInputType
     _max?: ZutatMaxAggregateInputType
   }
 
   export type ZutatGroupByOutputType = {
-    id: number
+    id: string
     name: string
-    istAllergen: boolean
+    isAllergen: boolean
     _count: ZutatCountAggregateOutputType | null
-    _avg: ZutatAvgAggregateOutputType | null
-    _sum: ZutatSumAggregateOutputType | null
     _min: ZutatMinAggregateOutputType | null
     _max: ZutatMaxAggregateOutputType | null
   }
@@ -9878,7 +9764,7 @@ export namespace Prisma {
   export type ZutatSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    istAllergen?: boolean
+    isAllergen?: boolean
     gerichte?: boolean | Zutat$gerichteArgs<ExtArgs>
     _count?: boolean | ZutatCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["zutat"]>
@@ -9888,10 +9774,10 @@ export namespace Prisma {
   export type ZutatSelectScalar = {
     id?: boolean
     name?: boolean
-    istAllergen?: boolean
+    isAllergen?: boolean
   }
 
-  export type ZutatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "istAllergen", ExtArgs["result"]["zutat"]>
+  export type ZutatOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "isAllergen", ExtArgs["result"]["zutat"]>
   export type ZutatInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     gerichte?: boolean | Zutat$gerichteArgs<ExtArgs>
     _count?: boolean | ZutatCountOutputTypeDefaultArgs<ExtArgs>
@@ -9903,9 +9789,9 @@ export namespace Prisma {
       gerichte: Prisma.$GerichtPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
+      id: string
       name: string
-      istAllergen: boolean
+      isAllergen: boolean
     }, ExtArgs["result"]["zutat"]>
     composites: {}
   }
@@ -10276,9 +10162,9 @@ export namespace Prisma {
    * Fields of the Zutat model
    */
   interface ZutatFieldRefs {
-    readonly id: FieldRef<"Zutat", 'Int'>
+    readonly id: FieldRef<"Zutat", 'String'>
     readonly name: FieldRef<"Zutat", 'String'>
-    readonly istAllergen: FieldRef<"Zutat", 'Boolean'>
+    readonly isAllergen: FieldRef<"Zutat", 'Boolean'>
   }
     
 
@@ -10677,33 +10563,29 @@ export namespace Prisma {
   }
 
   export type BewertungAvgAggregateOutputType = {
-    id: number | null
-    gerichtId: number | null
     bewertung: number | null
   }
 
   export type BewertungSumAggregateOutputType = {
-    id: number | null
-    gerichtId: number | null
     bewertung: number | null
   }
 
   export type BewertungMinAggregateOutputType = {
-    id: number | null
-    gerichtId: number | null
+    id: string | null
+    gerichtId: string | null
     bewertung: number | null
     kommentar: string | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type BewertungMaxAggregateOutputType = {
-    id: number | null
-    gerichtId: number | null
+    id: string | null
+    gerichtId: string | null
     bewertung: number | null
     kommentar: string | null
-    erstelltAm: Date | null
-    aktualisiertAm: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type BewertungCountAggregateOutputType = {
@@ -10711,21 +10593,17 @@ export namespace Prisma {
     gerichtId: number
     bewertung: number
     kommentar: number
-    erstelltAm: number
-    aktualisiertAm: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type BewertungAvgAggregateInputType = {
-    id?: true
-    gerichtId?: true
     bewertung?: true
   }
 
   export type BewertungSumAggregateInputType = {
-    id?: true
-    gerichtId?: true
     bewertung?: true
   }
 
@@ -10734,8 +10612,8 @@ export namespace Prisma {
     gerichtId?: true
     bewertung?: true
     kommentar?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type BewertungMaxAggregateInputType = {
@@ -10743,8 +10621,8 @@ export namespace Prisma {
     gerichtId?: true
     bewertung?: true
     kommentar?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type BewertungCountAggregateInputType = {
@@ -10752,8 +10630,8 @@ export namespace Prisma {
     gerichtId?: true
     bewertung?: true
     kommentar?: true
-    erstelltAm?: true
-    aktualisiertAm?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -10844,12 +10722,12 @@ export namespace Prisma {
   }
 
   export type BewertungGroupByOutputType = {
-    id: number
-    gerichtId: number
+    id: string
+    gerichtId: string
     bewertung: number
     kommentar: string | null
-    erstelltAm: Date
-    aktualisiertAm: Date
+    createdAt: Date
+    updatedAt: Date
     _count: BewertungCountAggregateOutputType | null
     _avg: BewertungAvgAggregateOutputType | null
     _sum: BewertungSumAggregateOutputType | null
@@ -10876,8 +10754,8 @@ export namespace Prisma {
     gerichtId?: boolean
     bewertung?: boolean
     kommentar?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     gericht?: boolean | GerichtDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["bewertung"]>
 
@@ -10888,11 +10766,11 @@ export namespace Prisma {
     gerichtId?: boolean
     bewertung?: boolean
     kommentar?: boolean
-    erstelltAm?: boolean
-    aktualisiertAm?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type BewertungOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gerichtId" | "bewertung" | "kommentar" | "erstelltAm" | "aktualisiertAm", ExtArgs["result"]["bewertung"]>
+  export type BewertungOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "gerichtId" | "bewertung" | "kommentar" | "createdAt" | "updatedAt", ExtArgs["result"]["bewertung"]>
   export type BewertungInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     gericht?: boolean | GerichtDefaultArgs<ExtArgs>
   }
@@ -10903,12 +10781,12 @@ export namespace Prisma {
       gericht: Prisma.$GerichtPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
-      id: number
-      gerichtId: number
+      id: string
+      gerichtId: string
       bewertung: number
       kommentar: string | null
-      erstelltAm: Date
-      aktualisiertAm: Date
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["bewertung"]>
     composites: {}
   }
@@ -11279,12 +11157,12 @@ export namespace Prisma {
    * Fields of the Bewertung model
    */
   interface BewertungFieldRefs {
-    readonly id: FieldRef<"Bewertung", 'Int'>
-    readonly gerichtId: FieldRef<"Bewertung", 'Int'>
+    readonly id: FieldRef<"Bewertung", 'String'>
+    readonly gerichtId: FieldRef<"Bewertung", 'String'>
     readonly bewertung: FieldRef<"Bewertung", 'Int'>
     readonly kommentar: FieldRef<"Bewertung", 'String'>
-    readonly erstelltAm: FieldRef<"Bewertung", 'DateTime'>
-    readonly aktualisiertAm: FieldRef<"Bewertung", 'DateTime'>
+    readonly createdAt: FieldRef<"Bewertung", 'DateTime'>
+    readonly updatedAt: FieldRef<"Bewertung", 'DateTime'>
   }
     
 
@@ -11684,8 +11562,8 @@ export namespace Prisma {
   export const RestaurantScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    parrentCompName: 'parrentCompName',
-    parrentCompID: 'parrentCompID',
+    parentCompName: 'parentCompName',
+    parentCompID: 'parentCompID',
     menuId: 'menuId',
     memberSince: 'memberSince',
     locationID: 'locationID'
@@ -11697,7 +11575,7 @@ export namespace Prisma {
   export const LocationScalarFieldEnum: {
     id: 'id',
     street: 'street',
-    Hausnummer: 'Hausnummer',
+    houseNumber: 'houseNumber',
     town: 'town',
     postcode: 'postcode',
     country: 'country',
@@ -11720,9 +11598,9 @@ export namespace Prisma {
   export const MenuScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung',
-    erstelltAm: 'erstelltAm',
-    aktualisiertAm: 'aktualisiertAm',
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     restaurantID: 'restaurantID'
   };
 
@@ -11732,7 +11610,7 @@ export namespace Prisma {
   export const KategorieScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung',
+    description: 'description',
     menuId: 'menuId'
   };
 
@@ -11742,11 +11620,11 @@ export namespace Prisma {
   export const GerichtScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung',
-    preis: 'preis',
+    description: 'description',
+    price: 'price',
     kategorieId: 'kategorieId',
-    erstelltAm: 'erstelltAm',
-    aktualisiertAm: 'aktualisiertAm',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     img: 'img'
   };
 
@@ -11756,7 +11634,7 @@ export namespace Prisma {
   export const ZutatScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    istAllergen: 'istAllergen'
+    isAllergen: 'isAllergen'
   };
 
   export type ZutatScalarFieldEnum = (typeof ZutatScalarFieldEnum)[keyof typeof ZutatScalarFieldEnum]
@@ -11767,8 +11645,8 @@ export namespace Prisma {
     gerichtId: 'gerichtId',
     bewertung: 'bewertung',
     kommentar: 'kommentar',
-    erstelltAm: 'erstelltAm',
-    aktualisiertAm: 'aktualisiertAm'
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type BewertungScalarFieldEnum = (typeof BewertungScalarFieldEnum)[keyof typeof BewertungScalarFieldEnum]
@@ -11811,8 +11689,8 @@ export namespace Prisma {
   export const RestaurantOrderByRelevanceFieldEnum: {
     id: 'id',
     name: 'name',
-    parrentCompName: 'parrentCompName',
-    parrentCompID: 'parrentCompID',
+    parentCompName: 'parentCompName',
+    parentCompID: 'parentCompID',
     menuId: 'menuId',
     locationID: 'locationID'
   };
@@ -11823,7 +11701,7 @@ export namespace Prisma {
   export const LocationOrderByRelevanceFieldEnum: {
     id: 'id',
     street: 'street',
-    Hausnummer: 'Hausnummer',
+    houseNumber: 'houseNumber',
     town: 'town',
     postcode: 'postcode',
     country: 'country',
@@ -11844,8 +11722,9 @@ export namespace Prisma {
 
 
   export const MenuOrderByRelevanceFieldEnum: {
+    id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung',
+    description: 'description',
     restaurantID: 'restaurantID'
   };
 
@@ -11853,16 +11732,20 @@ export namespace Prisma {
 
 
   export const KategorieOrderByRelevanceFieldEnum: {
+    id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung'
+    description: 'description',
+    menuId: 'menuId'
   };
 
   export type KategorieOrderByRelevanceFieldEnum = (typeof KategorieOrderByRelevanceFieldEnum)[keyof typeof KategorieOrderByRelevanceFieldEnum]
 
 
   export const GerichtOrderByRelevanceFieldEnum: {
+    id: 'id',
     name: 'name',
-    beschreibung: 'beschreibung',
+    description: 'description',
+    kategorieId: 'kategorieId',
     img: 'img'
   };
 
@@ -11870,6 +11753,7 @@ export namespace Prisma {
 
 
   export const ZutatOrderByRelevanceFieldEnum: {
+    id: 'id',
     name: 'name'
   };
 
@@ -11877,6 +11761,8 @@ export namespace Prisma {
 
 
   export const BewertungOrderByRelevanceFieldEnum: {
+    id: 'id',
+    gerichtId: 'gerichtId',
     kommentar: 'kommentar'
   };
 
@@ -11910,13 +11796,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -11927,6 +11806,13 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
   /**
    * Deep Input Types
@@ -12046,27 +11932,27 @@ export namespace Prisma {
     NOT?: RestaurantWhereInput | RestaurantWhereInput[]
     id?: StringFilter<"Restaurant"> | string
     name?: StringFilter<"Restaurant"> | string
-    parrentCompName?: StringFilter<"Restaurant"> | string
-    parrentCompID?: StringFilter<"Restaurant"> | string
+    parentCompName?: StringFilter<"Restaurant"> | string
+    parentCompID?: StringFilter<"Restaurant"> | string
     menuId?: StringFilter<"Restaurant"> | string
     memberSince?: DateTimeFilter<"Restaurant"> | Date | string
     locationID?: StringFilter<"Restaurant"> | string
     menu?: XOR<MenuNullableScalarRelationFilter, MenuWhereInput> | null
     location?: LocationListRelationFilter
-    reservierung?: ReservierungListRelationFilter
+    reservierungen?: ReservierungListRelationFilter
   }
 
   export type RestaurantOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    parrentCompName?: SortOrder
-    parrentCompID?: SortOrder
+    parentCompName?: SortOrder
+    parentCompID?: SortOrder
     menuId?: SortOrder
     memberSince?: SortOrder
     locationID?: SortOrder
     menu?: MenuOrderByWithRelationInput
     location?: LocationOrderByRelationAggregateInput
-    reservierung?: ReservierungOrderByRelationAggregateInput
+    reservierungen?: ReservierungOrderByRelationAggregateInput
     _relevance?: RestaurantOrderByRelevanceInput
   }
 
@@ -12078,19 +11964,19 @@ export namespace Prisma {
     OR?: RestaurantWhereInput[]
     NOT?: RestaurantWhereInput | RestaurantWhereInput[]
     name?: StringFilter<"Restaurant"> | string
-    parrentCompName?: StringFilter<"Restaurant"> | string
-    parrentCompID?: StringFilter<"Restaurant"> | string
+    parentCompName?: StringFilter<"Restaurant"> | string
+    parentCompID?: StringFilter<"Restaurant"> | string
     memberSince?: DateTimeFilter<"Restaurant"> | Date | string
     menu?: XOR<MenuNullableScalarRelationFilter, MenuWhereInput> | null
     location?: LocationListRelationFilter
-    reservierung?: ReservierungListRelationFilter
+    reservierungen?: ReservierungListRelationFilter
   }, "id" | "menuId" | "locationID">
 
   export type RestaurantOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    parrentCompName?: SortOrder
-    parrentCompID?: SortOrder
+    parentCompName?: SortOrder
+    parentCompID?: SortOrder
     menuId?: SortOrder
     memberSince?: SortOrder
     locationID?: SortOrder
@@ -12105,8 +11991,8 @@ export namespace Prisma {
     NOT?: RestaurantScalarWhereWithAggregatesInput | RestaurantScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Restaurant"> | string
     name?: StringWithAggregatesFilter<"Restaurant"> | string
-    parrentCompName?: StringWithAggregatesFilter<"Restaurant"> | string
-    parrentCompID?: StringWithAggregatesFilter<"Restaurant"> | string
+    parentCompName?: StringWithAggregatesFilter<"Restaurant"> | string
+    parentCompID?: StringWithAggregatesFilter<"Restaurant"> | string
     menuId?: StringWithAggregatesFilter<"Restaurant"> | string
     memberSince?: DateTimeWithAggregatesFilter<"Restaurant"> | Date | string
     locationID?: StringWithAggregatesFilter<"Restaurant"> | string
@@ -12118,7 +12004,7 @@ export namespace Prisma {
     NOT?: LocationWhereInput | LocationWhereInput[]
     id?: StringFilter<"Location"> | string
     street?: StringFilter<"Location"> | string
-    Hausnummer?: StringFilter<"Location"> | string
+    houseNumber?: StringFilter<"Location"> | string
     town?: StringFilter<"Location"> | string
     postcode?: StringFilter<"Location"> | string
     country?: StringFilter<"Location"> | string
@@ -12130,7 +12016,7 @@ export namespace Prisma {
   export type LocationOrderByWithRelationInput = {
     id?: SortOrder
     street?: SortOrder
-    Hausnummer?: SortOrder
+    houseNumber?: SortOrder
     town?: SortOrder
     postcode?: SortOrder
     country?: SortOrder
@@ -12147,7 +12033,7 @@ export namespace Prisma {
     OR?: LocationWhereInput[]
     NOT?: LocationWhereInput | LocationWhereInput[]
     street?: StringFilter<"Location"> | string
-    Hausnummer?: StringFilter<"Location"> | string
+    houseNumber?: StringFilter<"Location"> | string
     town?: StringFilter<"Location"> | string
     postcode?: StringFilter<"Location"> | string
     country?: StringFilter<"Location"> | string
@@ -12158,7 +12044,7 @@ export namespace Prisma {
   export type LocationOrderByWithAggregationInput = {
     id?: SortOrder
     street?: SortOrder
-    Hausnummer?: SortOrder
+    houseNumber?: SortOrder
     town?: SortOrder
     postcode?: SortOrder
     country?: SortOrder
@@ -12174,7 +12060,7 @@ export namespace Prisma {
     NOT?: LocationScalarWhereWithAggregatesInput | LocationScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Location"> | string
     street?: StringWithAggregatesFilter<"Location"> | string
-    Hausnummer?: StringWithAggregatesFilter<"Location"> | string
+    houseNumber?: StringWithAggregatesFilter<"Location"> | string
     town?: StringWithAggregatesFilter<"Location"> | string
     postcode?: StringWithAggregatesFilter<"Location"> | string
     country?: StringWithAggregatesFilter<"Location"> | string
@@ -12206,14 +12092,14 @@ export namespace Prisma {
   export type ReservierungWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     locationID?: string
-    restaurantID?: string
     AND?: ReservierungWhereInput | ReservierungWhereInput[]
     OR?: ReservierungWhereInput[]
     NOT?: ReservierungWhereInput | ReservierungWhereInput[]
+    restaurantID?: StringFilter<"Reservierung"> | string
     phoneNum?: StringFilter<"Reservierung"> | string
     location?: XOR<LocationScalarRelationFilter, LocationWhereInput>
     restaurant?: XOR<RestaurantScalarRelationFilter, RestaurantWhereInput>
-  }, "id" | "locationID" | "restaurantID">
+  }, "id" | "locationID">
 
   export type ReservierungOrderByWithAggregationInput = {
     id?: SortOrder
@@ -12239,11 +12125,11 @@ export namespace Prisma {
     AND?: MenuWhereInput | MenuWhereInput[]
     OR?: MenuWhereInput[]
     NOT?: MenuWhereInput | MenuWhereInput[]
-    id?: IntFilter<"Menu"> | number
+    id?: StringFilter<"Menu"> | string
     name?: StringFilter<"Menu"> | string
-    beschreibung?: StringNullableFilter<"Menu"> | string | null
-    erstelltAm?: DateTimeFilter<"Menu"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Menu"> | Date | string
+    description?: StringNullableFilter<"Menu"> | string | null
+    createdAt?: DateTimeFilter<"Menu"> | Date | string
+    updatedAt?: DateTimeFilter<"Menu"> | Date | string
     restaurantID?: StringFilter<"Menu"> | string
     kategorien?: KategorieListRelationFilter
     restaurant?: XOR<RestaurantScalarRelationFilter, RestaurantWhereInput>
@@ -12252,9 +12138,9 @@ export namespace Prisma {
   export type MenuOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     restaurantID?: SortOrder
     kategorien?: KategorieOrderByRelationAggregateInput
     restaurant?: RestaurantOrderByWithRelationInput
@@ -12262,15 +12148,15 @@ export namespace Prisma {
   }
 
   export type MenuWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     restaurantID?: string
     AND?: MenuWhereInput | MenuWhereInput[]
     OR?: MenuWhereInput[]
     NOT?: MenuWhereInput | MenuWhereInput[]
     name?: StringFilter<"Menu"> | string
-    beschreibung?: StringNullableFilter<"Menu"> | string | null
-    erstelltAm?: DateTimeFilter<"Menu"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Menu"> | Date | string
+    description?: StringNullableFilter<"Menu"> | string | null
+    createdAt?: DateTimeFilter<"Menu"> | Date | string
+    updatedAt?: DateTimeFilter<"Menu"> | Date | string
     kategorien?: KategorieListRelationFilter
     restaurant?: XOR<RestaurantScalarRelationFilter, RestaurantWhereInput>
   }, "id" | "restaurantID">
@@ -12278,26 +12164,24 @@ export namespace Prisma {
   export type MenuOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     restaurantID?: SortOrder
     _count?: MenuCountOrderByAggregateInput
-    _avg?: MenuAvgOrderByAggregateInput
     _max?: MenuMaxOrderByAggregateInput
     _min?: MenuMinOrderByAggregateInput
-    _sum?: MenuSumOrderByAggregateInput
   }
 
   export type MenuScalarWhereWithAggregatesInput = {
     AND?: MenuScalarWhereWithAggregatesInput | MenuScalarWhereWithAggregatesInput[]
     OR?: MenuScalarWhereWithAggregatesInput[]
     NOT?: MenuScalarWhereWithAggregatesInput | MenuScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Menu"> | number
+    id?: StringWithAggregatesFilter<"Menu"> | string
     name?: StringWithAggregatesFilter<"Menu"> | string
-    beschreibung?: StringNullableWithAggregatesFilter<"Menu"> | string | null
-    erstelltAm?: DateTimeWithAggregatesFilter<"Menu"> | Date | string
-    aktualisiertAm?: DateTimeWithAggregatesFilter<"Menu"> | Date | string
+    description?: StringNullableWithAggregatesFilter<"Menu"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Menu"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Menu"> | Date | string
     restaurantID?: StringWithAggregatesFilter<"Menu"> | string
   }
 
@@ -12305,10 +12189,10 @@ export namespace Prisma {
     AND?: KategorieWhereInput | KategorieWhereInput[]
     OR?: KategorieWhereInput[]
     NOT?: KategorieWhereInput | KategorieWhereInput[]
-    id?: IntFilter<"Kategorie"> | number
+    id?: StringFilter<"Kategorie"> | string
     name?: StringFilter<"Kategorie"> | string
-    beschreibung?: StringNullableFilter<"Kategorie"> | string | null
-    menuId?: IntFilter<"Kategorie"> | number
+    description?: StringNullableFilter<"Kategorie"> | string | null
+    menuId?: StringFilter<"Kategorie"> | string
     menu?: XOR<MenuScalarRelationFilter, MenuWhereInput>
     gerichte?: GerichtListRelationFilter
   }
@@ -12316,7 +12200,7 @@ export namespace Prisma {
   export type KategorieOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
     menuId?: SortOrder
     menu?: MenuOrderByWithRelationInput
     gerichte?: GerichtOrderByRelationAggregateInput
@@ -12324,13 +12208,13 @@ export namespace Prisma {
   }
 
   export type KategorieWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: KategorieWhereInput | KategorieWhereInput[]
     OR?: KategorieWhereInput[]
     NOT?: KategorieWhereInput | KategorieWhereInput[]
     name?: StringFilter<"Kategorie"> | string
-    beschreibung?: StringNullableFilter<"Kategorie"> | string | null
-    menuId?: IntFilter<"Kategorie"> | number
+    description?: StringNullableFilter<"Kategorie"> | string | null
+    menuId?: StringFilter<"Kategorie"> | string
     menu?: XOR<MenuScalarRelationFilter, MenuWhereInput>
     gerichte?: GerichtListRelationFilter
   }, "id">
@@ -12338,82 +12222,80 @@ export namespace Prisma {
   export type KategorieOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
+    description?: SortOrderInput | SortOrder
     menuId?: SortOrder
     _count?: KategorieCountOrderByAggregateInput
-    _avg?: KategorieAvgOrderByAggregateInput
     _max?: KategorieMaxOrderByAggregateInput
     _min?: KategorieMinOrderByAggregateInput
-    _sum?: KategorieSumOrderByAggregateInput
   }
 
   export type KategorieScalarWhereWithAggregatesInput = {
     AND?: KategorieScalarWhereWithAggregatesInput | KategorieScalarWhereWithAggregatesInput[]
     OR?: KategorieScalarWhereWithAggregatesInput[]
     NOT?: KategorieScalarWhereWithAggregatesInput | KategorieScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Kategorie"> | number
+    id?: StringWithAggregatesFilter<"Kategorie"> | string
     name?: StringWithAggregatesFilter<"Kategorie"> | string
-    beschreibung?: StringNullableWithAggregatesFilter<"Kategorie"> | string | null
-    menuId?: IntWithAggregatesFilter<"Kategorie"> | number
+    description?: StringNullableWithAggregatesFilter<"Kategorie"> | string | null
+    menuId?: StringWithAggregatesFilter<"Kategorie"> | string
   }
 
   export type GerichtWhereInput = {
     AND?: GerichtWhereInput | GerichtWhereInput[]
     OR?: GerichtWhereInput[]
     NOT?: GerichtWhereInput | GerichtWhereInput[]
-    id?: IntFilter<"Gericht"> | number
+    id?: StringFilter<"Gericht"> | string
     name?: StringFilter<"Gericht"> | string
-    beschreibung?: StringNullableFilter<"Gericht"> | string | null
-    preis?: FloatFilter<"Gericht"> | number
-    kategorieId?: IntFilter<"Gericht"> | number
-    erstelltAm?: DateTimeFilter<"Gericht"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Gericht"> | Date | string
+    description?: StringNullableFilter<"Gericht"> | string | null
+    price?: FloatFilter<"Gericht"> | number
+    kategorieId?: StringFilter<"Gericht"> | string
+    createdAt?: DateTimeFilter<"Gericht"> | Date | string
+    updatedAt?: DateTimeFilter<"Gericht"> | Date | string
     img?: StringFilter<"Gericht"> | string
     kategorie?: XOR<KategorieScalarRelationFilter, KategorieWhereInput>
     zutaten?: ZutatListRelationFilter
-    Bewertung?: BewertungListRelationFilter
+    bewertungen?: BewertungListRelationFilter
   }
 
   export type GerichtOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
-    preis?: SortOrder
+    description?: SortOrderInput | SortOrder
+    price?: SortOrder
     kategorieId?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     img?: SortOrder
     kategorie?: KategorieOrderByWithRelationInput
     zutaten?: ZutatOrderByRelationAggregateInput
-    Bewertung?: BewertungOrderByRelationAggregateInput
+    bewertungen?: BewertungOrderByRelationAggregateInput
     _relevance?: GerichtOrderByRelevanceInput
   }
 
   export type GerichtWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: GerichtWhereInput | GerichtWhereInput[]
     OR?: GerichtWhereInput[]
     NOT?: GerichtWhereInput | GerichtWhereInput[]
     name?: StringFilter<"Gericht"> | string
-    beschreibung?: StringNullableFilter<"Gericht"> | string | null
-    preis?: FloatFilter<"Gericht"> | number
-    kategorieId?: IntFilter<"Gericht"> | number
-    erstelltAm?: DateTimeFilter<"Gericht"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Gericht"> | Date | string
+    description?: StringNullableFilter<"Gericht"> | string | null
+    price?: FloatFilter<"Gericht"> | number
+    kategorieId?: StringFilter<"Gericht"> | string
+    createdAt?: DateTimeFilter<"Gericht"> | Date | string
+    updatedAt?: DateTimeFilter<"Gericht"> | Date | string
     img?: StringFilter<"Gericht"> | string
     kategorie?: XOR<KategorieScalarRelationFilter, KategorieWhereInput>
     zutaten?: ZutatListRelationFilter
-    Bewertung?: BewertungListRelationFilter
+    bewertungen?: BewertungListRelationFilter
   }, "id">
 
   export type GerichtOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrderInput | SortOrder
-    preis?: SortOrder
+    description?: SortOrderInput | SortOrder
+    price?: SortOrder
     kategorieId?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     img?: SortOrder
     _count?: GerichtCountOrderByAggregateInput
     _avg?: GerichtAvgOrderByAggregateInput
@@ -12426,13 +12308,13 @@ export namespace Prisma {
     AND?: GerichtScalarWhereWithAggregatesInput | GerichtScalarWhereWithAggregatesInput[]
     OR?: GerichtScalarWhereWithAggregatesInput[]
     NOT?: GerichtScalarWhereWithAggregatesInput | GerichtScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Gericht"> | number
+    id?: StringWithAggregatesFilter<"Gericht"> | string
     name?: StringWithAggregatesFilter<"Gericht"> | string
-    beschreibung?: StringNullableWithAggregatesFilter<"Gericht"> | string | null
-    preis?: FloatWithAggregatesFilter<"Gericht"> | number
-    kategorieId?: IntWithAggregatesFilter<"Gericht"> | number
-    erstelltAm?: DateTimeWithAggregatesFilter<"Gericht"> | Date | string
-    aktualisiertAm?: DateTimeWithAggregatesFilter<"Gericht"> | Date | string
+    description?: StringNullableWithAggregatesFilter<"Gericht"> | string | null
+    price?: FloatWithAggregatesFilter<"Gericht"> | number
+    kategorieId?: StringWithAggregatesFilter<"Gericht"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Gericht"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Gericht"> | Date | string
     img?: StringWithAggregatesFilter<"Gericht"> | string
   }
 
@@ -12440,60 +12322,58 @@ export namespace Prisma {
     AND?: ZutatWhereInput | ZutatWhereInput[]
     OR?: ZutatWhereInput[]
     NOT?: ZutatWhereInput | ZutatWhereInput[]
-    id?: IntFilter<"Zutat"> | number
+    id?: StringFilter<"Zutat"> | string
     name?: StringFilter<"Zutat"> | string
-    istAllergen?: BoolFilter<"Zutat"> | boolean
+    isAllergen?: BoolFilter<"Zutat"> | boolean
     gerichte?: GerichtListRelationFilter
   }
 
   export type ZutatOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    istAllergen?: SortOrder
+    isAllergen?: SortOrder
     gerichte?: GerichtOrderByRelationAggregateInput
     _relevance?: ZutatOrderByRelevanceInput
   }
 
   export type ZutatWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: ZutatWhereInput | ZutatWhereInput[]
     OR?: ZutatWhereInput[]
     NOT?: ZutatWhereInput | ZutatWhereInput[]
     name?: StringFilter<"Zutat"> | string
-    istAllergen?: BoolFilter<"Zutat"> | boolean
+    isAllergen?: BoolFilter<"Zutat"> | boolean
     gerichte?: GerichtListRelationFilter
   }, "id">
 
   export type ZutatOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    istAllergen?: SortOrder
+    isAllergen?: SortOrder
     _count?: ZutatCountOrderByAggregateInput
-    _avg?: ZutatAvgOrderByAggregateInput
     _max?: ZutatMaxOrderByAggregateInput
     _min?: ZutatMinOrderByAggregateInput
-    _sum?: ZutatSumOrderByAggregateInput
   }
 
   export type ZutatScalarWhereWithAggregatesInput = {
     AND?: ZutatScalarWhereWithAggregatesInput | ZutatScalarWhereWithAggregatesInput[]
     OR?: ZutatScalarWhereWithAggregatesInput[]
     NOT?: ZutatScalarWhereWithAggregatesInput | ZutatScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Zutat"> | number
+    id?: StringWithAggregatesFilter<"Zutat"> | string
     name?: StringWithAggregatesFilter<"Zutat"> | string
-    istAllergen?: BoolWithAggregatesFilter<"Zutat"> | boolean
+    isAllergen?: BoolWithAggregatesFilter<"Zutat"> | boolean
   }
 
   export type BewertungWhereInput = {
     AND?: BewertungWhereInput | BewertungWhereInput[]
     OR?: BewertungWhereInput[]
     NOT?: BewertungWhereInput | BewertungWhereInput[]
-    id?: IntFilter<"Bewertung"> | number
-    gerichtId?: IntFilter<"Bewertung"> | number
+    id?: StringFilter<"Bewertung"> | string
+    gerichtId?: StringFilter<"Bewertung"> | string
     bewertung?: IntFilter<"Bewertung"> | number
     kommentar?: StringNullableFilter<"Bewertung"> | string | null
-    erstelltAm?: DateTimeFilter<"Bewertung"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Bewertung"> | Date | string
+    createdAt?: DateTimeFilter<"Bewertung"> | Date | string
+    updatedAt?: DateTimeFilter<"Bewertung"> | Date | string
     gericht?: XOR<GerichtScalarRelationFilter, GerichtWhereInput>
   }
 
@@ -12502,22 +12382,22 @@ export namespace Prisma {
     gerichtId?: SortOrder
     bewertung?: SortOrder
     kommentar?: SortOrderInput | SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     gericht?: GerichtOrderByWithRelationInput
     _relevance?: BewertungOrderByRelevanceInput
   }
 
   export type BewertungWhereUniqueInput = Prisma.AtLeast<{
-    id?: number
+    id?: string
     AND?: BewertungWhereInput | BewertungWhereInput[]
     OR?: BewertungWhereInput[]
     NOT?: BewertungWhereInput | BewertungWhereInput[]
-    gerichtId?: IntFilter<"Bewertung"> | number
+    gerichtId?: StringFilter<"Bewertung"> | string
     bewertung?: IntFilter<"Bewertung"> | number
     kommentar?: StringNullableFilter<"Bewertung"> | string | null
-    erstelltAm?: DateTimeFilter<"Bewertung"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Bewertung"> | Date | string
+    createdAt?: DateTimeFilter<"Bewertung"> | Date | string
+    updatedAt?: DateTimeFilter<"Bewertung"> | Date | string
     gericht?: XOR<GerichtScalarRelationFilter, GerichtWhereInput>
   }, "id">
 
@@ -12526,8 +12406,8 @@ export namespace Prisma {
     gerichtId?: SortOrder
     bewertung?: SortOrder
     kommentar?: SortOrderInput | SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: BewertungCountOrderByAggregateInput
     _avg?: BewertungAvgOrderByAggregateInput
     _max?: BewertungMaxOrderByAggregateInput
@@ -12539,12 +12419,12 @@ export namespace Prisma {
     AND?: BewertungScalarWhereWithAggregatesInput | BewertungScalarWhereWithAggregatesInput[]
     OR?: BewertungScalarWhereWithAggregatesInput[]
     NOT?: BewertungScalarWhereWithAggregatesInput | BewertungScalarWhereWithAggregatesInput[]
-    id?: IntWithAggregatesFilter<"Bewertung"> | number
-    gerichtId?: IntWithAggregatesFilter<"Bewertung"> | number
+    id?: StringWithAggregatesFilter<"Bewertung"> | string
+    gerichtId?: StringWithAggregatesFilter<"Bewertung"> | string
     bewertung?: IntWithAggregatesFilter<"Bewertung"> | number
     kommentar?: StringNullableWithAggregatesFilter<"Bewertung"> | string | null
-    erstelltAm?: DateTimeWithAggregatesFilter<"Bewertung"> | Date | string
-    aktualisiertAm?: DateTimeWithAggregatesFilter<"Bewertung"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"Bewertung"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Bewertung"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -12658,60 +12538,60 @@ export namespace Prisma {
   export type RestaurantCreateInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     menu?: MenuCreateNestedOneWithoutRestaurantInput
     location?: LocationCreateNestedManyWithoutRestaurantInput
-    reservierung?: ReservierungCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantUncheckedCreateInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     menu?: MenuUncheckedCreateNestedOneWithoutRestaurantInput
     location?: LocationUncheckedCreateNestedManyWithoutRestaurantInput
-    reservierung?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     menu?: MenuUpdateOneWithoutRestaurantNestedInput
     location?: LocationUpdateManyWithoutRestaurantNestedInput
-    reservierung?: ReservierungUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUpdateManyWithoutRestaurantNestedInput
   }
 
   export type RestaurantUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     menu?: MenuUncheckedUpdateOneWithoutRestaurantNestedInput
     location?: LocationUncheckedUpdateManyWithoutRestaurantNestedInput
-    reservierung?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
   }
 
   export type RestaurantCreateManyInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
@@ -12720,8 +12600,8 @@ export namespace Prisma {
   export type RestaurantUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
@@ -12730,8 +12610,8 @@ export namespace Prisma {
   export type RestaurantUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
@@ -12740,7 +12620,7 @@ export namespace Prisma {
   export type LocationCreateInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -12751,7 +12631,7 @@ export namespace Prisma {
   export type LocationUncheckedCreateInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -12762,7 +12642,7 @@ export namespace Prisma {
   export type LocationUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -12773,7 +12653,7 @@ export namespace Prisma {
   export type LocationUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -12784,7 +12664,7 @@ export namespace Prisma {
   export type LocationCreateManyInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -12794,7 +12674,7 @@ export namespace Prisma {
   export type LocationUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -12803,7 +12683,7 @@ export namespace Prisma {
   export type LocationUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -12814,7 +12694,7 @@ export namespace Prisma {
     id?: string
     phoneNum: string
     location: LocationCreateNestedOneWithoutReservierungInput
-    restaurant: RestaurantCreateNestedOneWithoutReservierungInput
+    restaurant: RestaurantCreateNestedOneWithoutReservierungenInput
   }
 
   export type ReservierungUncheckedCreateInput = {
@@ -12828,7 +12708,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     phoneNum?: StringFieldUpdateOperationsInput | string
     location?: LocationUpdateOneRequiredWithoutReservierungNestedInput
-    restaurant?: RestaurantUpdateOneRequiredWithoutReservierungNestedInput
+    restaurant?: RestaurantUpdateOneRequiredWithoutReservierungenNestedInput
   }
 
   export type ReservierungUncheckedUpdateInput = {
@@ -12858,298 +12738,313 @@ export namespace Prisma {
   }
 
   export type MenuCreateInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     kategorien?: KategorieCreateNestedManyWithoutMenuInput
     restaurant: RestaurantCreateNestedOneWithoutMenuInput
   }
 
   export type MenuUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     restaurantID: string
     kategorien?: KategorieUncheckedCreateNestedManyWithoutMenuInput
   }
 
   export type MenuUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     kategorien?: KategorieUpdateManyWithoutMenuNestedInput
     restaurant?: RestaurantUpdateOneRequiredWithoutMenuNestedInput
   }
 
   export type MenuUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     restaurantID?: StringFieldUpdateOperationsInput | string
     kategorien?: KategorieUncheckedUpdateManyWithoutMenuNestedInput
   }
 
   export type MenuCreateManyInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     restaurantID: string
   }
 
   export type MenuUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type MenuUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     restaurantID?: StringFieldUpdateOperationsInput | string
   }
 
   export type KategorieCreateInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
+    description?: string | null
     menu: MenuCreateNestedOneWithoutKategorienInput
     gerichte?: GerichtCreateNestedManyWithoutKategorieInput
   }
 
   export type KategorieUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    menuId: number
+    description?: string | null
+    menuId: string
     gerichte?: GerichtUncheckedCreateNestedManyWithoutKategorieInput
   }
 
   export type KategorieUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     menu?: MenuUpdateOneRequiredWithoutKategorienNestedInput
     gerichte?: GerichtUpdateManyWithoutKategorieNestedInput
   }
 
   export type KategorieUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    menuId?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    menuId?: StringFieldUpdateOperationsInput | string
     gerichte?: GerichtUncheckedUpdateManyWithoutKategorieNestedInput
   }
 
   export type KategorieCreateManyInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    menuId: number
+    description?: string | null
+    menuId: string
   }
 
   export type KategorieUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type KategorieUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    menuId?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    menuId?: StringFieldUpdateOperationsInput | string
   }
 
   export type GerichtCreateInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     kategorie: KategorieCreateNestedOneWithoutGerichteInput
     zutaten?: ZutatCreateNestedManyWithoutGerichteInput
-    Bewertung?: BewertungCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    kategorieId: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    kategorieId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     zutaten?: ZutatUncheckedCreateNestedManyWithoutGerichteInput
-    Bewertung?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     kategorie?: KategorieUpdateOneRequiredWithoutGerichteNestedInput
     zutaten?: ZutatUpdateManyWithoutGerichteNestedInput
-    Bewertung?: BewertungUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    kategorieId?: IntFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    kategorieId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     zutaten?: ZutatUncheckedUpdateManyWithoutGerichteNestedInput
-    Bewertung?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtCreateManyInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    kategorieId: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    kategorieId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
   }
 
   export type GerichtUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
   }
 
   export type GerichtUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    kategorieId?: IntFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    kategorieId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
   }
 
   export type ZutatCreateInput = {
+    id?: string
     name: string
-    istAllergen?: boolean
+    isAllergen?: boolean
     gerichte?: GerichtCreateNestedManyWithoutZutatenInput
   }
 
   export type ZutatUncheckedCreateInput = {
-    id?: number
+    id?: string
     name: string
-    istAllergen?: boolean
+    isAllergen?: boolean
     gerichte?: GerichtUncheckedCreateNestedManyWithoutZutatenInput
   }
 
   export type ZutatUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
     gerichte?: GerichtUpdateManyWithoutZutatenNestedInput
   }
 
   export type ZutatUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
     gerichte?: GerichtUncheckedUpdateManyWithoutZutatenNestedInput
   }
 
   export type ZutatCreateManyInput = {
-    id?: number
+    id?: string
     name: string
-    istAllergen?: boolean
+    isAllergen?: boolean
   }
 
   export type ZutatUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ZutatUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type BewertungCreateInput = {
+    id?: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
-    gericht: GerichtCreateNestedOneWithoutBewertungInput
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    gericht: GerichtCreateNestedOneWithoutBewertungenInput
   }
 
   export type BewertungUncheckedCreateInput = {
-    id?: number
-    gerichtId: number
+    id?: string
+    gerichtId: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type BewertungUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    gericht?: GerichtUpdateOneRequiredWithoutBewertungNestedInput
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    gericht?: GerichtUpdateOneRequiredWithoutBewertungenNestedInput
   }
 
   export type BewertungUncheckedUpdateInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    gerichtId?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    gerichtId?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BewertungCreateManyInput = {
-    id?: number
-    gerichtId: number
+    id?: string
+    gerichtId: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type BewertungUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BewertungUncheckedUpdateManyInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    gerichtId?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
+    gerichtId?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -13371,8 +13266,8 @@ export namespace Prisma {
   export type RestaurantCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    parrentCompName?: SortOrder
-    parrentCompID?: SortOrder
+    parentCompName?: SortOrder
+    parentCompID?: SortOrder
     menuId?: SortOrder
     memberSince?: SortOrder
     locationID?: SortOrder
@@ -13381,8 +13276,8 @@ export namespace Prisma {
   export type RestaurantMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    parrentCompName?: SortOrder
-    parrentCompID?: SortOrder
+    parentCompName?: SortOrder
+    parentCompID?: SortOrder
     menuId?: SortOrder
     memberSince?: SortOrder
     locationID?: SortOrder
@@ -13391,8 +13286,8 @@ export namespace Prisma {
   export type RestaurantMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    parrentCompName?: SortOrder
-    parrentCompID?: SortOrder
+    parentCompName?: SortOrder
+    parentCompID?: SortOrder
     menuId?: SortOrder
     memberSince?: SortOrder
     locationID?: SortOrder
@@ -13417,7 +13312,7 @@ export namespace Prisma {
   export type LocationCountOrderByAggregateInput = {
     id?: SortOrder
     street?: SortOrder
-    Hausnummer?: SortOrder
+    houseNumber?: SortOrder
     town?: SortOrder
     postcode?: SortOrder
     country?: SortOrder
@@ -13427,7 +13322,7 @@ export namespace Prisma {
   export type LocationMaxOrderByAggregateInput = {
     id?: SortOrder
     street?: SortOrder
-    Hausnummer?: SortOrder
+    houseNumber?: SortOrder
     town?: SortOrder
     postcode?: SortOrder
     country?: SortOrder
@@ -13437,7 +13332,7 @@ export namespace Prisma {
   export type LocationMinOrderByAggregateInput = {
     id?: SortOrder
     street?: SortOrder
-    Hausnummer?: SortOrder
+    houseNumber?: SortOrder
     town?: SortOrder
     postcode?: SortOrder
     country?: SortOrder
@@ -13476,17 +13371,6 @@ export namespace Prisma {
     phoneNum?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type KategorieListRelationFilter = {
     every?: KategorieWhereInput
     some?: KategorieWhereInput
@@ -13506,52 +13390,28 @@ export namespace Prisma {
   export type MenuCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     restaurantID?: SortOrder
-  }
-
-  export type MenuAvgOrderByAggregateInput = {
-    id?: SortOrder
   }
 
   export type MenuMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     restaurantID?: SortOrder
   }
 
   export type MenuMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     restaurantID?: SortOrder
-  }
-
-  export type MenuSumOrderByAggregateInput = {
-    id?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type MenuScalarRelationFilter = {
@@ -13578,31 +13438,21 @@ export namespace Prisma {
   export type KategorieCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    menuId?: SortOrder
-  }
-
-  export type KategorieAvgOrderByAggregateInput = {
-    id?: SortOrder
+    description?: SortOrder
     menuId?: SortOrder
   }
 
   export type KategorieMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
+    description?: SortOrder
     menuId?: SortOrder
   }
 
   export type KategorieMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    menuId?: SortOrder
-  }
-
-  export type KategorieSumOrderByAggregateInput = {
-    id?: SortOrder
+    description?: SortOrder
     menuId?: SortOrder
   }
 
@@ -13651,46 +13501,42 @@ export namespace Prisma {
   export type GerichtCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    preis?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
     kategorieId?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     img?: SortOrder
   }
 
   export type GerichtAvgOrderByAggregateInput = {
-    id?: SortOrder
-    preis?: SortOrder
-    kategorieId?: SortOrder
+    price?: SortOrder
   }
 
   export type GerichtMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    preis?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
     kategorieId?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     img?: SortOrder
   }
 
   export type GerichtMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    beschreibung?: SortOrder
-    preis?: SortOrder
+    description?: SortOrder
+    price?: SortOrder
     kategorieId?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     img?: SortOrder
   }
 
   export type GerichtSumOrderByAggregateInput = {
-    id?: SortOrder
-    preis?: SortOrder
-    kategorieId?: SortOrder
+    price?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -13723,27 +13569,19 @@ export namespace Prisma {
   export type ZutatCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    istAllergen?: SortOrder
-  }
-
-  export type ZutatAvgOrderByAggregateInput = {
-    id?: SortOrder
+    isAllergen?: SortOrder
   }
 
   export type ZutatMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    istAllergen?: SortOrder
+    isAllergen?: SortOrder
   }
 
   export type ZutatMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    istAllergen?: SortOrder
-  }
-
-  export type ZutatSumOrderByAggregateInput = {
-    id?: SortOrder
+    isAllergen?: SortOrder
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -13752,6 +13590,17 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type GerichtScalarRelationFilter = {
@@ -13770,13 +13619,11 @@ export namespace Prisma {
     gerichtId?: SortOrder
     bewertung?: SortOrder
     kommentar?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BewertungAvgOrderByAggregateInput = {
-    id?: SortOrder
-    gerichtId?: SortOrder
     bewertung?: SortOrder
   }
 
@@ -13785,8 +13632,8 @@ export namespace Prisma {
     gerichtId?: SortOrder
     bewertung?: SortOrder
     kommentar?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BewertungMinOrderByAggregateInput = {
@@ -13794,14 +13641,28 @@ export namespace Prisma {
     gerichtId?: SortOrder
     bewertung?: SortOrder
     kommentar?: SortOrder
-    erstelltAm?: SortOrder
-    aktualisiertAm?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type BewertungSumOrderByAggregateInput = {
-    id?: SortOrder
-    gerichtId?: SortOrder
     bewertung?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type SessionCreateNestedOneWithoutUsersInput = {
@@ -14046,9 +13907,9 @@ export namespace Prisma {
     connect?: LocationWhereUniqueInput
   }
 
-  export type RestaurantCreateNestedOneWithoutReservierungInput = {
-    create?: XOR<RestaurantCreateWithoutReservierungInput, RestaurantUncheckedCreateWithoutReservierungInput>
-    connectOrCreate?: RestaurantCreateOrConnectWithoutReservierungInput
+  export type RestaurantCreateNestedOneWithoutReservierungenInput = {
+    create?: XOR<RestaurantCreateWithoutReservierungenInput, RestaurantUncheckedCreateWithoutReservierungenInput>
+    connectOrCreate?: RestaurantCreateOrConnectWithoutReservierungenInput
     connect?: RestaurantWhereUniqueInput
   }
 
@@ -14060,12 +13921,12 @@ export namespace Prisma {
     update?: XOR<XOR<LocationUpdateToOneWithWhereWithoutReservierungInput, LocationUpdateWithoutReservierungInput>, LocationUncheckedUpdateWithoutReservierungInput>
   }
 
-  export type RestaurantUpdateOneRequiredWithoutReservierungNestedInput = {
-    create?: XOR<RestaurantCreateWithoutReservierungInput, RestaurantUncheckedCreateWithoutReservierungInput>
-    connectOrCreate?: RestaurantCreateOrConnectWithoutReservierungInput
-    upsert?: RestaurantUpsertWithoutReservierungInput
+  export type RestaurantUpdateOneRequiredWithoutReservierungenNestedInput = {
+    create?: XOR<RestaurantCreateWithoutReservierungenInput, RestaurantUncheckedCreateWithoutReservierungenInput>
+    connectOrCreate?: RestaurantCreateOrConnectWithoutReservierungenInput
+    upsert?: RestaurantUpsertWithoutReservierungenInput
     connect?: RestaurantWhereUniqueInput
-    update?: XOR<XOR<RestaurantUpdateToOneWithWhereWithoutReservierungInput, RestaurantUpdateWithoutReservierungInput>, RestaurantUncheckedUpdateWithoutReservierungInput>
+    update?: XOR<XOR<RestaurantUpdateToOneWithWhereWithoutReservierungenInput, RestaurantUpdateWithoutReservierungenInput>, RestaurantUncheckedUpdateWithoutReservierungenInput>
   }
 
   export type KategorieCreateNestedManyWithoutMenuInput = {
@@ -14108,14 +13969,6 @@ export namespace Prisma {
     upsert?: RestaurantUpsertWithoutMenuInput
     connect?: RestaurantWhereUniqueInput
     update?: XOR<XOR<RestaurantUpdateToOneWithWhereWithoutMenuInput, RestaurantUpdateWithoutMenuInput>, RestaurantUncheckedUpdateWithoutMenuInput>
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type KategorieUncheckedUpdateManyWithoutMenuNestedInput = {
@@ -14332,18 +14185,26 @@ export namespace Prisma {
     deleteMany?: GerichtScalarWhereInput | GerichtScalarWhereInput[]
   }
 
-  export type GerichtCreateNestedOneWithoutBewertungInput = {
-    create?: XOR<GerichtCreateWithoutBewertungInput, GerichtUncheckedCreateWithoutBewertungInput>
-    connectOrCreate?: GerichtCreateOrConnectWithoutBewertungInput
+  export type GerichtCreateNestedOneWithoutBewertungenInput = {
+    create?: XOR<GerichtCreateWithoutBewertungenInput, GerichtUncheckedCreateWithoutBewertungenInput>
+    connectOrCreate?: GerichtCreateOrConnectWithoutBewertungenInput
     connect?: GerichtWhereUniqueInput
   }
 
-  export type GerichtUpdateOneRequiredWithoutBewertungNestedInput = {
-    create?: XOR<GerichtCreateWithoutBewertungInput, GerichtUncheckedCreateWithoutBewertungInput>
-    connectOrCreate?: GerichtCreateOrConnectWithoutBewertungInput
-    upsert?: GerichtUpsertWithoutBewertungInput
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type GerichtUpdateOneRequiredWithoutBewertungenNestedInput = {
+    create?: XOR<GerichtCreateWithoutBewertungenInput, GerichtUncheckedCreateWithoutBewertungenInput>
+    connectOrCreate?: GerichtCreateOrConnectWithoutBewertungenInput
+    upsert?: GerichtUpsertWithoutBewertungenInput
     connect?: GerichtWhereUniqueInput
-    update?: XOR<XOR<GerichtUpdateToOneWithWhereWithoutBewertungInput, GerichtUpdateWithoutBewertungInput>, GerichtUncheckedUpdateWithoutBewertungInput>
+    update?: XOR<XOR<GerichtUpdateToOneWithWhereWithoutBewertungenInput, GerichtUpdateWithoutBewertungenInput>, GerichtUncheckedUpdateWithoutBewertungenInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -14476,22 +14337,6 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[]
@@ -14530,6 +14375,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type SessionCreateWithoutUsersInput = {
@@ -14626,19 +14487,20 @@ export namespace Prisma {
   }
 
   export type MenuCreateWithoutRestaurantInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     kategorien?: KategorieCreateNestedManyWithoutMenuInput
   }
 
   export type MenuUncheckedCreateWithoutRestaurantInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     kategorien?: KategorieUncheckedCreateNestedManyWithoutMenuInput
   }
 
@@ -14650,7 +14512,7 @@ export namespace Prisma {
   export type LocationCreateWithoutRestaurantInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -14660,7 +14522,7 @@ export namespace Prisma {
   export type LocationUncheckedCreateWithoutRestaurantInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -14711,19 +14573,20 @@ export namespace Prisma {
   }
 
   export type MenuUpdateWithoutRestaurantInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     kategorien?: KategorieUpdateManyWithoutMenuNestedInput
   }
 
   export type MenuUncheckedUpdateWithoutRestaurantInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     kategorien?: KategorieUncheckedUpdateManyWithoutMenuNestedInput
   }
 
@@ -14749,7 +14612,7 @@ export namespace Prisma {
     NOT?: LocationScalarWhereInput | LocationScalarWhereInput[]
     id?: StringFilter<"Location"> | string
     street?: StringFilter<"Location"> | string
-    Hausnummer?: StringFilter<"Location"> | string
+    houseNumber?: StringFilter<"Location"> | string
     town?: StringFilter<"Location"> | string
     postcode?: StringFilter<"Location"> | string
     country?: StringFilter<"Location"> | string
@@ -14785,25 +14648,25 @@ export namespace Prisma {
   export type RestaurantCreateWithoutLocationInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     menu?: MenuCreateNestedOneWithoutRestaurantInput
-    reservierung?: ReservierungCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantUncheckedCreateWithoutLocationInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     menu?: MenuUncheckedCreateNestedOneWithoutRestaurantInput
-    reservierung?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantCreateOrConnectWithoutLocationInput = {
@@ -14814,7 +14677,7 @@ export namespace Prisma {
   export type ReservierungCreateWithoutLocationInput = {
     id?: string
     phoneNum: string
-    restaurant: RestaurantCreateNestedOneWithoutReservierungInput
+    restaurant: RestaurantCreateNestedOneWithoutReservierungenInput
   }
 
   export type ReservierungUncheckedCreateWithoutLocationInput = {
@@ -14842,25 +14705,25 @@ export namespace Prisma {
   export type RestaurantUpdateWithoutLocationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     menu?: MenuUpdateOneWithoutRestaurantNestedInput
-    reservierung?: ReservierungUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUpdateManyWithoutRestaurantNestedInput
   }
 
   export type RestaurantUncheckedUpdateWithoutLocationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     menu?: MenuUncheckedUpdateOneWithoutRestaurantNestedInput
-    reservierung?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
   }
 
   export type ReservierungUpsertWithoutLocationInput = {
@@ -14877,7 +14740,7 @@ export namespace Prisma {
   export type ReservierungUpdateWithoutLocationInput = {
     id?: StringFieldUpdateOperationsInput | string
     phoneNum?: StringFieldUpdateOperationsInput | string
-    restaurant?: RestaurantUpdateOneRequiredWithoutReservierungNestedInput
+    restaurant?: RestaurantUpdateOneRequiredWithoutReservierungenNestedInput
   }
 
   export type ReservierungUncheckedUpdateWithoutLocationInput = {
@@ -14889,7 +14752,7 @@ export namespace Prisma {
   export type LocationCreateWithoutReservierungInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -14899,7 +14762,7 @@ export namespace Prisma {
   export type LocationUncheckedCreateWithoutReservierungInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -14911,11 +14774,11 @@ export namespace Prisma {
     create: XOR<LocationCreateWithoutReservierungInput, LocationUncheckedCreateWithoutReservierungInput>
   }
 
-  export type RestaurantCreateWithoutReservierungInput = {
+  export type RestaurantCreateWithoutReservierungenInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
@@ -14923,11 +14786,11 @@ export namespace Prisma {
     location?: LocationCreateNestedManyWithoutRestaurantInput
   }
 
-  export type RestaurantUncheckedCreateWithoutReservierungInput = {
+  export type RestaurantUncheckedCreateWithoutReservierungenInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
@@ -14935,9 +14798,9 @@ export namespace Prisma {
     location?: LocationUncheckedCreateNestedManyWithoutRestaurantInput
   }
 
-  export type RestaurantCreateOrConnectWithoutReservierungInput = {
+  export type RestaurantCreateOrConnectWithoutReservierungenInput = {
     where: RestaurantWhereUniqueInput
-    create: XOR<RestaurantCreateWithoutReservierungInput, RestaurantUncheckedCreateWithoutReservierungInput>
+    create: XOR<RestaurantCreateWithoutReservierungenInput, RestaurantUncheckedCreateWithoutReservierungenInput>
   }
 
   export type LocationUpsertWithoutReservierungInput = {
@@ -14954,7 +14817,7 @@ export namespace Prisma {
   export type LocationUpdateWithoutReservierungInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -14964,29 +14827,29 @@ export namespace Prisma {
   export type LocationUncheckedUpdateWithoutReservierungInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
     restaurantID?: StringFieldUpdateOperationsInput | string
   }
 
-  export type RestaurantUpsertWithoutReservierungInput = {
-    update: XOR<RestaurantUpdateWithoutReservierungInput, RestaurantUncheckedUpdateWithoutReservierungInput>
-    create: XOR<RestaurantCreateWithoutReservierungInput, RestaurantUncheckedCreateWithoutReservierungInput>
+  export type RestaurantUpsertWithoutReservierungenInput = {
+    update: XOR<RestaurantUpdateWithoutReservierungenInput, RestaurantUncheckedUpdateWithoutReservierungenInput>
+    create: XOR<RestaurantCreateWithoutReservierungenInput, RestaurantUncheckedCreateWithoutReservierungenInput>
     where?: RestaurantWhereInput
   }
 
-  export type RestaurantUpdateToOneWithWhereWithoutReservierungInput = {
+  export type RestaurantUpdateToOneWithWhereWithoutReservierungenInput = {
     where?: RestaurantWhereInput
-    data: XOR<RestaurantUpdateWithoutReservierungInput, RestaurantUncheckedUpdateWithoutReservierungInput>
+    data: XOR<RestaurantUpdateWithoutReservierungenInput, RestaurantUncheckedUpdateWithoutReservierungenInput>
   }
 
-  export type RestaurantUpdateWithoutReservierungInput = {
+  export type RestaurantUpdateWithoutReservierungenInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
@@ -14994,11 +14857,11 @@ export namespace Prisma {
     location?: LocationUpdateManyWithoutRestaurantNestedInput
   }
 
-  export type RestaurantUncheckedUpdateWithoutReservierungInput = {
+  export type RestaurantUncheckedUpdateWithoutReservierungenInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
@@ -15007,15 +14870,16 @@ export namespace Prisma {
   }
 
   export type KategorieCreateWithoutMenuInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
+    description?: string | null
     gerichte?: GerichtCreateNestedManyWithoutKategorieInput
   }
 
   export type KategorieUncheckedCreateWithoutMenuInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
+    description?: string | null
     gerichte?: GerichtUncheckedCreateNestedManyWithoutKategorieInput
   }
 
@@ -15032,25 +14896,25 @@ export namespace Prisma {
   export type RestaurantCreateWithoutMenuInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     location?: LocationCreateNestedManyWithoutRestaurantInput
-    reservierung?: ReservierungCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantUncheckedCreateWithoutMenuInput = {
     id?: string
     name: string
-    parrentCompName: string
-    parrentCompID: string
+    parentCompName: string
+    parentCompID: string
     menuId: string
     memberSince?: Date | string
     locationID: string
     location?: LocationUncheckedCreateNestedManyWithoutRestaurantInput
-    reservierung?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
+    reservierungen?: ReservierungUncheckedCreateNestedManyWithoutRestaurantInput
   }
 
   export type RestaurantCreateOrConnectWithoutMenuInput = {
@@ -15078,10 +14942,10 @@ export namespace Prisma {
     AND?: KategorieScalarWhereInput | KategorieScalarWhereInput[]
     OR?: KategorieScalarWhereInput[]
     NOT?: KategorieScalarWhereInput | KategorieScalarWhereInput[]
-    id?: IntFilter<"Kategorie"> | number
+    id?: StringFilter<"Kategorie"> | string
     name?: StringFilter<"Kategorie"> | string
-    beschreibung?: StringNullableFilter<"Kategorie"> | string | null
-    menuId?: IntFilter<"Kategorie"> | number
+    description?: StringNullableFilter<"Kategorie"> | string | null
+    menuId?: StringFilter<"Kategorie"> | string
   }
 
   export type RestaurantUpsertWithoutMenuInput = {
@@ -15098,41 +14962,42 @@ export namespace Prisma {
   export type RestaurantUpdateWithoutMenuInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     location?: LocationUpdateManyWithoutRestaurantNestedInput
-    reservierung?: ReservierungUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUpdateManyWithoutRestaurantNestedInput
   }
 
   export type RestaurantUncheckedUpdateWithoutMenuInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    parrentCompName?: StringFieldUpdateOperationsInput | string
-    parrentCompID?: StringFieldUpdateOperationsInput | string
+    parentCompName?: StringFieldUpdateOperationsInput | string
+    parentCompID?: StringFieldUpdateOperationsInput | string
     menuId?: StringFieldUpdateOperationsInput | string
     memberSince?: DateTimeFieldUpdateOperationsInput | Date | string
     locationID?: StringFieldUpdateOperationsInput | string
     location?: LocationUncheckedUpdateManyWithoutRestaurantNestedInput
-    reservierung?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
+    reservierungen?: ReservierungUncheckedUpdateManyWithoutRestaurantNestedInput
   }
 
   export type MenuCreateWithoutKategorienInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     restaurant: RestaurantCreateNestedOneWithoutMenuInput
   }
 
   export type MenuUncheckedCreateWithoutKategorienInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
     restaurantID: string
   }
 
@@ -15142,26 +15007,27 @@ export namespace Prisma {
   }
 
   export type GerichtCreateWithoutKategorieInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     zutaten?: ZutatCreateNestedManyWithoutGerichteInput
-    Bewertung?: BewertungCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtUncheckedCreateWithoutKategorieInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     zutaten?: ZutatUncheckedCreateNestedManyWithoutGerichteInput
-    Bewertung?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtCreateOrConnectWithoutKategorieInput = {
@@ -15186,19 +15052,20 @@ export namespace Prisma {
   }
 
   export type MenuUpdateWithoutKategorienInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     restaurant?: RestaurantUpdateOneRequiredWithoutMenuNestedInput
   }
 
   export type MenuUncheckedUpdateWithoutKategorienInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     restaurantID?: StringFieldUpdateOperationsInput | string
   }
 
@@ -15222,27 +15089,28 @@ export namespace Prisma {
     AND?: GerichtScalarWhereInput | GerichtScalarWhereInput[]
     OR?: GerichtScalarWhereInput[]
     NOT?: GerichtScalarWhereInput | GerichtScalarWhereInput[]
-    id?: IntFilter<"Gericht"> | number
+    id?: StringFilter<"Gericht"> | string
     name?: StringFilter<"Gericht"> | string
-    beschreibung?: StringNullableFilter<"Gericht"> | string | null
-    preis?: FloatFilter<"Gericht"> | number
-    kategorieId?: IntFilter<"Gericht"> | number
-    erstelltAm?: DateTimeFilter<"Gericht"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Gericht"> | Date | string
+    description?: StringNullableFilter<"Gericht"> | string | null
+    price?: FloatFilter<"Gericht"> | number
+    kategorieId?: StringFilter<"Gericht"> | string
+    createdAt?: DateTimeFilter<"Gericht"> | Date | string
+    updatedAt?: DateTimeFilter<"Gericht"> | Date | string
     img?: StringFilter<"Gericht"> | string
   }
 
   export type KategorieCreateWithoutGerichteInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
+    description?: string | null
     menu: MenuCreateNestedOneWithoutKategorienInput
   }
 
   export type KategorieUncheckedCreateWithoutGerichteInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    menuId: number
+    description?: string | null
+    menuId: string
   }
 
   export type KategorieCreateOrConnectWithoutGerichteInput = {
@@ -15251,14 +15119,15 @@ export namespace Prisma {
   }
 
   export type ZutatCreateWithoutGerichteInput = {
+    id?: string
     name: string
-    istAllergen?: boolean
+    isAllergen?: boolean
   }
 
   export type ZutatUncheckedCreateWithoutGerichteInput = {
-    id?: number
+    id?: string
     name: string
-    istAllergen?: boolean
+    isAllergen?: boolean
   }
 
   export type ZutatCreateOrConnectWithoutGerichteInput = {
@@ -15267,18 +15136,19 @@ export namespace Prisma {
   }
 
   export type BewertungCreateWithoutGerichtInput = {
+    id?: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type BewertungUncheckedCreateWithoutGerichtInput = {
-    id?: number
+    id?: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type BewertungCreateOrConnectWithoutGerichtInput = {
@@ -15303,16 +15173,17 @@ export namespace Prisma {
   }
 
   export type KategorieUpdateWithoutGerichteInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     menu?: MenuUpdateOneRequiredWithoutKategorienNestedInput
   }
 
   export type KategorieUncheckedUpdateWithoutGerichteInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    menuId?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    menuId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ZutatUpsertWithWhereUniqueWithoutGerichteInput = {
@@ -15335,9 +15206,9 @@ export namespace Prisma {
     AND?: ZutatScalarWhereInput | ZutatScalarWhereInput[]
     OR?: ZutatScalarWhereInput[]
     NOT?: ZutatScalarWhereInput | ZutatScalarWhereInput[]
-    id?: IntFilter<"Zutat"> | number
+    id?: StringFilter<"Zutat"> | string
     name?: StringFilter<"Zutat"> | string
-    istAllergen?: BoolFilter<"Zutat"> | boolean
+    isAllergen?: BoolFilter<"Zutat"> | boolean
   }
 
   export type BewertungUpsertWithWhereUniqueWithoutGerichtInput = {
@@ -15360,35 +15231,36 @@ export namespace Prisma {
     AND?: BewertungScalarWhereInput | BewertungScalarWhereInput[]
     OR?: BewertungScalarWhereInput[]
     NOT?: BewertungScalarWhereInput | BewertungScalarWhereInput[]
-    id?: IntFilter<"Bewertung"> | number
-    gerichtId?: IntFilter<"Bewertung"> | number
+    id?: StringFilter<"Bewertung"> | string
+    gerichtId?: StringFilter<"Bewertung"> | string
     bewertung?: IntFilter<"Bewertung"> | number
     kommentar?: StringNullableFilter<"Bewertung"> | string | null
-    erstelltAm?: DateTimeFilter<"Bewertung"> | Date | string
-    aktualisiertAm?: DateTimeFilter<"Bewertung"> | Date | string
+    createdAt?: DateTimeFilter<"Bewertung"> | Date | string
+    updatedAt?: DateTimeFilter<"Bewertung"> | Date | string
   }
 
   export type GerichtCreateWithoutZutatenInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     kategorie: KategorieCreateNestedOneWithoutGerichteInput
-    Bewertung?: BewertungCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtUncheckedCreateWithoutZutatenInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    kategorieId: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    kategorieId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
-    Bewertung?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
+    bewertungen?: BewertungUncheckedCreateNestedManyWithoutGerichtInput
   }
 
   export type GerichtCreateOrConnectWithoutZutatenInput = {
@@ -15412,64 +15284,66 @@ export namespace Prisma {
     data: XOR<GerichtUpdateManyMutationInput, GerichtUncheckedUpdateManyWithoutZutatenInput>
   }
 
-  export type GerichtCreateWithoutBewertungInput = {
+  export type GerichtCreateWithoutBewertungenInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     kategorie: KategorieCreateNestedOneWithoutGerichteInput
     zutaten?: ZutatCreateNestedManyWithoutGerichteInput
   }
 
-  export type GerichtUncheckedCreateWithoutBewertungInput = {
-    id?: number
+  export type GerichtUncheckedCreateWithoutBewertungenInput = {
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    kategorieId: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    kategorieId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
     zutaten?: ZutatUncheckedCreateNestedManyWithoutGerichteInput
   }
 
-  export type GerichtCreateOrConnectWithoutBewertungInput = {
+  export type GerichtCreateOrConnectWithoutBewertungenInput = {
     where: GerichtWhereUniqueInput
-    create: XOR<GerichtCreateWithoutBewertungInput, GerichtUncheckedCreateWithoutBewertungInput>
+    create: XOR<GerichtCreateWithoutBewertungenInput, GerichtUncheckedCreateWithoutBewertungenInput>
   }
 
-  export type GerichtUpsertWithoutBewertungInput = {
-    update: XOR<GerichtUpdateWithoutBewertungInput, GerichtUncheckedUpdateWithoutBewertungInput>
-    create: XOR<GerichtCreateWithoutBewertungInput, GerichtUncheckedCreateWithoutBewertungInput>
+  export type GerichtUpsertWithoutBewertungenInput = {
+    update: XOR<GerichtUpdateWithoutBewertungenInput, GerichtUncheckedUpdateWithoutBewertungenInput>
+    create: XOR<GerichtCreateWithoutBewertungenInput, GerichtUncheckedCreateWithoutBewertungenInput>
     where?: GerichtWhereInput
   }
 
-  export type GerichtUpdateToOneWithWhereWithoutBewertungInput = {
+  export type GerichtUpdateToOneWithWhereWithoutBewertungenInput = {
     where?: GerichtWhereInput
-    data: XOR<GerichtUpdateWithoutBewertungInput, GerichtUncheckedUpdateWithoutBewertungInput>
+    data: XOR<GerichtUpdateWithoutBewertungenInput, GerichtUncheckedUpdateWithoutBewertungenInput>
   }
 
-  export type GerichtUpdateWithoutBewertungInput = {
+  export type GerichtUpdateWithoutBewertungenInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     kategorie?: KategorieUpdateOneRequiredWithoutGerichteNestedInput
     zutaten?: ZutatUpdateManyWithoutGerichteNestedInput
   }
 
-  export type GerichtUncheckedUpdateWithoutBewertungInput = {
-    id?: IntFieldUpdateOperationsInput | number
+  export type GerichtUncheckedUpdateWithoutBewertungenInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    kategorieId?: IntFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    kategorieId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     zutaten?: ZutatUncheckedUpdateManyWithoutGerichteNestedInput
   }
@@ -15513,7 +15387,7 @@ export namespace Prisma {
   export type LocationCreateManyRestaurantInput = {
     id?: string
     street: string
-    Hausnummer: string
+    houseNumber: string
     town: string
     postcode: string
     country: string
@@ -15528,7 +15402,7 @@ export namespace Prisma {
   export type LocationUpdateWithoutRestaurantInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -15538,7 +15412,7 @@ export namespace Prisma {
   export type LocationUncheckedUpdateWithoutRestaurantInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -15548,7 +15422,7 @@ export namespace Prisma {
   export type LocationUncheckedUpdateManyWithoutRestaurantInput = {
     id?: StringFieldUpdateOperationsInput | string
     street?: StringFieldUpdateOperationsInput | string
-    Hausnummer?: StringFieldUpdateOperationsInput | string
+    houseNumber?: StringFieldUpdateOperationsInput | string
     town?: StringFieldUpdateOperationsInput | string
     postcode?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
@@ -15573,152 +15447,157 @@ export namespace Prisma {
   }
 
   export type KategorieCreateManyMenuInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
+    description?: string | null
   }
 
   export type KategorieUpdateWithoutMenuInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     gerichte?: GerichtUpdateManyWithoutKategorieNestedInput
   }
 
   export type KategorieUncheckedUpdateWithoutMenuInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     gerichte?: GerichtUncheckedUpdateManyWithoutKategorieNestedInput
   }
 
   export type KategorieUncheckedUpdateManyWithoutMenuInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type GerichtCreateManyKategorieInput = {
-    id?: number
+    id?: string
     name: string
-    beschreibung?: string | null
-    preis: number
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    description?: string | null
+    price: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
     img: string
   }
 
   export type GerichtUpdateWithoutKategorieInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     zutaten?: ZutatUpdateManyWithoutGerichteNestedInput
-    Bewertung?: BewertungUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtUncheckedUpdateWithoutKategorieInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     zutaten?: ZutatUncheckedUpdateManyWithoutGerichteNestedInput
-    Bewertung?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtUncheckedUpdateManyWithoutKategorieInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
   }
 
   export type BewertungCreateManyGerichtInput = {
-    id?: number
+    id?: string
     bewertung?: number
     kommentar?: string | null
-    erstelltAm?: Date | string
-    aktualisiertAm?: Date | string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ZutatUpdateWithoutGerichteInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ZutatUncheckedUpdateWithoutGerichteInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ZutatUncheckedUpdateManyWithoutGerichteInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    istAllergen?: BoolFieldUpdateOperationsInput | boolean
+    isAllergen?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type BewertungUpdateWithoutGerichtInput = {
+    id?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BewertungUncheckedUpdateWithoutGerichtInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BewertungUncheckedUpdateManyWithoutGerichtInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     bewertung?: IntFieldUpdateOperationsInput | number
     kommentar?: NullableStringFieldUpdateOperationsInput | string | null
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GerichtUpdateWithoutZutatenInput = {
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
     kategorie?: KategorieUpdateOneRequiredWithoutGerichteNestedInput
-    Bewertung?: BewertungUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtUncheckedUpdateWithoutZutatenInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    kategorieId?: IntFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    kategorieId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
-    Bewertung?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
+    bewertungen?: BewertungUncheckedUpdateManyWithoutGerichtNestedInput
   }
 
   export type GerichtUncheckedUpdateManyWithoutZutatenInput = {
-    id?: IntFieldUpdateOperationsInput | number
+    id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    beschreibung?: NullableStringFieldUpdateOperationsInput | string | null
-    preis?: FloatFieldUpdateOperationsInput | number
-    kategorieId?: IntFieldUpdateOperationsInput | number
-    erstelltAm?: DateTimeFieldUpdateOperationsInput | Date | string
-    aktualisiertAm?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    kategorieId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     img?: StringFieldUpdateOperationsInput | string
   }
 
