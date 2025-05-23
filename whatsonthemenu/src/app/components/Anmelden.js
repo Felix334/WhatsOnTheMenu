@@ -35,7 +35,8 @@ export default function Home({renderLogin}) {
     });
     if (resp.status === 200) {
       const data = await resp.json();
-      window.localStorage.setItem("userID", data.userID);
+      console.log("Server Response: ", data)
+      window.sessionStorage.setItem("userID", data.id);
       window.sessionStorage.setItem("sessionID", data.sessionID); // Überarbeiten
       setSubmittedData(data);
       renderLogin(false)

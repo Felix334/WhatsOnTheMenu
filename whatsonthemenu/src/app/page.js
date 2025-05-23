@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
+import Profile from "./components/Profile";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,9 @@ export default function Home() {
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
+        <div className="fixed top-0 right-0 p-1 flex">
+          <Profile />
+        </div>
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">

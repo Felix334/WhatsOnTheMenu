@@ -22,7 +22,6 @@ export async function POST(req) {
   main()
   .catch((e) => {
     console.error(e);
-    process.exit(1);
     return NextResponse.json({
         error: "Error creating user",
     })
