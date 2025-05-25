@@ -1,66 +1,60 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { date } from 'zod';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { date } from "zod";
 
-export default function Home({renderLogin}) {
+export default function Home({ renderLogin, userID }) {
   const form = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
-    const [submittedData, setSubmittedData] = useState(null);
+  const [submittedData, setSubmittedData] = useState(null);
   const submitToServer = async (user_data) => {
     console.log("Submitted data sending: ", user_data);
-    var { email, password } = user_data
-    console.log("Data unpacked: ", email, password)
-    try{
-    const resp = await fetch("./api/Auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({email, password}),
-    });
-    if (resp.status === 200) {
-      const data = await resp.json();
-      console.log("Server Response: ", data)
-      window.sessionStorage.setItem("userID", data.id);
-      window.sessionStorage.setItem("sessionID", data.sessionID); // Überarbeiten
-      setSubmittedData(data);
-      renderLogin(false)
-      console.log("Data send succeess")
-    } else {
-      console.error("Failed to submit data:", resp.status);
+    var { email, password } = user_data;
+    console.log("Data unpacked: ", email, password);
+    try {
+      const resp = await fetch("./api/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (resp.status === 200) {
+        const data = await resp.json();
+        console.log("Server Response: ", data);
+        window.sessionStorage.setItem("userID", data.id);
+        window.sessionStorage.setItem("sessionID", data.sessionID); // Überarbeiten
+        setSubmittedData(data);
+        renderLogin(false);
+        userID(true);
+        console.log("Data send succeess");
+      } else {
+        console.error("Failed to submit data:", resp.status);
+      }
+    } catch (err) {
+      console.error("Error submitting data:", err);
     }
-  }catch(err){
-    console.error("Error submitting data:", err);
-  }
   };
   // Define the onSubmit function
   const onSubmit = (data) => {
-    console.log('onSubmit data param:', data);
+    console.log("onSubmit data param:", data);
     submitToServer(data);
     form.reset();
   };
   useEffect(() => {
     if (submittedData) {
-      console.log('submittedData updated:', submittedData);
+      console.log("submittedData updated:", submittedData);
     }
   }, [submittedData]);
 
-  return (
+  return ( // Ein div zu viel?
     <div className="relative min-h-screen w-screen bg-gray-600 text-black-900">
       <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80"></div>
       <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px]">
@@ -81,7 +75,7 @@ export default function Home({renderLogin}) {
                 <FormItem className="mb-4">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Email" {...field} style={{color: "black", backgroundColor: "white"}}/>
+                    <Input type="email" placeholder="Email" {...field} style={{ color: "black", backgroundColor: "white" }} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,7 +97,7 @@ export default function Home({renderLogin}) {
                 <FormItem className="mb-6">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Password" {...field} style={{color: "black", backgroundColor: "white"}} />
+                    <Input type="password" placeholder="Password" {...field} style={{ color: "black", backgroundColor: "white" }} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,13 +110,8 @@ export default function Home({renderLogin}) {
           </form>
         </Form>
 
-        {submittedData && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">
-            {`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}
-          </div>
-        )}
+        {submittedData && <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">{`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}</div>}
       </div>
     </div>
   );
 }
-

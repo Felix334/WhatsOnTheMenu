@@ -7,17 +7,27 @@ import Link from "next/link";
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import PermControleLocation from "./components/LocasionPermission";
 
+
+// Mit next/auth neuschreiben
+
+
 export default function Home() {
   const [renderLogin, setRenderLogin] = useState(false);
   const [closeInput, setCloseInput] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
+  const [userID, setUserID] = useState("");
+
+  useEffect(() => {
+    const userID = sessionStorage.getItem("userID");
+    setUserID(userID)
+  })
 
   const renderLoginW = () => {
     if (closeInput) {
@@ -48,7 +58,7 @@ export default function Home() {
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
         <div className="fixed top-0 right-0 p-1 flex">
-          <Profile />
+          {userID && <Profile />}
         </div>
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md">
@@ -151,7 +161,7 @@ export default function Home() {
         </section>
       </main>
       <div className="absolute item-center justify-center flex grid fixed">
-        {renderLogin && <LoginForm renderLogin={setRenderLogin} />}
+        {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={userID} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
     </div>
