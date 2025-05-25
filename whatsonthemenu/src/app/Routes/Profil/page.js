@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
 
 const menuSchema = z.object({
   menu_col: z.string().min(1, "Menü-Kategorie erforderlich"),
@@ -25,7 +25,7 @@ const menuSchema = z.object({
   ),
 });
 
-const MenuSection = ({ section }) => {
+const MenuSection = ({ section, toggleOpenEditWin }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-4 my-4">
       <h3 className="text-2xl font-semibold">{section.title}</h3>
@@ -35,6 +35,7 @@ const MenuSection = ({ section }) => {
             <TableHead>Speise</TableHead>
             <TableHead>Beschreibung</TableHead>
             <TableHead className="text-right">Preis</TableHead>
+            <Button onClick={toggleOpenEditWin}>+</Button>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,7 +55,7 @@ const MenuSection = ({ section }) => {
 export default function PageBuilder() {
   const [components, setComponents] = useState([]);
   const [openEditWin, setOpenEditWin] = useState(false);
-  const [bgColor, setBgColor] = useState("")
+  const [bgColor, setBgColor] = useState("");
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -90,9 +91,10 @@ export default function PageBuilder() {
 
   const handleBgChange = (event) => {
     setBgColor(event.target.value);
-  }
+  };
 
   const edditWin = () => {
+    // Kategorien werden sortiert
     return (
       <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20">
         <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10 relative z-30">
@@ -117,7 +119,7 @@ export default function PageBuilder() {
                 name="menu_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Menüname</FormLabel>
+                    <FormLabel>Menüname:</FormLabel>
                     <FormControl>
                       <Input placeholder="z.B. Pasta Menü" {...field} />
                     </FormControl>
@@ -127,7 +129,7 @@ export default function PageBuilder() {
               />
 
               <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-semibold">Gerichte</h3>
+                <h3 className="text-lg font-semibold">Gerichte:</h3>
                 {fields.map((item, index) => (
                   <div key={item.id} className="p-4 border rounded-xl space-y-2 bg-gray-50 relative">
                     <FormField
@@ -221,24 +223,24 @@ export default function PageBuilder() {
   };
 
   return (
-    <div className="min-h-screen"  style={{ backgroundColor: bgColor }}>
+    <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
         <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
-        <Input 
-        name="Hintergrund"
-        type="color"
-        id="bgColInp"
-        onClick={() =>window.alert("Wichtig!\Helligkeit (rechter Balken) muss eingestellt werden")}
-        onChange={handleBgChange}/>
+        <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden")} onChange={handleBgChange} />
         <Button onClick={toggleOpenEditWin}>+ Menü hinzufügen</Button>
         {openEditWin && edditWin()}
 
         <div className="mt-6 space-y-6">
           {components.map((component, index) => (
-            <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} /> : <h4 className="text-lg">{component.name}</h4>}</div>
+            <div key={index}>
+              {component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)}/> : <h4 className="text-lg">{component.name}</h4>}</div>
           ))}
         </div>
       </div>
     </div>
   );
 }
+
+
+
+// toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar
