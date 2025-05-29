@@ -4,3 +4,9 @@ verwendet werden
 shadcn => imports geändert weil das package mittendrinn alles zerstört hat => @/compontent => ./compontente(Orginal)
 
 Fals Probleme mit Bildern auftauchen => Profil-Code anschauen
+
+Für Zukünftige Projekte => Wenn shcdn import spinnen in jsconfig/tsconfig das hier hinzufügen:
+"baseUrl": ".",
+    "paths": {
+      "@/*": ["/src/*"]
+    }

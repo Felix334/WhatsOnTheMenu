@@ -57,6 +57,11 @@ export default function PageBuilder() {
   const [openEditWin, setOpenEditWin] = useState(false);
   const [bgColor, setBgColor] = useState("");
 
+  const checkUser = async() => {
+    var userID = "";
+    var resp = fetch("./api/user/pro")
+  }
+
   const form = useForm({
     resolver: zodResolver(menuSchema),
     defaultValues: {
@@ -243,4 +248,4 @@ export default function PageBuilder() {
 
 
 
-// toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar
+// toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar machen

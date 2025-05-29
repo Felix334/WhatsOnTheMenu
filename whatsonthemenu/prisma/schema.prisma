@@ -77,6 +77,8 @@ model Menu {
   updatedAt    DateTime    @updatedAt
   restaurantID String      @unique
   restaurant   Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [id])
+  bgColor      String
+  font         String
 }
 
 model Kategorie {
