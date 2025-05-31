@@ -76,15 +76,17 @@ export default function PageBuilder() {
     },
   ]);
 
+  const router = useRouter()
+
   useEffect(() => {
-    const userID_ = window.sessionStorage.getItem("userID");
+    const userID_ = window.localStorage.getItem("userID");
     const role = window.sessionStorage.getItem("role");
     if (!userID_) {
       console.log("Keine ID vorhanden");
       window.alert("Keine berechtigte Benutzer-ID vorhanden! \nBitte melden sie sich im Hauptmenu an!");
       return;
     }
-    if ((userID_ && role === "Admin") || (userID && role === "User")) {
+    if ((userID_ && role === "Admin") || (userID_ && role === "User")) {
       setUserID(userID_);
       render_user(userID_);
     }
@@ -272,12 +274,10 @@ export default function PageBuilder() {
     );
   };
   
-  const router = useRouter()
-
   useEffect(() => {
-    const { querry, userID } = router;
-    console.log("Querry:", querry, "User ID:", userID)
-  })
+    const { query } = router;
+    console.log("Route querry (Profil)",query)
+  }, []);
 
   const warning = () => {
     window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");

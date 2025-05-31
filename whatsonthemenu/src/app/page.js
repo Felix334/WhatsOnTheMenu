@@ -58,7 +58,7 @@ export default function Home() {
     if (userID) {
       const { query } = router;
       const pathname = "/Routes/Profil/";
-      console.log("Routing Info:", pathname, query);
+      console.log("Routing Info:(page.js)", pathname, query);
       const newQuery = { ...query, userID };
       const queryString = new URLSearchParams(newQuery).toString();
       router.replace(`${pathname}?${queryString}`);
@@ -66,7 +66,6 @@ export default function Home() {
       window.alert("Bitte anmelden");
     }
   };
-
   // Profil Renderung ersetzen
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
@@ -74,9 +73,9 @@ export default function Home() {
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
-        <div className="fixed top-0 right-0 p-1 flex">{userID && <Profile setUserID={setUserID} />}</div>
+        <div className="fixed top-0 right-0 p-1 flex z-20">{userID && <Profile setUserID={setUserID} />}</div>
       </header>
-      <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md">
+      <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
           <Card className="flex item-center grid gap-1">
             <CardHeader>
