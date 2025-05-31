@@ -7,16 +7,16 @@ import Link from "next/link";
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import PermControleLocation from "./components/LocasionPermission";
-
+import { useRouter } from "next/navigation";
+import path from "path";
 
 // Mit next/auth neuschreiben
-
 
 export default function Home() {
   const [renderLogin, setRenderLogin] = useState(false);
@@ -24,15 +24,20 @@ export default function Home() {
   const [renderRegister, setRenderRegister] = useState(false);
   const [userID, setUserID] = useState("");
 
+  const router = useRouter();
+
   useEffect(() => {
-    const userID = sessionStorage.getItem("userID");
-    setUserID(userID)
-  })
+    if (userID) {
+      window.localStorage.setItem("userID", userID);
+    } else {
+      var userID_ = window.localStorage.getItem("userID");
+      if (userID_) {
+        setUserID(userID_);
+      }
+    }
+  }, [userID]);
 
   const renderLoginW = () => {
-    if (closeInput) {
-      setRenderLogin(false);
-    }
     if (!renderLogin) {
       setRenderLogin(true);
     } else {
@@ -41,25 +46,35 @@ export default function Home() {
   };
 
   const renderRegisterW = () => {
-    if (closeInput) {
-      setRenderRegister(false);
-    }
-    if (!renderLogin) {
+    if (!renderRegister) {
       setRenderRegister(true);
     } else {
       setRenderRegister(false);
     }
   };
 
+  const goToProfil = () => {
+    // Seperate Route für Restaurants
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Profil/";
+      console.log("Routing Info:", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      window.alert("Bitte anmelden");
+    }
+  };
+
+  // Profil Renderung ersetzen
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
       <header className="mb-12 text-center align-top leading-tight grid gap-0 relative flex">
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
-        <div className="fixed top-0 right-0 p-1 flex">
-          {userID && <Profile />}
-        </div>
+        <div className="fixed top-0 right-0 p-1 flex">{userID && <Profile setUserID={setUserID} />}</div>
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
@@ -153,15 +168,19 @@ export default function Home() {
               <CardDescription>Profil bearbeiten</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Link href="./Routes/Profil">Mein Profil</Link>
+              <Button
+                onClick={() => {
+                  goToProfil();
+                }}
+              >
+                Mein Profil
               </Button>
             </CardContent>
           </Card>
         </section>
       </main>
       <div className="absolute item-center justify-center flex grid fixed">
-        {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={userID} />}
+        {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
     </div>

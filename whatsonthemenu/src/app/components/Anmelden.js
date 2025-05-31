@@ -3,9 +3,11 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { date } from "zod";
+import { useRouter } from "next/navigation";
 
 export default function Home({ renderLogin, userID }) {
+  const [submittedData, setSubmittedData] = useState(null);
+  const router = useRouter();
   const form = useForm({
     defaultValues: {
       email: "",
@@ -13,11 +15,11 @@ export default function Home({ renderLogin, userID }) {
     },
   });
 
-  const [submittedData, setSubmittedData] = useState(null);
   const submitToServer = async (user_data) => {
+    const pathname = router.pathname;
     console.log("Submitted data sending: ", user_data);
-    var { email, password } = user_data;
-    console.log("Data unpacked: ", email, password);
+    const { email, password } = user_data;
+
     try {
       const resp = await fetch("./api/Auth/login", {
         method: "POST",
@@ -26,15 +28,35 @@ export default function Home({ renderLogin, userID }) {
         },
         body: JSON.stringify({ email, password }),
       });
+
       if (resp.status === 200) {
         const data = await resp.json();
         console.log("Server Response: ", data);
+
+        // Store user and session IDs in sessionStorage
         window.sessionStorage.setItem("userID", data.id);
-        window.sessionStorage.setItem("sessionID", data.sessionID); // Überarbeiten
+        window.sessionStorage.setItem("sessionID", data.sessionID);
+        userID(data.id)
         setSubmittedData(data);
         renderLogin(false);
-        userID(true);
-        console.log("Data send succeess");
+
+        // Update the query parameter with the new user ID
+        const pathname = router.pathname;
+        const newQuery = { ...router.query, id: data.id };
+        // ...
+        router.replace({
+          //pathname,
+          query: newQuery,
+        });
+
+        const searchParams = new URLSearchParams(newQuery).toString();
+        const url = `${searchParams ? `?${searchParams}` : ""}`;
+        router.replace(url, { shallow: true });
+
+        if (data.role === "Admin") {
+          window.sessionStorage.setItem("role", data.role);
+        }
+        console.log("Data sent successfully");
       } else {
         console.error("Failed to submit data:", resp.status);
       }
@@ -42,23 +64,25 @@ export default function Home({ renderLogin, userID }) {
       console.error("Error submitting data:", err);
     }
   };
+
   // Define the onSubmit function
   const onSubmit = (data) => {
     console.log("onSubmit data param:", data);
     submitToServer(data);
-    form.reset();
+    form.reset(); // Reset the form after submission
   };
+
   useEffect(() => {
     if (submittedData) {
       console.log("submittedData updated:", submittedData);
     }
   }, [submittedData]);
 
-  return ( // Ein div zu viel?
+  return (
     <div className="relative min-h-screen w-screen bg-gray-600 text-black-900">
       <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80"></div>
       <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px]">
-        <h1 className=" relative text-2xl font-bold mb-6 text-gray-900 align-center justify-center">Login</h1>
+        <h1 className="relative text-2xl font-bold mb-6 text-gray-900 align-center justify-center">Login</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
             <FormField
@@ -87,7 +111,6 @@ export default function Home({ renderLogin, userID }) {
               name="password"
               rules={{
                 required: "Password is required",
-                color: "black",
                 minLength: {
                   value: 6,
                   message: "Password must have at least 6 characters",

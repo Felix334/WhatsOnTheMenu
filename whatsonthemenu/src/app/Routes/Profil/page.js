@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
+import { title } from "process";
 
 const menuSchema = z.object({
   menu_col: z.string().min(1, "Menü-Kategorie erforderlich"),
@@ -56,11 +58,54 @@ export default function PageBuilder() {
   const [components, setComponents] = useState([]);
   const [openEditWin, setOpenEditWin] = useState(false);
   const [bgColor, setBgColor] = useState("");
+  const [userID, setUserID] = useState("");
+  const [menu, setMenu] = useState([
+    {
+      // Muss die selbe Struktur haben
+      title: "",
+      bgCol: "",
+      position: 0,
+      items: [
+        {
+          name: "",
+          price: "",
+          description: "",
+          image: "",
+        },
+      ],
+    },
+  ]);
 
-  const checkUser = async() => {
-    var userID = "";
-    var resp = fetch("./api/user/pro")
-  }
+  useEffect(() => {
+    const userID_ = window.sessionStorage.getItem("userID");
+    const role = window.sessionStorage.getItem("role");
+    if (!userID_) {
+      console.log("Keine ID vorhanden");
+      window.alert("Keine berechtigte Benutzer-ID vorhanden! \nBitte melden sie sich im Hauptmenu an!");
+      return;
+    }
+    if ((userID_ && role === "Admin") || (userID && role === "User")) {
+      setUserID(userID_);
+      render_user(userID_);
+    }
+  }, [userID]);
+
+  const checkUser = async (userID) => {
+    var userID = userID;
+    var response = fetch("./api/user/profile/getData", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: userID }),
+    }).then((response) => response.json()); // => selbe Struktur wie die useState
+    if (response) {
+      console.log(response);
+      //setMenu(response)
+      return true;
+    }
+    return null;
+  };
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -226,26 +271,51 @@ export default function PageBuilder() {
       </div>
     );
   };
+  
+  const router = useRouter()
 
+  useEffect(() => {
+    const { querry, userID } = router;
+    console.log("Querry:", querry, "User ID:", userID)
+  })
+
+  const warning = () => {
+    window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");
+  };
+
+  const load = async (userID) => {
+    var data = await checkUser(userID).then(() => {
+      if (data == null) {
+        return null;
+      }
+      return data;
+    });
+  };
+  const render_user = async (userID) => {
+    var result = await load(userID);
+    if (result == null) {
+      return null;
+    }
+  };
+  if (!userID) {
+    return <div>Bitte Anmelden</div>;
+  }
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
         <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
-        <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden")} onChange={handleBgChange} />
-        <Button onClick={toggleOpenEditWin}>+ Menü hinzufügen</Button>
+        <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
+        <Button onClick={toggleOpenEditWin}>Menü hinzufügen</Button>
         {openEditWin && edditWin()}
 
         <div className="mt-6 space-y-6">
           {components.map((component, index) => (
-            <div key={index}>
-              {component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)}/> : <h4 className="text-lg">{component.name}</h4>}</div>
+            <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
           ))}
         </div>
       </div>
     </div>
   );
 }
-
-
 
 // toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar machen
