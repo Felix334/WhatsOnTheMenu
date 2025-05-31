@@ -5,7 +5,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { title } from "process";
+import Link from "next/link";
 
 const menuSchema = z.object({
   menu_col: z.string().min(1, "Menü-Kategorie erforderlich"),
@@ -55,6 +56,9 @@ const MenuSection = ({ section, toggleOpenEditWin }) => {
 };
 
 export default function PageBuilder() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter()
   const [components, setComponents] = useState([]);
   const [openEditWin, setOpenEditWin] = useState(false);
   const [bgColor, setBgColor] = useState("");
@@ -76,9 +80,9 @@ export default function PageBuilder() {
     },
   ]);
 
-  const router = useRouter()
-
   useEffect(() => {
+    const { query } = router
+    console.log((query))
     const userID_ = window.localStorage.getItem("userID");
     const role = window.sessionStorage.getItem("role");
     if (!userID_) {
@@ -276,12 +280,21 @@ export default function PageBuilder() {
   
   useEffect(() => {
     const { query } = router;
+    const params = new URLSearchParams(searchParams.toString());
+    const id = params.get('userID');
+    if (id) {
+      setUserID(id)
+    }
     console.log("Route querry (Profil)",query)
   }, []);
 
   const warning = () => {
     window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");
   };
+
+  const goBackBtn = () => {
+    const query = new URLSearchParams(searchParams.toString());
+  }
 
   const load = async (userID) => {
     var data = await checkUser(userID).then(() => {
@@ -303,6 +316,11 @@ export default function PageBuilder() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
+        <div>
+          <div>
+            <Button onClick={goBackBtn}>Zurück</Button>
+          </div>
+        </div>
         <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
         <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
         <Button onClick={toggleOpenEditWin}>Menü hinzufügen</Button>

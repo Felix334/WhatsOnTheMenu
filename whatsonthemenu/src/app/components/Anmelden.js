@@ -43,9 +43,9 @@ export default function Home({ renderLogin, userID }) {
         // Update the query parameter with the new user ID
         const pathname = router.pathname;
         const newQuery = { ...router.query, id: data.id };
-        // ...
+   
         router.replace({
-          //pathname,
+          pathname,
           query: newQuery,
         });
 

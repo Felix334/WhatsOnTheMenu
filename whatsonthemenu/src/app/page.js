@@ -37,6 +37,18 @@ export default function Home() {
     }
   }, [userID]);
 
+  useEffect(() => {
+    window.onload = () => {
+      const pathname = "/";
+      if (userID) {
+        const { query } = router;
+        const loadQuerry = { ...query, userID };
+        const queryString = new URLSearchParams(loadQuerry).toString();
+        router.replace(`${pathname}?${queryString}`);
+      }
+    };
+  });
+
   const renderLoginW = () => {
     if (!renderLogin) {
       setRenderLogin(true);
@@ -53,6 +65,19 @@ export default function Home() {
     }
   };
 
+  const goToUnserTeam = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Partner/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Profil");
+    }
+  };
+
   const goToProfil = () => {
     // Seperate Route für Restaurants
     if (userID) {
@@ -64,6 +89,32 @@ export default function Home() {
       router.replace(`${pathname}?${queryString}`);
     } else {
       window.alert("Bitte anmelden");
+    }
+  };
+  
+  const MobileFunktion = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Mobile/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Mobile");
+    }
+  };
+
+  const goToPartner = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Partner/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Profil");
     }
   };
   // Profil Renderung ersetzen
@@ -105,8 +156,8 @@ export default function Home() {
               <CardDescription>Finden sie herraus wer schon Teil unserer Community geworden ist.</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Link href="./Routes/UnserePartner">Unsere Partner</Link>
+              <Button className="flex" onClick={goToPartner}>
+                Unsere Partner
               </Button>
             </CardContent>
           </Card>
@@ -115,9 +166,7 @@ export default function Home() {
               <CardTitle>Unser Team</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Link href="./Routes/UnserTeam">Unser Team</Link>
-              </Button>
+              <Button onClick={goToUnserTeam}>Unser Team</Button>
             </CardContent>
           </Card>
           <Card>
