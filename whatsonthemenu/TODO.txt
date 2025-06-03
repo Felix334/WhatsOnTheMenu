@@ -1,3 +1,6 @@
 Fix the Profil picture
 
 Neues Routing überall einfügen
+
+Checken ob die "goBackBtnFunktion" mit neuem Routing nötig ist
+wenn neues Reload System funktioniert 

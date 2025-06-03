@@ -255,6 +255,10 @@ export default function PageBuilder() {
     window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");
   };
 
+
+
+// checken ob die "goBackBtnFunktion" nötig ist 
+
   const goBackBtn = () => {
     const backURL = "./"
     const pathname = router.pathname;
