@@ -16,6 +16,7 @@ import PermControleLocation from "./components/LocasionPermission";
 import { useRouter } from "next/navigation";
 import path from "path";
 
+
 // Mit next/auth neuschreiben
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
   const [closeInput, setCloseInput] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [userID, setUserID] = useState("");
+ const [hasReloaded, setHasReloaded] = useState(false);
 
   const router = useRouter();
 
@@ -37,17 +39,16 @@ export default function Home() {
     }
   }, [userID]);
 
-  useEffect(() => {
-    window.onload = () => {
-      const pathname = "/";
-      if (userID) {
-        const { query } = router;
-        const loadQuerry = { ...query, userID };
-        const queryString = new URLSearchParams(loadQuerry).toString();
-        router.replace(`${pathname}?${queryString}`);
-      }
-    };
-  });
+   useEffect(() => { // Fixes the url reload
+    if (userID) {
+      window.localStorage.setItem("userID", userID);
+      const currentQuery = { ...router.query, userID };
+      const queryString = new URLSearchParams(currentQuery).toString();
+      const newUrl = `/?${queryString}`;
+      router.replace(newUrl);
+    }
+  }, [userID, router]);
+
 
   const renderLoginW = () => {
     if (!renderLogin) {
@@ -227,7 +228,7 @@ export default function Home() {
           </Card>
         </section>
       </main>
-      <div className="absolute item-center justify-center flex grid fixed">
+      <div className="absolute item-center justify-center align-center flex grid">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>

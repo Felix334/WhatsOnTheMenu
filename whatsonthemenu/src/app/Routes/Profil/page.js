@@ -15,45 +15,8 @@ import { Label } from "@/components/ui/label";
 import { title } from "process";
 import Link from "next/link";
 
-const menuSchema = z.object({
-  menu_col: z.string().min(1, "Menü-Kategorie erforderlich"),
-  menu_name: z.string().min(1, "Menü-Name erforderlich"),
-  items: z.array(
-    z.object({
-      name: z.string().min(1),
-      price: z.string().min(1),
-      description: z.string().optional(),
-      image: z.string().optional(), // base64 oder URL
-    })
-  ),
-});
-
-const MenuSection = ({ section, toggleOpenEditWin }) => {
-  return (
-    <div className="bg-white rounded-xl shadow-lg p-4 my-4">
-      <h3 className="text-2xl font-semibold">{section.title}</h3>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Speise</TableHead>
-            <TableHead>Beschreibung</TableHead>
-            <TableHead className="text-right">Preis</TableHead>
-            <Button onClick={toggleOpenEditWin}>+</Button>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {section.items.map((item, index) => (
-            <TableRow key={index}>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell className="text-right">{item.price}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-};
+import MenuSection from "./components/menusection"
+import menuSchema from "./components/menuSchema"
 
 export default function PageBuilder() {
   const searchParams = useSearchParams();
@@ -293,7 +256,14 @@ export default function PageBuilder() {
   };
 
   const goBackBtn = () => {
-    const query = new URLSearchParams(searchParams.toString());
+    const backURL = "./"
+    const pathname = router.pathname;
+    const newQuery = {... router.query, id: userID};
+    router.replace({
+      pathname: pathname,
+      querry: newQuery
+      });
+    router.push("../")
   }
 
   const load = async (userID) => {

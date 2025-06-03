@@ -79,8 +79,8 @@ export default function Home({ renderLogin, userID }) {
   }, [submittedData]);
 
   return (
-    <div className="relative min-h-screen w-screen bg-gray-600 text-black-900">
-      <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80"></div>
+    <div className="relative min-h-screen w-screen bg-gray-600 text-black-900 z-10">
+      <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80 z-9"></div>
       <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px]">
         <h1 className="relative text-2xl font-bold mb-6 text-gray-900 align-center justify-center">Login</h1>
         <Form {...form}>
