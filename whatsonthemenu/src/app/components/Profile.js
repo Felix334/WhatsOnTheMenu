@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import profileImage from "./img/account_profile_user_avatar_icon_219236.jpg";
 import { useState, useRef, useEffect } from "react";
+import { Fascinate } from "next/font/google";
 
 const Profile = () => {
   const [openProfil, setOpenProfil] = useState(false);
@@ -24,19 +25,16 @@ const Profile = () => {
     }
   };
 
-  const logout = () => {
+const logout = async () => {
+    const pathname_ = router.pathname;
     window.localStorage.removeItem("userID");
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("id");
-    const newUrl = `${pathname}${params.toString() ? "?" + params.toString() : ""}`;
-    router.replace(newUrl, { shallow: true }).then(() => {
-      handleClickOutside();
-      setCloseLogout(false);
-      router.refresh();
-      router.reload();
-      window.location.reload();
-    });
-    return;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("userID");
+    const newUrl = `${pathname_}${params.toString() ? "?" + params.toString() : ""}`;
+    await router.replace(newUrl, { shallow: true });
+    setOpenProfil(false);
+    setCloseLogout(false);
+    await router.push("./")
   };
 
   useEffect(() => {
@@ -51,14 +49,15 @@ const Profile = () => {
     };
   }, [openProfil]);
 
-  const goToProfil = () => {
+  const goToProfil = async () => {
     const userID = window.localStorage.getItem("userID");
     const newQuery = new URLSearchParams(searchParams.toString());
     if (userID) {
       const pathname = "/Routes/Profil/";
       newQuery.set("userID", userID);
       const queryString = newQuery.toString();
-      router.replace(`${pathname}?${queryString}`);
+      await router.replace(`${pathname}?${queryString}`);
+      await router.refresh()
     } else {
       window.alert("Bitte anmelden");
     }

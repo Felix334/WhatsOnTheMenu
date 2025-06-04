@@ -268,6 +268,7 @@ export default function PageBuilder() {
       querry: newQuery
       });
     router.push("../")
+    router.back()
   }
 
   const load = async (userID) => {

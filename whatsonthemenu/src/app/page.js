@@ -16,7 +16,6 @@ import PermControleLocation from "./components/LocasionPermission";
 import { useRouter } from "next/navigation";
 import path from "path";
 
-
 // Mit next/auth neuschreiben
 
 export default function Home() {
@@ -24,7 +23,7 @@ export default function Home() {
   const [closeInput, setCloseInput] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [userID, setUserID] = useState("");
- const [hasReloaded, setHasReloaded] = useState(false);
+  const [hasReloaded, setHasReloaded] = useState(false);
 
   const router = useRouter();
 
@@ -39,7 +38,8 @@ export default function Home() {
     }
   }, [userID]);
 
-   useEffect(() => { // Fixes the url reload
+  useEffect(() => {
+    // Fixes the url reload
     if (userID) {
       window.localStorage.setItem("userID", userID);
       const currentQuery = { ...router.query, userID };
@@ -48,7 +48,6 @@ export default function Home() {
       router.replace(newUrl);
     }
   }, [userID, router]);
-
 
   const renderLoginW = () => {
     if (!renderLogin) {
@@ -66,6 +65,19 @@ export default function Home() {
     }
   };
 
+  const goToPartner = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Partner/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Profil");
+    }
+  };
+
   const goToUnserTeam = () => {
     if (userID) {
       const { query } = router;
@@ -76,6 +88,32 @@ export default function Home() {
       router.replace(`${pathname}?${queryString}`);
     } else {
       router.push("/Routes/Profil");
+    }
+  };
+
+    const MobileFunktion = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Mobile/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Mobile");
+    }
+  };
+
+  const WieFunktionierts = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Mobile/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      router.push("/Routes/Mobile");
     }
   };
 
@@ -92,32 +130,7 @@ export default function Home() {
       window.alert("Bitte anmelden");
     }
   };
-  
-  const MobileFunktion = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/Mobile/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      router.push("/Routes/Mobile");
-    }
-  };
 
-  const goToPartner = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/Partner/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      router.push("/Routes/Profil");
-    }
-  };
   // Profil Renderung ersetzen
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
@@ -176,7 +189,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild className="flex">
-                <Link href="./Routes/Mobile">Mobile Funktionen</Link>
+                <Button onClick={MobileFunktion}>Unser Team</Button>
               </Button>
             </CardContent>
           </Card>
@@ -186,7 +199,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild className="flex">
-                <Link href="./WieFunktionierts">Wie Funktioniert`s</Link>
+                <Button onClick={WieFunktionierts}>Unser Team</Button>
               </Button>
             </CardContent>
           </Card>
