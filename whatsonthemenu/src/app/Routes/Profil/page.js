@@ -6,26 +6,29 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import { title } from "process";
-import Link from "next/link";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-import MenuSection from "./components/menusection"
-import menuSchema from "./components/menuSchema"
+import { ChevronRightIcon } from "lucide-react";
+
+import MenuSection from "./components/menusection";
+import menuSchema from "./components/menuSchema";
 
 export default function PageBuilder() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const router = useRouter()
+  const router = useRouter();
   const [components, setComponents] = useState([]);
   const [openEditWin, setOpenEditWin] = useState(false);
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
+  const [expandMenu, setExpandMenu] = useState(false);
   const [menu, setMenu] = useState([
     {
       // Muss die selbe Struktur haben
@@ -44,8 +47,8 @@ export default function PageBuilder() {
   ]);
 
   useEffect(() => {
-    const { query } = router
-    console.log((query))
+    const { query } = router;
+    console.log(query);
     const userID_ = window.localStorage.getItem("userID");
     const role = window.sessionStorage.getItem("role");
     if (!userID_) {
@@ -115,7 +118,7 @@ export default function PageBuilder() {
   const edditWin = () => {
     // Kategorien werden sortiert
     return (
-      <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20">
+      <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20 ">
         <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10 relative z-30">
           <h1 className="text-2xl font-bold mb-6 text-center">Neues Menü erstellen</h1>
           <Form {...form}>
@@ -240,36 +243,45 @@ export default function PageBuilder() {
       </div>
     );
   };
-  
+
   useEffect(() => {
     const { query } = router;
     const params = new URLSearchParams(searchParams.toString());
-    const id = params.get('userID');
+    const id = params.get("userID");
     if (id) {
-      setUserID(id)
+      setUserID(id);
     }
-    console.log("Route querry (Profil)",query)
+    console.log("Route querry (Profil)", query);
   }, []);
 
   const warning = () => {
     window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");
   };
 
-
-
-// checken ob die "goBackBtnFunktion" nötig ist 
+  // checken ob die "goBackBtnFunktion" nötig ist
 
   const goBackBtn = () => {
-    const backURL = "./"
+    const backURL = "./";
     const pathname = router.pathname;
-    const newQuery = {... router.query, id: userID};
+    const newQuery = { ...router.query, id: userID };
     router.replace({
       pathname: pathname,
-      querry: newQuery
-      });
-    router.push("../")
-    router.back()
-  }
+      querry: newQuery,
+    });
+    router.push("../");
+    router.back();
+  };
+
+  const toggleMenu = () => {
+    if (openEditWin) {
+      setOpenEditWin(false);
+    }
+    if (!expandMenu) {
+      setExpandMenu(true);
+    } else {
+      setExpandMenu(false);
+    }
+  };
 
   const load = async (userID) => {
     var data = await checkUser(userID).then(() => {
@@ -279,15 +291,36 @@ export default function PageBuilder() {
       return data;
     });
   };
+
   const render_user = async (userID) => {
     var result = await load(userID);
     if (result == null) {
       return null;
     }
   };
+
   if (!userID) {
     return <div>Bitte Anmelden</div>;
   }
+
+  const OptionMenu = () => {
+    return (
+      <Card className="w-full max-w-sm bg-red-200">
+        <div className="bg-grey-200">
+          <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
+          <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
+          <Button onClick={toggleOpenEditWin}>Menü erstellen</Button>
+          {openEditWin && edditWin()}
+          <div className="mt-6 space-y-6">
+            {components.map((component, index) => (
+              <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
@@ -296,19 +329,45 @@ export default function PageBuilder() {
             <Button onClick={goBackBtn}>Zurück</Button>
           </div>
         </div>
-        <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
-        <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
-        <Button onClick={toggleOpenEditWin}>Menü hinzufügen</Button>
-        {openEditWin && edditWin()}
-
-        <div className="mt-6 space-y-6">
-          {components.map((component, index) => (
-            <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
-          ))}
+        <div className="">
+          <Button onClick={toggleMenu}>|||</Button>
+        </div>
+        <div>
+          {expandMenu && <OptionMenu />}
+        </div>
+        <div>
+          <HandleUser />
         </div>
       </div>
     </div>
   );
 }
 
+
+function HandleUser() {
+  const [data, setData] = useState([]);
+  const [userID, setUserID] = useState(null);
+  const [change, setChange] = useState([{
+      // Muss die selbe Struktur haben
+      title: "",
+      bgCol: "",
+      position: 0,
+      items: [
+        {
+          name: "",
+          price: "",
+          description: "",
+          image: "",
+        },
+      ],
+    },
+  ]);
+  
+  const getMenu = async() => {
+    const resp = await fetch("./api/restaurant/menu");
+    const data = await resp.json();
+    setData(data);
+  }
+
+}
 // toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar machen

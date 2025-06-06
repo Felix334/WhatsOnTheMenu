@@ -29,7 +29,8 @@ async function main(data) {
   const user = await prisma.user.findUnique({ where: { email: email } });
   if (user) {
     console.log("User found:", user);
-    if (user.passwordHash == password) {
+    // Fix: compare password with user.password (not passwordHash)
+    if (user.password === password) {
       return user.id;
     } else {
       console.log("Password mismatch");

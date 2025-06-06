@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  //output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -9,17 +8,22 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  name         String      @unique
-  email        String      @unique
-  passwordHash String
-  sessionID    String?
-  session      Session?    @relation(fields: [sessionID], references: [id])
-  role         Role
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now())
-  ownerID      String?     @unique
-  restaurant   Restaurant?
+  id         String      @id @default(cuid())
+  name       String      @unique
+  email      String      @unique
+  password   String
+  role       Role
+  session    Session?
+  restaurant Restaurant? // Nur Owner haben ein Restaurant
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 enum Role {
@@ -28,95 +32,90 @@ enum Role {
   Owner
 }
 
-model Session {
-  id     String   @id @default(cuid())
-  users  User[]
-  timeIn DateTime
-}
-
 model Restaurant {
-  id             String     @id @default(cuid())
-  name           String
-  parentCompName String
-  parentCompID   String
-  menuId         String     @unique
-  menu           Menu?      @relation(name: "MenuRel")
-  memberSince    DateTime   @default(now())
-  locationID     String     @unique
-  location       Location[] @relation(name: "locationRest")
-  ownerID        String     @unique
-  owner          User       @relation(fields: [ownerID], references: [ownerID])
+  id            String     @id @default(cuid())
+  name          String
+  parentCompany String
+  ownerId       String     @unique
+  owner         User       @relation(fields: [ownerId], references: [id])
+  menuID        String
+  menu          Menu?
+  locations     Location[]
+  createdAt     DateTime   @default(now())
 }
 
 model Location {
-  id           String        @id @default(cuid())
+  id           String       @id @default(cuid())
   street       String
   houseNumber  String
-  town         String
-  postcode     String
+  city         String
+  postalCode   String
   country      String
-  restaurantID String        @unique
-  restaurant   Restaurant    @relation(name: "locationRest", fields: [restaurantID], references: [id])
-  reservierung Reservierung? @relation(name: "reservierungLoc")
+  restaurantId String       @unique
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  reservation  Reservation?
 }
 
-model Reservierung {
-  id           String   @id @default(cuid())
-  locationID   String   @unique
-  restaurantID String
-  location     Location @relation(name: "reservierungLoc", fields: [locationID], references: [id])
-  phoneNum     String
+model Reservation {
+  id          String   @id @default(cuid())
+  locationId  String   @unique
+  phoneNumber String
+  location    Location @relation(fields: [locationId], references: [id])
+  createdAt   DateTime @default(now())
 }
 
 model Menu {
-  id           String      @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
   description  String?
-  kategorien   Kategorie[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  restaurantID String      @unique
-  restaurant   Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [id])
+  restaurantID String     @unique
+  restaurant   Restaurant @relation(fields: [restaurantID], references: [id])
+  categories   Category[]
+  dishes       Dish[]
   bgColor      String
   font         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
-model Kategorie {
-  id          String    @id @default(cuid())
+model Category {
+  id          String  @id @default(cuid())
   name        String
   description String?
-  menuId      String
-  menu        Menu      @relation(fields: [menuId], references: [id])
-  gerichte    Gericht[]
+  menuId      String  @unique
+  menu        Menu    @relation(fields: [menuId], references: [id])
+  dishes      Dish[]
 }
 
-model Gericht {
-  id          String      @id @default(cuid())
+model Dish {
+  id          String       @id @unique @default(cuid())
   name        String
   description String?
   price       Float
-  kategorieId String
-  kategorie   Kategorie   @relation(fields: [kategorieId], references: [id])
-  zutaten     Zutat[]     @relation("GerichtZutaten")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  bewertungen Bewertung[] @relation("Bewertung Gericht")
-  img         String
+  imageUrl    String
+  categoryId  String
+  menuId      String
+  category    Category     @relation(fields: [categoryId], references: [id])
+  menu        Menu         @relation(fields: [menuId], references: [id])
+  ingredients Ingredient[] @relation("DishIngredients")
+  reviews     Review[]     @relation("DishReviews")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
-model Zutat {
-  id         String    @id @default(cuid())
+model Ingredient {
+  id         String  @id @default(cuid())
   name       String
-  isAllergen Boolean   @default(false)
-  gerichte   Gericht[] @relation("GerichtZutaten")
+  isAllergen Boolean @default(false)
+  dishes     Dish[]  @relation("DishIngredients")
 }
 
-model Bewertung {
-  id        String   @id @default(cuid())
-  gerichtId String
-  bewertung Int      @default(0)
-  kommentar String?
+model Review {
+  id        String   @id @unique @default(cuid())
+  dishId    String
+  rating    Float    @default(0)
+  comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  gericht   Gericht  @relation("Bewertung Gericht", fields: [gerichtId], references: [id])
+  dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
 }
