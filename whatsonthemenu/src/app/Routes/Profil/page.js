@@ -14,6 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 import { ChevronRightIcon } from "lucide-react";
 
@@ -118,8 +126,25 @@ export default function PageBuilder() {
   const edditWin = () => {
     // Kategorien werden sortiert
     return (
-      <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20 ">
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10 relative z-30">
+      <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20 align-top">
+        <Sheet>
+  <SheetTrigger>Open</SheetTrigger>
+  <SheetContent>
+    <SheetHeader>
+      <SheetTitle>Are you absolutely sure?</SheetTitle>
+      <SheetDescription>
+        This action cannot be undone. This will permanently delete your account
+        and remove your data from our servers.
+      </SheetDescription>
+    </SheetHeader>
+  </SheetContent>
+</Sheet>
+        <div className="absolute">
+          <div>
+            <Button></Button>
+          </div>
+        </div>
+        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-2 z-30 mt-15">
           <h1 className="text-2xl font-bold mb-6 text-center">Neues Menü erstellen</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -309,12 +334,14 @@ export default function PageBuilder() {
         <div className="bg-grey-200">
           <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
           <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
-          <Button onClick={toggleOpenEditWin}>Menü erstellen</Button>
+          <Button onClick={toggleOpenEditWin} className="absolute">Menü erstellen</Button>
+          <div className="absolute mt-0 w-full top-0">
           {openEditWin && edditWin()}
           <div className="mt-6 space-y-6">
             {components.map((component, index) => (
               <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
             ))}
+          </div>
           </div>
         </div>
       </Card>
@@ -325,14 +352,14 @@ export default function PageBuilder() {
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
         <div>
-          <div>
+          <div className="">
             <Button onClick={goBackBtn}>Zurück</Button>
           </div>
         </div>
         <div className="">
           <Button onClick={toggleMenu}>|||</Button>
         </div>
-        <div>
+        <div className="absolute top-0">
           {expandMenu && <OptionMenu />}
         </div>
         <div>
