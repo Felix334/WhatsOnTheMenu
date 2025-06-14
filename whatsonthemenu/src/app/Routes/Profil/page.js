@@ -111,7 +111,7 @@ export default function PageBuilder() {
                 <SheetTitle>Menü-Dashboard</SheetTitle>
                 <SheetDescription>Hier können sie ganz einfach ein neues Menü erstellen</SheetDescription>
               </SheetHeader>
-              <ScrollArea className="h-[89%] w-[100%] rounded-md border">
+              <ScrollArea className="h-[89%] w-[100%] rounded-md border pt-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
