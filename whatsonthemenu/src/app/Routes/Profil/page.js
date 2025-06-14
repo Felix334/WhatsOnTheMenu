@@ -28,10 +28,10 @@ export default function PageBuilder() {
   const router = useRouter();
 
   const [components, setComponents] = useState([]);
-  const [openEditWin, setOpenEditWin] = useState(true);
+  const [openEditWin, setOpenEditWin] = useState(false);
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
-  const [expandMenu, setExpandMenu] = useState(true);
+  const [expandMenu, setExpandMenu] = useState(false);
   const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
@@ -44,7 +44,6 @@ export default function PageBuilder() {
     if (userID_ && (role === "Admin" || role === "User")) {
       setUserID(userID_);
       setUserRole(role);
-      router.refresh();
     }
   }, []);
 
@@ -59,7 +58,11 @@ export default function PageBuilder() {
 
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" });
 
-  const toggleOpenEditWin = () => setOpenEditWin((prev) => !prev);
+  //const toggleOpenEditWin = () => setOpenEditWin((prev) => !prev);
+  const toggleOpenEditWin = (e) => {
+    e.preventDefault()
+    if(!openEditWin){setOpenEditWin(true)}else{setOpenEditWin(false)}
+  }
   const toggleMenu = () => setExpandMenu((prev) => !prev);
   const handleBgChange = (e) => setBgColor(e.target.value);
 
@@ -106,7 +109,7 @@ export default function PageBuilder() {
             <SheetContent side="right">
               <SheetHeader>
                 <SheetTitle>Menü-Dashboard</SheetTitle>
-                <SheetDescription>Neues Menü erstellen</SheetDescription>
+                <SheetDescription>Hier können sie ganz einfach ein neues Menü erstellen</SheetDescription>
               </SheetHeader>
               <ScrollArea className="h-[89%] w-[100%] rounded-md border">
               <Form {...form}>
