@@ -23,13 +23,15 @@ export default function Home() {
   const [closeInput, setCloseInput] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [userID, setUserID] = useState("");
+  const [role, setRole] = useState("")
   const [hasReloaded, setHasReloaded] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (userID) {
+    if (userID && role) {
       window.localStorage.setItem("userID", userID);
+      window.localStorage.setItem("role", role)
     } else {
       var userID_ = window.localStorage.getItem("userID");
       if (userID_) {
@@ -242,7 +244,7 @@ export default function Home() {
         </section>
       </main>
       <div className="absolute item-center justify-center align-center flex grid">
-        {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} />}
+        {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
     </div>

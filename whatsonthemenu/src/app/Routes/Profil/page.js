@@ -14,14 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea, ScrollAreaViewport, ScrollAreaScrollbar, ScrollAreaThumb } from "@/components/ui/scroll-area";
 
 import { ChevronRightIcon } from "lucide-react";
 
@@ -32,60 +26,27 @@ export default function PageBuilder() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+
   const [components, setComponents] = useState([]);
-  const [openEditWin, setOpenEditWin] = useState(false);
+  const [openEditWin, setOpenEditWin] = useState(true);
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
-  const [expandMenu, setExpandMenu] = useState(false);
-  const [menu, setMenu] = useState([
-    {
-      // Muss die selbe Struktur haben
-      title: "",
-      bgCol: "",
-      position: 0,
-      items: [
-        {
-          name: "",
-          price: "",
-          description: "",
-          image: "",
-        },
-      ],
-    },
-  ]);
+  const [expandMenu, setExpandMenu] = useState(true);
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    const { query } = router;
-    console.log(query);
-    const userID_ = window.localStorage.getItem("userID");
-    const role = window.sessionStorage.getItem("role");
+    const userID_ = sessionStorage.getItem("userID");
+    const role = sessionStorage.getItem("role");
     if (!userID_) {
-      console.log("Keine ID vorhanden");
-      window.alert("Keine berechtigte Benutzer-ID vorhanden! \nBitte melden sie sich im Hauptmenu an!");
+      alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
       return;
     }
-    if ((userID_ && role === "Admin") || (userID_ && role === "User")) {
+    if (userID_ && (role === "Admin" || role === "User")) {
       setUserID(userID_);
-      render_user(userID_);
+      setUserRole(role);
+      router.refresh();
     }
-  }, [userID]);
-
-  const checkUser = async (userID) => {
-    var userID = userID;
-    var response = fetch("./api/user/profile/getData", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: userID }),
-    }).then((response) => response.json()); // => selbe Struktur wie die useState
-    if (response) {
-      console.log(response);
-      //setMenu(response)
-      return true;
-    }
-    return null;
-  };
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -96,14 +57,11 @@ export default function PageBuilder() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "items",
-  });
+  const { fields, append, remove } = useFieldArray({ control: form.control, name: "items" });
 
-  const toggleOpenEditWin = () => {
-    setOpenEditWin((prev) => !prev);
-  };
+  const toggleOpenEditWin = () => setOpenEditWin((prev) => !prev);
+  const toggleMenu = () => setExpandMenu((prev) => !prev);
+  const handleBgChange = (e) => setBgColor(e.target.value);
 
   const submitToServer = (data) => {
     const newSection = {
@@ -119,282 +77,173 @@ export default function PageBuilder() {
     toggleOpenEditWin();
   };
 
-  const handleBgChange = (event) => {
-    setBgColor(event.target.value);
+  const goBackBtn = () => {
+    router.push("../");
   };
 
-  const edditWin = () => {
-    // Kategorien werden sortiert
-    return (
-      <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20 align-top">
-        <Sheet>
-  <SheetTrigger>Open</SheetTrigger>
-  <SheetContent>
-    <SheetHeader>
-      <SheetTitle>Are you absolutely sure?</SheetTitle>
-      <SheetDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
-      </SheetDescription>
-    </SheetHeader>
-  </SheetContent>
-</Sheet>
-        <div className="absolute">
-          <div>
-            <Button></Button>
-          </div>
-        </div>
-        <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-2 z-30 mt-15">
-          <h1 className="text-2xl font-bold mb-6 text-center">Neues Menü erstellen</h1>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="menu_col"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Kategorie</FormLabel>
-                    <FormControl>
-                      <Input placeholder="z.B. Mittag" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="menu_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Menüname:</FormLabel>
-                    <FormControl>
-                      <Input placeholder="z.B. Pasta Menü" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+  const OptionMenu = () => (
+    <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-10">
+      <Sheet open={expandMenu} onOpenChange={setExpandMenu}>
+        <SheetTrigger asChild>
+          <Button variant="outline">|||</Button>
+        </SheetTrigger>
+        <SheetContent side="left" style={{ width: "800px" }}>
+          <SheetHeader>
+            <SheetTitle>Dashboard</SheetTitle>
+            <SheetDescription>Hier können Sie Ihre Seite individuell gestalten</SheetDescription>
+          </SheetHeader>
+          <Input name="Hintergrund" type="color" onChange={handleBgChange} />
+          <Button onClick={toggleOpenEditWin}>Menü erstellen</Button>
+          {openEditWin && renderEditor()}
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
 
-              <div className="space-y-4 border-t pt-4">
-                <h3 className="text-lg font-semibold">Gerichte:</h3>
-                {fields.map((item, index) => (
-                  <div key={item.id} className="p-4 border rounded-xl space-y-2 bg-gray-50 relative">
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Gerichtname</FormLabel>
-                          <FormControl>
-                            <Input placeholder="z.B. Spaghetti Carbonara" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.description`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Beschreibung</FormLabel>
-                          <FormControl>
-                            <Input placeholder="z.B. Mit Sahnesauce" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.price`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Preis</FormLabel>
-                          <FormControl>
-                            <Input placeholder="z.B. 9.50 €" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.image`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bild</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => {
-                                    form.setValue(`items.${index}.image`, reader.result); // base64 speichern
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          {form.watch(`items.${index}.image`) && <Image src={form.watch(`items.${index}.image`)} alt="Vorschau" className="mt-2 w-full h-auto rounded-lg border" />}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="button" variant="ghost" className="absolute top-2 right-2 text-sm text-red-500" onClick={() => remove(index)}>
-                      Entfernen
+  const renderEditor = () => (
+    <div className="">
+          <Sheet open={openEditWin} onOpenChange={setOpenEditWin}>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle>Menü-Dashboard</SheetTitle>
+                <SheetDescription>Neues Menü erstellen</SheetDescription>
+              </SheetHeader>
+              <ScrollArea className="h-[89%] w-[100%] rounded-md border">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="menu_col"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kategorie</FormLabel>
+                        <FormControl>
+                          <Input placeholder="z.B. Mittag" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="menu_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Menüname</FormLabel>
+                        <FormControl>
+                          <Input placeholder="z.B. Pasta Menü" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="space-y-4 border-t pt-4">
+                    <h3 className="text-lg font-semibold">Gerichte:</h3>
+                    {fields.map((item, index) => (
+                      <div key={item.id} className="p-4 border rounded-xl bg-gray-50 relative">
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Gerichtname:</FormLabel>
+                              <FormControl>
+                                <Input placeholder="z.B. Spaghetti" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.description`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Beschreibung</FormLabel>
+                              <FormControl>
+                                <Input placeholder="z.B. Mit Sahnesauce" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.price`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Preis</FormLabel>
+                              <FormControl>
+                                <Input placeholder="z.B. 9.50 €" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.image`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bild</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      const reader = new FileReader();
+                                      reader.onloadend = () => {
+                                        form.setValue(`items.${index}.image`, reader.result);
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              {form.watch(`items.${index}.image`) && <Image src={form.watch(`items.${index}.image`)} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />}
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
+                          Entfernen
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button type="button" variant="outline" onClick={() => append({ name: "", price: "", description: "" })}>
+                    + Gericht hinzufügen
+                  </Button>
+                  <div className="flex justify-between pt-4">
+                    <Button type="submit">Speichern</Button>
+                    <Button type="button" variant="outline" onClick={toggleOpenEditWin}>
+                      Abbrechen
                     </Button>
                   </div>
-                ))}
-
-                <Button type="button" variant="outline" onClick={() => append({ name: "", price: "", description: "" })}>
-                  + Gericht hinzufügen
-                </Button>
-              </div>
-
-              <div className="flex justify-between pt-4">
-                <Button type="submit">Speichern</Button>
-                <Button type="button" variant="outline" onClick={toggleOpenEditWin}>
-                  Abbrechen
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </div>
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    const { query } = router;
-    const params = new URLSearchParams(searchParams.toString());
-    const id = params.get("userID");
-    if (id) {
-      setUserID(id);
-    }
-    console.log("Route querry (Profil)", query);
-  }, []);
-
-  const warning = () => {
-    window.alert("Wichtig!Helligkeit (rechter Balken) muss eingestellt werden");
-  };
-
-  // checken ob die "goBackBtnFunktion" nötig ist
-
-  const goBackBtn = () => {
-    const backURL = "./";
-    const pathname = router.pathname;
-    const newQuery = { ...router.query, id: userID };
-    router.replace({
-      pathname: pathname,
-      querry: newQuery,
-    });
-    router.push("../");
-    router.back();
-  };
-
-  const toggleMenu = () => {
-    if (openEditWin) {
-      setOpenEditWin(false);
-    }
-    if (!expandMenu) {
-      setExpandMenu(true);
-    } else {
-      setExpandMenu(false);
-    }
-  };
-
-  const load = async (userID) => {
-    var data = await checkUser(userID).then(() => {
-      if (data == null) {
-        return null;
-      }
-      return data;
-    });
-  };
-
-  const render_user = async (userID) => {
-    var result = await load(userID);
-    if (result == null) {
-      return null;
-    }
-  };
-
-  if (!userID) {
-    return <div>Bitte Anmelden</div>;
-  }
-
-  const OptionMenu = () => {
-    return (
-      <Card className="w-full max-w-sm bg-red-200">
-        <div className="bg-grey-200">
-          <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
-          <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
-          <Button onClick={toggleOpenEditWin} className="absolute">Menü erstellen</Button>
-          <div className="absolute mt-0 w-full top-0">
-          {openEditWin && edditWin()}
-          <div className="mt-6 space-y-6">
-            {components.map((component, index) => (
-              <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
-            ))}
-          </div>
-          </div>
-        </div>
-      </Card>
-    );
-  };
+                </form>
+              </Form>
+              </ScrollArea>
+            </SheetContent>
+          </Sheet>
+    </div>
+  );
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-4">
-        <div>
-          <div className="">
-            <Button onClick={goBackBtn}>Zurück</Button>
+        <Button onClick={goBackBtn}>Zurück</Button>
+        <Button onClick={toggleMenu} className="ml-4">
+          |||
+        </Button>
+        {expandMenu && <OptionMenu />}
+        <div className="mt-6 space-y-6">
+            {components.map((component, index) => (
+              <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} /> : <h4 className="text-lg">{component.name}</h4>}</div>
+            ))}
           </div>
-        </div>
-        <div className="">
-          <Button onClick={toggleMenu}>|||</Button>
-        </div>
-        <div className="absolute top-0">
-          {expandMenu && <OptionMenu />}
-        </div>
-        <div>
-          <HandleUser />
-        </div>
       </div>
     </div>
   );
 }
-
-
-function HandleUser() {
-  const [data, setData] = useState([]);
-  const [userID, setUserID] = useState(null);
-  const [change, setChange] = useState([{
-      // Muss die selbe Struktur haben
-      title: "",
-      bgCol: "",
-      position: 0,
-      items: [
-        {
-          name: "",
-          price: "",
-          description: "",
-          image: "",
-        },
-      ],
-    },
-  ]);
-  
-  const getMenu = async() => {
-    const resp = await fetch("./api/restaurant/menu");
-    const data = await resp.json();
-    setData(data);
-  }
-
-}
-// toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar machen

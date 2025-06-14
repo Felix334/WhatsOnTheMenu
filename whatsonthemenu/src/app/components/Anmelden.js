@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-export default function Home({ renderLogin, userID }) {
+export default function Home({ renderLogin, userID, role }) {
   const [submittedData, setSubmittedData] = useState(null);
   const router = useRouter();
   const form = useForm({
@@ -36,7 +36,10 @@ export default function Home({ renderLogin, userID }) {
         // Store user and session IDs in sessionStorage
         window.sessionStorage.setItem("userID", data.id);
         window.sessionStorage.setItem("sessionID", data.sessionID);
-        userID(data.id)
+        window.sessionStorage.setItem("role", data.role);
+        console.log("UserId:", data.id, "user role:", data.role)
+        userID(data.id);
+        role(data.role);
         setSubmittedData(data);
         renderLogin(false);
 
@@ -53,7 +56,7 @@ export default function Home({ renderLogin, userID }) {
         const url = `${searchParams ? `?${searchParams}` : ""}`;
         router.replace(url, { shallow: true });
 
-        if (data.role === "Admin") {
+        if (data.role === "Admin" || data.role === "User") {
           window.sessionStorage.setItem("role", data.role);
         }
         console.log("Data sent successfully");

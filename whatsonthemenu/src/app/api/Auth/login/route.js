@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -6,16 +6,18 @@ const prisma = new PrismaClient();
 export async function POST(req) {
   try {
     const data = await req.json();
-    if (data) {
-      console.log("Daten empfangen:", data);
-      const userID = await main(data);
-      if (userID) {
-        return NextResponse.json({ message: "Login Successful", id: userID }, { status: 200 });
-      } else {
-        return NextResponse.json({ message: "Login Failed" }, { status: 401 });
-      }
-    } else {
+    if (!data) {
       return NextResponse.json({ message: "No data received" }, { status: 400 });
+    }
+
+    const result = await main(data);
+    if (result && result.userID) {
+      return NextResponse.json(
+        { message: "Login Successful", id: result.userID, role: result.role },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json({ message: "Login Failed" }, { status: 401 });
     }
   } catch (error) {
     console.error("Error in POST handler:", error);
@@ -24,19 +26,23 @@ export async function POST(req) {
 }
 
 async function main(data) {
-  const { email, password } = await data;
+  const { email, password } = data;
   console.log("Checking user with email and password:", email, password);
-  const user = await prisma.user.findUnique({ where: { email: email } });
-  if (user) {
-    console.log("User found:", user);
-    // Fix: compare password with user.password (not passwordHash)
-    if (user.password === password) {
-      return user.id;
-    } else {
-      console.log("Password mismatch");
-    }
-  } else {
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
     console.log("User not found");
+    return null;
   }
-  return null;
+
+  if (user.password !== password) {
+    console.log("Password mismatch");
+    return null;
+  }
+
+  console.log("User authenticated:", user.id, user.role);
+  return { userID: user.id, role: user.role };
 }

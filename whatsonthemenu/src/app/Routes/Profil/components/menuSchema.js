@@ -5,7 +5,7 @@ const menuSchema = z.object({
   menu_name: z.string().min(1, "Menü-Name erforderlich"),
   items: z.array(
     z.object({
-      name: z.string().min(1),
+      name: z.string().min(2),
       price: z.string().min(1),
       description: z.string().optional(),
       image: z.string().optional(), // base64 oder URL

@@ -1,13 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import Link from "next/link";
-
+"use client"
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -16,111 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-import { ChevronRightIcon } from "lucide-react";
 
-import MenuSection from "./components/menusection";
-import menuSchema from "./components/menuSchema";
-
-export default function PageBuilder() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const [components, setComponents] = useState([]);
-  const [openEditWin, setOpenEditWin] = useState(false);
-  const [bgColor, setBgColor] = useState("");
-  const [userID, setUserID] = useState("");
-  const [expandMenu, setExpandMenu] = useState(false);
-  const [menu, setMenu] = useState([
-    {
-      // Muss die selbe Struktur haben
-      title: "",
-      bgCol: "",
-      position: 0,
-      items: [
-        {
-          name: "",
-          price: "",
-          description: "",
-          image: "",
-        },
-      ],
-    },
-  ]);
-
-  useEffect(() => {
-    const { query } = router;
-    console.log(query);
-    const userID_ = window.localStorage.getItem("userID");
-    const role = window.sessionStorage.getItem("role");
-    if (!userID_) {
-      console.log("Keine ID vorhanden");
-      window.alert("Keine berechtigte Benutzer-ID vorhanden! \nBitte melden sie sich im Hauptmenu an!");
-      return;
-    }
-    if ((userID_ && role === "Admin") || (userID_ && role === "User")) {
-      setUserID(userID_);
-      render_user(userID_);
-    }
-  }, [userID]);
-
-  const checkUser = async (userID) => {
-    var userID = userID;
-    var response = fetch("./api/user/profile/getData", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: userID }),
-    }).then((response) => response.json()); // => selbe Struktur wie die useState
-    if (response) {
-      console.log(response);
-      //setMenu(response)
-      return true;
-    }
-    return null;
-  };
-
-  const form = useForm({
-    resolver: zodResolver(menuSchema),
-    defaultValues: {
-      menu_col: "",
-      menu_name: "",
-      items: [{ name: "", price: "", description: "", image: "" }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "items",
-  });
-
-  const toggleOpenEditWin = () => {
-    setOpenEditWin((prev) => !prev);
-  };
-
-  const submitToServer = (data) => {
-    const newSection = {
-      title: data.menu_name,
-      items: data.items,
-    };
-    setComponents((prev) => [...prev, { name: "menuSection", content: newSection }]);
-  };
-
-  const onSubmit = (data) => {
-    submitToServer(data);
-    form.reset();
-    toggleOpenEditWin();
-  };
-
-  const handleBgChange = (event) => {
-    setBgColor(event.target.value);
-  };
-
-  const edditWin = () => {
+const edditWin = ({}) => {
     // Kategorien werden sortiert
     return (
       <div className="absolute min-h-screen w-screen bg-black/30 backdrop-blur-md text-black z-20 align-top">
-        <Sheet>
+        <Sheet open={toggleMenu}>
           <SheetTrigger>Open</SheetTrigger>
           <SheetContent>
             <SheetHeader>
@@ -253,105 +145,5 @@ export default function PageBuilder() {
         </Sheet>
       </div>
     );
-  };
-
-  const toggleMenu = () => {
-    if (openEditWin) {
-      setOpenEditWin(false);
-    }
-    if (!expandMenu) {
-      setExpandMenu(true);
-    } else {
-      setExpandMenu(false);
-    }
-  };
-
-  const load = async (userID) => {
-    var data = await checkUser(userID).then(() => {
-      if (data == null) {
-        return null;
-      }
-      return data;
-    });
-  };
-
-  const render_user = async (userID) => {
-    var result = await load(userID);
-    if (result == null) {
-      return null;
-    }
-  };
-
-  if (!userID) {
-    return <div>Bitte Anmelden</div>;
-  }
-
-  const OptionMenu = () => {
-    return (
-      <Card className="w-full max-w-sm bg-red-200">
-        <div className="bg-grey-200">
-          <Label htmlFor="bgColInp">Hintergrund-Farbe</Label>
-          <Input name="Hintergrund" type="color" id="bgColInp" onClick={() => warning()} onChange={handleBgChange} width={90} />
-          <Button onClick={toggleOpenEditWin} className="absolute">
-            Menü erstellen
-          </Button>
-          <div className="absolute mt-0 w-full top-0">
-            {openEditWin && edditWin()}
-            <div className="mt-6 space-y-6">
-              {components.map((component, index) => (
-                <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} toggleOpenEditWin={openWin(index)} /> : <h4 className="text-lg">{component.name}</h4>}</div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  };
-
-  return (
-    <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
-      <div className="p-4">
-        <div>
-          <div className="">
-            <Button onClick={goBackBtn}>Zurück</Button>
-          </div>
-        </div>
-        <div className="">
-          <Button onClick={toggleMenu}>|||</Button>
-        </div>
-        <div className="absolute top-0">{expandMenu && <OptionMenu />}</div>
-        <div>
-          <HandleUser />
-        </div>
-      </div>
-    </div>
-  );
+  
 }
-
-function HandleUser() {
-  const [data, setData] = useState([]);
-  const [userID, setUserID] = useState(null);
-  const [change, setChange] = useState([
-    {
-      // Muss die selbe Struktur haben
-      title: "",
-      bgCol: "",
-      position: 0,
-      items: [
-        {
-          name: "",
-          price: "",
-          description: "",
-          image: "",
-        },
-      ],
-    },
-  ]);
-
-  const getMenu = async () => {
-    const resp = await fetch("./api/restaurant/menu");
-    const data = await resp.json();
-    setData(data);
-  };
-}
-// toggleOpenEditWin vervollständigen => Berreits erstelltes Mnü bearbeitbar machen
