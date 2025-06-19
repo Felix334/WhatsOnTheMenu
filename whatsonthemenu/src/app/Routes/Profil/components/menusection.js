@@ -20,7 +20,7 @@ const MenuSection = ({ section, toggleOpenEditWin }) => {
             <TableRow key={index}>
               <TableCell>{item.name}</TableCell>
               <TableCell>{item.description}</TableCell>
-              <TableCell className="text-right">{item.price}</TableCell>
+              <TableCell className="text-right">{item.price}€</TableCell>
             </TableRow>
           ))}
         </TableBody>

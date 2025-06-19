@@ -83,7 +83,7 @@ export default function Home() {
   const goToUnserTeam = () => {
     if (userID) {
       const { query } = router;
-      const pathname = "/Routes/Partner/";
+      const pathname = "/Routes/UnserTeam/";
       console.log("Routing Info:(page.js)", pathname, query);
       const newQuery = { ...query, userID };
       const queryString = new URLSearchParams(newQuery).toString();

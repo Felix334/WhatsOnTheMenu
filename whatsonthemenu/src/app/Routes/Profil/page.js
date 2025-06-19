@@ -28,11 +28,19 @@ export default function PageBuilder() {
   const router = useRouter();
 
   const [components, setComponents] = useState([]);
-  const [openEditWin, setOpenEditWin] = useState(false);
+  const [serverData, setServerData] = useState([]);
+  const [updatedData, setUpdatetData] = useState([]);
+
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
-  const [expandMenu, setExpandMenu] = useState(false);
   const [userRole, setUserRole] = useState("");
+
+  const [expandMenu, setExpandMenu] = useState(false);
+  const [openEditWin, setOpenEditWin] = useState(false);
+
+  const [newChange, setNewChange] = useState(false);
+
+  const updateData = () => {};
 
   useEffect(() => {
     const userID_ = sessionStorage.getItem("userID");
@@ -44,6 +52,7 @@ export default function PageBuilder() {
     if (userID_ && (role === "Admin" || role === "User")) {
       setUserID(userID_);
       setUserRole(role);
+      loadServerData();
     }
   }, []);
 
@@ -60,9 +69,13 @@ export default function PageBuilder() {
 
   //const toggleOpenEditWin = () => setOpenEditWin((prev) => !prev);
   const toggleOpenEditWin = (e) => {
-    e.preventDefault()
-    if(!openEditWin){setOpenEditWin(true)}else{setOpenEditWin(false)}
-  }
+    e.preventDefault();
+    if (!openEditWin) {
+      setOpenEditWin(true);
+    } else {
+      setOpenEditWin(false);
+    }
+  };
   const toggleMenu = () => setExpandMenu((prev) => !prev);
   const handleBgChange = (e) => setBgColor(e.target.value);
 
@@ -78,6 +91,30 @@ export default function PageBuilder() {
     submitToServer(data);
     form.reset();
     toggleOpenEditWin();
+  };
+
+  const loadServerData = async () => {
+    const data = fetch("./api/user/profil/getData", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        userID: userID,
+      },
+    })
+      .then((data) => data.json())
+      .then(() => setServerData(data));
+  };
+
+  const submitData = () => {
+    var data = fetch("./api/user/profil/setData", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, PATCH, DELETE",
+      },
+    });
   };
 
   const goBackBtn = () => {
@@ -105,131 +142,131 @@ export default function PageBuilder() {
 
   const renderEditor = () => (
     <div className="">
-          <Sheet open={openEditWin} onOpenChange={setOpenEditWin}>
-            <SheetContent side="right">
-              <SheetHeader>
-                <SheetTitle>Menü-Dashboard</SheetTitle>
-                <SheetDescription>Hier können sie ganz einfach ein neues Menü erstellen</SheetDescription>
-              </SheetHeader>
-              <ScrollArea className="h-[89%] w-[100%] rounded-md border pt-2">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="menu_col"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kategorie</FormLabel>
-                        <FormControl>
-                          <Input placeholder="z.B. Mittag" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="menu_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Menüname</FormLabel>
-                        <FormControl>
-                          <Input placeholder="z.B. Pasta Menü" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="space-y-4 border-t pt-4">
-                    <h3 className="text-lg font-semibold">Gerichte:</h3>
-                    {fields.map((item, index) => (
-                      <div key={item.id} className="p-4 border rounded-xl bg-gray-50 relative">
-                        <FormField
-                          control={form.control}
-                          name={`items.${index}.name`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Gerichtname:</FormLabel>
-                              <FormControl>
-                                <Input placeholder="z.B. Spaghetti" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`items.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Beschreibung</FormLabel>
-                              <FormControl>
-                                <Input placeholder="z.B. Mit Sahnesauce" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`items.${index}.price`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Preis</FormLabel>
-                              <FormControl>
-                                <Input placeholder="z.B. 9.50 €" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`items.${index}.image`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Bild</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      const reader = new FileReader();
-                                      reader.onloadend = () => {
-                                        form.setValue(`items.${index}.image`, reader.result);
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  }}
-                                />
-                              </FormControl>
-                              {form.watch(`items.${index}.image`) && <Image src={form.watch(`items.${index}.image`)} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />}
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
-                          Entfernen
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  <Button type="button" variant="outline" onClick={() => append({ name: "", price: "", description: "" })}>
-                    + Gericht hinzufügen
+      <Sheet open={openEditWin} onOpenChange={setOpenEditWin}>
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>Menü-Dashboard</SheetTitle>
+            <SheetDescription>Hier können sie ganz einfach ein neues Menü erstellen</SheetDescription>
+          </SheetHeader>
+          <ScrollArea className="h-[89%] w-[100%] rounded-md border pt-2">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="menu_col"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kategorie</FormLabel>
+                      <FormControl>
+                        <Input placeholder="z.B. Mittag" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="menu_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Menüname</FormLabel>
+                      <FormControl>
+                        <Input placeholder="z.B. Pasta Menü" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="space-y-4 border-t pt-4">
+                  <h3 className="text-lg font-semibold">Gerichte:</h3>
+                  {fields.map((item, index) => (
+                    <div key={item.id} className="p-4 border rounded-xl bg-gray-50 relative">
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Gerichtname:</FormLabel>
+                            <FormControl>
+                              <Input placeholder="z.B. Spaghetti" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Beschreibung</FormLabel>
+                            <FormControl>
+                              <Input placeholder="z.B. Mit Sahnesauce" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.price`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Preis</FormLabel>
+                            <FormControl>
+                              <Input placeholder="z.B. 9.50 €" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.image`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Bild</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      form.setValue(`items.${index}.image`, reader.result);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            {form.watch(`items.${index}.image`) && <Image src={form.watch(`items.${index}.image`)} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
+                        Entfernen
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button type="button" variant="outline" onClick={() => append({ name: "", price: "", description: "" })}>
+                  + Gericht hinzufügen
+                </Button>
+                <div className="flex justify-between pt-4">
+                  <Button type="submit">Speichern</Button>
+                  <Button type="button" variant="outline" onClick={toggleOpenEditWin}>
+                    Abbrechen
                   </Button>
-                  <div className="flex justify-between pt-4">
-                    <Button type="submit">Speichern</Button>
-                    <Button type="button" variant="outline" onClick={toggleOpenEditWin}>
-                      Abbrechen
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-              </ScrollArea>
-            </SheetContent>
-          </Sheet>
+                </div>
+              </form>
+            </Form>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 
@@ -240,12 +277,19 @@ export default function PageBuilder() {
         <Button onClick={toggleMenu} className="ml-4">
           |||
         </Button>
-        {expandMenu && <OptionMenu />}
-        <div className="mt-6 space-y-6">
+        <Form onChange={updateData}>
+          {expandMenu && <OptionMenu />}
+          <div className="mt-6 space-y-6">
             {components.map((component, index) => (
               <div key={index}>{component.name === "menuSection" ? <MenuSection section={component.content} /> : <h4 className="text-lg">{component.name}</h4>}</div>
             ))}
           </div>
+          {newChange && (
+            <div>
+              <Button onClick={submitData}>Speichern</Button>
+            </div>
+          )}
+        </Form>
       </div>
     </div>
   );
