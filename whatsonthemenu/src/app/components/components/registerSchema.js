@@ -1,11 +1,15 @@
 import * as z from "zod";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  name: z.string().min(1, {
+    message: "Bitte geben sie ihren vollständigen Namen an",
+  }),
   email: z.string().email({
     message: "Bitte geben sie eine gültige Emailadresse ein",
   }),
   password: z
     .string()
+    .lowercase()/////////////////////////////////////////////////////??
     .min(6, {
       message: "Bitte geben sie ein Passwort mit mindestens 6 Zeichen ein",
     })
@@ -14,4 +18,4 @@ const loginSchema = z.object({
     }),
 });
 
-export default loginSchema;
+export default registerSchema;
