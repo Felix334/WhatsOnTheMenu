@@ -23,7 +23,7 @@ export default function Home() {
   const [closeInput, setCloseInput] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [userID, setUserID] = useState("");
-  const [role, setRole] = useState("")
+  const [role, setRole] = useState("");
   const [hasReloaded, setHasReloaded] = useState(false);
 
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function Home() {
   useEffect(() => {
     if (userID && role) {
       window.localStorage.setItem("userID", userID);
-      window.localStorage.setItem("role", role)
+      window.localStorage.setItem("role", role);
     } else {
       var userID_ = window.localStorage.getItem("userID");
       if (userID_) {
@@ -93,7 +93,7 @@ export default function Home() {
     }
   };
 
-    const MobileFunktion = () => {
+  const MobileFunktion = () => {
     if (userID) {
       const { query } = router;
       const pathname = "/Routes/Mobile/";
@@ -132,6 +132,32 @@ export default function Home() {
       window.alert("Bitte anmelden");
     }
   };
+
+  const goToReservierung = () => {
+    if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/Reservierung/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      window.alert("Bitte anmelden");
+    }
+  };
+
+  const goToAnfrageStellen = () => {
+     if (userID) {
+      const { query } = router;
+      const pathname = "/Routes/AnfrageStellen/";
+      console.log("Routing Info:(page.js)", pathname, query);
+      const newQuery = { ...query, userID };
+      const queryString = new URLSearchParams(newQuery).toString();
+      router.replace(`${pathname}?${queryString}`);
+    } else {
+      window.alert("Bitte anmelden");
+    }
+  }
 
   // Profil Renderung ersetzen
   return (
@@ -182,7 +208,7 @@ export default function Home() {
               <CardTitle>Unser Team</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={goToUnserTeam}>Unser Team</Button>
+              <Button onClick={goToUnserTeam}>Impressum</Button>
             </CardContent>
           </Card>
           <Card>
@@ -190,9 +216,7 @@ export default function Home() {
               <CardTitle>Mobile Funktionen</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Button onClick={MobileFunktion}>Unser Team</Button>
-              </Button>
+              <Button onClick={MobileFunktion}>Unser Team</Button>
             </CardContent>
           </Card>
           <Card>
@@ -200,9 +224,7 @@ export default function Home() {
               <CardTitle>Wie funktioniert`s?</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Button onClick={WieFunktionierts}>Unser Team</Button>
-              </Button>
+              <Button onClick={WieFunktionierts}>Unser Team</Button>
             </CardContent>
           </Card>
           <Card>
@@ -210,9 +232,7 @@ export default function Home() {
               <CardTitle>Werden sie ein Teil unserer Community</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Link href="Community">Anfrage stellen</Link>
-              </Button>
+              <Button onClick={goToAnfrageStellen}>Anfrage stellen</Button>
             </CardContent>
           </Card>
           <Card>
@@ -221,9 +241,7 @@ export default function Home() {
               <CardDescription>Hier einfach und schnell einen Tisch reservieren</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="flex">
-                <Link href="./Routes/Reservierungen">Reservieren</Link>
-              </Button>
+              <Button onClick={goToReservierung}>Reservieren</Button>
             </CardContent>
           </Card>
           <Card>
