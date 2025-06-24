@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 
 const menuSchema = z.object({
   menu_col: z.string().min(1, "Menü-Kategorie erforderlich"),

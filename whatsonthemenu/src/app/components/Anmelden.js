@@ -4,11 +4,28 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import loginSchema from "./components/loginSchema.js";
 
 export default function Home({ renderLogin, userID, role }) {
   const [submittedData, setSubmittedData] = useState(null);
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setError,
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
   const form = useForm({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -37,7 +54,7 @@ export default function Home({ renderLogin, userID, role }) {
         window.sessionStorage.setItem("userID", data.id);
         window.sessionStorage.setItem("sessionID", data.sessionID);
         window.sessionStorage.setItem("role", data.role);
-        console.log("UserId:", data.id, "user role:", data.role)
+        console.log("UserId:", data.id, "user role:", data.role);
         userID(data.id);
         role(data.role);
         setSubmittedData(data);
@@ -46,7 +63,7 @@ export default function Home({ renderLogin, userID, role }) {
         // Update the query parameter with the new user ID
         const pathname = router.pathname;
         const newQuery = { ...router.query, id: data.id };
-   
+
         router.replace({
           pathname,
           query: newQuery,
@@ -84,7 +101,7 @@ export default function Home({ renderLogin, userID, role }) {
   return (
     <div className="relative min-h-screen w-screen bg-gray-600 text-black-900 z-10">
       <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80 z-9"></div>
-      <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px]">
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px]">
         <h1 className="relative text-2xl font-bold mb-6 text-gray-900 align-center justify-center">Login</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -125,7 +142,7 @@ export default function Home({ renderLogin, userID, role }) {
                   <FormControl>
                     <Input type="password" placeholder="Password" {...field} style={{ color: "black", backgroundColor: "white" }} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage/>
                 </FormItem>
               )}
             />
