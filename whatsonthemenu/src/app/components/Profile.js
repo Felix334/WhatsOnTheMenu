@@ -34,7 +34,9 @@ const logout = async () => {
     await router.replace(newUrl, { shallow: true });
     setOpenProfil(false);
     setCloseLogout(false);
-    await router.push("./")
+    router.refresh();
+    window.location.reload();
+    await router.push("./");
   };
 
   useEffect(() => {

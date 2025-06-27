@@ -67,6 +67,8 @@ export default function Home() {
     }
   };
 
+
+  
   const goToPartner = () => {
     if (userID) {
       const { query } = router;
@@ -109,7 +111,7 @@ export default function Home() {
   const WieFunktionierts = () => {
     if (userID) {
       const { query } = router;
-      const pathname = "/Routes/Mobile/";
+      const pathname = "/Routes/WieFunktionierts/";
       console.log("Routing Info:(page.js)", pathname, query);
       const newQuery = { ...query, userID };
       const queryString = new URLSearchParams(newQuery).toString();
@@ -170,6 +172,7 @@ export default function Home() {
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
+          {!userID && <>
           <Card className="flex item-center grid gap-1">
             <CardHeader>
               <CardTitle>Login</CardTitle>
@@ -192,6 +195,8 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
+          </>
+          }
           <Card>
             <CardHeader>
               <CardTitle>Unsere Partner</CardTitle>
@@ -224,7 +229,7 @@ export default function Home() {
               <CardTitle>Wie funktioniert`s?</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={WieFunktionierts}>Unser Team</Button>
+              <Button onClick={WieFunktionierts}>Wie funktionierts?</Button>
             </CardContent>
           </Card>
           <Card>
