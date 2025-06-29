@@ -78,7 +78,7 @@ export default function Home() {
       const queryString = new URLSearchParams(newQuery).toString();
       router.replace(`${pathname}?${queryString}`);
     } else {
-      router.push("/Routes/Profil");
+      router.push("/Routes/UnserePartner");
     }
   };
 
@@ -91,7 +91,7 @@ export default function Home() {
       const queryString = new URLSearchParams(newQuery).toString();
       router.replace(`${pathname}?${queryString}`);
     } else {
-      router.push("/Routes/Profil");
+      router.push("/Routes/UnserTeam");
     }
   };
 
@@ -109,27 +109,35 @@ export default function Home() {
   };
 
   const WieFunktionierts = () => {
-    if (userID) {
+    router.push("./Routes/WieFunktionierts")
+    /*if (userID) {
+     
       const { query } = router;
       const pathname = "/Routes/WieFunktionierts/";
       console.log("Routing Info:(page.js)", pathname, query);
       const newQuery = { ...query, userID };
       const queryString = new URLSearchParams(newQuery).toString();
       router.replace(`${pathname}?${queryString}`);
+      
     } else {
-      router.push("/Routes/Mobile");
-    }
+      router.push("/Routes/WieFunktionierts")
+      window.alert("Bitte melden sie sich vorher an um diese Funktion nutzen zu können")
+    }*/
   };
 
   const goToProfil = () => {
     // Seperate Route für Restaurants
     if (userID) {
+      /*
       const { query } = router;
       const pathname = "/Routes/Profil/";
       console.log("Routing Info:(page.js)", pathname, query);
       const newQuery = { ...query, userID };
       const queryString = new URLSearchParams(newQuery).toString();
       router.replace(`${pathname}?${queryString}`);
+      */
+// middleware wurde eingerichtet und funktioniert => Routing anpassen
+     router.push("/Routes/Profil");
     } else {
       window.alert("Bitte anmelden");
     }
@@ -221,7 +229,7 @@ export default function Home() {
               <CardTitle>Mobile Funktionen</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={MobileFunktion}>Unser Team</Button>
+              <Button onClick={MobileFunktion}>Mobile Funktionen</Button>
             </CardContent>
           </Card>
           <Card>

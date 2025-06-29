@@ -5,8 +5,6 @@ Neues Routing überall einfügen
 Checken ob die "goBackBtnFunktion" mit neuem Routing nötig ist
 wenn neues Reload System funktioniert 
 
-Conditional Rendering für die "Mein Profil"-Card einfügen
-
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)
