@@ -38,7 +38,7 @@ export default function Home() {
         setUserID(userID_);
       }
     }
-  }, [userID]);
+  }, [userID, role]);
 
   useEffect(() => {
     // Fixes the url reload
@@ -67,109 +67,8 @@ export default function Home() {
     }
   };
 
+  // Routeprotection in middleware einfüge
 
-  
-  const goToPartner = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/Partner/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      router.push("/Routes/UnserePartner");
-    }
-  };
-
-  const goToUnserTeam = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/UnserTeam/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      router.push("/Routes/UnserTeam");
-    }
-  };
-
-  const MobileFunktion = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/Mobile/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      router.push("/Routes/Mobile");
-    }
-  };
-
-  const WieFunktionierts = () => {
-    router.push("./Routes/WieFunktionierts")
-    /*if (userID) {
-     
-      const { query } = router;
-      const pathname = "/Routes/WieFunktionierts/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-      
-    } else {
-      router.push("/Routes/WieFunktionierts")
-      window.alert("Bitte melden sie sich vorher an um diese Funktion nutzen zu können")
-    }*/
-  };
-
-  const goToProfil = () => {
-    // Seperate Route für Restaurants
-    if (userID) {
-      /*
-      const { query } = router;
-      const pathname = "/Routes/Profil/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-      */
-// middleware wurde eingerichtet und funktioniert => Routing anpassen
-     router.push("/Routes/Profil");
-    } else {
-      window.alert("Bitte anmelden");
-    }
-  };
-
-  const goToReservierung = () => {
-    if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/Reservierung/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      window.alert("Bitte anmelden");
-    }
-  };
-
-  const goToAnfrageStellen = () => {
-     if (userID) {
-      const { query } = router;
-      const pathname = "/Routes/AnfrageStellen/";
-      console.log("Routing Info:(page.js)", pathname, query);
-      const newQuery = { ...query, userID };
-      const queryString = new URLSearchParams(newQuery).toString();
-      router.replace(`${pathname}?${queryString}`);
-    } else {
-      window.alert("Bitte anmelden");
-    }
-  }
-
-  // Profil Renderung ersetzen
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
       <header className="mb-12 text-center align-top leading-tight grid gap-0 relative flex">
@@ -180,39 +79,40 @@ export default function Home() {
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
-          {!userID && <>
-          <Card className="flex item-center grid gap-1">
-            <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>Melde dich jetzt an um all unsere Funktionen benutzen zu können</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="flex" onClick={renderLoginW}>
-                Login
-              </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Registrieren</CardTitle>
-              <CardDescription>Neuen Account erstellen</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="flex" onClick={renderRegisterW}>
-                Registrieren
-              </Button>
-            </CardContent>
-          </Card>
-          </>
-          }
+          {!userID && (
+            <>
+              <Card className="flex item-center grid gap-1">
+                <CardHeader>
+                  <CardTitle>Login</CardTitle>
+                  <CardDescription>Melde dich jetzt an um all unsere Funktionen benutzen zu können</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="flex" onClick={renderLoginW}>
+                    Login
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Registrieren</CardTitle>
+                  <CardDescription>Neuen Account erstellen</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="flex" onClick={renderRegisterW}>
+                    Registrieren
+                  </Button>
+                </CardContent>
+              </Card>
+            </>
+          )}
           <Card>
             <CardHeader>
               <CardTitle>Unsere Partner</CardTitle>
               <CardDescription>Finden sie herraus wer schon Teil unserer Community geworden ist.</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="flex" onClick={goToPartner}>
-                Unsere Partner
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/UnserePartner", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Partner</Link>
               </Button>
             </CardContent>
           </Card>
@@ -221,7 +121,9 @@ export default function Home() {
               <CardTitle>Unser Team</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={goToUnserTeam}>Impressum</Button>
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/UnserTeam/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Unser Team</Link>
+              </Button>
             </CardContent>
           </Card>
           <Card>
@@ -229,15 +131,19 @@ export default function Home() {
               <CardTitle>Mobile Funktionen</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={MobileFunktion}>Mobile Funktionen</Button>
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/Mobile/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>
+              </Button>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Wie funktioniert`s?</CardTitle>
+              <CardTitle>Unsere Funktionen</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={WieFunktionierts}>Wie funktionierts?</Button>
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/WieFunktionierts", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Wie Funktionierts?</Link>
+              </Button>
             </CardContent>
           </Card>
           <Card>
@@ -245,7 +151,9 @@ export default function Home() {
               <CardTitle>Werden sie ein Teil unserer Community</CardTitle>
             </CardHeader>
             <CardContent>
-              <Button onClick={goToAnfrageStellen}>Anfrage stellen</Button>
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/Community/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
+              </Button>
             </CardContent>
           </Card>
           <Card>
@@ -254,24 +162,26 @@ export default function Home() {
               <CardDescription>Hier einfach und schnell einen Tisch reservieren</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={goToReservierung}>Reservieren</Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Mein Restaurant</CardTitle>
-              <CardDescription>Profil bearbeiten</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => {
-                  goToProfil();
-                }}
-              >
-                Mein Profil
+              <Button asChild>
+                <Link href={{ pathname: "/Routes/Reservierung/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Reservierung</Link>
               </Button>
             </CardContent>
           </Card>
+          {userID && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Mein Restaurant</CardTitle>
+                <CardDescription>Profil bearbeiten</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild>
+                  <Link className="" href={{ pathname: "/Routes/Profil/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
+                    Profil
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </section>
       </main>
       <div className="absolute item-center justify-center align-center flex grid">

@@ -13,45 +13,8 @@ export function middleware(req) {
   }*/
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // Wenn die userID in the url ist kann ich nicht mehr mit den Browserpfeilen navigieren
 // aber wenn nicht dann schon
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -63,6 +26,7 @@ export function middleware(req) {
       url.pathname.startsWith("/Routes/UnserTeam/") ||
       url.pathname.startsWith("/Routes/WieFunktionierts/")
     ) {
+      window.alert(id)
       const newPath = url.pathname.replace('/Routes/', '/');
       return NextResponse.push(new URL(newPath, req.url));
     }
