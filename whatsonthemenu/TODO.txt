@@ -1,6 +1,6 @@
 Fix the Profil picture
 
-Routing zu Restaurants über Restaurant Liste funktioniert noch nicht
+middleware routing die die url verändert("Routes" entfernt) funktioniert noch nicht
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)

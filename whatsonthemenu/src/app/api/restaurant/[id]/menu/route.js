@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCookie } from "cookies-next";
+//import { getCookie } from "cookies-next";
 import { PrismaClient } from "@prisma/client";
-import { verify } from "jsonwebtoken";
+//import { verify } from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req, res) {

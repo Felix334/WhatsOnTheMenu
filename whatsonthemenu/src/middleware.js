@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req) {
-  console.log(`Middleware-Log(middleware.js):[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log(`Middleware-Log:[${new Date().toISOString()}] ${req.method} ${req.url}`);
   
   const url = req.nextUrl.clone();
   const id = url.searchParams.get("userID");
@@ -26,9 +26,9 @@ export function middleware(req) {
       url.pathname.startsWith("/Routes/UnserTeam/") ||
       url.pathname.startsWith("/Routes/WieFunktionierts/")
     ) {
-      window.alert(id)
-      const newPath = url.pathname.replace('/Routes/', '/');
-      return NextResponse.push(new URL(newPath, req.url));
+      console.log(id)
+      /*const newPath = url.pathname.replace('/Routes/', '/');
+      return NextResponse.push(new URL(newPath, req.url));*/
     }
 
     // If userID is present in the search params, remove it and redirect to the home page

@@ -7,12 +7,14 @@ import Link from "next/link";
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
+import PermControleLocation from "./components/LocasionPermission";
+import SlowRenderImage from "./components/slowRenderImage"
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-import PermControleLocation from "./components/LocasionPermission";
 import { useRouter } from "next/navigation";
 import path from "path";
 
@@ -67,11 +69,20 @@ export default function Home() {
     }
   };
 
-  // Routeprotection in middleware einfüge
+  // Routeprotection in middleware einfügen
+
+
+
+
+
+
+
+
+  // Ich hab nichts an der Überschrift verändert das Package hat sich verändert
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
-      <header className="mb-12 text-center align-top leading-tight grid gap-0 relative flex">
+      <header className="mb-12 text-center align-top leading-tight grid grid-col-1 gap-0 relative">
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
@@ -183,6 +194,7 @@ export default function Home() {
             </Card>
           )}
         </section>
+          <SlowRenderImage />
       </main>
       <div className="absolute item-center justify-center align-center flex grid">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}

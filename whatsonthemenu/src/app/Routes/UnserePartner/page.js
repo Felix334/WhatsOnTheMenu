@@ -132,7 +132,7 @@ export default function RestaurantList() {
             <CardFooter className="flex justify-end">
               <Button variant="outline" asChild>
                 <Link href={{
-                  pathname: "/Routes/Restaurants/Menu",
+                  pathname: "/Routes/UnserePartner/Restaurants/Menu",
                   query: {
                     ...router.query,
                     ...(userID ? { userID } : {}),
