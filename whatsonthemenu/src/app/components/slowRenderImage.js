@@ -1,136 +1,95 @@
-// components/ImageGrid.js
-import { useEffect } from 'react';
-import profileImage from "./img/account_profile_user_avatar_icon_219236.jpg";
-import Image from 'next/image';
+// app/gallery/page.tsx
+import { Card } from "@/components/ui/card"
+import Image from "next/image"
+import profileImage from "./account_profile_user_avatar_icon_219236.jpg";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+const cards = [
+  {
+    title: "Project Dashboard",
+    description: "Modern analytics dashboard with interactive charts",
+    image: {
+      alt: "Dashboard interface with charts and metrics",
+      label: "Dashboard"
+    }
+  },
+  {
+    title: "E-commerce Store",
+    description: "Complete online shopping experience with cart functionality",
+    image: {
+      alt: "Online store with product listings",
+      label: "E-commerce"
+    }
+  },
+  {
+    title: "Social Platform",
+    description: "Network connecting users with shared interests",
+    image: {
+      alt: "Social media feed with posts and comments",
+      label: "Social"
+    }
+  },
+  {
+    title: "Task Manager",
+    description: "Productivity app for organizing daily work",
+    image: {
+      alt: "Todo list with checked items and deadlines",
+      label: "Tasks"
+    }
+  },
+  {
+    title: "Task Manager",
+    description: "Productivity app for organizing daily work",
+    image: {
+      alt: "Todo list with checked items and deadlines",
+      label: "Tasks"
+    }
+  },
+  {
+    title: "Task Manager",
+    description: "Productivity app for organizing daily work",
+    image: {
+      alt: "Todo list with checked items and deadlines",
+      label: "Tasks"
+    }
+  },
+]
 
-const SlowRenderImage = () => {
-  useEffect(() => {
-    // Fade in all images
-    const fadeInImages = () => {
-      setTimeout(() => {
-        const images = document.querySelectorAll('.fade-in');
-        images.forEach(img => {
-          img.classList.add('loaded');
-        });
-      }, 100);
-    };
-
-    // Responsive behavior
-    const handleResize = () => {
-      const grid = document.querySelector('.grid');
-      if (window.innerWidth < 768) {
-        grid.classList.add('grid-cols-1');
-        grid.classList.remove('grid-cols-2');
-      } else {
-        grid.classList.add('grid-cols-2');
-        grid.classList.remove('grid-cols-1');
-      }
-    };
-
-    // Initial check
-    handleResize();
-    fadeInImages();
-
-    // Add resize listener
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup listener on component unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
+const SlowRenderImage =() => {
   return (
-    <div className="p-4 flex justify-center items-center align-center">
-      <div className="flex justify-center items-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          {/* First row */}
-          
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Professional profile image</p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Casual portrait</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Casual portrait</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Casual portrait</p>
-          </div>
-
-          {/* Second row */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Smiling portrait</p>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow-md">
-           <Image
-              src={profileImage.src}
-              alt="Profile image showing a professional headshot"
-              className="w-full h-auto fade-in"
-              id="img1"
-              width={100}
-              height={100}
-            />
-            <p className="mt-2 text-gray-700">Work environment</p>
-          </div>
+    <div className="min-h-screen p-4 md:p-8">
+      <div className="mx-auto max-w-7xl">
+        <h1 className="mb-8 text-3xl font-bold">Wie funktionierts:</h1>
+        
+        {/* Responsive Grid */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {cards.map((card, index) => (
+            <Card key={index} className="group transition-all hover:shadow-lg">
+              <div className="relative h-64 w-full overflow-hidden rounded-t-lg">
+                <Image
+                  src={profileImage.src}
+                  alt={card.image.alt}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              
+              <div className="p-6">
+                <h2 className="mb-2 text-xl font-semibold">{card.title}</h2>
+                <p className="text-muted-foreground">{card.description}</p>
+                
+                <div className="mt-4 flex justify-end">
+                  <button className="rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90">
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .fade-in {
-          opacity: 0;
-          transition: opacity 1s ease-in-out;
-        }
-        .fade-in.loaded {
-          opacity: 1;
-        }
-      `}</style>
     </div>
-  );
-};
+  )
+}
+
 
 export default SlowRenderImage;

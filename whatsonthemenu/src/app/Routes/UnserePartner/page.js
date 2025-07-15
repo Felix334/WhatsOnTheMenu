@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -23,8 +23,8 @@ import { Badge } from "@/components/ui/badge"
 
 const restaurants = [
   {
-    id: "1eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    name: "Epicurean Delight",
+    id: "cmd4qojb6000255q0j5295w2o",
+    name: "Mein Restaurant",
     cuisine: "French",
     rating: 4.7,
     priceRange: "1€-20€",
@@ -56,9 +56,41 @@ const restaurants = [
 export default function RestaurantList() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCuisine, setSelectedCuisine] = useState('')
-  const [userID, setUserID] = useState("")
+  const [userID, setUserID] = useState("");
+  const [allowGeoLocation, setAllowGeoLocation] = useState(false);
+  const [reqCookie, setReqcookie] = useState(false)
 
   const router = useRouter()
+
+  useEffect(() => {
+    const consent = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('geoLocation='));
+    if (consent?.split('=')[1] === 'true') {
+      setAllowGeoLocation(true);
+    } else {
+      setAllowGeoLocation(false);
+    }
+  }, []);
+
+  // Prompt only if no permission
+  useEffect(() => {
+    if(!reqCookie){
+    if (allowGeoLocation === false) {
+      const confirmConsent = window.confirm(
+        "Kein genauer Standort verfügbar.\nMöchten Sie Cookies zulassen, um Standortdaten zu aktivieren?"
+      );
+      if (confirmConsent) {
+        const expiry = new Date();
+        expiry.setFullYear(expiry.getFullYear() + 1);
+        document.cookie = `geoLocation=true; expires=${expiry.toUTCString()};`;
+        setAllowGeoLocation(true);
+      }
+    }
+  }
+    setReqcookie(true);
+  }, [allowGeoLocation, reqCookie]);
+
 
   useEffect(() => {
     if (userID) {
@@ -154,4 +186,11 @@ export default function RestaurantList() {
       )}
     </div>
   )
+}
+
+function getGeoLocation(){
+  var confGeo = window.confirm("Diese Webseite benutzt Cookies um ihren Standort zu erfassen! \nIn dem sie zustimmen können wir ihre Ergebnisse besser personaliesieren")
+  if(!navigator.geolocation){
+    window.alert("Geographische Daten nicht verfügbar")
+  }
 }

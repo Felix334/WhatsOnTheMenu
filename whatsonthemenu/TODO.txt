@@ -4,3 +4,6 @@ middleware routing die die url verändert("Routes" entfernt) funktioniert noch n
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)
+
+Ein Weg um die Cookies zu test (einen Knopf um sie zurück zu setzen(zum testen))
+Cookies Fertg machen

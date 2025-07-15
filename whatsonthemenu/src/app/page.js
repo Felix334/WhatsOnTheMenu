@@ -27,8 +27,14 @@ export default function Home() {
   const [userID, setUserID] = useState("");
   const [role, setRole] = useState("");
   const [hasReloaded, setHasReloaded] = useState(false);
+  const [renderCookieWin, setRenderCookieWin] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    
+
+  })
 
   useEffect(() => {
     if (userID && role) {
@@ -41,6 +47,7 @@ export default function Home() {
       }
     }
   }, [userID, role]);
+
 
   useEffect(() => {
     // Fixes the url reload
@@ -68,7 +75,6 @@ export default function Home() {
       setRenderRegister(false);
     }
   };
-
   // Routeprotection in middleware einfügen
 
 
@@ -194,9 +200,11 @@ export default function Home() {
             </Card>
           )}
         </section>
-          <SlowRenderImage />
+          <section className="">
+            <SlowRenderImage />
+          </section>
       </main>
-      <div className="absolute item-center justify-center align-center flex grid">
+      <div className="fixed align-top flex grid z-10 mt-0 top-0">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
