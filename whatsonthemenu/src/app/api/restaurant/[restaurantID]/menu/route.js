@@ -19,7 +19,6 @@ export async function GET(req, { params }) {
       include: {
         owner: {
           select: {
-            id: true,
             name: true,
             email: true,
             role: true
@@ -61,7 +60,6 @@ export async function GET(req, { params }) {
       )
     }
 
-    // Calculate average ratings for dishes
     const menuWithRatings = {
       ...restaurant.menu,
       categories: restaurant.menu?.categories.map(category => ({

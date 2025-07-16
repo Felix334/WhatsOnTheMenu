@@ -59,7 +59,8 @@ export default function Home({ renderLogin, userID, role }) {
         router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
 
       } else {
-        console.error("Login failed:", resp.status);
+        console.log("Login failed:", resp.status);
+        window.alert("Login fehlgeschlagen!\nBitte richtige Benutzerdaten angeben!")
       }
     } catch (err) {
       console.error("Network error:", err);

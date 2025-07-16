@@ -7,3 +7,6 @@ Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata
 
 Ein Weg um die Cookies zu test (einen Knopf um sie zurück zu setzen(zum testen))
 Cookies Fertg machen
+
+=> Testen ob die Datenbank richtig diesing ist und ob alle Daten richtig abgerufen werden
+(Es werden noch nicht alle Daten angezigt könnte aber an einer falschen manuellen Erstellung liegen)
