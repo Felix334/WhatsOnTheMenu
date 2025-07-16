@@ -52,6 +52,8 @@ const Menu = () => {
 //Datan werden übertragen
 // Option für Zweite Überschrift
 
+// Andere Kategorien werden nicht angezeigt=>(Fhler in der Datenbank?)
+
 
 return (
     <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
