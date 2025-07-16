@@ -31,7 +31,6 @@ const Menu = () => {
           const data = await resp.json();
           var name = data.name;
           setName(name)
-          setServerData(data)
           console.log("Name__: ", name)
           console.log("Daten empfangen:", data)
           //setMenuItems(data.menu.categories.flatMap(category => category.dishes)); // Alle Gerichte aus den Kategorien
@@ -50,41 +49,56 @@ const Menu = () => {
 
 
 //Datan werden übertragen
-// Option für Zweite Überschrift
+//Name wird fehlerhaft angezeigt(Styles werden nicht angewannt) from-yellow-50 via-yellow-100 to-yellow-200
+
+
+
+
+
 
 
 return (
     <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
-        <header className="mb-12 text-center w-full">
-            <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
-            <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl">{/*description*/}</p>
-        </header>
-        <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
-            <div className="max-w-7xl mx-auto grid gap-4">
-                {serverData.menu.categories.map((category) => (
-                    <Kategorie 
-                        key={category.id}
-                        menuItems={category.dishes}
-                        setTotalPrice={setTotalPrice}
-                        name={category.name} // Pass the category name
-                    />
-                ))}
-            </div>
-            <p className="mt-4">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
-        </main>
+      <header className="mb-12 text-center w-full">
+        <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
+        <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl"></p>
+      </header>
+      <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
+        <div className="max-w-7xl mx-auto grid gap-4">
+          <Vorspeisen menuItems={menuItems} setTotalPrice={setTotalPrice} />
+          <Hauptspeisen menuItems={menuItems} setTotalPrice={setTotalPrice} />
+          <Nachspeise menuItems={menuItems} setTotalPrice={setTotalPrice} />
+          <Getränke menuItems={menuItems} setTotalPrice={setTotalPrice} />
+        </div>
+        <p className="mt-4">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
+      </main>
     </div>
-);
-}
-const Kategorie = ({ menuItems, setTotalPrice, name }) => {
-    return (
-        <MenuSection 
-            title={name} 
-            menuItems={menuItems} // Use the passed menuItems directly
-            setTotalPrice={setTotalPrice} 
-        />
-    );
+  );
 };
 
+const Vorspeisen = ({ menuItems, setTotalPrice }) => {
+  return (
+    <MenuSection title="Vorspeisen" menuItems={menuItems.filter(item => item.category === "Vorspeisen")} setTotalPrice={setTotalPrice} />
+  );
+};
+
+const Hauptspeisen = ({ menuItems, setTotalPrice }) => {
+  return (
+    <MenuSection title="Hauptspeisen" menuItems={menuItems.filter(item => item.category === "Hauptspeisen")} setTotalPrice={setTotalPrice} />
+  );
+};
+
+const Nachspeise = ({ menuItems, setTotalPrice }) => {
+  return (
+    <MenuSection title="Nachspeisen" menuItems={menuItems.filter(item => item.category === "Nachspeisen")} setTotalPrice={setTotalPrice} />
+  );
+};
+
+const Getränke = ({ menuItems, setTotalPrice }) => {
+  return (
+    <MenuSection title="Getränke" menuItems={menuItems.filter(item => item.category === "Getränke")} setTotalPrice={setTotalPrice} />
+  );
+};
 
 const MenuSection = ({ title, menuItems, setTotalPrice }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
