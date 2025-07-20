@@ -26,7 +26,7 @@ export default function Home({ renderRegistrieren }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({name, email, password }),
       });
       if (resp.status === 200) {
         const data = await resp.json();

@@ -10,7 +10,7 @@ import Profile from "./components/Profile";
 import PermControleLocation from "./components/LocasionPermission";
 import SlowRenderImage from "./components/slowRenderImage"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +28,7 @@ export default function Home() {
   const [role, setRole] = useState("");
   const [hasReloaded, setHasReloaded] = useState(false);
   const [renderCookieWin, setRenderCookieWin] = useState(false);
+  const [autherizedUser, setIsAutherizedUser] = useState(false);
 
   const router = useRouter();
 
@@ -38,6 +39,7 @@ export default function Home() {
 
   useEffect(() => {
     if (userID && role) {
+      console.log("User-ID:", userID, "role:", role)
       window.localStorage.setItem("userID", userID);
       window.localStorage.setItem("role", role);
     } else {
@@ -60,6 +62,42 @@ export default function Home() {
     }
   }, [userID, router]);
 
+
+
+
+
+
+
+
+
+
+// Komplett broken seit ich es durch setIsAutherizedUser erstez habe (siehe web console.log)
+  
+  useEffect(() => {
+    console.log("Checke:", userID, role)
+    if(userID && (role == "Owner" || role == "Admin")){
+      setIsAutherizedUser(true);
+    }
+  }, [userID, role])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const renderLoginW = () => {
     if (!renderLogin) {
       setRenderLogin(true);
@@ -76,13 +114,6 @@ export default function Home() {
     }
   };
   // Routeprotection in middleware einfügen
-
-
-
-
-
-
-
 
   // Ich hab nichts an der Überschrift verändert das Package hat sich verändert
 
@@ -169,7 +200,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/Community/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
+                <Link href={{ pathname: "/Routes/ErstelleRestaurantAccount/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
               </Button>
             </CardContent>
           </Card>
@@ -184,7 +215,7 @@ export default function Home() {
               </Button>
             </CardContent>
           </Card>
-          {userID && (
+          {autherizedUser && (
             <Card>
               <CardHeader>
                 <CardTitle>Mein Restaurant</CardTitle>

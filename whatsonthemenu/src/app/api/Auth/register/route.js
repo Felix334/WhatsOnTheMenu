@@ -4,32 +4,41 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function POST(req) {
-  async function main() {
-    const { name, email, password } = await req.json();
-    console.log("Daten empfangen:",name, email, password)
-    const newUser = await prisma.user.create({
+  const { name, email, password } = await req.json();
+
+  if (!name || !email || !password) {
+    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+
+  try {
+    const newUser  = await prisma.user.create({
       data: {
         name: name,
         email: email,
-        passwordHash: password,
-        role: "User"
+        password: password,
+        role: "User",
       },
     });
-    console.log("Created User:", newUser);
+
+    console.log("Created User:", newUser );
+
     const allUsers = await prisma.user.findMany();
     console.log("All Users:", allUsers);
-  }
-  main()
-  .catch((e) => {
+
+    return NextResponse.json({ status: 201 });
+  } catch (e) {
     console.error(e);
+
+    if (e.code === 'P2002') {
+      return NextResponse.json({
+        error: `User  with email ${email} already exists.`,
+      }, { status: 409 });
+    }
+
     return NextResponse.json({
-        error: "Error creating user",
-    })
-  })
-  .finally(async () => {
+      error: `Error creating user: ${e.message}`,
+    }, { status: 500 }); // Internal Server Error
+  } finally {
     await prisma.$disconnect();
-    return NextResponse.json({
-        status: 200,
-    })
-  });
+  }
 }
