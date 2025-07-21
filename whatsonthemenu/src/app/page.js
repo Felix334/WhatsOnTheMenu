@@ -44,8 +44,10 @@ export default function Home() {
       window.localStorage.setItem("role", role);
     } else {
       var userID_ = window.localStorage.getItem("userID");
-      if (userID_) {
+      var role_ = window.localStorage.getItem("role");
+      if (userID_ && role_) {
         setUserID(userID_);
+        setRole(role_)
       }
     }
   }, [userID, role]);
@@ -61,17 +63,6 @@ export default function Home() {
       router.replace(newUrl);
     }
   }, [userID, router]);
-
-
-
-
-
-
-
-
-
-
-// Komplett broken seit ich es durch setIsAutherizedUser erstez habe (siehe web console.log)
   
   useEffect(() => {
     console.log("Checke:", userID, role)
@@ -79,24 +70,6 @@ export default function Home() {
       setIsAutherizedUser(true);
     }
   }, [userID, role])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const renderLoginW = () => {
     if (!renderLogin) {
@@ -120,7 +93,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
       <header className="mb-12 text-center align-top leading-tight grid grid-col-1 gap-0 relative">
-        <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0">Whats-On-The-Menu.de</h1>
+        <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0 font-blue">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
         <div className="fixed top-0 right-0 p-1 flex z-20">{userID && <Profile setUserID={setUserID} />}</div>
@@ -234,6 +207,9 @@ export default function Home() {
           <section className="">
             <SlowRenderImage />
           </section>
+          <section>
+            <button onClick={printUserDevice}>Device</button>
+          </section>
       </main>
       <div className="fixed align-top flex grid z-10 mt-0 top-0">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
@@ -241,4 +217,15 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+function printUserDevice(){
+  console.log("Device:", navigator.userAgent);
+  console.log("Plattform: ",navigator.platform);
+  console.log("Sprache:",navigator.language);
+  console.log("Sprachen:",navigator.languages);
+  console.log("Browser Online?: ",navigator.onLine);
+  console.log("Cookies erlaubt?: ",navigator.cookieEnabled);
+  console.log("Gerätespeicher: ", navigator.deviceMemory);
+  console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
 }
