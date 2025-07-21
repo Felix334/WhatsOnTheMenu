@@ -26,8 +26,8 @@ export async function POST(req) {
 }
 
 async function main(data) {
-  const { email, password } = data;
-  console.log("Checking user with email and password:", email, password);
+  const { email, password, userIP } = data;
+  console.log("Checking user with email and password:", email, password, userIP);
 
   const user = await prisma.user.findUnique({
     where: { email },

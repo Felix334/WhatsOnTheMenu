@@ -4,19 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import loginSchema from "./components/loginSchema.js";
 import { useRouter } from "next/navigation";
 
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Home({ renderLogin, userID, role }) {
   const [submittedData, setSubmittedData] = useState(null);
+  const [userIP, setUserIP] = useState("");
   const router = useRouter();
 
   const form = useForm({
@@ -27,18 +21,22 @@ export default function Home({ renderLogin, userID, role }) {
     },
   });
 
-  const { control, handleSubmit, formState: { errors }, reset } = form;
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = form;
 
   const submitToServer = async (user_data) => {
     const { email, password } = user_data;
-
     try {
       const resp = await fetch("./api/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, userIP }),
       });
 
       if (resp.ok) {
@@ -57,16 +55,33 @@ export default function Home({ renderLogin, userID, role }) {
         // Replace URL query
         const newQuery = { ...router.query, id: data.id };
         router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
-
       } else {
         console.log("Login failed:", resp.status);
-        window.alert("Login fehlgeschlagen!\nBitte richtige Benutzerdaten angeben!")
+        window.alert("Login fehlgeschlagen!\nBitte richtige Benutzerdaten angeben!");
       }
     } catch (err) {
       console.error("Network error:", err);
     }
   };
 
+  useEffect(() => {
+    const getIP = () => {
+      try {
+        fetch("https://api.ipify.org?format=json")
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("IP-Adresse:", data.ip);
+            setUserIP(data.ip)
+          })
+          .catch((error) => {
+            console.error("Error fetching IP:", error);
+          });
+      } catch (e) {
+        console.log("Fehler", e);
+      }
+    };
+    getIP()
+  });
   const onSubmit = (data) => {
     submitToServer(data);
     reset();
@@ -93,12 +108,7 @@ export default function Home({ renderLogin, userID, role }) {
                 <FormItem className="mb-4">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Email"
-                      {...field}
-                      className="text-black bg-white"
-                    />
+                    <Input type="email" placeholder="Email" {...field} className="text-black bg-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,12 +122,7 @@ export default function Home({ renderLogin, userID, role }) {
                 <FormItem className="mb-6">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      {...field}
-                      className="text-black bg-white"
-                    />
+                    <Input type="password" placeholder="Password" {...field} className="text-black bg-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -130,11 +135,7 @@ export default function Home({ renderLogin, userID, role }) {
           </form>
         </Form>
 
-        {submittedData && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">
-            {`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}
-          </div>
-        )}
+        {submittedData && <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">{`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}</div>}
       </div>
     </div>
   );

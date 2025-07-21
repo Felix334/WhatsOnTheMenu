@@ -18,6 +18,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { useRouter } from "next/navigation";
 import path from "path";
 
+
 // Mit next/auth neuschreiben
 
 export default function Home() {
@@ -32,10 +33,6 @@ export default function Home() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    
-
-  })
 
   useEffect(() => {
     if (userID && role) {
@@ -221,11 +218,11 @@ export default function Home() {
 
 function printUserDevice(){
   console.log("Device:", navigator.userAgent);
-  console.log("Plattform: ",navigator.platform);
   console.log("Sprache:",navigator.language);
   console.log("Sprachen:",navigator.languages);
   console.log("Browser Online?: ",navigator.onLine);
   console.log("Cookies erlaubt?: ",navigator.cookieEnabled);
   console.log("Gerätespeicher: ", navigator.deviceMemory);
   console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
+  
 }

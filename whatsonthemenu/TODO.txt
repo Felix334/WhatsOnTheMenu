@@ -11,4 +11,4 @@ Cookies Fertg machen
 => Testen ob die Datenbank richtig diesing ist und ob alle Daten richtig abgerufen werden
 (Es werden noch nicht alle Daten angezigt könnte aber an einer falschen manuellen Erstellung liegen)
 
-Am Ende ein IP Tracking einfügen für mehr Sicherheit
+Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
