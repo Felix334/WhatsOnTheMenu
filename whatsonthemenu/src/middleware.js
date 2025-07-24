@@ -20,15 +20,15 @@ export function middleware(req) {
 
 
   // If there's no userID and the path matches specific routes
-  /*if (!id) {
+  if (!id) {
     if (
       url.pathname.startsWith("/Routes/UnserePartner/") ||
       url.pathname.startsWith("/Routes/UnserTeam/") ||
       url.pathname.startsWith("/Routes/WieFunktionierts/")
     ) {
       console.log(id)
-      const newPath = url.pathname.replace('/Routes/', '/');
-      return NextResponse.push(new URL(newPath, req.url));
+      /*const newPath = url.pathname.replace('/Routes/', '/');
+      return NextResponse.push(new URL(newPath, req.url));*/
     }
 
     // If userID is present in the search params, remove it and redirect to the home page
@@ -36,7 +36,7 @@ export function middleware(req) {
       url.searchParams.delete("userID");
       return NextResponse.push(new URL("/", req.url));
     }
-  }else{}*/
+  }else{}
 
   // Proceed to the next middleware or request handler
   return NextResponse.next();

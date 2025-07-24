@@ -71,7 +71,7 @@ export default function Home({ renderLogin, userID, role }) {
           .then((response) => response.json())
           .then((data) => {
             console.log("IP-Adresse:", data.ip);
-            setUserIP(data.ip);
+            setUserIP(data.ip)
           })
           .catch((error) => {
             console.error("Error fetching IP:", error);
@@ -80,9 +80,8 @@ export default function Home({ renderLogin, userID, role }) {
         console.log("Fehler", e);
       }
     };
-    getIP();
-  }, []);
-
+    getIP()
+  });
   const onSubmit = (data) => {
     submitToServer(data);
     reset();
@@ -136,11 +135,7 @@ export default function Home({ renderLogin, userID, role }) {
           </form>
         </Form>
 
-        {submittedData && (
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">
-            {`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}
-          </div>
-        )}
+        {submittedData && <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">{`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}</div>}
       </div>
     </div>
   );
