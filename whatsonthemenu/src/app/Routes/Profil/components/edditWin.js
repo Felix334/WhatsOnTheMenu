@@ -1,4 +1,5 @@
-"use client"
+/*"use client"
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -147,3 +148,4 @@ const edditWin = ({}) => {
     );
   
 }
+export default edditWin;*/

@@ -1,5 +1,5 @@
-/*"use client"
-import { useState } from "react"
+"use client"
+/*import { useState } from "react"
 import { BarcodeScanner } from "../../components/QR-CodeScanner.mjs"
 
 export default function Page(){
@@ -8,7 +8,7 @@ export default function Page(){
       <input type="file" name="image" accept="image/*" capture="environment"></input>
     </div>
   )
-}*/
+}
 // components/QRScanner.js
 'use client'
 
@@ -27,7 +27,7 @@ export default function QRScanner() {
           height: 250
         },
         fps: 10
-      }, /* verbose= */ false)
+      }, /* verbose=  false)
 
      scanner.render(
   (decodedText) => {
@@ -82,4 +82,9 @@ export default function QRScanner() {
       `}</style>
     </div>
   )
+}*/
+import { Scanner } from "@yudiel/react-qr-scanner";
+
+export default function Page() {
+  return <Scanner onScan={(result) => {window.alert(result)}}/>
 }

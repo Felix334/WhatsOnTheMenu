@@ -1,26 +1,12 @@
-// pages/index.js
 import Head from 'next/head';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    // Load Google API script
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const handleCredentialResponse = (response) => {
+  const handleCredentialResponse = useCallback((response) => {
     console.log("Encoded JWT ID token: " + response.credential);
     
     // Send this to your backend for verification
@@ -39,11 +25,26 @@ export default function Home() {
     .catch((error) => {
       console.error('Error:', error);
     });
-  };
+  }, [router]);
 
   useEffect(() => {
-    window.handleCredentialResponse = handleCredentialResponse;
-  }, []);
+    // Load Google API script
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      window.handleCredentialResponse = handleCredentialResponse;
+    };
+    script.onerror = () => {
+      console.error('Google API script failed to load.');
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [handleCredentialResponse]); // Include handleCredentialResponse here
 
   return (
     <div className={styles.container}>
@@ -65,7 +66,7 @@ export default function Home() {
             <div className={styles.cardBody}>
               <div 
                 id="g_id_onload"
-                data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com"
+                data-client_id="YOUR_CLIENT_ID.apps.googleusercontent.com" // Replace with your actual client ID
                 data-context="signin"
                 data-ux_mode="popup"
                 data-callback="handleCredentialResponse"
