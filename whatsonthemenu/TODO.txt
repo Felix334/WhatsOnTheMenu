@@ -12,3 +12,8 @@ Cookies Fertg machen
 (Es werden noch nicht alle Daten angezigt könnte aber an einer falschen manuellen Erstellung liegen)
 
 Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
+
+
+
+Docker installiert und in NPM eingebaut aber API kann sich aufgrund eines Versionsuterschiedes nicht verbinden
+und VS-Code wirft komische Fehler bei der Verbindung

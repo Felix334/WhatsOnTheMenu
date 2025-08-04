@@ -1,5 +1,6 @@
 // pages/api/auth/google.js
 import { OAuth2Client } from 'google-auth-library';
+import { NextResponse, NextRequest } from 'next/server';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -9,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { token } = req.body;
+    const { token } = await req.body;
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,

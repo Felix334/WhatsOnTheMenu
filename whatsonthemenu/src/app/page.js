@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { useRouter } from "next/navigation";
 import path from "path";
-
+//console.log(process.env)
 
 // Mit next/auth neuschreiben
 
@@ -30,25 +30,24 @@ export default function Home() {
   const [hasReloaded, setHasReloaded] = useState(false);
   const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [autherizedUser, setIsAutherizedUser] = useState(false);
+  const [renderDashBoard, setRenderDashBoard] = useState(false);
 
   const router = useRouter();
 
-
   useEffect(() => {
-    if(userID && role) {
+    if (userID && role) {
       console.log("User-ID:", userID, "role:", role);
       window.localStorage.setItem("userID", userID);
       window.localStorage.setItem("role", role);
     } else {
       var userID_ = window.localStorage.getItem("userID");
       var role_ = window.localStorage.getItem("role");
-      if(userID_ && role_) {
+      if (userID_ && role_) {
         setUserID(userID_);
         setRole(role_);
       }
     }
   }, [userID, role]);
-
 
   useEffect(() => {
     // Fixes the url reload
@@ -60,16 +59,25 @@ export default function Home() {
       router.replace(newUrl);
     }
   }, [userID, router]);
-  
+
   useEffect(() => {
-    console.log("Checke:", userID, role)
-    if(userID && (role == "Owner" || role == "Admin")){
+    console.log("Checke:", userID, role);
+    if (userID && (role == "Owner" || role == "Admin")) {
       setIsAutherizedUser(true);
     }
-  }, [userID, role])
+  }, [userID, role]);
+
+    useEffect(() => {
+    console.log("Checke:", userID, role);
+    if (userID && (role == "Admin")) {
+      setRenderDashBoard(true);
+    }
+  }, [userID, role]);
+
+  // Anzeige für Authorisierte Benutzer noch nicht voll funktionsfähig (Rollencheck)
 
   const renderLoginW = () => {
-    if(!renderLogin) {
+    if (!renderLogin) {
       setRenderLogin(true);
     } else {
       setRenderLogin(false);
@@ -86,6 +94,8 @@ export default function Home() {
   // Routeprotection in middleware einfügen
 
   // Ich hab nichts an der Überschrift verändert das Package hat sich verändert
+
+  // SUPABASE configurieren =>Funktioniert auch mit Prisma
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
@@ -130,7 +140,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/UnserePartner", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Partner</Link>
+                <Link href={{ pathname: "/UnserePartner", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Partner</Link>
               </Button>
             </CardContent>
           </Card>
@@ -140,7 +150,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/UnserTeam/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Unser Team</Link>
+                <Link href={{ pathname: "/UnserTeam/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Unser Team</Link>
               </Button>
             </CardContent>
           </Card>
@@ -160,7 +170,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/WieFunktionierts", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Wie Funktionierts?</Link>
+                <Link href={{ pathname: "/WieFunktionierts", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Wie Funktionierts?</Link>
               </Button>
             </CardContent>
           </Card>
@@ -170,7 +180,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/ErstelleRestaurantAccount/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
+                <Link href={{ pathname: "/ErstelleRestaurantAccount/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
               </Button>
             </CardContent>
           </Card>
@@ -181,7 +191,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/Reservierung/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Reservierung</Link>
+                <Link href={{ pathname: "/Reservierung/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Reservierung</Link>
               </Button>
             </CardContent>
           </Card>
@@ -193,20 +203,35 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild>
-                  <Link className="" href={{ pathname: "/Routes/Profil/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
+                  <Link className="" href={{ pathname: "/Profil/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
                     Profil
                   </Link>
                 </Button>
               </CardContent>
             </Card>
           )}
+          {renderDashBoard && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Mein Dashboard</CardTitle>
+                <CardDescription>Kunden-Übersicht</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild>
+                  <Link className="" href={{ pathname: "/Protected/Dashboard/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
+                    Dashboard
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </section>
-          <section className="">
-            <SlowRenderImage />
-          </section>
-          <section>
-            <button onClick={printUserDevice}>Device</button>
-          </section>
+        <section className="">
+          <SlowRenderImage />
+        </section>
+        <section>
+          <button onClick={printUserDevice}>Device</button>
+        </section>
       </main>
       <div className="fixed align-top flex grid z-10 mt-0 top-0">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
@@ -216,13 +241,12 @@ export default function Home() {
   );
 }
 
-function printUserDevice(){
+function printUserDevice() {
   console.log("Device:", navigator.userAgent);
-  console.log("Sprache:",navigator.language);
-  console.log("Sprachen:",navigator.languages);
-  console.log("Browser Online?: ",navigator.onLine);
-  console.log("Cookies erlaubt?: ",navigator.cookieEnabled);
+  console.log("Sprache:", navigator.language);
+  console.log("Sprachen:", navigator.languages);
+  console.log("Browser Online?: ", navigator.onLine);
+  console.log("Cookies erlaubt?: ", navigator.cookieEnabled);
   console.log("Gerätespeicher: ", navigator.deviceMemory);
   console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
-  
 }
