@@ -11,24 +11,33 @@ export async function POST(req) {
   console.log("Empfangene Daten", data);
   const id = data.userID;
   console.log("UserID suchen:", id)
-  const role = await prisma.user.findUnique({
-    where: {
-      id: 
-        id
-      ,
-    },
-  });
-  if (role && role === "Owner") {
-    return NextResponse({ msg: true, status: 200 });
+  var data = await main(id)
+  if(data.status === 401){
+    return NextResponse.json({ status: 401 });
   }
+  return NextResponse.json({ status: 200, userData: data });
 }
 
 async function main(ID) {
   var id = id;
   console.log("Checke UserID:");
-  const role = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       id: ID
     }
   })
+  if(user){
+    console.log("User gefunden:", user);
+    return user;
+  }else{
+    console.log("User nicht gefunden");
+    return ({status: 401});
+  }
 }
+
+
+
+
+
+
+// Connect mit Restaurant
