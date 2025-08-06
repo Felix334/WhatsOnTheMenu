@@ -17,18 +17,21 @@ export async function POST(req) {
         { status: 200 }
       );
     } else {
-      return NextResponse.json({ message: "Login Failed" }, { status: 401 });
+      var {error, status} = await result;
+      return NextResponse.json({ message: "Login Failed" }, { status: 401 }, {databaselog: {message: error, status: status}});
     }
   } catch (error) {
     console.error("Error in POST handler:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }finally{
+    await prisma.$disconnect()
   }
 }
 
 async function main(data) {
   const { email, password, userIP } = data;
   console.log("Checking user with email, password and IP:", email, password, userIP);
-
+try{
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -45,4 +48,8 @@ async function main(data) {
 
   console.log("User authenticated:", user.id, user.role);
   return { userID: user.id, role: user.role };
+}catch(err){
+  console.error("Ein Fehler ist aufgetreten:", err)
+  return ({error: err, status: 500})
+}
 }

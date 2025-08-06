@@ -9,10 +9,13 @@ export async function POST(req) {
     return NextResponse.json({ status: 400 });
   }
   console.log("Empfangene Daten", data);
-  var id = data.id;
+  const id = data.userID;
+  console.log("UserID suchen:", id)
   const role = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: 
+        id
+      ,
     },
   });
   if (role && role === "Owner") {
@@ -20,7 +23,12 @@ export async function POST(req) {
   }
 }
 
-async function main(id) {
+async function main(ID) {
   var id = id;
   console.log("Checke UserID:");
+  const role = await prisma.user.findUnique({
+    where: {
+      id: ID
+    }
+  })
 }

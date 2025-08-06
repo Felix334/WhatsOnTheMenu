@@ -43,19 +43,29 @@ export default function PageBuilder() {
 
   const updateData = () => {};
 
-  useEffect(() => {
+useEffect(() => {
     const userID_ = sessionStorage.getItem("userID");
     const role = sessionStorage.getItem("role");
+
     if (!userID_) {
-      alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
-      return;
+        alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
+        return;
     }
-    if (userID_ && (role === "Admin" || role === "User")) {
-      setUserID(userID_);
-      setUserRole(role);
-      loadServerData();
+
+    // Fix the role check - remove extra space
+    if (role === "Admin" || role === "Owner") {
+        setUserID(userID_);
+        setUserRole(role);
     }
-  }, []);
+}, []); // Empty dependency array is correct here
+
+// Separate useEffect for loading data when userID is available
+useEffect(() => {
+    if (userID) {
+        loadServerData();
+    }
+}, [userID]); // This runs when userID changes
+
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -95,15 +105,6 @@ export default function PageBuilder() {
   };
 
 
-
-
-
-// Wenn fertig dann 
-
-
-
-
-
 const loadServerData = async () => {
   setIsLoading(true); // Start loading
   var data = sessionStorage.getItem("serverData")
@@ -111,6 +112,7 @@ const loadServerData = async () => {
     setServerData(data)
   }
   try {
+    console.log("Sende User-ID:", userID)
     const response = await fetch("./api/user/profil/getData", {
       method: "POST",
       headers: {
