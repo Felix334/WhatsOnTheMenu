@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function Home({ renderLogin, userID, role }) {
   const [submittedData, setSubmittedData] = useState(null);
   const [userIP, setUserIP] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter();
 
   const form = useForm({
@@ -31,6 +32,7 @@ export default function Home({ renderLogin, userID, role }) {
   const submitToServer = async (user_data) => {
     const { email, password } = user_data;
     try {
+      setIsLoading(true)
       const resp = await fetch("./api/Auth/login", {
         method: "POST",
         headers: {
@@ -61,6 +63,8 @@ export default function Home({ renderLogin, userID, role }) {
       }
     } catch (err) {
       console.error("Network error:", err);
+    }finally{
+      setIsLoading(false)
     }
   };
 
@@ -92,6 +96,14 @@ export default function Home({ renderLogin, userID, role }) {
       console.log("submittedData updated:", submittedData);
     }
   }, [submittedData]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-opacity-80">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-grey-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-screen bg-gray-600 text-black-900 relative">

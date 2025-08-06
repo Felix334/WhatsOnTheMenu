@@ -30,6 +30,7 @@ export default function PageBuilder() {
   const [components, setComponents] = useState([]);
   const [serverData, setServerData] = useState([]);
   const [updatedData, setUpdatetData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
@@ -94,15 +95,23 @@ export default function PageBuilder() {
   };
 
   const loadServerData = async () => {
-    const data = fetch("./api/user/profil/getData", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        userID: userID,
-      },
-    })
-      .then((data) => data.json())
-      .then(() => setServerData(data));
+    try {
+      setIsLoading(true);
+      const data = fetch("./api/user/profil/getData", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          userID: userID,
+        },
+      })
+        .then((data) => data.json())
+        .then(() => setServerData(data));
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+      return
+    }
   };
 
   const submitData = () => {
@@ -269,6 +278,14 @@ export default function PageBuilder() {
       </Sheet>
     </div>
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
