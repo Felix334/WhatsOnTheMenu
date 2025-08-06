@@ -94,25 +94,44 @@ export default function PageBuilder() {
     toggleOpenEditWin();
   };
 
-  const loadServerData = async () => {
-    try {
-      setIsLoading(true);
-      const data = fetch("./api/user/profil/getData", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          userID: userID,
-        },
-      })
-        .then((data) => data.json())
-        .then(() => setServerData(data));
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-      return
+
+
+
+
+// Wenn fertig dann 
+
+
+
+
+
+const loadServerData = async () => {
+  setIsLoading(true); // Start loading
+  var data = sessionStorage.getItem("serverData")
+  if(data){
+    setServerData(data)
+  }
+  try {
+    const response = await fetch("./api/user/profil/getData", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userID: userID }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+
+    const data = await response.json();
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const submitData = () => {
     var data = fetch("./api/user/profil/setData", {
