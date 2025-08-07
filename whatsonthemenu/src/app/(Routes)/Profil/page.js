@@ -28,7 +28,7 @@ export default function PageBuilder() {
   const router = useRouter();
 
   const [components, setComponents] = useState([]);
-  const [serverData, setServerData] = useState([]);
+  const [serverData, setServerData] = useState(null);
   const [updatedData, setUpdatetData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,28 +43,21 @@ export default function PageBuilder() {
 
   const updateData = () => {};
 
-useEffect(() => {
+  useEffect(() => {
     const userID_ = sessionStorage.getItem("userID");
     const role = sessionStorage.getItem("role");
 
     if (!userID_) {
-        alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
-        return;
+      alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
+      return;
     }
 
     // Fix the role check - remove extra space
     if (role === "Admin" || role === "Owner") {
-        setUserID(userID_);
-        setUserRole(role);
+      setUserID(userID_);
+      setUserRole(role);
     }
-}, []); // Empty dependency array is correct here
-
-// Separate useEffect for loading data when userID is available
-useEffect(() => {
-    if (userID) {
-        loadServerData();
-    }
-}, [userID]); // This runs when userID changes
+  }, []); // Empty dependency array is correct here
 
 
   const form = useForm({
@@ -103,48 +96,63 @@ useEffect(() => {
     form.reset();
     toggleOpenEditWin();
   };
+  
 
+useEffect(() => {
+  const fetchData = async () => {
+    if (!userID || !(userRole === "Admin" || userRole === "Owner")) return;
+    
+    setIsLoading(true);
+    try {
+      const cachedData = sessionStorage.getItem("serverData");
+      if (cachedData) setServerData(JSON.parse(cachedData));
 
-const loadServerData = async () => {
-  setIsLoading(true); // Start loading
-  var data = sessionStorage.getItem("serverData")
-  if(data){
-    setServerData(data)
-  }
-  try {
-    console.log("Sende User-ID:", userID)
-    const response = await fetch("./api/user/profil/getData", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userID: userID }),
-    });
+      const response = await fetch("./api/user/profil/getData", { // User-Daten werden Doppelt gesendet =>  Einmal User und einmal Restaurant
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userID })
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      
+      const freshData = await response.json();
+      if(freshData){
+        console.log(freshData)
+      }
+      setServerData(freshData);
+      sessionStorage.setItem("serverData", JSON.stringify(freshData));
+    } catch (error) {
+      console.error("Fetch failed:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const data = await response.json();
-    console.log(data);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  fetchData();
+}, [userID, userRole]); // Only re-run when these change
 
 
-  const submitData = () => {
-    var data = fetch("./api/user/profil/setData", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, PATCH, DELETE",
-      },
-    });
+  const submitData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("./api/user/profil/setData", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userID: userID,
+          data: updatedData, // Make sure this contains your updated data
+        }),
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      alert("Data saved successfully!");
+    } catch (err) {
+      console.error("Failed to save data:", err);
+      alert("Failed to save data");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const goBackBtn = () => {
