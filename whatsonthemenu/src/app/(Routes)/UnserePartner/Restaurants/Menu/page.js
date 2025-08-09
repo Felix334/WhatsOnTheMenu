@@ -44,7 +44,7 @@ const Menu = () => {
   }, []);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Es tut uns sehr Leid, ein Fehler ist aufgetrten: {error}!</div>;
 
   const MenuSection = ({ title, menuItems }) => {
     const [expandedIndex, setExpandedIndex] = useState(null);
@@ -55,6 +55,13 @@ const Menu = () => {
     const calcPrice = (price) => {
       setTotalPrice((oldPrice) => oldPrice + price);
     };
+
+
+    const imageHandler = (new_img) => {
+      //Bild wird umbenannt => (enthält user-id menü-id, und img-id)
+      // Dann wir das Bild coprimiert
+      // Als letztes wird es im ./img gespeichert
+    }
 
     return (
       <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
@@ -111,7 +118,7 @@ const Menu = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
+    <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8 absolute">
       <header className="mb-12 text-center w-full">
         <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
         <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl">{/*description*/}</p>

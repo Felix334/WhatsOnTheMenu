@@ -12,6 +12,7 @@ Cookies Fertg machen
 (Es werden noch nicht alle Daten angezigt könnte aber an einer falschen manuellen Erstellung liegen)
 
 Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
+Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => Wenn chat hinzugefügt dann auch
 
 
 Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden

@@ -1,5 +1,6 @@
 "use client"
 import Head from 'next/head';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export default function Page() {
   return (
@@ -12,6 +13,7 @@ export default function Page() {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
+      
       <main>
         <header>
           <h1>Unser Team</h1>
