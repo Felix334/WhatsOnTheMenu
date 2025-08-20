@@ -1,6 +1,6 @@
 Fix the Profil picture
 
-middleware routing die die url verändert("Routes" entfernt) funktioniert noch nicht
+=> In die Datenbank eine Option für Fonts einfügen
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)
@@ -13,6 +13,8 @@ Cookies Fertg machen
 
 Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
 Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => Wenn chat hinzugefügt dann auch
+
+Fertige Version => Eine Kopie erstellen und Auth mit Next/Auth probieren => Testprojekt uwandeln
 
 
 Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden

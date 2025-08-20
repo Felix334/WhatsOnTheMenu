@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { Prociono } from "next/font/google";
+
+const cryptoJS = require("crypto-js");
 
 export default function Page() {
   const [userData, setUserData] = useState([]);
@@ -11,19 +14,21 @@ export default function Page() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      var userID = await localStorage.getItem("userID")
+      const userID = await localStorage.getItem("userID")
+      var encrypted_user_id = cryptoJS.AES.encrypt(userID, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+      var encrypted_api_key = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8)
       console.log("User-ID gefunden:", userID)
       try {
         if(!userID){
           notAuth();
           return;
         }
-        const response = await fetch("/api/user/profil/getData", {
+        const response = await fetch("/api/user/userData", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({userID}),
+          body: JSON.stringify({encrypted_user_id: encrypted_user_id, encrypted_api_key: encrypted_api_key}),
         });
 
         if (response.status === 401) {
@@ -34,12 +39,9 @@ export default function Page() {
         }
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user data:", response.status);
+          throw new Error("Failed to fetch user data:", response.status, response);
         }
 
-        if(response.status == 200 || response.ok){
-          window.alert("Funktioniet")
-        }
         const data = await response.json();
         setData(data)
         console.log("Response:", data)

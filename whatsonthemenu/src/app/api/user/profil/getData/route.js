@@ -1,21 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
-  var data = await req.json();
-  if (!data) {
-    return NextResponse.json({ status: 400 });
+  try {
+    const data = await req.json();
+    if (!data) {
+      return NextResponse.json({ status: 400, error: "No data provided" });
+    }
+    
+    console.log("Empfangene Daten", data);
+    const id = data.userID;
+    console.log("UserID suchen:", id);
+    
+    if (!id) {
+      return NextResponse.json({ status: 400, error: "userID is required" });
+    }
+    
+    const userData = await main(id);
+    
+    if (!userData) {
+      return NextResponse.json({ status: 404, error: "User not found" });
+    }
+    
+    return NextResponse.json({ status: 200, userData });
+  } catch (error) {
+    console.error("Error in POST handler:", error);
+    return NextResponse.json({ status: 500, error: "Internal server error" });
   }
-  console.log("Empfangene Daten", data);
-  const id = data.userID;
-  console.log("UserID suchen:", id);
-  var data = await main(id);
-  if (data.status === 401) {
-    return NextResponse.json({ status: 401 });
-  }
-  return NextResponse.json({ status: 200, userData: data });
 }
 
 async function main(userId) {
@@ -31,8 +44,8 @@ async function main(userId) {
                   include: {
                     dishes: {
                       include: {
-                        ingredients: true, // Include ingredients for each dish
-                        reviews: true,     // Include reviews for each dish
+                        ingredients: true,
+                        reviews: true,
                       },
                     },
                   },
@@ -43,14 +56,13 @@ async function main(userId) {
         },
       },
     });
-    console.log(userData)
+    
+    console.log("User data found:", userData);
     return userData;
   } catch (error) {
     console.error("Error fetching user data:", error);
-    throw error; // Rethrow the error for further handling if needed
+    throw error;
   } finally {
-    await prisma.$disconnect(); // Ensure the database connection is closed
+    await prisma.$disconnect();
   }
-
-// Connect mit Restaurant
 }

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import loginSchema from "./components/loginSchema.js";
 import { useRouter } from "next/navigation";
+const cryptoJS = require("crypto-js");
 
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 export default function Home({ renderLogin, userID, role }) {
   const [submittedData, setSubmittedData] = useState(null);
   const [userIP, setUserIP] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm({
@@ -31,14 +32,19 @@ export default function Home({ renderLogin, userID, role }) {
 
   const submitToServer = async (user_data) => {
     const { email, password } = user_data;
+    var encrypted_email = cryptoJS.AES.encrypt(email, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_password = cryptoJS.AES.encrypt(password, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_IP = cryptoJS.AES.encrypt(userIP, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_API_KEY = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    console.log("Encryption-Test", encrypted_email, encrypted_password);
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const resp = await fetch("./api/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, userIP }),
+        body: JSON.stringify({ encrypted_email, encrypted_password, encrypted_IP, encrypted_API_KEY }),
       });
 
       if (resp.ok) {
@@ -63,8 +69,8 @@ export default function Home({ renderLogin, userID, role }) {
       }
     } catch (err) {
       console.error("Network error:", err);
-    }finally{
-      setIsLoading(false)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,7 +81,7 @@ export default function Home({ renderLogin, userID, role }) {
           .then((response) => response.json())
           .then((data) => {
             console.log("IP-Adresse:", data.ip);
-            setUserIP(data.ip)
+            setUserIP(data.ip);
           })
           .catch((error) => {
             console.error("Error fetching IP:", error);
@@ -84,7 +90,7 @@ export default function Home({ renderLogin, userID, role }) {
         console.log("Fehler", e);
       }
     };
-    getIP()
+    getIP();
   });
   const onSubmit = (data) => {
     submitToServer(data);

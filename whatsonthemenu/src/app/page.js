@@ -4,6 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
@@ -11,12 +12,15 @@ import PermControleLocation from "./components/LocasionPermission";
 import SlowRenderImage from "./components/slowRenderImage";
 
 import { useState, useEffect, useReducer } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import path from "path";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-import { useRouter } from "next/navigation";
-import path from "path";
+
 //console.log(process.env)
 
 // Mit next/auth neuschreiben
@@ -67,9 +71,9 @@ export default function Home() {
     }
   }, [userID, role]);
 
-    useEffect(() => {
+  useEffect(() => {
     console.log("Checke:", userID, role);
-    if (userID && (role == "Admin")) {
+    if (userID && role == "Admin") {
       setRenderDashBoard(true);
     }
   }, [userID, role]);
@@ -103,13 +107,16 @@ export default function Home() {
         <h1 className="text-2xl md:text-5xl font-bold mb-0 top-0 font-blue">Whats-On-The-Menu.de</h1>
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
+        <div>
+          <Button className="absolute flex left-0" onClick={recreateDB}>DB neu erstellen</Button>
+        </div>
         <div className="fixed top-0 right-0 p-1 flex z-20">{userID && <Profile setUserID={setUserID} />}</div>
       </header>
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <section className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-center gap-4">
           {!userID && (
             <>
-              <Card className="flex item-center grid gap-1">
+              <Card className="item-center grid gap-1">
                 <CardHeader>
                   <CardTitle>Login</CardTitle>
                   <CardDescription>Melde dich jetzt an um all unsere Funktionen benutzen zu können</CardDescription>
@@ -233,7 +240,7 @@ export default function Home() {
           <button onClick={printUserDevice}>Device</button>
         </section>
       </main>
-      <div className="fixed align-top flex grid z-10 mt-0 top-0">
+      <div className="fixed align-top grid z-10 mt-0 top-0">
         {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
         {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
       </div>
@@ -249,4 +256,16 @@ function printUserDevice() {
   console.log("Cookies erlaubt?: ", navigator.cookieEnabled);
   console.log("Gerätespeicher: ", navigator.deviceMemory);
   console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
+}
+
+function goToMobile(){
+  var touchp = window.navigator.maxTouchPoints;
+  if(touchp > 1){
+    return <Link href={{ pathname: "/Routes/Mobile/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>
+  }
+}
+
+function recreateDB(){
+  //const dbPush = fetch("")
+  console.log(process.env.NEXT_PUBLIC_API_KEY)
 }
