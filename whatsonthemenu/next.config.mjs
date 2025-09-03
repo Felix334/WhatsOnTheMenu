@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
   // Removed redirect that breaks routing to /Routes/*
   // async redirects() {
   //   return [

@@ -7,23 +7,24 @@ const prisma = new PrismaClient();
 export async function POST(req) {
   console.log("Ping");
   var data = await req.json();
-  console.log(data);
+  console.log("Empfangene Daten: ",data);
   
   if (!data || Object.keys(data).length === 0) {
     return NextResponse.json({ status: 400 });
   }
   
-  const { encrypted_user_id, encrypted_api_key, encrypted_data } = data;
+  const { encrypted_user_id, encrypted_api_key} = data;
   var userID = cryptoJS.AES.decrypt(encrypted_user_id, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
   var api_key = cryptoJS.AES.decrypt(encrypted_api_key, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
   
-  var decrypted_data;
   if (encrypted_data) {
-    decrypted_data = cryptoJS.AES.decrypt(encrypted_data, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+    var decrypted_data = cryptoJS.AES.decrypt(encrypted_data, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+    console.log("Decrypted Data:", decrypted_data)
   }
   
   if (api_key === process.env.NEXT_PUBLIC_API_KEY) {
     var user_data = await main(userID, decrypted_data);
+    console.log("Benutzerdaten:",user_data)
 
 
 
@@ -41,6 +42,11 @@ export async function POST(req) {
 
 
 
+
+
+
+
+
     return NextResponse.json({ status: 200, data: user_data });
   } else {
     console.error("Nicht autorisierter Zugriff erkannt! Kein API_Key vorhanden!");
@@ -49,7 +55,7 @@ export async function POST(req) {
 
 async function main(ID, data) {
   try {
-    var CheckUser  = await prisma.user.findUnique({
+    var CheckUser = await prisma.user.findUnique({
       where: {
         id: ID,
       },
@@ -59,12 +65,12 @@ async function main(ID, data) {
       throw new Error("User  not found");
     }
 
-    if (CheckUser .role === "Admin" && !data) {
+    if (CheckUser.role === "Admin" && !data) {
       return prisma.user.findMany({
         take: 20,
         skip: 0,
       });
-    } else if (CheckUser .role === "Admin" && data) {
+    } else if (CheckUser.role === "Admin" && data) {
       return prisma.user.findMany({
         where: {
           name: {
@@ -78,6 +84,7 @@ async function main(ID, data) {
   } catch (e) {
     console.log("Database Error", e);
   } finally {
+    console.log()
     await prisma.$disconnect();
   }
 }

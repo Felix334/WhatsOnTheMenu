@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -36,6 +37,7 @@ export default function PageBuilder() {
   const [openOptions, setOpenOptions] = useState(false);
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
+  const [openItem, setOpenItem] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -48,6 +50,8 @@ export default function PageBuilder() {
 
   const { control, handleSubmit, reset, watch, setValue } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
+
+  // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
   useEffect(() => {
     const userID_ = sessionStorage.getItem("userID");
@@ -138,6 +142,10 @@ export default function PageBuilder() {
 
   const goBackBtn = () => {
     router.push("../");
+  };
+
+  const openMenuItemEddit = (id) => {
+    openMenuItemEddit ? setOpenItem(true) : setOpenItem(false);
   };
 
   const MenuEditor = () => (
@@ -321,9 +329,11 @@ export default function PageBuilder() {
             <Label>Hintergrund</Label>
             <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
           </div>
-          <div>
-            {/* Additional options can be added here */}
-          </div>
+          <div>{/* Additional options can be added here */}</div>
+
+          <Button asChild>
+            <Link href={{ pathname: "/Profil/QRBuilder/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>QR-Code erstellen</Link>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
@@ -342,23 +352,17 @@ export default function PageBuilder() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-1">
-        <div className="absolute top-5 flex gap-2 items-center">
+        <div className="absolut top-5 flex gap-2 items-center absolute">
           <Button onClick={goBackBtn}>Zurück</Button>
-
-          {/* Option sheet trigger */}
           <OptionMenu />
-
-          {/* Editor trigger (separate sheet) */}
           <MenuEditor />
         </div>
-
-        <div className="mt-20 space-y-6">{components.map((component, index) => (component.type === "menuSection" ? <MenuSection key={index} title={component.section.title} menuItems={component.section.items} /> : <div key={index}>{component.type}</div>))}</div>
 
         <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
           <header className="mb-12 text-center w-full">
             <div className="grid grid-col-1">
               <h1 className="text-5xl font-serif font-semibold italic tracking-wide">
-                {!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} /> }
+                {!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}
                 <Button>e</Button>
               </h1>
             </div>
@@ -397,6 +401,7 @@ const MenuSection = ({ title, menuItems }) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead></TableHead>
             <TableHead className="text-left">Speisen:</TableHead>
             <TableHead className="text-left">Beschreibung:</TableHead>
             <TableHead className="text-right">Preis:</TableHead>
@@ -406,6 +411,9 @@ const MenuSection = ({ title, menuItems }) => {
           {menuItems?.map((item, index) => (
             <React.Fragment key={index}>
               <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
+                <TableCell>
+                  <Button onClick={() => openMenuItemEddit(item.id)}>i</Button>
+                </TableCell>
                 <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
                 <TableCell className="text-gray-600">{item.description}</TableCell>
                 <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
@@ -422,5 +430,13 @@ const MenuSection = ({ title, menuItems }) => {
         </TableBody>
       </Table>
     </Table>
+  );
+};
+
+const ItemMenu = (id) => {
+  return (
+    <div className="absolute">
+      <div></div>
+    </div>
   );
 };

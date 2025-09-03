@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import { Ca } from "zod/v4/locales";
 
 //console.log(process.env)
 
@@ -35,6 +36,7 @@ export default function Home() {
   const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [autherizedUser, setIsAutherizedUser] = useState(false);
   const [renderDashBoard, setRenderDashBoard] = useState(false);
+  const [restaurantID, setRestaurantID] = useState("")
 
   const router = useRouter();
 
@@ -46,12 +48,50 @@ export default function Home() {
     } else {
       var userID_ = window.localStorage.getItem("userID");
       var role_ = window.localStorage.getItem("role");
+      var restaurant_ID = window.localStorage.getItem("restaurnatID")
       if (userID_ && role_) {
         setUserID(userID_);
         setRole(role_);
+        if(restaurant_ID){
+          setRestaurantID(restaurant_ID)
+        }
       }
     }
   }, [userID, role]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Weg finden mehrere Restaurant-IDs zu nutzen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     // Fixes the url reload
@@ -108,7 +148,9 @@ export default function Home() {
         <p className="text-1xl md:text-3xl font-bold mb-0 ">Ihre visualisierte Speisekarte!</p>
         <p className="text-1xl md:text-3xl font-bold mb-0">Finden sie was sie wirklich essen wollen!</p>
         <div>
-          <Button className="absolute flex left-0" onClick={recreateDB}>DB neu erstellen</Button>
+          <Button className="absolute flex left-0" onClick={recreateDB}>
+            DB neu erstellen
+          </Button>
         </div>
         <div className="fixed top-0 right-0 p-1 flex z-20">{userID && <Profile setUserID={setUserID} />}</div>
       </header>
@@ -157,7 +199,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/UnserTeam/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Unser Team</Link>
+                <Link href={{ pathname: "/UnserTeam", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Unser Team</Link>
               </Button>
             </CardContent>
           </Card>
@@ -167,7 +209,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Routes/Mobile/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>
+                <Link href={{ pathname: "/Mobile", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>
               </Button>
             </CardContent>
           </Card>
@@ -187,7 +229,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/ErstelleRestaurantAccount/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
+                <Link href={{ pathname: "/ErstelleRestaurantAccount", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Anfrage stellen</Link>
               </Button>
             </CardContent>
           </Card>
@@ -198,9 +240,21 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <Button asChild>
-                <Link href={{ pathname: "/Reservierung/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Reservierung</Link>
+                <Link href={{ pathname: "/Reservierung", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Reservierung</Link>
               </Button>
             </CardContent>
+          </Card>
+          <Card>
+            <CardTitle>Scanner</CardTitle>
+            <Button asChild>
+              <Link href={{ pathname: "/TestScanner2", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Scanner-Test</Link>
+            </Button>
+          </Card>
+          <Card>
+            <CardTitle>QR-Code-Builder</CardTitle>
+            <Button asChild>
+              <Link href={{ pathname: "/BuildQRCode", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Scanner-Test</Link>
+            </Button>
           </Card>
           {autherizedUser && (
             <Card>
@@ -210,7 +264,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild>
-                  <Link className="" href={{ pathname: "/Profil/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
+                  <Link className="" href={{ pathname: "/Profil", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
                     Profil
                   </Link>
                 </Button>
@@ -225,7 +279,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild>
-                  <Link className="" href={{ pathname: "/Protected/Dashboard/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
+                  <Link className="" href={{ pathname: "/Protected/Dashboard", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>
                     Dashboard
                   </Link>
                 </Button>
@@ -258,14 +312,14 @@ function printUserDevice() {
   console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
 }
 
-function goToMobile(){
+function goToMobile() {
   var touchp = window.navigator.maxTouchPoints;
-  if(touchp > 1){
-    return <Link href={{ pathname: "/Routes/Mobile/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>
+  if (touchp > 1) {
+    return <Link href={{ pathname: "/Routes/Mobile/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>Mobile Funktionen</Link>;
   }
 }
 
-function recreateDB(){
+function recreateDB() {
   //const dbPush = fetch("")
-  console.log(process.env.NEXT_PUBLIC_API_KEY)
+  console.log(process.env.NEXT_PUBLIC_API_KEY);
 }
