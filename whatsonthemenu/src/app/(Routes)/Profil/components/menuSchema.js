@@ -20,7 +20,10 @@ const menuSchema = z.object({
 const itemSchema = z.object({
   name: z.string().min(1, "Name erforderlich"),
   description: z.string().min(5, "Beschreibung erforderlich"),
-  price: z.number().min(4, "Bitte eine Dezimalzahl als Preis angeben(Währungszeichen auslassen)")
+    price: z.preprocess(
+    (val) => (typeof val === "string" ? parseFloat(val) : val),
+    z.number().positive()
+  ),
 })
 
 

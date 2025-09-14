@@ -16,40 +16,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import {menuSchema,  itemSchema} from "./components/menuSchema";
-
-
-
-
-
-
-
-
-
-
-
+import { menuSchema, itemSchema } from "./components/menuSchema";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const schnitzel = require("./img/SchnitzelMitSpätzle.jpg");
 
@@ -407,17 +376,17 @@ const MenuSection = ({ title, menuItems }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [openItem, setOpenItem] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [itemData, setItemData] = useState({id: "", name: "", price: 0, description: ""})
+  const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
   const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
 
   const openMenuItemEddit = (id, name, price, description) => {
     setSelectedItem(id);
-    setItemData(prev => ({
+    setItemData((prev) => ({
       ...prev,
       name: name,
-      prive: price,
-      description: description
-    }))
+      price: price,
+      description: description,
+    }));
     setOpenItem(true);
   };
 
@@ -466,26 +435,94 @@ const SelectItem = ({ open, onOpenChange, selectedItem }) => {
   const form = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: {
-      item_name: "",
-      item_descript: "",
-      item_price: 0
+      name: "",
+      description: "",
+      price: 0,
+    },
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = form;
+
+  const onSubmit = (data, selectedItem) => {
+    if (!data) {
+      window.alert("Keine Veränderung");
     }
-  })
+    console.log("Data:", data);
+    console.log("Changed Item:", item)
+    console.log(data, selectedItem.id);
+    reset();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Item Details</DialogTitle>
+          <DialogTitle>Gericht-Informationen:</DialogTitle>
         </DialogHeader>
         <div className="mt-4">
           {selectedItem ? (
             <div>
-              <div><strong>Name:</strong><Input alt={selectedItem.name} placeholder="Name"/></div>
-              <div><strong>Description:</strong> <Input alt={selectedItem.description} placeholder="Beschreibung"/></div>
-              <div><strong>Preis:</strong> <Input type="number" alt={selectedItem.price} placeholder="Preis(Bitte nur eine Dezimalzahl angeben)"/></div>
-              {selectedItem.image && (
-                <Image src={selectedItem.image} alt={selectedItem.name} width={200} height={150} className="rounded-lg border mt-2" />
-              )}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Form {...form}>
+                  <FormField
+                    control={control}
+                    name="name"
+                    rules={{ required: "Name is required" }}
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Name:</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Name" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Beschreibung:</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Beschreibung" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Preis:</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="Preis als Dezimalzahl(ohne € Zeichen)" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="Bild"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Bild</FormLabel>
+                        <FormControl>
+                          <Input type="file" placeholder="Bild" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    Aktualisieren
+                  </Button>
+                </Form>
+              </form>
             </div>
           ) : (
             "No item selected."
