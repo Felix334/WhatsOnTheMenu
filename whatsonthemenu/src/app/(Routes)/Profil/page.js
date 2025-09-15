@@ -72,7 +72,7 @@ export default function PageBuilder() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userID || !(userRole === "Admin" || userRole === "Owner")) return;
+      if (!userID || !(userRole === "Admin" || userRole === "Owner")) throw new Error("Not Authorized! \n Bitte melden sie sich an");
 
       setIsLoading(true);
       try {
