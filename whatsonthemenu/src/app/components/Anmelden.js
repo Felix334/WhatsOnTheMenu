@@ -32,10 +32,10 @@ export default function Home({ renderLogin, userID, role }) {
 
   const submitToServer = async (user_data) => {
     const { email, password } = user_data;
-    var encrypted_email = cryptoJS.AES.encrypt(email, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
-    var encrypted_password = cryptoJS.AES.encrypt(password, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
-    var encrypted_IP = cryptoJS.AES.encrypt(userIP, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
-    var encrypted_API_KEY = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_email = cryptoJS.AES.encrypt(email, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_password = cryptoJS.AES.encrypt(password, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_IP = cryptoJS.AES.encrypt(userIP, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+    var encrypted_API_KEY = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
     console.log("Encryption-Test", encrypted_email, encrypted_password);
     try {
       setIsLoading(true);

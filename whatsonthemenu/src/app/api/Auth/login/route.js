@@ -39,10 +39,10 @@ async function decrypt(data) {
   console.log("Test Decrypt Function", encrypted_email, encrypted_password, encrypted_IP, encrypted_API_KEY);
 
   // Decrypt the values
-  const email = cryptoJS.AES.decrypt(encrypted_email, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
-  const password = cryptoJS.AES.decrypt(encrypted_password, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
-  const userIP = cryptoJS.AES.decrypt(encrypted_IP, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
-  const key = cryptoJS.AES.decrypt(encrypted_API_KEY, process.env.ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+  const email = cryptoJS.AES.decrypt(encrypted_email, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+  const password = cryptoJS.AES.decrypt(encrypted_password, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+  const userIP = cryptoJS.AES.decrypt(encrypted_IP, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
+  const key = cryptoJS.AES.decrypt(encrypted_API_KEY, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.enc.Utf8);
   console.log("Decrypted Data(server):", email, password, userIP, key);
   // Check if the decrypted key matches the expected API key
   if (key === process.env.NEXT_PUBLIC_API_KEY) {
