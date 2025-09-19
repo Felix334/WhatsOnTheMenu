@@ -13,9 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import menuSchema from "./components/menuSchema";
+import { menuSchema, itemSchema } from "./components/menuSchema";
+
+// Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
 const schnitzel = require("./img/SchnitzelMitSpätzle.jpg");
 
@@ -37,7 +40,6 @@ export default function PageBuilder() {
   const [openOptions, setOpenOptions] = useState(false);
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
-  const [openItem, setOpenItem] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -70,7 +72,7 @@ export default function PageBuilder() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userID || !(userRole === "Admin" || userRole === "Owner")) return;
+      if (!userID || !(userRole === "Admin" || userRole === "Owner")) throw new Error("Not Authorized! \n Bitte melden sie sich an");
 
       setIsLoading(true);
       try {
@@ -144,22 +146,16 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  const openMenuItemEddit = (id) => {
-    openMenuItemEddit ? setOpenItem(true) : setOpenItem(false);
-  };
-
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <SheetTrigger asChild>
         <Button variant="outline">Menü erstellen</Button>
       </SheetTrigger>
-
       <SheetContent side="right" className="w-full max-w-3xl">
         <SheetHeader>
           <SheetTitle>Menü-Dashboard</SheetTitle>
           <SheetDescription>Hier können Sie ganz einfach ein neues Menü erstellen</SheetDescription>
         </SheetHeader>
-
         <ScrollArea className="h-[70vh]">
           <div className="p-4">
             <Form {...form}>
@@ -179,7 +175,6 @@ export default function PageBuilder() {
                 />
 
                 <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets und schließt sie</h1>
-
                 <FormField
                   control={control}
                   name="menu_name"
@@ -193,7 +188,6 @@ export default function PageBuilder() {
                     </FormItem>
                   )}
                 />
-
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold">Gerichte:</h3>
                   {fields.map((item, index) => (
@@ -211,7 +205,6 @@ export default function PageBuilder() {
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={control}
                         name={`items.${index}.description`}
@@ -225,7 +218,6 @@ export default function PageBuilder() {
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={control}
                         name={`items.${index}.price`}
@@ -239,7 +231,6 @@ export default function PageBuilder() {
                           </FormItem>
                         )}
                       />
-
                       {/* File input: do NOT spread field onto file input */}
                       <FormField
                         control={control}
@@ -265,18 +256,15 @@ export default function PageBuilder() {
                                 className="block"
                               />
                             </FormControl>
-
                             {watch(`items.${index}.image`) && (
                               <div className="mt-2">
                                 <Image src={String(watch(`items.${index}.image`))} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />
                               </div>
                             )}
-
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
                       <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
                         Entfernen
                       </Button>
@@ -357,14 +345,10 @@ export default function PageBuilder() {
           <OptionMenu />
           <MenuEditor />
         </div>
-
         <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
           <header className="mb-12 text-center w-full">
             <div className="grid grid-col-1">
-              <h1 className="text-5xl font-serif font-semibold italic tracking-wide">
-                {!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}
-                <Button>e</Button>
-              </h1>
+              <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}</h1>
             </div>
             <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
           </header>
@@ -390,14 +374,27 @@ export default function PageBuilder() {
 
 const MenuSection = ({ title, menuItems }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [openItem, setOpenItem] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
   const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
+
+  const openMenuItemEddit = (id, name, price, description) => {
+    setSelectedItem(id);
+    setItemData((prev) => ({
+      ...prev,
+      name: name,
+      price: price,
+      description: description,
+    }));
+    setOpenItem(true);
+  };
 
   return (
     <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
       <div className="mb-3">
         <h3 className="text-center text-4xl font-semibold">{title}</h3>
       </div>
-
       <Table>
         <TableHeader>
           <TableRow>
@@ -412,7 +409,7 @@ const MenuSection = ({ title, menuItems }) => {
             <React.Fragment key={index}>
               <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
                 <TableCell>
-                  <Button onClick={() => openMenuItemEddit(item.id)}>i</Button>
+                  <Button onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>i</Button>
                 </TableCell>
                 <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
                 <TableCell className="text-gray-600">{item.description}</TableCell>
@@ -429,14 +426,109 @@ const MenuSection = ({ title, menuItems }) => {
           ))}
         </TableBody>
       </Table>
+      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} />
     </Table>
   );
 };
 
-const ItemMenu = (id) => {
+const SelectItem = ({ open, onOpenChange, selectedItem }) => {
+  const form = useForm({
+    resolver: zodResolver(itemSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+    },
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = form;
+
+  const onSubmit = (data, selectedItem) => {
+    if (!data) {
+      window.alert("Keine Veränderung");
+    }
+    console.log("Data:", data);
+    console.log("Changed Item:", item)
+    console.log(data, selectedItem.id);
+    reset();
+  };
+
   return (
-    <div className="absolute">
-      <div></div>
-    </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Gericht-Informationen:</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
+          {selectedItem ? (
+            <div>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Form {...form}>
+                  <FormField
+                    control={control}
+                    name="name"
+                    rules={{ required: "Name is required" }}
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Name:</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Name" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Beschreibung:</FormLabel>
+                        <FormControl>
+                          <Input type="text" placeholder="Beschreibung" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Preis:</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="Preis als Dezimalzahl(ohne € Zeichen)" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="Bild"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel>Bild</FormLabel>
+                        <FormControl>
+                          <Input type="file" placeholder="Bild" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    Aktualisieren
+                  </Button>
+                </Form>
+              </form>
+            </div>
+          ) : (
+            "No item selected."
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

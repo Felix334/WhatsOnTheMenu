@@ -1,3 +1,4 @@
+
 import * as z from "zod";
 
 const menuSchema = z.object({
@@ -16,4 +17,14 @@ const menuSchema = z.object({
   ),
 });
 
-export default menuSchema;
+const itemSchema = z.object({
+  name: z.string().min(1, "Name erforderlich"),
+  description: z.string().min(5, "Beschreibung erforderlich"),
+    price: z.preprocess(
+    (val) => (typeof val === "string" ? parseFloat(val) : val),
+    z.number().positive()
+  ),
+})
+
+
+export {menuSchema, itemSchema};

@@ -1,5 +1,13 @@
 Fix the Profil picture
 
+Die Änderungs-Funktion is noch nicht fertig
+
+
+In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
+
+Wenn das "Bild-Speicher" System fertig ist eine Möglichkeit finden den Speicher 
+bei Anderungen zu aktualsieren
+
 => In die Datenbank eine Option für Fonts einfügen
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
@@ -14,7 +22,8 @@ Cookies Fertg machen
 Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
 Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => Wenn chat hinzugefügt dann auch
 
-Fertige Version => Eine Kopie erstellen und Auth mit Next/Auth probieren => Testprojekt uwandeln
+Fertige Version => Eine Kopie erstellen und Auth mit Next/Auth probieren => Testprojekt 
+umwandeln
 
 
 Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden

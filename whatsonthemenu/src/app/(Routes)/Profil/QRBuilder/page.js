@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import QRCode from "qrcode";
+
 
 export default function Page() {
   const [text, setText] = useState("");
   const [qrCode, setQrCode] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
+  const [userHRF, setUserHREF] = useState("");
+
 
   const generateQRCode = async () => {
     if (!text.trim()) {
@@ -70,6 +73,12 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    if(!userHRF){
+      var url = new URLSearchParams()
+    }
+  })
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-8">
@@ -84,7 +93,7 @@ export default function Page() {
           <label htmlFor="qr-text" className="block text-sm font-medium text-gray-700 mb-2">
             Bitte URL eingeben
           </label>
-          <input id="qr-text" type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="https://example.com or any text..." className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" onKeyPress={(e) => e.key === "Enter" && generateQRCode()} />
+          <input id="qr-text" type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="https://WhatsOnTheMenu/.com" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200" onKeyPress={(e) => e.key === "Enter" && generateQRCode()} />
         </div>
 
         {/* Generate Button */}
@@ -98,7 +107,7 @@ export default function Page() {
               Erstellen...
             </span>
           ) : (
-            "Generate QR Code"
+            "Erstelle QR-Code"
           )}
         </button>
 
@@ -146,11 +155,6 @@ export default function Page() {
             </li>
           </ul>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="text-center mt-8">
-        <p className="text-gray-600 text-sm">Built with Next.js, React, and QRCode.js</p>
       </div>
     </div>
   );
