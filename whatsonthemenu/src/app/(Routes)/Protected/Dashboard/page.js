@@ -15,8 +15,8 @@ export default function Page() {
   useEffect(() => {
     const fetchUserData = async () => {
       const userID = await localStorage.getItem("userID")
-      var encrypted_user_id = cryptoJS.AES.encrypt(userID, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
-      var encrypted_api_key = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8)
+      var encrypted_user_id = cryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8);
+      var encrypted_api_key = cryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(cryptoJS.AES.Utf8)
       console.log("User-ID gefunden:", userID)
       try {
         if(!userID){
