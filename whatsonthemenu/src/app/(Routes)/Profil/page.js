@@ -340,7 +340,7 @@ export default function PageBuilder() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-1">
-        <div className="absolut top-5 flex gap-2 items-center absolute">
+        <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
           <OptionMenu />
           <MenuEditor />
@@ -377,6 +377,7 @@ const MenuSection = ({ title, menuItems }) => {
   const [openItem, setOpenItem] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
+  const [changedItems, setChangedItems] = useState([]);
   const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
 
   const openMenuItemEddit = (id, name, price, description) => {
@@ -390,6 +391,9 @@ const MenuSection = ({ title, menuItems }) => {
     setOpenItem(true);
   };
 
+  if(changedItems){
+    console.log("Changes",changedItems)
+  }
   return (
     <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
       <div className="mb-3">
@@ -426,12 +430,17 @@ const MenuSection = ({ title, menuItems }) => {
           ))}
         </TableBody>
       </Table>
-      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} />
+      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} />
     </Table>
   );
 };
 
-const SelectItem = ({ open, onOpenChange, selectedItem }) => {
+const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
+  const [newName, setNewName] = useState("");
+  const [newDescription, setNewDescrition] = useState("");
+  const [newPrice, setNewPrice] = useState(0);
+  const [newImg, setNewImage] = useState();
+
   const form = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: {
@@ -452,10 +461,27 @@ const SelectItem = ({ open, onOpenChange, selectedItem }) => {
     if (!data) {
       window.alert("Keine Veränderung");
     }
-    console.log("Data:", data);
-    console.log("Changed Item:", item)
+    console.log("Data-Ausgabe:", data);
     console.log(data, selectedItem.id);
+    setChangedItem.id = data.id;
+    if (data.name) {
+      setChangedItem.name = data.name;
+    }
+    if (data.price) {
+      setChangedItem.price = data.price;
+    }
+    if (data.description) {
+      setChangedItem.description = data.description;
+    }
+    if (data.Bild) {
+      setChangedItem.img = data.Bild;
+    } /////////////////////////////////////////////////////////////////////////?
     reset();
+  };
+
+  const handleNameChange = (e) => {
+    if (selectedItem.name != e.target.value) {
+    }
   };
 
   return (
@@ -477,7 +503,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem }) => {
                       <FormItem className="mb-6">
                         <FormLabel>Name:</FormLabel>
                         <FormControl>
-                          <Input type="text" placeholder="Name" {...field} />
+                          <Input type="text" placeholder="Name" {...field} alt="test" />
                         </FormControl>
                       </FormItem>
                     )}
