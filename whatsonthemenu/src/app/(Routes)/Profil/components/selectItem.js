@@ -83,6 +83,35 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
         setEditPrice((prev) => !prev);
         break;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Unfertig
+
+
+
+
     }
   };
   return (
@@ -138,7 +167,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                           <Input type="number" placeholder="Preis als Dezimalzahl (ohne € Zeichen)" {...field} />
                         </FormControl>
                       ) : (
-                        <div>{selectedItem.price ?? "-"}</div>
+                        <div>{editPrice || selectedItem.price || ""}€</div>
                       )}
                     </FormItem>
                   )}
