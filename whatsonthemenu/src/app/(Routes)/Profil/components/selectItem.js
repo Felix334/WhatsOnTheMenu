@@ -8,75 +8,83 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea"
 
 import { menuSchema, itemSchema } from "./menuSchema";
 
+import { FaPen } from "react-icons/fa";
 
 const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescrition] = useState("");
-  const [newPrice, setNewPrice] = useState(0);
-  const [newImg, setNewImage] = useState();
-  const [edditName, setEdditName] = useState(true);
-  const [edditDescription, setEdditDescritption] = useState(true)
-  const [edditPrice, setEdditPrice] = useState(true)
-
+  // State to toggle edit mode for fields
+  const [editName, setEditName] = useState(false);
+  const [editDescription, setEditDescription] = useState(false);
+  const [editPrice, setEditPrice] = useState(false);
   const form = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
+      name: selectedItem?.name || "",
+      description: selectedItem?.description || "",
+      price: selectedItem?.price || 0,
+      Bild: null,
     },
   });
+  const { control, handleSubmit, reset } = form;
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = form;
-
-  const onSubmit = (data, selectedItem) => {
+  useEffect(() => {
+    reset({
+      name: selectedItem?.name || "",
+      description: selectedItem?.description || "",
+      price: selectedItem?.price || 0,
+      Bild: null,
+    });
+    // Reset edit modes on item change
+    setEditName(false);
+    setEditDescription(false);
+    setEditPrice(false);
+  }, [selectedItem, reset]);
+  const onSubmit = (data) => {
     if (!data) {
       window.alert("Keine Veränderung");
+      return;
     }
     console.log("Data-Ausgabe:", data);
-    console.log(data, selectedItem.id);
-    setChangedItem.id = data.id;
-    if (data.name) {
-      setChangedItem.name = data.name;
+    if (!selectedItem) return;
+    // Update the changed item object properly
+    const updatedItem = { ...selectedItem };
+    if (data.name && data.name !== selectedItem.name) {
+      updatedItem.name = data.name;
     }
-    if (data.price) {
-      setChangedItem.price = data.price;
+    if (data.price !== undefined && data.price !== selectedItem.price) {
+      updatedItem.price = data.price;
     }
-    if (data.description) {
-      setChangedItem.description = data.description;
+    if (data.description && data.description !== selectedItem.description) {
+      updatedItem.description = data.description;
     }
-    if (data.Bild) {
-      setChangedItem.img = data.Bild;
-    } /////////////////////////////////////////////////////////////////////////?
+    if (data.Bild && data.Bild.length > 0) {
+      // Assuming Bild is a FileList from input type="file"
+      updatedItem.img = data.Bild[0];
+    }
+    setChangedItem(updatedItem);
     reset();
+    // Optionally close dialog or reset edit modes
+    setEditName(false);
+    setEditDescription(false);
+    setEditPrice(false);
   };
+  const toggleEdit = (field) => {
+    switch (field) {
+      case "name":
+        setEditName((prev) => !prev);
+        break;
+      case "description":
+        setEditDescription((prev) => !prev);
+        break;
+      case "price":
+        setEditPrice((prev) => !prev);
+        break;
 
-  const handleNameChange = (e) => {
-    if (selectedItem.name != e.target.value) {
     }
   };
-
-  const toggleEddit = (type) => {
-    switch(type){
-        case "name":
-            edditName ? setEdditName(true) : setEdditName(false);
-            break;
-        case "description" :
-            edditDescription ? setEdditDescritption(true) : setEdditDescritption(false);
-            break;
-        case "price":
-            edditPrice ? setEdditPrice(true): setEdditPrice(false)
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -85,72 +93,73 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
         </DialogHeader>
         <div className="mt-4">
           {selectedItem ? (
-            <div>
+            <Form {...form}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <Form {...form}>
-                  <FormField
-                    control={control}
-                    name="name"
-                    rules={{ required: "Name is required" }}
-                    render={({ field }) => (
-                      <FormItem className="mb-6" onClick={toggleEddit("name")}>
-                        <FormLabel>Name:</FormLabel>
-                        {edditName ? (
-                          <FormControl>
-                            <Input type="text" placeholder="Name" {...field} alt="Name"></Input>
-                          </FormControl>
-                        ) : (
-                          <div>{selectedItem.name}</div>
-                        )}
-
+                <FormField
+                  control={control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="mb-6">
+                      <FormLabel onClick={() => toggleEdit("name")}><FaPen />Name:</FormLabel>
+                      {editName ? (
                         <FormControl>
-                          <Input type="text" placeholder="Name" {...field} alt="test" />
+                          <Input type="text" placeholder="Name" {...field} alt="Name" />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="mb-6">
-                        <FormLabel>Beschreibung:</FormLabel>
+                      ) : (
+                        <div>{selectedItem.name || "-"}</div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="mb-6">
+                      <FormLabel onClick={() => toggleEdit("description")}><FaPen />Beschreibung:</FormLabel>
+                      {editDescription ? (
                         <FormControl>
-                          <Input type="text" placeholder="Beschreibung" {...field} />
+                          <Textarea type="text" placeholder="Beschreibung" {...field} />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem className="mb-6">
-                        <FormLabel>Preis:</FormLabel>
+                      ) : (
+                        <div>{selectedItem.description || "-"}</div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="price"
+                  render={({ field }) => (
+                    <FormItem className="mb-6">
+                      <FormLabel onClick={() => toggleEdit("price")}><FaPen />Preis:</FormLabel>
+                      {editPrice ? (
                         <FormControl>
-                          <Input type="number" placeholder="Preis als Dezimalzahl(ohne € Zeichen)" {...field} />
+                          <Input type="number" placeholder="Preis als Dezimalzahl (ohne € Zeichen)" {...field} />
                         </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="Bild"
-                    render={({ field }) => (
-                      <FormItem className="mb-6">
-                        <FormLabel>Bild</FormLabel>
-                        <FormControl>
-                          <Input type="file" placeholder="Bild" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full">
-                    Aktualisieren
-                  </Button>
-                </Form>
+                      ) : (
+                        <div>{selectedItem.price ?? "-"}</div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="Bild"
+                  render={({ field }) => (
+                    <FormItem className="mb-6">
+                      <FormLabel><FaPen />Bild</FormLabel>
+                      <FormControl>
+                        <Input type="file" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Aktualisieren
+                </Button>
               </form>
-            </div>
+            </Form>
           ) : (
             "No item selected."
           )}
@@ -159,5 +168,4 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
     </Dialog>
   );
 };
-
 export { SelectItem };

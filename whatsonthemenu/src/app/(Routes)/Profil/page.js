@@ -16,6 +16,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+import { FaPen } from "react-icons/fa";
+
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem"
 
@@ -382,7 +384,13 @@ const MenuSection = ({ title, menuItems }) => {
   const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
 
   const openMenuItemEddit = (id, name, price, description) => {
-    setSelectedItem(id);
+    var newEddit = {
+      id: id,
+      name: name,
+      price: price,
+      description: description,
+    }
+    setSelectedItem(newEddit);
     setItemData((prev) => ({
       ...prev,
       name: name,
