@@ -393,6 +393,7 @@ const MenuSection = ({ title, menuItems }) => {
     setSelectedItem(newEddit);
     setItemData((prev) => ({
       ...prev,
+      id: id,
       name: name,
       price: price,
       description: description,
@@ -421,12 +422,17 @@ const MenuSection = ({ title, menuItems }) => {
           {menuItems?.map((item, index) => (
             <React.Fragment key={index}>
               <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
+                {changedItems }
+
+
+                
                 <TableCell>
-                  <Button onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>i</Button>
+                  <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}><FaPen /></Button>
                 </TableCell>
                 <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
                 <TableCell className="text-gray-600">{item.description}</TableCell>
                 <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
+                <TableCell className="hidden">{item.id}</TableCell>
               </TableRow>
               {expandedIndex === index && (
                 <TableRow>

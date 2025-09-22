@@ -8,7 +8,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
 
 import { menuSchema, itemSchema } from "./menuSchema";
 
@@ -16,9 +16,11 @@ import { FaPen } from "react-icons/fa";
 
 const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
   // State to toggle edit mode for fields
-  const [editName, setEditName] = useState(false);
-  const [editDescription, setEditDescription] = useState(false);
-  const [editPrice, setEditPrice] = useState(false);
+  const [editName, setEditName] = useState();
+  const [editDescription, setEditDescription] = useState();
+  const [editPrice, setEditPrice] = useState();
+  const [edditImg, setEdditImage] = useState()
+  const [updatedItem, setUpdatedItem] = useState("");
   const form = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: {
@@ -42,6 +44,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
     setEditDescription(false);
     setEditPrice(false);
   }, [selectedItem, reset]);
+
   const onSubmit = (data) => {
     if (!data) {
       window.alert("Keine Veränderung");
@@ -49,27 +52,37 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
     }
     console.log("Data-Ausgabe:", data);
     if (!selectedItem) return;
-    // Update the changed item object properly
-    const updatedItem = { ...selectedItem };
     if (data.name && data.name !== selectedItem.name) {
-      updatedItem.name = data.name;
+      setUpdatedItem((item) => ({
+        ...item,
+        name: data.name,
+      }));
     }
     if (data.price !== undefined && data.price !== selectedItem.price) {
-      updatedItem.price = data.price;
+      setUpdatedItem((item) => ({
+        ...item,
+        price: data.price,
+      }));
     }
     if (data.description && data.description !== selectedItem.description) {
-      updatedItem.description = data.description;
+      setUpdatedItem((item) => ({
+        ...item,
+        description: data.description,
+      }));
     }
     if (data.Bild && data.Bild.length > 0) {
+      setUpdatedItem((item) => ({
+        ...item,
+        img: data.Bild,
+      }));
       // Assuming Bild is a FileList from input type="file"
-      updatedItem.img = data.Bild[0];
     }
     setChangedItem(updatedItem);
     reset();
-    // Optionally close dialog or reset edit modes
     setEditName(false);
     setEditDescription(false);
     setEditPrice(false);
+    console.log("Updatedt Data:",updatedItem)
   };
   const toggleEdit = (field) => {
     switch (field) {
@@ -82,36 +95,11 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
       case "price":
         setEditPrice((prev) => !prev);
         break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Unfertig
-
-
-
-
+      case "img":
+        setEdditImage((prev) => !prev);
+        break;
+      default:
+        break;
     }
   };
   return (
@@ -129,13 +117,16 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                   name="name"
                   render={({ field }) => (
                     <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("name")}><FaPen />Name:</FormLabel>
+                      <FormLabel onClick={() => toggleEdit("name")}>
+                        <FaPen />
+                        Name:
+                      </FormLabel>
                       {editName ? (
                         <FormControl>
                           <Input type="text" placeholder="Name" {...field} alt="Name" />
                         </FormControl>
                       ) : (
-                        <div>{selectedItem.name || "-"}</div>
+                        <div>{updatedItem.name ? updatedItem.name : selectedItem.name }</div>
                       )}
                     </FormItem>
                   )}
@@ -145,7 +136,10 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                   name="description"
                   render={({ field }) => (
                     <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("description")}><FaPen />Beschreibung:</FormLabel>
+                      <FormLabel onClick={() => toggleEdit("description")}>
+                        <FaPen />
+                        Beschreibung:
+                      </FormLabel>
                       {editDescription ? (
                         <FormControl>
                           <Textarea type="text" placeholder="Beschreibung" {...field} />
@@ -161,7 +155,10 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                   name="price"
                   render={({ field }) => (
                     <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("price")}><FaPen />Preis:</FormLabel>
+                      <FormLabel onClick={() => toggleEdit("price")}>
+                        <FaPen />
+                        Preis:
+                      </FormLabel>
                       {editPrice ? (
                         <FormControl>
                           <Input type="number" placeholder="Preis als Dezimalzahl (ohne € Zeichen)" {...field} />
@@ -177,7 +174,10 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                   name="Bild"
                   render={({ field }) => (
                     <FormItem className="mb-6">
-                      <FormLabel><FaPen />Bild</FormLabel>
+                      <FormLabel>
+                        <FaPen />
+                        Bild
+                      </FormLabel>
                       <FormControl>
                         <Input type="file" {...field} />
                       </FormControl>
