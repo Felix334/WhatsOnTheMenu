@@ -9,17 +9,20 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
+import { FaCircleInfo } from "react-icons/fa6";
 
 import { menuSchema, itemSchema } from "./menuSchema";
 
-import { FaPen } from "react-icons/fa";
 
 const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
   // State to toggle edit mode for fields
   const [editName, setEditName] = useState();
   const [editDescription, setEditDescription] = useState();
   const [editPrice, setEditPrice] = useState();
-  const [edditImg, setEdditImage] = useState()
+  const [edditImg, setEdditImage] = useState();
   const [updatedItem, setUpdatedItem] = useState("");
   const form = useForm({
     resolver: zodResolver(itemSchema),
@@ -45,13 +48,16 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
     setEditPrice(false);
   }, [selectedItem, reset]);
 
-  const onSubmit = (data) => {
+  const onSubmit = async(data) => {
     if (!data) {
       window.alert("Keine Veränderung");
       return;
     }
     console.log("Data-Ausgabe:", data);
-    if (!selectedItem) return;
+    if (!selectedItem){return}else{setUpdatedItem((item) => ({
+      ...item,
+      id: selectedItem.id
+    }))};
     if (data.name && data.name !== selectedItem.name) {
       setUpdatedItem((item) => ({
         ...item,
@@ -75,14 +81,26 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
         ...item,
         img: data.Bild,
       }));
-      // Assuming Bild is a FileList from input type="file"
+     
+    }
+
+    var resp = await fetch("/api/user/profil/setData", {
+      method: "PATCH",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        userID: userID,
+        data: updatedItem,
+      })
+    })
+    if(resp.status != 200){
+      window.alert("Ups etwas ist schief gelaufen! \nBitte versuchen sie es nochmal!")
     }
     setChangedItem(updatedItem);
     reset();
     setEditName(false);
     setEditDescription(false);
     setEditPrice(false);
-    console.log("Updatedt Data:",updatedItem)
+    console.log("Updatedt Data:", updatedItem);
   };
   const toggleEdit = (field) => {
     switch (field) {
@@ -106,7 +124,15 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Gericht-Informationen:</DialogTitle>
+          <DialogTitle>Speise bearbeiten:</DialogTitle>
+          <Tooltip>
+            <TooltipTrigger>
+              <FaCircleInfo />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="truncate whitespace-nowrap">Auf das Stift Symbol oder die Bezeichnung klicken um das Element bearbeiten zu können</p>
+            </TooltipContent>
+          </Tooltip>
         </DialogHeader>
         <div className="mt-4">
           {selectedItem ? (
@@ -126,7 +152,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem }) => {
                           <Input type="text" placeholder="Name" {...field} alt="Name" />
                         </FormControl>
                       ) : (
-                        <div>{updatedItem.name ? updatedItem.name : selectedItem.name }</div>
+                        <div>{updatedItem.name ? updatedItem.name : selectedItem.name}</div>
                       )}
                     </FormItem>
                   )}

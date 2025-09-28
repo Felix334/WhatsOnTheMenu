@@ -82,12 +82,11 @@ export default function PageBuilder() {
         const cachedData = sessionStorage.getItem("serverData");
         if (cachedData) setServerData(JSON.parse(cachedData));
 
-        // use absolute API path
         const response = await fetch("/api/user/profil/getData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
-        });
+        }, 500);
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -110,15 +109,11 @@ export default function PageBuilder() {
       items: data.items,
     };
 
-    // push a structured object so mapping later is consistent
     setComponents((prev) => [...prev, { type: "menuSection", section: newSection }]);
   };
 
   const onSubmit = (data) => {
     submitToServer(data);
-    // reset to defaults (will restore defaultValues from useForm)
-    reset();
-    // close editor
     setOpenEditor(false);
   };
 
@@ -130,9 +125,9 @@ export default function PageBuilder() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userID: userID,
-          data: components, // sending created components (adjust as needed)
+          data: components,
         }),
-      });
+      }, 500);
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
