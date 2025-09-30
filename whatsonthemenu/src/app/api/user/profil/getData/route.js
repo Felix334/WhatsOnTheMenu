@@ -57,10 +57,10 @@ async function main(userId) {
       },
     });
     
-    console.log("User data found:", userData);
+    console.log("User data found: ", userData);
     return userData;
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error("Error fetching user data: ", error);
     throw error;
   } finally {
     await prisma.$disconnect();
