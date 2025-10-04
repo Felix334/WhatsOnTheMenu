@@ -32,7 +32,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/middleware.js"  ],
+, "src/middleware.js", "src/app/api/user/profil/setData/route.js"  ],
   "exclude": [
     "node_modules"
   ]
