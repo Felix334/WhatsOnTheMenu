@@ -32,7 +32,7 @@ function isErrorResult(result: MainResult): result is { error: string; status: n
   return result !== null && "error" in result && "status" in result;
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const encrypted_data: EncryptedData = await req.json();
     console.log(encrypted_data);
