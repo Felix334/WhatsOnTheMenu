@@ -39,6 +39,7 @@
     "google-auth-library": "^10.1.0",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.510.0",
+    "multer": "^2.0.2",
     "next": "^15.4.1",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
