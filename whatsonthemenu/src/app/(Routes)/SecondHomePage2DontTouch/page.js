@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import Head from "next/head";
 import { useState, useEffect } from "react";
@@ -8,65 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 
-import LoginForm from "./components/Anmelden";
-import Registrieren from "./components/Registrieren";
-import Profile from "./components/Profile";
-import PermControleLocation from "./components/LocasionPermission";
-
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navShadow, setNavShadow] = useState(false);
-  const [userID, setUserID] = useState("");
-  const [role, setRole] = useState("");
-  const [renderCookieWin, setRenderCookieWin] = useState(false);
-  const [autherizedUser, setIsAutherizedUser] = useState(false);
-  const [renderLogin, setRenderLogin] = useState(false);
-
-  const router = useRouter();
-
-  useEffect(() => {
-    if (userID && role) {
-      console.log("User-ID:", userID, "role:", role);
-      window.localStorage.setItem("userID", userID);
-      window.localStorage.setItem("role", role);
-    } else {
-      var userID_ = window.localStorage.getItem("userID");
-      var role_ = window.localStorage.getItem("role");
-      var restaurant_ID = window.localStorage.getItem("restaurnatID");
-      if (userID_ && role_) {
-        setUserID(userID_);
-        setRole(role_);
-        if (restaurant_ID) {
-          setRestaurantID(restaurant_ID);
-        }
-      }
-    }
-  }, [userID, role]);
-
-    useEffect(() => {
-    // Fixes the url reload
-    if (userID) {
-      window.localStorage.setItem("userID", userID);
-      const currentQuery = { ...router.query, userID };
-      const queryString = new URLSearchParams(currentQuery).toString();
-      const newUrl = `/?${queryString}`;
-      router.replace(newUrl);
-    }
-  }, [userID, router]);
-
-  useEffect(() => {
-    console.log("Checke:", userID, role);
-    if (userID && (role == "Owner" || role == "Admin")) {
-      setIsAutherizedUser(true);
-    }
-  }, [userID, role]);
-
-  useEffect(() => {
-    console.log("Checke:", userID, role);
-    if (userID && role == "Admin") {
-      setRenderDashBoard(true);
-    }
-  }, [userID, role]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,13 +27,6 @@ export default function Home() {
     }
   };
 
-  const renderLoginW = () => {
-    if (!renderLogin) {
-      setRenderLogin(true);
-    } else {
-      setRenderLogin(false);
-    }
-  };
   return (
     <>
       <Head>
@@ -138,16 +75,11 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <div className="text-2xl font-bold text-indigo-600">🍽️ WhatsOnMyMenu</div>
+                <div className="text-2xl font-bold text-indigo-600">🍽️ MenuMaker</div>
               </div>
               <div className="hidden md:block">
                 <NavigationMenu>
                   <NavigationMenuList>
-                    <NavigationMenuItem>
-                      <Button variant="ghost" onClick={() => scrollToSection("#features")}>
-                        Unsere Partner
-                      </Button>
-                    </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button variant="ghost" onClick={() => scrollToSection("#features")}>
                         Features
@@ -164,8 +96,8 @@ export default function Home() {
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <Button variant="ghost" onClick={renderLoginW} asChild>
-                        Anmelden
+                      <Button variant="ghost" asChild>
+                        <a href="/login">Anmelden</a>
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
@@ -230,14 +162,14 @@ export default function Home() {
 
         <main>
           {/* Hero Section */}
-          <section className="gradient-bg text-red-500 py-20">
+          <section className="gradient-bg text-white py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Digitale Speisekarten in <span className="text-black">Minuten</span> erstellen
+                    Digitale Speisekarten in <span className="text-yellow-300">Minuten</span> erstellen
                   </h1>
-                  <p className="text-xl mb-8 text-gray-400">Erstelle professionelle, interaktive Speisekarten für dein Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-gray-300">Erstelle professionelle, interaktive Speisekarten für dein Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300">
                       <a href="/editor">Jetzt kostenlos starten</a>
@@ -249,11 +181,11 @@ export default function Home() {
                   <div className="mt-8 flex items-center space-x-6 text-sm">
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
-                      Kostenlose Standartversion verfügbar
+                      Keine Kreditkarte erforderlich
                     </div>
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
-                      Premium für 14 Tage kostenlos testen
+                      14 Tage kostenlos testen
                     </div>
                   </div>
                 </div>
@@ -300,10 +232,10 @@ export default function Home() {
                 <Card className="card-hover">
                   <CardHeader>
                     <div className="feature-icon text-4xl mb-4">🎨</div>
-                    <CardTitle>Einfach gehaltene Editoren</CardTitle>
+                    <CardTitle>EinfacherEditor</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>Intuitives Erstellen ohne technische Kenntnisse. Einfaches Erstellen und Bearbeiten von Speisekarten.</CardDescription>
+                    <CardDescription>Intuitive Bearbeitung ohne technische Kenntnisse. Einfach ziehen, ablegen und anpassen.</CardDescription>
                   </CardContent>
                 </Card>
 
@@ -313,17 +245,17 @@ export default function Home() {
                     <CardTitle>QR-Code Integration</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>Automatische QR-Code Generierung für einfache Integration und Verwendung.</CardDescription>
+                    <CardDescription>Automatische QR-Code Generierung für kontaktloses Bestellen und einfachen Zugang.</CardDescription>
                   </CardContent>
                 </Card>
 
                 <Card className="card-hover">
                   <CardHeader>
                     <div className="feature-icon text-4xl mb-4">🌍</div>
-                    <CardTitle>Premium-Features</CardTitle>
+                    <CardTitle>Mehrsprachig</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>Für ein noch intensiveres und ansprechenderes Erlebniss für ihre Kunden</CardDescription>
+                    <CardDescription>Unterstützung für mehrere Sprachen um internationale Gäste zu erreichen.</CardDescription>
                   </CardContent>
                 </Card>
 
@@ -333,7 +265,7 @@ export default function Home() {
                     <CardTitle>Echtzeit Updates</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>Daten und Bilder sofort aktualisieren - ohne neue QR-Codes drucken zu müssen.</CardDescription>
+                    <CardDescription>Preise und Verfügbarkeit sofort aktualisieren - ohne neue QR-Codes drucken zu müssen.</CardDescription>
                   </CardContent>
                 </Card>
 
@@ -353,7 +285,7 @@ export default function Home() {
                     <CardTitle>Anpassbare Designs</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription>Professionelle Vorlagen die zu ihrem Restaurant-Branding passen.</CardDescription>
+                    <CardDescription>Professionelle Vorlagen die zu deinem Restaurant-Branding passen.</CardDescription>
                   </CardContent>
                 </Card>
               </div>
@@ -364,7 +296,7 @@ export default function Home() {
           <section className="py-20 bg-indigo-600 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für deine erste digitale Speisekarte?</h2>
-              <p className="text-xl mb-8 text-indigo-100">Schließe dich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
+              <p className="text-xl mb-8 text-indigo-100">Schließe dich über 5.000 Restaurants an, die bereits auf digitale Speisekarten setzen</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300">
                   <a href="/register">Kostenlos registrieren</a>
@@ -413,14 +345,11 @@ export default function Home() {
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
                     <div className="text-3xl font-bold">
-                      €<span className="text-lg font-normal">/Monat</span>
+                      29€<span className="text-lg font-normal">/Monat</span>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3 mb-8">
-                      <li className="flex items-center">
-                        <span className="text-yellow-300 mr-2">✓</span>Keine Adds in ihrem Menü
-                      </li>
                       <li className="flex items-center">
                         <span className="text-yellow-300 mr-2">✓</span>Unbegrenzte Karten
                       </li>
@@ -570,10 +499,6 @@ export default function Home() {
             </div>
           </div>
         </footer>
-        <div className="fixed align-top grid z-10 mt-0 top-0">
-          {renderLogin && <LoginForm renderLogin={setRenderLogin} userID={setUserID} role={setRole} />}
-          {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
-        </div>
       </div>
     </>
   );
