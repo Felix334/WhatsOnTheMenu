@@ -56,7 +56,7 @@ const logout = async () => {
     const userID = window.localStorage.getItem("userID");
     const newQuery = new URLSearchParams(searchParams.toString());
     if (userID) {
-      const pathname = "/Routes/Profil/";
+      const pathname = "/Profil/";
       newQuery.set("userID", userID);
       const queryString = newQuery.toString();
       await router.replace(`${pathname}?${queryString}`);
