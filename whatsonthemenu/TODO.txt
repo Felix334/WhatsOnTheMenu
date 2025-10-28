@@ -33,3 +33,5 @@ umwandeln
 
 
 Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden
+
+=> Später Premium Fetaures hinzufügen(user anylytics, keine adds mehr Custom Optionen, Möglichkeit online essen zu bestellen, )
