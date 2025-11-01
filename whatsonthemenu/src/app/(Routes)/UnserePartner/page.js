@@ -145,7 +145,7 @@ export default function RestaurantList() {
                     href={{
                       pathname: "/UnserePartner/Restaurants/Menu",
                       query: {
-                        ...router.query,
+                        ...router .query,
                         ...(userID ? { userID } : {}),
                         ...(restaurant.id ? { restaurantID: restaurant.id } : {}),
                       },

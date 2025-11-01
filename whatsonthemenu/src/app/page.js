@@ -187,12 +187,7 @@ export default function Home() {
                 <NavigationMenu>
                   <NavigationMenuList>
                     <NavigationMenuItem>
-                      <Button
-                        variant="ghost"
-                        onClick={() => scrollToSection("#features")}
-                      >
-                        Unsere Partner
-                      </Button>
+                      <Link href={{ pathname: "/Routes/UnserePartner", query: { ...router.queryString}}}>Unsere Partner</Link>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button

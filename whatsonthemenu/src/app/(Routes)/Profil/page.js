@@ -118,10 +118,11 @@ export default function PageBuilder() {
   };
 
   const submitData = async () => {
+    console.log(`Submited data for ${userID}:`, components)
     setIsLoading(true);
     try {
       const response = await fetch("/api/user/profil/setData", {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userID: userID,
@@ -171,7 +172,6 @@ export default function PageBuilder() {
                     </FormItem>
                   )}
                 />
-
                 <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets und schließt sie</h1>
                 <FormField
                   control={control}

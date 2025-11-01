@@ -4,11 +4,11 @@ Die AGBs als PDF speichern/herrunterladen können
 
 Die Änderungs-Funktion is noch nicht fertig
 
-Die Boxengröße an die Beschreibung anpassen
+Login/Logout-Funktion noch nicht fertig (user ID wird nicht richtig gespeichert/abgerufen)
 
 In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
 
-Wenn das "Bild-Speicher" System fertig ist eine Möglichkeit finden den Speicher 
+Wenn das "Bild-Speicher" System fertig ist eine Möglichkeit finden den Speicher
 bei Anderungen zu aktualsieren
 
 => In die Datenbank eine Option für Fonts einfügen

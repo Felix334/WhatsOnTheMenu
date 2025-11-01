@@ -110,9 +110,9 @@ const Menu = () => {
 
   const Kategorie = ({ menuItems, name }) => {
     return (
-      <MenuSection 
-        title={name} 
-        menuItems={menuItems} 
+      <MenuSection
+        title={name}
+        menuItems={menuItems}
       />
     );
   };
@@ -126,10 +126,10 @@ const Menu = () => {
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <div className="max-w-7xl mx-auto grid gap-4">
           {serverData.menu?.categories?.map((category) => (
-            <Kategorie 
+            <Kategorie
               key={category.id}
               menuItems={category.dishes}
-              name={category.name} 
+              name={category.name}
             />
           ))}
         </div>
