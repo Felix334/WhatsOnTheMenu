@@ -18,7 +18,7 @@ interface AuthData {
 }
 
 type MainResult =
-  | { userID: string; role: string } // Changed to string to match your Prisma schema
+  | { userID: string; role: string }
   | { error: string; status: number }
   | null;
 
@@ -135,7 +135,7 @@ async function main(data: AuthData): Promise<MainResult> {
     }
 
     console.log("User authenticated:", user.id, user.role);
-    return { userID: user.id, role: user.role }; // user.id is now inferred as string
+    return { userID: user.id, role: user.role };
   } catch (err) {
     console.error("An error occurred:", err);
     return { error: (err as Error).message, status: 500 };

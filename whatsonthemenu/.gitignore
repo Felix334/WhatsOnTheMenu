@@ -51,6 +51,7 @@ package-lock.json
 # prisma migrations
 prisma/migrations/
 prisma/seedPrisma.js
+prisma/schema.prisma
 
 # Drawio
 /Roadmap.drawio
