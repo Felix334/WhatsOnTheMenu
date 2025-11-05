@@ -12,6 +12,7 @@ Wenn das "Bild-Speicher" System fertig ist eine Möglichkeit finden den Speicher
 bei Anderungen zu aktualsieren
 
 => In die Datenbank eine Option für Fonts einfügen
+=>"Kategorie" Array zur DB hinzufügen => dann auf der Seite eine Option zum erstellen/hinzuzufügen azf der Webseite
 
 => Ein Email-Postfach einrichten und email Adresse überall einfügen(z.B. in die AGBs)
 => Eine Email-Bestätigung für die erfolgreiche Registrierung(auch bei der Restaurant Registrierung)
