@@ -43,28 +43,8 @@ export async function POST(req: NextRequest) {
     if (isSuccess(decryptResult)) {
       const { userID, data } = decryptResult;
 
-
-
-
-
-
-// Datenaufbau von Sendung ändern
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       if (userID && data) {
-        console.log(`Empfangene Daten: userID: ${userID}, Daten:`, data);
+        console.log(`Empfangene Daten: userID: ${userID}, Daten:`, data.section);
         if (Array.isArray(data)) {
           data.forEach((item, index) => {
             console.log(`Item ${index}:`, item.section);
@@ -83,6 +63,7 @@ export async function POST(req: NextRequest) {
 
 async function decryption(data: EncryptedData): Promise<Response> {
   const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+  console.log("Encryption Key Kontrolle(api):", encryptionKey)
   if (!encryptionKey) {
     console.error("Encryption-Key konnte nicht gelesen werden");
     return { error: "Encryption key not found", status: 500 };

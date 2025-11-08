@@ -6,6 +6,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import * as CryptoJS from "crypto-js";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
@@ -118,6 +119,9 @@ export default function PageBuilder() {
   };
 
   const submitData = async () => {
+    console.log(`Vor dem senden: UserID: ${userID}, Daten: ${components}`)
+    var {enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id} = await encrypt_data(userID, components)
+    console.log("Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted Used ID",encrypted_user_id)
     console.log(`Submited data for ${userID}:`, components)
     setIsLoading(true);
     try {
@@ -125,8 +129,10 @@ export default function PageBuilder() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userID: userID,
-          data: components,
+          encrypted_user_id: encrypted_user_id,
+          encrypted_restaurant_id: encrypted_restaurant_id,
+          encrypted_data: enc_data,
+          encrypted_api_key: encrypted_api_key
         }),
       }, 500);
 
@@ -140,6 +146,21 @@ export default function PageBuilder() {
       setIsLoading(false);
     }
   };
+
+  const encrypt_data = (userID, components) => {
+    console.log('components before stringify(funktion encrypt_data):', components, typeof components);
+    var data = JSON.stringify(components)
+    try{
+    var enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString()
+    var encrypted_restaurant_id = CryptoJS.AES.encrypt(serverData.restaurant.id, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8)
+    var encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+    var encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
+    }catch(error){
+      console.log(error)
+    }
+    console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id)
+    return {enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id}
+  }
 
   const goBackBtn = () => {
     router.push("../");
