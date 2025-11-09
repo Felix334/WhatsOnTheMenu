@@ -62,7 +62,7 @@ export default function Home() {
     }
   }, [userID, role]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     // Fixes the url reload
     if (userID) {
       window.localStorage.setItem("userID", userID);
@@ -71,7 +71,7 @@ export default function Home() {
       const newUrl = `/?${queryString}`;
       router.replace(newUrl);
     }
-  }, [userID, router]);
+  }, [userID, router]);*/
 
   useEffect(() => {
     console.log("Checke:", userID, role);
