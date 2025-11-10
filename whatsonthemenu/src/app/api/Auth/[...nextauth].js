@@ -13,11 +13,16 @@ export const authOptions = {
   // Configure one or more authentication providers
   providers: [
     EmailProvider({
-      server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-      maxAge: 10 * 60 * 60,
-      // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
-    }),
+    server: {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: process.env.EMAIL_SERVER_PORT,
+      auth: {
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD
+      }
+    },
+    from: process.env.EMAIL_FROM
+  }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
