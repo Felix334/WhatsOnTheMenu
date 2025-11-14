@@ -14,7 +14,7 @@ model User {
   password   String
   role       Role
   session    Session?
-  restaurant Restaurant? // Nur Owner haben ein Restaurant
+  restaurant Restaurant?
   createdAt  DateTime    @default(now())
   accounts      Account[]
   updatedAt  DateTime    @updatedAt

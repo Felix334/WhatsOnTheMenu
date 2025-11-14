@@ -2,9 +2,9 @@ Fix the Profil picture
 
 Die AGBs als PDF speichern/herrunterladen können
 
-Die Änderungs-Funktion is noch nicht fertig
+DB ändern => Restauran an die Location binden => User => Restaurant => Location[] => Menü
 
-Login/Logout-Funktion noch nicht fertig (user ID wird nicht richtig gespeichert/abgerufen)
+Die Änderungs-Funktion is noch nicht fertig
 
 In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
 

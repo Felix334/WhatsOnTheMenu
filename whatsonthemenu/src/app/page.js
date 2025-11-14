@@ -62,16 +62,20 @@ export default function Home() {
     }
   }, [userID, role]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     // Fixes the url reload
     if (userID) {
+      console.log("UserID Test 2 UserID vorhanden", userID)
       window.localStorage.setItem("userID", userID);
       const currentQuery = { ...router.query, userID };
       const queryString = new URLSearchParams(currentQuery).toString();
       const newUrl = `/?${queryString}`;
       router.replace(newUrl);
+    }else{
+      const params = new URLSearchParams(window.location.search)
+      params.delete("userID")
     }
-  }, [userID, router]);*/
+  }, [userID, router]);
 
   useEffect(() => {
     console.log("Checke:", userID, role);
@@ -187,7 +191,7 @@ export default function Home() {
                 <NavigationMenu>
                   <NavigationMenuList>
                     <NavigationMenuItem>
-                      <Link href={{ pathname: "/Routes/UnserePartner", query: { ...router.queryString}}}>Unsere Partner</Link>
+                      <Link href={{ pathname: "/UnserePartner", query: { ...router.queryString}}}>Unsere Partner</Link>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button

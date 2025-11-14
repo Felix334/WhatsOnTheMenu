@@ -60,13 +60,17 @@ export default function PageBuilder() {
   // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
   useEffect(() => {
-    const userID_ = sessionStorage.getItem("userID");
-    const role = sessionStorage.getItem("role");
+    const userID_ = localStorage.getItem("userID");
+    const role = localStorage.getItem("role");
 
-    if (!userID_) {
-      alert("Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.");
-      return;
-    }
+if (!userID_) {
+  const searchParams = new URLSearchParams(window.location.search);
+  const userID = searchParams.get("userID");
+  console.log("ID-Test", userID);
+  alert(`Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.`);
+
+}
+
 
     if (role === "Admin" || role === "Owner") {
       setUserID(userID_);
@@ -92,6 +96,7 @@ export default function PageBuilder() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const freshData = await response.json();
+        console.log("server data:", freshData)
         setServerData(freshData);
         sessionStorage.setItem("serverData", JSON.stringify(freshData));
       } catch (error) {
@@ -118,49 +123,58 @@ export default function PageBuilder() {
     setOpenEditor(false);
   };
 
-  const submitData = async () => {
-    console.log(`Vor dem senden: UserID: ${userID}, Daten: ${components}`)
-    var {enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id} = await encrypt_data(userID, components)
-    console.log("Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted Used ID",encrypted_user_id)
-    console.log(`Submited data for ${userID}:`, components)
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/user/profil/setData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          encrypted_user_id: encrypted_user_id,
-          encrypted_restaurant_id: encrypted_restaurant_id,
-          encrypted_data: enc_data,
-          encrypted_api_key: encrypted_api_key
-        }),
-      }, 500);
+const submitData = async () => {
+  const restaurantID = serverData.userData.restaurant.id;
+  const api_key = process.env.NEXT_PUBLIC_API_KEY;
+  console.log(`!Vor dem Verschlüsseln (und Senden): UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${process.env.NEXT_PUBLIC_API_KEY}`);
+  const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
+  console.log("!Vor dem Senden (Encrypted API_Key:", encrypted_api_key);
+  console.log("!Vor dem Senden (Encrypted User ID:", encrypted_user_id);
+  console.log("!Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted User ID", encrypted_user_id);
+  console.log(`!Submitted data for ${userID}:`, components);
+  setIsLoading(true);
+  try {
+    const response = await fetch("/api/user/profil/setData", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        encrypted_user_id: encrypted_user_id,
+        encrypted_restaurant_id: encrypted_restaurant_id,
+        encrypted_data: enc_data,
+        encrypted_api_key: encrypted_api_key
+      }),
+    });
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, Message: ${response.message}, Error: ${response.error}`);
 
-      alert("Data saved successfully!");
-    } catch (err) {
-      console.error("Failed to save data:", err);
-      alert("Failed to save data");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const encrypt_data = (userID, components) => {
-    console.log('components before stringify(funktion encrypt_data):', components, typeof components);
-    var data = JSON.stringify(components)
-    try{
-    var enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString()
-    var encrypted_restaurant_id = CryptoJS.AES.encrypt(serverData.restaurant.id, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8)
-    var encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
-    var encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString(CryptoJS.enc.Utf8);
-    }catch(error){
-      console.log(error)
-    }
-    console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id)
-    return {enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id}
+    alert("Data saved successfully!");
+  } catch (err) {
+    console.error("Failed to save data:", err);
+    alert("Failed to save data");
+  } finally {
+    setIsLoading(false);
   }
+};
+
+const encrypt_data = async (userID, components, restaurantID, api_key) => {
+  console.log('components before stringify (function encrypt_data):', components, typeof components);
+  console.log("Vor dem Verschlüsseln: (userID)", userID);
+  console.log("Vor dem Verschlüsseln: (api_key)", api_key);
+  console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
+  const data = JSON.stringify(components);
+  try {
+    const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
+    return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 
   const goBackBtn = () => {
     router.push("../");

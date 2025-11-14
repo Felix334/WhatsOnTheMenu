@@ -26,7 +26,12 @@ const Menu = () => {
         try {
           const resp = await fetch(`/api/restaurant/${restaurantID}/menu`);
           if (!resp.ok) {
-            throw new Error("Fehler beim Abrufen der Restaurantdaten");
+            if(resp.status == 404){
+              throw new Error("Fehler beim Abrufen der Restaurantdaten: Restaurant nicht gefunden!")
+            } else if(resp.status == 500){
+              throw new Error("Fehler beim Abrufen der Restaurantdaten: Internal Server Error:", resp.status)
+            }
+            throw new Error("Fehler beim Abrufen der Restaurantdaten",);
           }
           const data = await resp.json();
           setName(data.name);
