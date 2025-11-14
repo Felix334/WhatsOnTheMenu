@@ -20,7 +20,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FaPen } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
-import { SelectItem } from "./components/selectItem"
+import { SelectItem } from "./components/selectItem";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -63,14 +63,12 @@ export default function PageBuilder() {
     const userID_ = localStorage.getItem("userID");
     const role = localStorage.getItem("role");
 
-if (!userID_) {
-  const searchParams = new URLSearchParams(window.location.search);
-  const userID = searchParams.get("userID");
-  console.log("ID-Test", userID);
-  alert(`Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.`);
-
-}
-
+    if (!userID_) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const userID = searchParams.get("userID");
+      console.log("ID-Test", userID);
+      alert(`Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.`);
+    }
 
     if (role === "Admin" || role === "Owner") {
       setUserID(userID_);
@@ -87,16 +85,20 @@ if (!userID_) {
         const cachedData = sessionStorage.getItem("serverData");
         if (cachedData) setServerData(JSON.parse(cachedData));
 
-        const response = await fetch("/api/user/profil/getData", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userID }),
-        }, 500);
+        const response = await fetch(
+          "/api/user/profil/getData",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userID }),
+          },
+          500
+        );
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const freshData = await response.json();
-        console.log("server data:", freshData)
+        console.log("server data:", freshData);
         setServerData(freshData);
         sessionStorage.setItem("serverData", JSON.stringify(freshData));
       } catch (error) {
@@ -123,62 +125,82 @@ if (!userID_) {
     setOpenEditor(false);
   };
 
-const submitData = async () => {
-  const restaurantID = serverData.userData.restaurant.id;
-  const api_key = process.env.NEXT_PUBLIC_API_KEY;
-  console.log(`!Vor dem Verschlüsseln (und Senden): UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${process.env.NEXT_PUBLIC_API_KEY}`);
-  const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
-  console.log("!Vor dem Senden (Encrypted API_Key:", encrypted_api_key);
-  console.log("!Vor dem Senden (Encrypted User ID:", encrypted_user_id);
-  console.log("!Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted User ID", encrypted_user_id);
-  console.log(`!Submitted data for ${userID}:`, components);
-  setIsLoading(true);
-  try {
-    const response = await fetch("/api/user/profil/setData", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        encrypted_user_id: encrypted_user_id,
-        encrypted_restaurant_id: encrypted_restaurant_id,
-        encrypted_data: enc_data,
-        encrypted_api_key: encrypted_api_key
-      }),
-    });
+  const submitData = async () => {
+    const restaurantID = serverData.userData.restaurant.id;
+    const api_key = process.env.NEXT_PUBLIC_API_KEY;
+    console.log(`!Vor dem Verschlüsseln (und Senden): UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${process.env.NEXT_PUBLIC_API_KEY}`);
+    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
+    console.log("!Vor dem Senden (Encrypted API_Key:", encrypted_api_key);
+    console.log("!Vor dem Senden (Encrypted User ID:", encrypted_user_id);
+    console.log("!Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted User ID", encrypted_user_id);
+    console.log(`!Submitted data for ${userID}:`, components);
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/user/profil/setData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          encrypted_user_id: encrypted_user_id,
+          encrypted_restaurant_id: encrypted_restaurant_id,
+          encrypted_data: enc_data,
+          encrypted_api_key: encrypted_api_key,
+        }),
+      });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, Message: ${response.message}, Error: ${response.error}`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, Message: ${response.message}, Error: ${response.error}`);
 
-    alert("Data saved successfully!");
-  } catch (err) {
-    console.error("Failed to save data:", err);
-    alert("Failed to save data");
-  } finally {
-    setIsLoading(false);
-  }
-};
+      alert("Data saved successfully!");
+    } catch (err) {
+      console.error("Failed to save data:", err);
+      alert("Failed to save data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-const encrypt_data = async (userID, components, restaurantID, api_key) => {
-  console.log('components before stringify (function encrypt_data):', components, typeof components);
-  console.log("Vor dem Verschlüsseln: (userID)", userID);
-  console.log("Vor dem Verschlüsseln: (api_key)", api_key);
-  console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
-  const data = JSON.stringify(components);
-  try {
-    const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-    const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-    const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-    const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-    console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
-    return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
+  const encrypt_data = async (userID, components, restaurantID, api_key) => {
+    console.log("components before stringify (function encrypt_data):", components, typeof components);
+    console.log("Vor dem Verschlüsseln: (userID)", userID);
+    console.log("Vor dem Verschlüsseln: (api_key)", api_key);
+    console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
+    const data = JSON.stringify(components);
+    try {
+      const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
+      return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
 
   const goBackBtn = () => {
     router.push("../");
   };
+
+
+
+
+
+
+// Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
+// Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
+// Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola) 
+
+
+
+
+
+
+
+
+
+
+
+
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -419,7 +441,7 @@ const MenuSection = ({ title, menuItems }) => {
       name: name,
       price: price,
       description: description,
-    }
+    };
     setSelectedItem(newEddit);
     setItemData((prev) => ({
       ...prev,
@@ -452,12 +474,12 @@ const MenuSection = ({ title, menuItems }) => {
           {menuItems?.map((item, index) => (
             <React.Fragment key={index}>
               <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
-                {changedItems }
+                {changedItems}
 
-
-                
                 <TableCell>
-                  <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}><FaPen /></Button>
+                  <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>
+                    <FaPen />
+                  </Button>
                 </TableCell>
                 <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
                 <TableCell className="text-gray-600">{item.description}</TableCell>
@@ -479,4 +501,3 @@ const MenuSection = ({ title, menuItems }) => {
     </Table>
   );
 };
-

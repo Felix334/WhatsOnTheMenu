@@ -24,6 +24,7 @@ function isError(result: Response): result is { error: string; status: number } 
   return result !== null && "error" in result && "status" in result;
 }
 
+
 export async function POST(req: NextRequest) {
   try {
     const encrypted_data: EncryptedData = await req.json();
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
       }
 
-      // Validate user and restaurant exist, and user owns the restaurant
+
       const user = await prisma.user.findUnique({ where: { id: userID } });
       const restaurant = await prisma.restaurant.findUnique({
         where: { id: restaurantId },
@@ -102,7 +103,6 @@ export async function POST(req: NextRequest) {
 
       console.log(`Empfangene Daten: userID: ${userID}, RestaurantID: ${restaurantId}, MenuID: ${menuId}, Daten:`, parsedData);
 
-      // Process and save each menuSection as a category with items as dishes
       for (const menuSection of parsedData) {
         if (!menuSection.section || !menuSection.section.title) {
           console.warn("MenuSection ohne 'section.title' übersprungen:", menuSection);
@@ -114,7 +114,6 @@ export async function POST(req: NextRequest) {
         console.log(`Verarbeite Kategorie: ${categoryName} mit ${items.length} Gerichten`);
 
         try {
-          // Create category (assuming no ID for updates in this data; use create for simplicity)
           const category = await prisma.category.create({
             data: {
               name: categoryName,
