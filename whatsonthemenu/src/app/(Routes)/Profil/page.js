@@ -459,7 +459,7 @@ const MenuSection = ({ title, menuItems }) => {
   return (
     <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
       <div className="mb-3">
-        <h3 className="text-center text-4xl font-semibold">{title}</h3>
+        <h3 className="text-center text-4xl font-semibold mt-3 mb-9">{title}</h3>
       </div>
       <Table>
         <TableHeader>

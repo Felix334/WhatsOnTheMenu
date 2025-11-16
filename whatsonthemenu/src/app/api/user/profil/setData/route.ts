@@ -7,14 +7,11 @@ const prisma = new PrismaClient();
 interface EncryptedData {
   encrypted_user_id: string;
   encrypted_restaurant_id: string;
-  encrypted_data: string;  // Encrypted JSON string of the data array
+  encrypted_data: string; // Encrypted JSON string of the data array
   encrypted_api_key: string;
 }
 
-type Response =
-  | { status: number; userID: string; restaurantId: string; data: any; apiKey: string }
-  | { error: string; status: number }
-  | null;
+type Response = { status: number; userID: string; restaurantId: string; data: any; apiKey: string } | { error: string; status: number } | null;
 
 function isSuccess(result: Response): result is { status: number; userID: string; restaurantId: string; data: any; apiKey: string } {
   return result !== null && "status" in result && "userID" in result;
@@ -23,7 +20,6 @@ function isSuccess(result: Response): result is { status: number; userID: string
 function isError(result: Response): result is { error: string; status: number } {
   return result !== null && "error" in result && "status" in result;
 }
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,14 +39,12 @@ export async function POST(req: NextRequest) {
       console.log("Successful decryption");
       const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
 
-      // Validate API key
       const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
       console.log("Expected API Key:", expectedApiKey, "Decrypted API Key:", apiKey);
       if (!expectedApiKey || apiKey !== expectedApiKey) {
         return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
       }
 
-      // Parse the decrypted data
       let parsedData;
       try {
         parsedData = JSON.parse(decryptedDataString);
@@ -63,11 +57,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
       }
 
-
       const user = await prisma.user.findUnique({ where: { id: userID } });
       const restaurant = await prisma.restaurant.findUnique({
         where: { id: restaurantId },
-        include: { menu: true },  // Include menu to check if it exists
+        include: { menu: true }, // Include menu to check if it exists
       });
       console.log("User found:", !!user, "Restaurant found:", !!restaurant, "Menu found:", !!restaurant?.menu);
       if (!user || !restaurant) {
@@ -84,11 +77,11 @@ export async function POST(req: NextRequest) {
         try {
           const newMenu = await prisma.menu.create({
             data: {
-              name: `Menü für ${restaurant.name}`,  // Default name based on restaurant
+              name: `Menü für ${restaurant.name}`, // Default name based on restaurant
               description: null,
               restaurantID: restaurantId,
-              bgColor: "#ffffff",  // Default background color
-              font: "Arial",  // Default font
+              bgColor: "#ffffff", // Default background color
+              font: "Arial", // Default font
             },
           });
           menuId = newMenu.id;
@@ -114,6 +107,20 @@ export async function POST(req: NextRequest) {
         console.log(`Verarbeite Kategorie: ${categoryName} mit ${items.length} Gerichten`);
 
         try {
+          // Check if category already exists
+          const existingCategory = await prisma.category.findFirst({
+            where: {
+              name: categoryName,
+              menuId,
+            },
+          });
+
+          if (existingCategory) {
+            console.log(`Kategorie '${categoryName}' existiert bereits, überspringe...`);
+            continue; // Skip if category already exists
+          }
+
+          // Create new category
           const category = await prisma.category.create({
             data: {
               name: categoryName,
@@ -130,13 +137,13 @@ export async function POST(req: NextRequest) {
 
             console.log(`Verarbeite Gericht: ${dishData.name}`);
 
-            // Create dish (assuming no ID for updates; use create)
+            // Create dish
             await prisma.dish.create({
               data: {
                 name: dishData.name,
                 description: dishData.description || null,
-                price: parseFloat(dishData.price),  // Convert string to float
-                imageUrl: dishData.image || "",  // Use empty string if missing
+                price: parseFloat(dishData.price), // Convert string to float
+                imageUrl: dishData.image || "", // Use empty string if missing
                 categoryId: category.id,
                 menuId,
               },
