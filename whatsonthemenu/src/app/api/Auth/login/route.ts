@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import * as CryptoJS from "crypto-js";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -32,10 +33,9 @@ function isErrorResult(result: MainResult): result is { error: string; status: n
   return result !== null && "error" in result && "status" in result;
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
     const encrypted_data: EncryptedData = await req.json();
-    console.log(encrypted_data);
     if (!encrypted_data) {
       return NextResponse.json({ message: "No data received" }, { status: 400 });
     }
@@ -45,28 +45,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (status === 401) {
       return NextResponse.json({ status: 401, message: "Not Authorized" });
     }
-    console.log("API-KEY:", process.env.NEXT_PUBLIC_API_KEY);
-    console.log("Received Data:", encrypted_data);
 
     const result: MainResult = await main({ email, password, userIP });
     if (isSuccessResult(result)) {
-      return NextResponse.json(
-        {
-          message: "Login Successful",
-          id: result.userID,
-          role: result.role,
-        },
-        { status: 200 }
-      );
+      // Instead of setting cookie manually, return success message and user info
+      return NextResponse.json({
+        message: "Login Successful",
+        id: result.userID,
+        role: result.role,
+      });
     } else {
-      // Handle error or null cases
       let errorMessage = "Login Failed";
       let errorStatus = 401;
       if (isErrorResult(result)) {
         errorMessage = result.error;
         errorStatus = result.status;
       }
-      // Include databaselog in the response body (not in ResponseInit)
       return NextResponse.json(
         {
           message: errorMessage,
@@ -86,15 +80,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 async function decrypt(data: EncryptedData): Promise<AuthData & { status?: number }> {
   const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
   if (!encryptionKey) {
-    // Early exit if env var is missing (prevents undefined from reaching CryptoJS)
     console.error("Encryption key is missing from environment variables");
     return { email: "", password: "", userIP: "", status: 500 };
   }
 
   const { encrypted_email, encrypted_password, encrypted_IP, encrypted_API_KEY } = data;
-  console.log("Test Decrypt Function", encrypted_email, encrypted_password, encrypted_IP, encrypted_API_KEY);
 
-  // Decrypt the values (add checks for empty strings if decryption fails)
   const emailBytes = CryptoJS.AES.decrypt(encrypted_email, encryptionKey);
   const passwordBytes = CryptoJS.AES.decrypt(encrypted_password, encryptionKey);
   const userIPBytes = CryptoJS.AES.decrypt(encrypted_IP, encryptionKey);
@@ -105,13 +96,9 @@ async function decrypt(data: EncryptedData): Promise<AuthData & { status?: numbe
   const userIP = userIPBytes.toString(CryptoJS.enc.Utf8);
   const key = keyBytes.toString(CryptoJS.enc.Utf8);
 
-  console.log("Decrypted Data(server):", email, password, userIP, key);
-
-  // Check if decryption succeeded (non-empty) and key matches
   if (email && password && userIP && key && key === process.env.NEXT_PUBLIC_API_KEY) {
     return { email, password, userIP };
   } else {
-    // Return 401 for invalid key/decryption failure (to match the status check in POST)
     return { email: "", password: "", userIP: "", status: 401 };
   }
 }
@@ -129,7 +116,8 @@ async function main(data: AuthData): Promise<MainResult> {
       return null;
     }
 
-    if (user.password !== password) {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
       console.log("Password mismatch");
       return null;
     }

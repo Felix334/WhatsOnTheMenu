@@ -11,13 +11,14 @@ model User {
   id         String      @id @default(cuid())
   name       String      @unique
   email      String      @unique
-  password   String
-  role       Role
+  password   String?     // made optional
+  role       Role        @default(User)
   session    Session?
   restaurant Restaurant?
   createdAt  DateTime    @default(now())
   accounts   Account[]
   updatedAt  DateTime    @updatedAt
+  image      String
 }
 
 model Account {
@@ -110,7 +111,7 @@ model Category {
   name        String
   description String?
   position    Int?
-  menuId      String
+  menuId      String  @unique
   menu        Menu    @relation(fields: [menuId], references: [id])
   dishes      Dish[]
 

@@ -1,7 +1,11 @@
-// pages/api/auth/google.js
+
 import { OAuth2Client } from 'google-auth-library';
 import { NextResponse, NextRequest } from 'next/server';
 
+export default function handler(req, res){
+  
+}
+/*
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export default async function handler(req, res) {
@@ -39,3 +43,4 @@ export default async function handler(req, res) {
     res.status(401).json({ success: false, message: 'Authentication failed' });
   }
 }
+*/
