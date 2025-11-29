@@ -64,6 +64,7 @@ export const authOptions = {
           where: { email: credentials.email },
         });
         if (user && (await bcrypt.compare(credentials.password, user.password))) {
+          console.log("Benutzer gefunden:", user)
           return { id: user.id, email: user.email, name: user.name };
         }
         return null; // Invalid credentials
@@ -72,25 +73,29 @@ export const authOptions = {
   ],
   session: { strategy: "jwt" }, // Or 'database'
   cookies: {
-  sessionToken: {
-    name: `__Secure-next-auth.session-token`,
-    options: {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      secure: process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_USE_SECURE_COOKIE === 'true',
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_USE_SECURE_COOKIE === 'true',
+      },
     },
   },
-},
 
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },

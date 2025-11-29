@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import loginSchema from "./components/loginSchema.js";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 
 import {
   Form,
@@ -19,9 +19,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Home({ renderLogin, userID, role }) {
-  const [submittedData, setSubmittedData] = useState(null);
-  const [userIP, setUserIP] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const form = useForm({
@@ -35,63 +35,70 @@ export default function Home({ renderLogin, userID, role }) {
   const { control, handleSubmit, formState, reset } = form;
 
   // -----------------------------------
-  // Credentials Login (ohne Verschlüsselung)
+  // NextAuth Credentials Login
   // -----------------------------------
-  const submitToServer = async (user_data) => {
-    const { email, password } = user_data;
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    setError("");
 
     try {
-      setIsLoading(true);
-
-      const resp = await fetch("./api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          ip: userIP,
-        }),
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false, // Don't redirect automatically
       });
 
-      if (resp.ok) {
-        const data = await resp.json();
+      if (result?.error) {
+        setError("Login fehlgeschlagen! Bitte richtige Benutzerdaten angeben!");
+      } else if (result?.ok) {
+        // Get session to update user state
+        const session = await getSession();
+        if (session?.user) {
+          userID(session.user.id);
 
-        sessionStorage.setItem("userID", data.id);
-        sessionStorage.setItem("sessionID", data.sessionID);
-        sessionStorage.setItem("role", data.role);
+        }
 
-        userID(data.id);
-        role(data.role);
-        setSubmittedData(data);
-        renderLogin(false);
+        setLoginSuccess(true);
 
-        router.replace("/", undefined, { shallow: true });
-      } else {
-        alert("Login fehlgeschlagen!\nBitte richtige Benutzerdaten angeben!");
+        // Show success popup for 2 seconds, then redirect
+        setTimeout(() => {
+          renderLogin(false);
+          router.replace("/", undefined, { shallow: true });
+        }, 2000);
       }
     } catch (err) {
-      console.error("Network error:", err);
+      console.error("Login error:", err);
+      setError("Ein unerwarteter Fehler ist aufgetreten.");
     } finally {
       setIsLoading(false);
     }
-  };
 
-  const onSubmit = (data) => {
-    submitToServer(data);
     reset();
   };
 
   // -----------------------------------
-  // IP fetch
+  // Social Login Handlers
   // -----------------------------------
-  useEffect(() => {
-    fetch("https://api.ipify.org?format=json")
-      .then((res) => res.json())
-      .then((data) => setUserIP(data.ip))
-      .catch(() => {});
-  }, []);
+  const handleEmailSignIn = () => {
+    const email = form.getValues("email");
+    console.log("Email-Login",email)
+    if (!email) {
+      setError("Bitte geben Sie eine E-Mail-Adresse ein.");
+      return;
+    }
+
+    signIn("email", {
+      email,
+      redirect: true,
+      callbackUrl: "/",
+    });
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn("google", {
+      callbackUrl: "/",
+    });
+  };
 
   // -----------------------------------
   // Loading screen
@@ -108,12 +115,29 @@ export default function Home({ renderLogin, userID, role }) {
     <div className="min-h-screen w-screen bg-gray-600 relative">
       <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80 z-10" />
 
+      {/* Success Popup */}
+      {loginSuccess && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-green-500 text-white p-6 rounded-lg shadow-lg text-center">
+            <div className="text-4xl mb-4">✅</div>
+            <h2 className="text-xl font-bold mb-2">Login erfolgreich!</h2>
+            <p>Willkommen zurück!</p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative z-20 min-h-[300px]">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">
           Login
         </h1>
 
-        {/* Credentials Login */}
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormField
@@ -163,13 +187,7 @@ export default function Home({ renderLogin, userID, role }) {
         {/* Magic Link Email Login */}
         <Button
           type="button"
-          onClick={() =>
-            signIn("email", {
-              email: form.getValues("email"),
-              redirect: true,
-              callbackUrl: "/",
-            })
-          }
+          onClick={handleEmailSignIn}
           className="w-full mb-4 bg-gray-700 hover:bg-gray-800 text-white"
         >
           Magic Link an Email senden
@@ -178,7 +196,7 @@ export default function Home({ renderLogin, userID, role }) {
         {/* Google Login */}
         <Button
           type="button"
-          onClick={() => signIn("google", { callbackUrl: "http://localhost:3000" })}
+          onClick={handleGoogleSignIn}
           className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white"
         >
           Mit Google anmelden

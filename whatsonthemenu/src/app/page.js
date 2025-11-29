@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,15 +35,33 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [navShadow, setNavShadow] = useState(false);
-  const [userID, setUserID] = useState("");
-  const [role, setRole] = useState("");
   const [renderCookieWin, setRenderCookieWin] = useState(false);
-  const [autherizedUser, setIsAutherizedUser] = useState(false);
-  //const [renderDashBoard, setRenderDashBoard] = useState(false);
   const [renderLogin, setRenderLogin] = useState(false);
+  const [setTrue, setSetTrue] = useState(false)
 
+  const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // Derive user state from NextAuth session
+  const userID = session?.user?.id || "";
+  const role = session?.user?.role || "";
+  const autherizedUser = userID && (role === "Owner" || role === "Admin");
+
+
+  useEffect(() => {
+    if (userID && !setTrue) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set('userID', userID); // Add or update userID
+      const newUrl = `${pathname}?${newSearchParams.toString()}`;
+      router.replace(newUrl);
+      setSetTrue(true);
+    }
+  }, [userID, setTrue, router, pathname, searchParams]);  // Dependencies to re-run only when needed
+  // Rest of your component...
+
+/*
   useEffect(() => {
     if (userID && role) {
       console.log("User-ID:", userID, "role:", role);
@@ -782,8 +801,6 @@ export default function Home() {
           {renderLogin && (
             <LoginForm
               renderLogin={setRenderLogin}
-              userID={setUserID}
-              role={setRole}
             />
           )}
           {renderRegister && (

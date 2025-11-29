@@ -1,20 +1,19 @@
 "use client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import profileImage from "./img/account_profile_user_avatar_icon_219236.jpg";
 import { useState, useRef, useEffect } from "react";
-import { Fascinate } from "next/font/google";
-import { COMPILER_NAMES } from "next/dist/shared/lib/constants";
 
 const Profile = () => {
   const [openProfil, setOpenProfil] = useState(false);
-  const [closeLogout, setCloseLogout] = useState(true);
   const modalRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
 
   const toggleWindow = () => {
     setOpenProfil(!openProfil);
@@ -27,7 +26,8 @@ const Profile = () => {
   };
 
 const logout = async () => {
-    const pathname_ = router.pathname;
+  signOut({ callbackUrl: '/'})
+    /*const pathname_ = router.pathname;
     window.localStorage.removeItem("userID");
     const params = new URLSearchParams(window.location.search);
     params.delete("userID");
@@ -37,7 +37,7 @@ const logout = async () => {
     setCloseLogout(false);
     router.refresh();
     window.location.reload();
-    await router.push("./");
+    await router.push("./");*/
   };
 
   useEffect(() => {
@@ -53,14 +53,13 @@ const logout = async () => {
   }, [openProfil]);
 
   const goToProfil = async () => {
-    const userID = window.localStorage.getItem("userID");
-    const newQuery = new URLSearchParams(searchParams.toString());
+    const userID = session?.user?.id;
     if (userID) {
-      const pathname = "/Profil/";
+      const newQuery = new URLSearchParams(searchParams.toString());
       newQuery.set("userID", userID);
       const queryString = newQuery.toString();
-      await router.replace(`${pathname}?${queryString}`);
-      await router.refresh()
+      await router.replace(`/Profil/?${queryString}`);
+      await router.refresh();
     } else {
       window.alert("Bitte anmelden");
     }
@@ -68,14 +67,12 @@ const logout = async () => {
 
   return (
     <div className="relative">
-      {closeLogout ? (
-        <div onClick={toggleWindow}>
-          <Avatar className="w-12 h-12 cursor-pointer z-50">
-            <AvatarImage src={profileImage.src} alt="Profilbild" />
-            <AvatarFallback>PR</AvatarFallback>
-          </Avatar>
-        </div>
-      ) : null}
+      <div onClick={toggleWindow}>
+        <Avatar className="w-12 h-12 cursor-pointer z-50">
+          <AvatarImage src={profileImage.src} alt="Profilbild" />
+          <AvatarFallback>PR</AvatarFallback>
+        </Avatar>
+      </div>
 
       {openProfil && (
         <div className="fixed inset-0 z-100 ag-opacity-zero flex items-center justify-center">
@@ -85,8 +82,8 @@ const logout = async () => {
               <AvatarFallback>PR</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-lg font-semibold">Max Mustermann</h2>
-              <p className="text-sm text-gray-500">max@example.com</p>
+              <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
+              <p className="text-sm text-gray-500">{session?.user?.email}</p>
             </div>
             <div className="space-y-2">
               <Button

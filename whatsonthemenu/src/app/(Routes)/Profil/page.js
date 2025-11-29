@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import * as CryptoJS from "crypto-js";
+import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
@@ -45,6 +46,20 @@ export default function PageBuilder() {
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
 
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+      setUserID(session?.user?.id);
+  }, [session])
+
+//TODO: Session-System hier einfügen/und in allen Seiten wo es fehlt(Auth System funktionert (: )
+
+
+
+
+
+
+
   const form = useForm({
     resolver: zodResolver(menuSchema),
     defaultValues: {
@@ -62,13 +77,6 @@ export default function PageBuilder() {
   useEffect(() => {
     const userID_ = localStorage.getItem("userID");
     const role = localStorage.getItem("role");
-
-    if (!userID_) {
-      const searchParams = new URLSearchParams(window.location.search);
-      const userID = searchParams.get("userID");
-      console.log("ID-Test", userID);
-      alert(`Keine berechtigte Benutzer-ID vorhanden! Bitte melden Sie sich im Hauptmenü an.`);
-    }
 
     if (role === "Admin" || role === "Owner") {
       setUserID(userID_);
