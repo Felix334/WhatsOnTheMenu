@@ -95,9 +95,7 @@ export default function Home({ renderLogin, userID, role }) {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", {
-      callbackUrl: "/",
-    });
+    signIn("google");
   };
 
   // -----------------------------------

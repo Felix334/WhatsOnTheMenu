@@ -22,6 +22,7 @@ import { FaPen } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
+import { fetchData } from "next-auth/client/_utils";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -45,20 +46,19 @@ export default function PageBuilder() {
   const [openOptions, setOpenOptions] = useState(false);
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
+  const [autherized, setIsAutherizedUser] = useState(false)
 
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-      setUserID(session?.user?.id);
-  }, [session])
+if(status === "authenticated" && !autherized){
+  console.log("Signed in as:", session.user.id)
+  console.log("User Data:", session.user)
+  setUserID(session.user.id)
+
+  setIsAutherizedUser(true)
+}
 
 //TODO: Session-System hier einfügen/und in allen Seiten wo es fehlt(Auth System funktionert (: )
-
-
-
-
-
-
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -75,19 +75,8 @@ export default function PageBuilder() {
   // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
   useEffect(() => {
-    const userID_ = localStorage.getItem("userID");
-    const role = localStorage.getItem("role");
-
-    if (role === "Admin" || role === "Owner") {
-      setUserID(userID_);
-      setUserRole(role);
-    }
-  }, []);
-
-  useEffect(() => {
+    if(!userID){return}
     const fetchData = async () => {
-      if (!userID || !(userRole === "Admin" || userRole === "Owner")) throw new Error("Not Authorized! \n Bitte melden sie sich an");
-
       setIsLoading(true);
       try {
         const cachedData = sessionStorage.getItem("serverData");
@@ -102,7 +91,7 @@ export default function PageBuilder() {
           },
           500
         );
-
+//TODO: ABK-Key Abfrage
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const freshData = await response.json();
@@ -115,9 +104,8 @@ export default function PageBuilder() {
         setIsLoading(false);
       }
     };
-
-    fetchData();
-  }, [userID, userRole]);
+    fetchData()
+  }, [userID, userRole])
 
   const submitToServer = (data) => {
     const newSection = {
@@ -136,6 +124,7 @@ export default function PageBuilder() {
   const submitData = async () => {
     const restaurantID = serverData.userData.restaurant.id;
     const api_key = process.env.NEXT_PUBLIC_API_KEY;
+    console.log("API-KEY Abfrage:", api_key)
     console.log(`!Vor dem Verschlüsseln (und Senden): UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${process.env.NEXT_PUBLIC_API_KEY}`);
     const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
     console.log("!Vor dem Senden (Encrypted API_Key:", encrypted_api_key);
@@ -190,24 +179,9 @@ export default function PageBuilder() {
   };
 
 
-
-
-
-
 // Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
 // Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
 // Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola) 
-
-
-
-
-
-
-
-
-
-
-
 
 
   const MenuEditor = () => (
@@ -434,7 +408,6 @@ export default function PageBuilder() {
     </div>
   );
 }
-
 const MenuSection = ({ title, menuItems }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [openItem, setOpenItem] = useState(false);

@@ -1,5 +1,7 @@
 Fix the Profil picture
 
+API-Key Abfrage ÜBERALL einfügen
+
 Die AGBs als PDF speichern/herrunterladen können
 
 DB ändern => Restauran an die Location binden => User => Restaurant => Location[] => Menü
@@ -29,7 +31,6 @@ Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => 
 
 Fertige Version => Eine Kopie erstellen und Auth mit Next/Auth probieren => Testprojekt 
 umwandeln
-
 
 Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden
 PROXMOX => als alternative zu Docker

@@ -7,12 +7,14 @@ datasource db {
   url      = "mysql://root:Neja6.pixu6@localhost:3306/RestaurantWebseite"
 }
 
+// Updated Prisma Schema
+
 model User {
   id            String      @id @default(cuid())
-  name          String      
+  name          String
   email         String      @unique
   emailVerified DateTime?
-  password      String?     // made optional
+  password      String?
   role          Role        @default(User)
   session       Session?
   restaurant    Restaurant?
@@ -67,8 +69,7 @@ model Restaurant {
   parentCompany String
   ownerId       String     @unique
   owner         User       @relation(fields: [ownerId], references: [id])
-  menuID        String?
-  menu          Menu?
+  menu          Menu[] // A restaurant can have zero or multiple menus
   locations     Location[]
   createdAt     DateTime   @default(now())
 }
@@ -80,7 +81,7 @@ model Location {
   city         String
   postalCode   String
   country      String
-  restaurantId String       @unique
+  restaurantId String
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   reservation  Reservation?
 }
@@ -97,14 +98,14 @@ model Menu {
   id           String     @id @default(cuid())
   name         String
   description  String?
-  restaurantID String     @unique
-  restaurant   Restaurant @relation(fields: [restaurantID], references: [id])
+  restaurantId String // A menu belongs to one restaurant
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   categories   Category[]
-  dishes       Dish[]
-  bgColor      String
-  font         String
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+  bgColor      String
+  font         String
+  dishes       Dish[]
 }
 
 model Category {
@@ -112,22 +113,22 @@ model Category {
   name        String
   description String?
   position    Int?
-  menuId      String  @unique
-  menu        Menu    @relation(fields: [menuId], references: [id])
+  menuId      String?
+  menu        Menu?   @relation(fields: [menuId], references: [id])
   dishes      Dish[]
 
   @@unique([name, menuId])
 }
 
 model Dish {
-  id          String       @id @unique @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
   price       Float
   imageUrl    String
-  categoryId  String
+  categoryId  String?
   menuId      String
-  category    Category     @relation(fields: [categoryId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
   menu        Menu         @relation(fields: [menuId], references: [id])
   ingredients Ingredient[] @relation("DishIngredients")
   reviews     Review[]     @relation("DishReviews")
@@ -143,7 +144,7 @@ model Ingredient {
 }
 
 model Review {
-  id        String   @id @unique @default(cuid())
+  id        String   @id @default(cuid())
   dishId    String
   rating    Float    @default(0)
   comment   String?
@@ -151,3 +152,7 @@ model Review {
   updatedAt DateTime @updatedAt
   dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
 }
+
+
+
+Muss nach auf die DB geschoben werden

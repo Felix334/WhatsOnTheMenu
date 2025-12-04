@@ -7,185 +7,177 @@ const prisma = new PrismaClient();
 interface EncryptedData {
   encrypted_user_id: string;
   encrypted_restaurant_id: string;
-  encrypted_data: string; // Encrypted JSON string of the data array
+  encrypted_data: string;
   encrypted_api_key: string;
 }
 
-type Response = { status: number; userID: string; restaurantId: string; data: any; apiKey: string } | { error: string; status: number } | null;
+type Response =
+  | { status: number; userID: string; restaurantId: string; data: any; apiKey: string }
+  | { error: string; status: number }
+  | null;
 
-function isSuccess(result: Response): result is { status: number; userID: string; restaurantId: string; data: any; apiKey: string } {
+function isSuccess(
+  result: Response
+): result is { status: number; userID: string; restaurantId: string; data: any; apiKey: string } {
   return result !== null && "status" in result && "userID" in result;
 }
 
 function isError(result: Response): result is { error: string; status: number } {
-  return result !== null && "error" in result && "status" in result;
+  return result !== null && "error" in result;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const encrypted_data: EncryptedData = await req.json();
-    console.log("Daten empfangen:", encrypted_data);
+
     if (!encrypted_data) {
       return NextResponse.json({ message: "Keine Daten empfangen" }, { status: 400 });
     }
 
-    // Decrypt the data
+    // ------------------------------------------
+    // 🔓 ENTZIEFERN
+    // ------------------------------------------
     const decryptResult = await decryption(encrypted_data);
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
     }
 
-    if (isSuccess(decryptResult)) {
-      console.log("Successful decryption");
-      const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
-
-      const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
-      console.log("Expected API Key:", expectedApiKey, "Decrypted API Key:", apiKey);
-      if (!expectedApiKey || apiKey !== expectedApiKey) {
-        return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
-      }
-
-      let parsedData;
-      try {
-        parsedData = JSON.parse(decryptedDataString);
-      } catch (parseError) {
-        console.error("Fehler beim Parsen der Daten:", parseError);
-        return NextResponse.json({ message: "Ungültiges Datenformat" }, { status: 400 });
-      }
-
-      if (!Array.isArray(parsedData)) {
-        return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
-      }
-
-      const user = await prisma.user.findUnique({ where: { id: userID } });
-      const restaurant = await prisma.restaurant.findUnique({
-        where: { id: restaurantId },
-        include: { menu: true }, // Include menu to check if it exists
-      });
-      console.log("User found:", !!user, "Restaurant found:", !!restaurant, "Menu found:", !!restaurant?.menu);
-      if (!user || !restaurant) {
-        return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
-      }
-      if (restaurant.ownerId !== userID) {
-        return NextResponse.json({ message: "Benutzer ist nicht der Besitzer des Restaurants" }, { status: 403 });
-      }
-
-      let menuId;
-      if (!restaurant.menu) {
-        // Create a new menu for the restaurant
-        console.log("Kein Menü gefunden, erstelle neues Menü...");
-        try {
-          const newMenu = await prisma.menu.create({
-            data: {
-              name: `Menü für ${restaurant.name}`, // Default name based on restaurant
-              description: null,
-              restaurantID: restaurantId,
-              bgColor: "#ffffff", // Default background color
-              font: "Arial", // Default font
-            },
-          });
-          menuId = newMenu.id;
-          console.log("Neues Menü erstellt mit ID:", menuId);
-        } catch (menuError) {
-          console.error("Fehler beim Erstellen des Menüs:", menuError);
-          return NextResponse.json({ message: "Fehler beim Erstellen des Menüs" }, { status: 500 });
-        }
-      } else {
-        menuId = restaurant.menu.id;
-      }
-
-      console.log(`Empfangene Daten: userID: ${userID}, RestaurantID: ${restaurantId}, MenuID: ${menuId}, Daten:`, parsedData);
-
-      for (const menuSection of parsedData) {
-        if (!menuSection.section || !menuSection.section.title) {
-          console.warn("MenuSection ohne 'section.title' übersprungen:", menuSection);
-          continue;
-        }
-
-        const categoryName = menuSection.section.title;
-        const items = menuSection.section.items || [];
-        console.log(`Verarbeite Kategorie: ${categoryName} mit ${items.length} Gerichten`);
-
-        try {
-          // Check if category already exists
-          const existingCategory = await prisma.category.findFirst({
-            where: {
-              name: categoryName,
-              menuId,
-            },
-          });
-
-          if (existingCategory) {
-            console.log(`Kategorie '${categoryName}' existiert bereits, überspringe...`);
-            continue; // Skip if category already exists
-          }
-
-          // Create new category
-          const category = await prisma.category.create({
-            data: {
-              name: categoryName,
-              menuId,
-            },
-          });
-
-          // Process dishes
-          for (const dishData of items) {
-            if (!dishData.name || !dishData.price) {
-              console.warn("Gericht ohne 'name' oder 'price' übersprungen:", dishData);
-              continue;
-            }
-
-            console.log(`Verarbeite Gericht: ${dishData.name}`);
-
-            // Create dish
-            await prisma.dish.create({
-              data: {
-                name: dishData.name,
-                description: dishData.description || null,
-                price: parseFloat(dishData.price), // Convert string to float
-                imageUrl: dishData.image || "", // Use empty string if missing
-                categoryId: category.id,
-                menuId,
-              },
-            });
-
-            // Note: No ingredients in your data, so skipping that part
-          }
-        } catch (dbError) {
-          console.error("Fehler beim Speichern der Kategorie/Gericht:", dbError);
-          return NextResponse.json({ message: "Fehler beim Speichern der Daten" }, { status: 500 });
-        }
-      }
-
-      return NextResponse.json({ status: 201, message: "Daten erfolgreich gespeichert" });
+    if (!isSuccess(decryptResult)) {
+      return NextResponse.json({ message: "Unbekannter Fehler" }, { status: 500 });
     }
 
-    // Fallback
-    return NextResponse.json({ message: "Unbekannter Fehler" }, { status: 500 });
-  } catch (error) {
-    console.log("Ein Fehler in der API ist aufgetreten: ", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
+
+    const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
+    console.log(decryptedDataString)
+    if (!expectedApiKey || apiKey !== expectedApiKey) {
+      return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
+    }
+
+    // ------------------------------------------
+    // ⬇️ JSON parsen
+    // ------------------------------------------
+    let parsedData: any[];
+    try {
+      parsedData = JSON.parse(decryptedDataString);
+    } catch {
+      return NextResponse.json({ message: "Ungültiges Datenformat" }, { status: 400 });
+    }
+
+    if (!Array.isArray(parsedData)) {
+      return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
+    }
+
+    // ------------------------------------------
+    // 🔍 USER & RESTAURANT Prüfen
+    // ------------------------------------------
+    const user = await prisma.user.findUnique({ where: { id: userID } });
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+      include: { menu: { include: { categories: true } } },
+    });
+
+    if (!user || !restaurant) {
+      return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
+    }
+
+    if (restaurant.ownerId !== userID) {
+      return NextResponse.json({ message: "Benutzer ist nicht der Besitzer des Restaurants" }, { status: 403 });
+    }
+
+    // ------------------------------------------
+    // 📌 Menü erzeugen (falls nicht vorhanden)
+    // ------------------------------------------
+    let menuId: string;
+
+    if (!restaurant.menu) {
+      const newMenu = await prisma.menu.create({
+        data: {
+          name: `Menü für ${restaurant.name}`,
+          description: null,
+          restaurantID: restaurantId,
+          bgColor: "#ffffff",
+          font: "Arial",
+        },
+      });
+      menuId = newMenu.id;
+    } else {
+      menuId = restaurant.menu.id;
+    }
+
+    // ==========================================
+    // 📦 HAUPTTEIL — ALLE DATEN VERARBEITEN
+    // ==========================================
+
+    for (const entry of parsedData) {
+      if (entry.type === "menuSection") {
+        const section = entry.section;
+        const title = section.title;
+        const items = section.items || [];
+
+        // 1️⃣ Kategorie suchen oder erstellen
+        let category = await prisma.category.findFirst({
+          where: { menuId, name: title },
+        });
+
+        if (!category) {
+          category = await prisma.category.create({
+            data: {
+              name: title,
+              description: null,
+              position: null,
+              menuId,
+            },
+          });
+        }
+
+        // 2️⃣ Items speichern
+        for (const item of items) {
+          await prisma.dish.create({
+            data: {
+              name: item.name,
+              description: item.description || null,
+              price: parseFloat(item.price),
+              imageUrl: item.image || "",
+              categoryId: category.id,
+              menuId: menuId, // <- notwendig in deinem Schema!
+            },
+          });
+        }
+      }
+    }
+
+    return NextResponse.json(
+      {
+        message: "Daten erfolgreich verarbeitet",
+        restaurantId,
+        menuId,
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Serverfehler:", err);
+    return NextResponse.json({ message: "Serverfehler" }, { status: 500 });
   }
 }
 
+// -------------------------------------------------------
+// 🔐 ENTZIEFERUNG
+// -------------------------------------------------------
 async function decryption(data: EncryptedData): Promise<Response> {
-  const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-  console.log("Encryption Key Kontrolle (API):", encryptionKey);
-  if (!encryptionKey) {
-    console.error("Encryption-Key konnte nicht gelesen werden");
-    return { error: "Encryption key not found", status: 500 };
-  }
+  const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+  if (!key) return { error: "Encryption key missing", status: 500 };
 
   try {
-    const decryptedUserId = CryptoJS.AES.decrypt(data.encrypted_user_id, encryptionKey).toString(CryptoJS.enc.Utf8);
-    const decryptedRestaurantId = CryptoJS.AES.decrypt(data.encrypted_restaurant_id, encryptionKey).toString(CryptoJS.enc.Utf8);
-    const decryptedData = CryptoJS.AES.decrypt(data.encrypted_data, encryptionKey).toString(CryptoJS.enc.Utf8);
-    const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, encryptionKey).toString(CryptoJS.enc.Utf8);
+    const decryptedUserId = CryptoJS.AES.decrypt(data.encrypted_user_id, key).toString(CryptoJS.enc.Utf8);
+    const decryptedRestaurantId = CryptoJS.AES.decrypt(data.encrypted_restaurant_id, key).toString(CryptoJS.enc.Utf8);
+    const decryptedData = CryptoJS.AES.decrypt(data.encrypted_data, key).toString(CryptoJS.enc.Utf8);
+    const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
 
     if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return { error: "Entschlüsselung fehlgeschlagen - leere Werte", status: 400 };
+      return { error: "Entschlüsselung fehlgeschlagen (leere Werte)", status: 400 };
     }
-    console.log(`Decrypted UserID: ${decryptedUserId}, decrypted restaurantID: ${decryptedRestaurantId}, decrypted data: ${decryptedData}, decrypted api-key: ${decryptedApiKey}`);
 
     return {
       userID: decryptedUserId,
@@ -194,8 +186,7 @@ async function decryption(data: EncryptedData): Promise<Response> {
       apiKey: decryptedApiKey,
       status: 200,
     };
-  } catch (error) {
-    console.error("Decryption failed:", error);
+  } catch (e) {
     return { error: "Decryption failed", status: 400 };
   }
 }
