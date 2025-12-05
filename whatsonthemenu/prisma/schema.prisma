@@ -7,8 +7,6 @@ datasource db {
   url      = "mysql://root:Neja6.pixu6@localhost:3306/RestaurantWebseite"
 }
 
-// Updated Prisma Schema
-
 model User {
   id            String      @id @default(cuid())
   name          String
@@ -116,8 +114,6 @@ model Category {
   menuId      String?
   menu        Menu?   @relation(fields: [menuId], references: [id])
   dishes      Dish[]
-
-  @@unique([name, menuId])
 }
 
 model Dish {
@@ -152,7 +148,3 @@ model Review {
   updatedAt DateTime @updatedAt
   dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
 }
-
-
-
-Muss nach auf die DB geschoben werden

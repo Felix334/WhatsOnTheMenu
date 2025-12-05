@@ -91,7 +91,22 @@ if(status === "authenticated" && !autherized){
           },
           500
         );
-//TODO: ABK-Key Abfrage
+
+
+
+
+        
+//TODO: Daten werden empfangen aber nicht angezeigt
+
+
+
+
+
+
+
+
+
+
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const freshData = await response.json();
@@ -121,39 +136,51 @@ if(status === "authenticated" && !autherized){
     setOpenEditor(false);
   };
 
-  const submitData = async () => {
-    const restaurantID = serverData.userData.restaurant.id;
-    const api_key = process.env.NEXT_PUBLIC_API_KEY;
-    console.log("API-KEY Abfrage:", api_key)
-    console.log(`!Vor dem Verschlüsseln (und Senden): UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${process.env.NEXT_PUBLIC_API_KEY}`);
-    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
-    console.log("!Vor dem Senden (Encrypted API_Key:", encrypted_api_key);
-    console.log("!Vor dem Senden (Encrypted User ID:", encrypted_user_id);
-    console.log("!Encrypted Data vor dem Senden:", "Encrypted Daten", enc_data, "Encrypted API Key", encrypted_api_key, "Encrypted User ID", encrypted_user_id);
-    console.log(`!Submitted data for ${userID}:`, components);
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/user/profil/setData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          encrypted_user_id: encrypted_user_id,
-          encrypted_restaurant_id: encrypted_restaurant_id,
-          encrypted_data: enc_data,
-          encrypted_api_key: encrypted_api_key,
-        }),
-      });
+const submitData = async () => {
+  const restaurantID = serverData.userData.restaurant.id;
+  const api_key = process.env.NEXT_PUBLIC_API_KEY;
+  console.log("API-KEY Abfrage:", api_key);
+  console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, Message: ${response.message}, Error: ${response.error}`);
+  const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } =
+    await encrypt_data(userID, components, restaurantID, api_key);
 
-      alert("Data saved successfully!");
-    } catch (err) {
-      console.error("Failed to save data:", err);
-      alert("Failed to save data");
-    } finally {
-      setIsLoading(false);
+  console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
+  console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
+  console.log("!Encrypted Data vor dem Senden:", enc_data);
+
+  setIsLoading(true);
+
+  try {
+    const response = await fetch("/api/user/profil/setData", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        encrypted_user_id,
+        encrypted_restaurant_id,
+        encrypted_data: enc_data,
+        encrypted_api_key,
+      }),
+    });
+
+    // JSON parsen, um die Fehlernachricht zu erhalten
+    const resData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`
+      );
     }
-  };
+
+    alert("Data saved successfully!");
+  } catch (err) {
+    console.error("Failed to save data:", err);
+    alert(`Failed to save data: ${err.message}`);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const encrypt_data = async (userID, components, restaurantID, api_key) => {
     console.log("components before stringify (function encrypt_data):", components, typeof components);
