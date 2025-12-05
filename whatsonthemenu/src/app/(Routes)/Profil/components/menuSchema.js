@@ -10,7 +10,7 @@ const menuSchema = z.object({
       price: z
         .string()
         .min(1)
-        .regex(/^\d+([.,]\d{1,2})?$/, "Bitte eine gültige Zahl mit max. 2 Nachkommastellen eingeben"),
+        .regex(/^\d+([.,]\d{2})?$/, "Bitte eine gültige Zahl mit max. 2 Nachkommastellen eingeben"),
       description: z.string().optional(),
       image: z.string().optional(), // base64 oder URL
     })

@@ -1,23 +1,12 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useSession } from "next-auth/react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { LoadCoordinates } from "/components";
@@ -57,16 +46,31 @@ const restaurants = [
 export default function RestaurantList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("Alle");
-  const [userID, setUserID] = useState("");
   const [allowGeoLocation, setAllowGeoLocation] = useState(false);
   const [reqCookie, setReqcookie] = useState(false);
+  const [setTrue, setSetTrue] = useState(false);
 
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+
+  const userID = session?.user?.id || "";
+  const role = session?.user?.role || "";
+  const autherizedUser = userID && (role === "Owner" || role === "Admin");
 
   useEffect(() => {
-    const consent = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("geoLocation="));
+    if (userID && !setTrue) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("userID", userID); // Add or update userID
+      const newUrl = `${pathname}?${newSearchParams.toString()}`;
+      router.replace(newUrl);
+      setSetTrue(true);
+    }
+  }, [userID, setTrue, router, pathname, searchParams]);
+
+  useEffect(() => {
+    const consent = document.cookie.split("; ").find((row) => row.startsWith("geoLocation="));
     if (consent?.split("=")[1] === "true") {
       setAllowGeoLocation(true);
     } else {
@@ -78,9 +82,7 @@ export default function RestaurantList() {
   useEffect(() => {
     if (!reqCookie) {
       if (allowGeoLocation === false) {
-        const confirmConsent = window.confirm(
-          "Kein genauer Standort verfügbar.\nMöchten Sie Cookies zulassen, um Standortdaten zu aktivieren?"
-        );
+        const confirmConsent = window.confirm("Kein genauer Standort verfügbar.\nMöchten Sie Cookies zulassen, um Standortdaten zu aktivieren?");
         if (confirmConsent) {
           const expiry = new Date();
           expiry.setFullYear(expiry.getFullYear() + 1);
@@ -92,44 +94,21 @@ export default function RestaurantList() {
     setReqcookie(true);
   }, [allowGeoLocation, reqCookie]);
 
-  useEffect(() => {
-    if (userID) {
-      window.localStorage.setItem("userID", userID);
-    } else {
-      const userID_ = window.localStorage.getItem("userID");
-      if (userID_) {
-        setUserID(userID_);
-      }
-    }
-  }, [userID]);
-
-  const cuisines = [
-    "Alle",
-    "Französisch",
-    "Asiatisch",
-    "Italienisch",
-    "Americanisch",
-    "FastFood",
-  ];
+  const cuisines = ["Alle", "Französisch", "Asiatisch", "Italienisch", "Americanisch", "FastFood"];
 
   const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchesSearch = restaurant.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCuisine =
-      selectedCuisine === "Alle" || restaurant.cuisine === selectedCuisine;
+    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCuisine = selectedCuisine === "Alle" || restaurant.cuisine === selectedCuisine;
     return matchesSearch && matchesCuisine;
   });
 
   const checkCoordinates = () => {
     if (!navigator.geolocation) {
-      window.alert(
-        "Oops! \nWie es scheint, unterstützt Ihr Browser keine Standortermittlung! \nVerwenden Sie einen anderen Internetbrowser, um alle Funktionen unserer Seite nutzen zu können."
-      );
+      window.alert("Oops! \nWie es scheint, unterstützt Ihr Browser keine Standortermittlung! \nVerwenden Sie einen anderen Internetbrowser, um alle Funktionen unserer Seite nutzen zu können.");
       return;
     }
 
-    // GEht nur in localhost oder mit https
+    // Geht nur in localhost oder mit https
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
@@ -139,19 +118,13 @@ export default function RestaurantList() {
       (error) => {
         switch (error.code) {
           case 1:
-            alert(
-              "Standortzugriff verweigert. Bitte erlauben Sie den Zugriff in Ihren Browsereinstellungen und laden Sie die Seite neu."
-            );
+            alert("Standortzugriff verweigert. Bitte erlauben Sie den Zugriff in Ihren Browsereinstellungen und laden Sie die Seite neu.");
             break;
           case 2:
-            alert(
-              "Standort konnte nicht ermittelt werden. Überprüfen Sie Ihre GPS-Einstellungen."
-            );
+            alert("Standort konnte nicht ermittelt werden. Überprüfen Sie Ihre GPS-Einstellungen.");
             break;
           case 3:
-            alert(
-              "Zeitüberschreitung bei der Standortermittlung. Versuchen Sie es erneut."
-            );
+            alert("Zeitüberschreitung bei der Standortermittlung. Versuchen Sie es erneut.");
             break;
           default:
             console.error("Unbekannter Fehler:", error);
@@ -168,12 +141,7 @@ export default function RestaurantList() {
           <div className="fixed right-2">
             <Button onClick={checkCoordinates}></Button>
           </div>
-          <Input
-            placeholder="Suchen"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="md:w-1/3 bg-amber-50"
-          />
+          <Input placeholder="Suchen" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="md:w-1/3 bg-amber-50" />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -183,10 +151,7 @@ export default function RestaurantList() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {cuisines.map((cuisine) => (
-                <DropdownMenuItem
-                  key={cuisine}
-                  onSelect={() => setSelectedCuisine(cuisine)}
-                >
+                <DropdownMenuItem key={cuisine} onSelect={() => setSelectedCuisine(cuisine)}>
                   {cuisine}
                 </DropdownMenuItem>
               ))}
@@ -196,10 +161,7 @@ export default function RestaurantList() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRestaurants.map((restaurant) => (
-            <Card
-              key={restaurant.id}
-              className="hover:shadow-lg transition-shadow"
-            >
+            <Card key={restaurant.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle>{restaurant.name}</CardTitle>
@@ -228,9 +190,7 @@ export default function RestaurantList() {
                       query: {
                         ...router.query,
                         ...(userID ? { userID } : {}),
-                        ...(restaurant.id
-                          ? { restaurantID: restaurant.id }
-                          : {}),
+                        ...(restaurant.id ? { restaurantID: restaurant.id } : {}),
                       },
                     }}
                   >
@@ -244,9 +204,7 @@ export default function RestaurantList() {
 
         {filteredRestaurants.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No restaurants found matching your criteria
-            </p>
+            <p className="text-muted-foreground">No restaurants found matching your criteria</p>
           </div>
         )}
       </div>
@@ -255,9 +213,7 @@ export default function RestaurantList() {
 }
 
 function getGeoLocation() {
-  var confGeo = window.confirm(
-    "Diese Webseite benutzt Cookies um ihren Standort zu erfassen! \nIn dem sie zustimmen können wir ihre Ergebnisse besser personaliesieren"
-  );
+  var confGeo = window.confirm("Diese Webseite benutzt Cookies um ihren Standort zu erfassen! \nIn dem sie zustimmen können wir ihre Ergebnisse besser personaliesieren");
   if (!navigator.geolocation) {
     window.alert("Geographische Daten nicht verfügbar");
   }

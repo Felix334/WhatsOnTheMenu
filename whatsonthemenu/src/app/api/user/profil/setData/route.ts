@@ -71,47 +71,6 @@ export async function POST(req: NextRequest) {
     if (apiKey !== expectedApiKey) {
       return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// SetData geht wieder aber die Daten werden nicht angezeigt(aber gesendet)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // parse JSON
     let parsedData: any;
     try {

@@ -36,6 +36,7 @@ export default function PageBuilder() {
   const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }
   const [serverData, setServerData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [edditComponents, setEdditComponents] = useState([]);
 
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
@@ -91,21 +92,6 @@ if(status === "authenticated" && !autherized){
           },
           500
         );
-
-
-
-
-        
-//TODO: Daten werden empfangen aber nicht angezeigt
-
-
-
-
-
-
-
-
-
 
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -409,7 +395,7 @@ const submitData = async () => {
           <OptionMenu />
           <MenuEditor />
         </div>
-        <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
+        <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
           <header className="mb-12 text-center w-full">
             <div className="grid grid-col-1">
               <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}</h1>
@@ -418,7 +404,7 @@ const submitData = async () => {
           </header>
 
           <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
-            <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) || <div>Keine Daten vorhanden</div>}</div>
+            <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) || <div>Keine Daten vorhanden</div>}</div>
 
             <p className="mt-4">Gesamtpreis:</p>
 
@@ -428,7 +414,7 @@ const submitData = async () => {
             </details>
           </main>
         </div>
-        <div className="fixed bottom-6 left-6">
+        <div className="fixed bottom-6 left-6 z-20">
           <Button onClick={() => submitData()}>Speichern (Server)</Button>
         </div>
       </div>
