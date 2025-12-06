@@ -84,6 +84,7 @@ const logout = async () => {
             <div>
               <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
               <p className="text-sm text-gray-500">{session?.user?.email}</p>
+              {session?.user.role == "Admin" ? <div className="text-red-600">Admin</div>: <></>}
             </div>
             <div className="space-y-2">
               <Button
@@ -92,7 +93,7 @@ const logout = async () => {
                   goToProfil();
                 }}
               >
-                Profil ansehen
+                Profil
               </Button>
 
               <Link href="/settings">

@@ -59,8 +59,6 @@ if(status === "authenticated" && !autherized){
   setIsAutherizedUser(true)
 }
 
-//TODO: Session-System hier einfügen/und in allen Seiten wo es fehlt(Auth System funktionert (: )
-
   const form = useForm({
     resolver: zodResolver(menuSchema),
     defaultValues: {
@@ -387,6 +385,81 @@ const submitData = async () => {
     );
   }
 
+  const MenuSection = ({ title, menuItems }) => {
+    const [expandedIndex, setExpandedIndex] = useState(null);
+    const [openItem, setOpenItem] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
+    const [changedItems, setChangedItems] = useState([]);
+    const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
+
+    const openMenuItemEddit = (id, name, price, description) => {
+      var newEddit = {
+        id: id,
+        name: name,
+        price: price,
+        description: description,
+      };
+      setSelectedItem(newEddit);
+      setItemData((prev) => ({
+        ...prev,
+        id: id,
+        name: name,
+        price: price,
+        description: description,
+      }));
+      setOpenItem(true);
+    };
+
+    if (changedItems) {
+      console.log("Changes", changedItems);
+    }
+    return (
+      <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
+        <div className="mb-3">
+          <h3 className="text-center text-4xl font-semibold mt-3 mb-9">{title}</h3>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead className="text-left">Speisen:</TableHead>
+              <TableHead className="text-left">Beschreibung:</TableHead>
+              <TableHead className="text-right">Preis:</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {menuItems?.map((item, index) => (
+              <React.Fragment key={index}>
+                <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
+                  {changedItems}
+
+                  <TableCell>
+                    <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>
+                      <FaPen />
+                    </Button>
+                  </TableCell>
+                  <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
+                  <TableCell className="text-gray-600">{item.description}</TableCell>
+                  <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
+                  <TableCell className="hidden">{item.id}</TableCell>
+                </TableRow>
+                {expandedIndex === index && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="px-6 py-4">
+                      <Image src={schnitzel} alt="" />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+        <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
+      </Table>
+    );
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
       <div className="p-1">
@@ -421,77 +494,3 @@ const submitData = async () => {
     </div>
   );
 }
-const MenuSection = ({ title, menuItems }) => {
-  const [expandedIndex, setExpandedIndex] = useState(null);
-  const [openItem, setOpenItem] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
-  const [changedItems, setChangedItems] = useState([]);
-  const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
-
-  const openMenuItemEddit = (id, name, price, description) => {
-    var newEddit = {
-      id: id,
-      name: name,
-      price: price,
-      description: description,
-    };
-    setSelectedItem(newEddit);
-    setItemData((prev) => ({
-      ...prev,
-      id: id,
-      name: name,
-      price: price,
-      description: description,
-    }));
-    setOpenItem(true);
-  };
-
-  if (changedItems) {
-    console.log("Changes", changedItems);
-  }
-  return (
-    <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
-      <div className="mb-3">
-        <h3 className="text-center text-4xl font-semibold mt-3 mb-9">{title}</h3>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead></TableHead>
-            <TableHead className="text-left">Speisen:</TableHead>
-            <TableHead className="text-left">Beschreibung:</TableHead>
-            <TableHead className="text-right">Preis:</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {menuItems?.map((item, index) => (
-            <React.Fragment key={index}>
-              <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
-                {changedItems}
-
-                <TableCell>
-                  <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>
-                    <FaPen />
-                  </Button>
-                </TableCell>
-                <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
-                <TableCell className="text-gray-600">{item.description}</TableCell>
-                <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
-                <TableCell className="hidden">{item.id}</TableCell>
-              </TableRow>
-              {expandedIndex === index && (
-                <TableRow>
-                  <TableCell colSpan={3} className="px-6 py-4">
-                    <Image src={schnitzel} alt="" />
-                  </TableCell>
-                </TableRow>
-              )}
-            </React.Fragment>
-          ))}
-        </TableBody>
-      </Table>
-      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} />
-    </Table>
-  );
-};

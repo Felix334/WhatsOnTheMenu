@@ -18,7 +18,7 @@ import CryptoJS from 'crypto-js'; // Add this import for encryption
 
 import { menuSchema, itemSchema } from "./menuSchema";
 
-const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID }) => { // Add userID as prop (from parent/auth)
+const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, category, restaurantId }) => { // Add userID as prop (from parent/auth)
   // State to toggle edit mode for fields (default false)
   const [editName, setEditName] = useState(false);
   const [editDescription, setEditDescription] = useState(false);
@@ -56,7 +56,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID }
     setEditImage(false);
   }, [selectedItem, reset]);
 
-  // Encryption function (fixed: stringify object, add IV, call properly)
+  // Encryption function (fixed: stringify object, add IV, call properly) 
   const encryptObject = useCallback((userID, itemToEncrypt, encryptionKey) => {
     if (!encryptionKey) throw new Error('Encryption key missing');
 
@@ -107,31 +107,48 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID }
       name: data.name || selectedItem.name,
       price: data.price != null ? data.price : selectedItem.price,
       description: data.description || selectedItem.description,
-      img: data.Bild || selectedItem.img // For files: Upload first, set to URL (see notes)
+      image: data.Bild || selectedItem.img // For files: Upload first, set to URL (see notes)
     };
 
     // TODO: If Bild is a File, upload it separately before encryption
     // Example: if (data.Bild && data.Bild instanceof File) {
     //   const uploadResp = await fetch('/api/upload', { method: 'POST', body: formDataWithFile });
     //   const { url } = await uploadResp.json();
-    //   finalUpdatedItem.img = url;
+    //   finalUpdatedItem.image = url;
     // }
 
+    // Format data as menu section for editData API
+    const menuSectionData = [{
+      type: "menuSection",
+      section: {
+        title: category,
+        items: [finalUpdatedItem]
+      }
+    }];
+
     const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || '';
-    if (!encryptionKey || !userID) {
-      console.error('Missing encryption key or userID');
+    if (!encryptionKey || !userID || !restaurantId) {
+      console.error('Missing encryption key, userID, or restaurantId');
       window.alert('Configuration error - cannot submit');
       return;
     }
 
-    // Now call the encryption function properly (with args)
-    const enc_obj = encryptObject(userID, finalUpdatedItem, encryptionKey);
+    // Encrypt the data
+    const enc_data = CryptoJS.AES.encrypt(JSON.stringify(menuSectionData), encryptionKey).toString();
+    const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantId, encryptionKey).toString();
+    const encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY || '', encryptionKey).toString();
+    const encrypted_user_id = CryptoJS.AES.encrypt(userID, encryptionKey).toString();
 
     try {
-      const resp = await fetch("/api/user/profil/setData", {
-        method: "POST", // Or "PATCH" if your API exports PATCH handler
+      const resp = await fetch("/api/user/profil/edditData", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: enc_obj }) // Now sends proper encrypted object
+        body: JSON.stringify({
+          encrypted_user_id,
+          encrypted_restaurant_id,
+          encrypted_data: enc_data,
+          encrypted_api_key
+        })
       });
 
       if (!resp.ok) {
@@ -157,7 +174,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID }
       console.error('Fetch/Encryption Error:', error);
       window.alert("Ups etwas ist schief gelaufen! \nBitte versuchen sie es nochmal! \nFehler: " + error.message);
     }
-  }, [selectedItem, userID, setChangedItem, reset, encryptObject]);
+  }, [selectedItem, userID, restaurantId, category, setChangedItem, reset]);
 
   const toggleEdit = (field) => {
     switch (field) {

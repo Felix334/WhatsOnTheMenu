@@ -1,3 +1,6 @@
+=> Anmelden mit Credentials funktioniert nicht mehr
+
+
 Fix the Profil picture
 
 API-Key Abfrage ÜBERALL einfügen
