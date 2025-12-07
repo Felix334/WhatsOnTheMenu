@@ -25,7 +25,7 @@ export default function Home() {
   const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [renderLogin, setRenderLogin] = useState(false);
   const [setTrue, setSetTrue] = useState(false);
-  const [adminAcces, setAdminAccess] = useState(false)
+  const [adminAcces, setAdminAccess] = useState(false);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function Home() {
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
   const autherizedUser = userID && (role === "Owner" || role === "Admin");
-  const adminAcc = userID && (role === "Admin")
+  const adminAcc = userID && role === "Admin";
 
   useEffect(() => {
     if (userID && !setTrue) {
@@ -49,11 +49,11 @@ export default function Home() {
   }, [userID, setTrue, router, pathname, searchParams]); // Dependencies to re-run only when needed
 
   useEffect(() => {
-    if(adminAcc){
-      setAdminAccess(true)
-      console.log("Admin")
+    if (adminAcc) {
+      setAdminAccess(true);
+      console.log("Admin");
     }
-  }, [adminAcc])
+  }, [adminAcc]);
   // Rest of your component...
 
   /*
@@ -217,7 +217,7 @@ export default function Home() {
                         Beispiele
                       </Button>
                     </NavigationMenuItem>
-                    
+
                     {!userID && (
                       <NavigationMenuItem>
                         <Button variant="" onClick={renderLoginW}>
@@ -274,9 +274,9 @@ export default function Home() {
                         Beispiele
                       </Button>
 
-                        <Button variant="ghost" asChild>
-                          <Link href={{ pathname: "/UnserePartner", query: { ...router.queryString } }}>Unsere Partner</Link>
-                        </Button>
+                      <Button variant="ghost" asChild>
+                        <Link href={{ pathname: "/UnserePartner", query: { ...router.queryString } }}>Unsere Partner</Link>
+                      </Button>
                       {userID ? null : (
                         <Button
                           variant=""
@@ -463,7 +463,7 @@ export default function Home() {
                   <CardContent>
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>1 Speisekarte
+                        <span className="text-green-500 mr-2">✓</span>7 Speisekarte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Basis Templates
@@ -493,7 +493,7 @@ export default function Home() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-yellow-300 mr-2">✓</span>
-                        Unbegrenzte Karten
+                        15 Karten
                       </li>
                       <li className="flex items-center">
                         <span className="text-yellow-300 mr-2">✓</span>Premium Templates
@@ -504,6 +504,9 @@ export default function Home() {
                       <li className="flex items-center">
                         <span className="text-yellow-300 mr-2">✓</span>
                         Mehrsprachig
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-yellow-300 mr-2">✓</span>QR-Code
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300">
@@ -530,6 +533,9 @@ export default function Home() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Priority Support
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-500 mr-2">✓</span>QR-Code-Generierung
                       </li>
                     </ul>
                     <Button asChild className="w-full">
