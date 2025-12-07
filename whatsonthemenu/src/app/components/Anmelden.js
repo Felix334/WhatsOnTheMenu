@@ -124,7 +124,7 @@ export default function Home({ renderLogin, userID, role }) {
         </div>
       )}
 
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative z-20 min-h-[300px]">
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative z-20 min-h-[300px] top-40 md:top-30">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">
           Login
         </h1>
@@ -181,15 +181,6 @@ export default function Home({ renderLogin, userID, role }) {
             </Button>
           </form>
         </Form>
-
-        {/* Magic Link Email Login */}
-        <Button
-          type="button"
-          onClick={handleEmailSignIn}
-          className="w-full mb-4 bg-gray-700 hover:bg-gray-800 text-white"
-        >
-          Magic Link an Email senden
-        </Button>
 
         {/* Google Login */}
         <Button
