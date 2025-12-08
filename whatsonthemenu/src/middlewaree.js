@@ -1,14 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth";
+import { headers } from "next/headers";
 
 export async function middleware(req) {
 
   const { pathname } = req.nextUrl;
 
-  // Enhanced logging with timestamp and path
-  console.log(`Middleware-Log: [${new Date().toISOString()}] ${req.method} ${req.url}`);
 
+  console.log(`Middleware-Log: [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  try{
+    const origin = (await headers()).get('origin');
+    if(origin !== 'http://localhost:3000'){
+
+
+
+
+
+
+
+
+
+
+
+
+//?
+
+
+
+
+
+
+      console.log("Unauthorized Access")
+      return NextResponse.json({error: 'Unauthorized'}, {status: 403})
+    }
+  }catch(err){
+    console.log(err)
+  }
   try {
     // Protect routes under /Protected
     if (pathname.startsWith("/Protected")) {
