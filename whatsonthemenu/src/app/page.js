@@ -54,56 +54,6 @@ export default function Home() {
       console.log("Admin");
     }
   }, [adminAcc]);
-  // Rest of your component...
-
-  /*
-  useEffect(() => {
-    if (userID && role) {
-      console.log("User-ID:", userID, "role:", role);
-      window.localStorage.setItem("userID", userID);
-      window.localStorage.setItem("role", role);
-    } else {
-      var userID_ = window.localStorage.getItem("userID");
-      var role_ = window.localStorage.getItem("role");
-      var restaurant_ID = window.localStorage.getItem("restaurnatID");
-      if (userID_ && role_) {
-        setUserID(userID_);
-        setRole(role_);
-        if (restaurant_ID) {
-          setRestaurantID(restaurant_ID);
-        }
-      }
-    }
-  }, [userID, role]);
-
-  useEffect(() => {
-    // Fixes the url reload
-    if (userID) {
-      console.log("UserID Test 2 UserID vorhanden", userID)
-      window.localStorage.setItem("userID", userID);
-      const currentQuery = { ...router.query, userID };
-      const queryString = new URLSearchParams(currentQuery).toString();
-      const newUrl = `/?${queryString}`;
-      router.replace(newUrl);
-    }else{
-      const params = new URLSearchParams(window.location.search)
-      params.delete("userID")
-    }
-  }, [userID, router]);
-
-  useEffect(() => {
-    console.log("Checke:", userID, role);
-    if (userID && (role == "Owner" || role == "Admin")) {
-      setIsAutherizedUser(true);
-    }
-  }, [userID, role]);
-
-  /*useEffect(() => {
-    console.log("Checke:", userID, role);
-    if (userID && role == "Admin") {
-      setRenderDashBoard(true);
-    }
-  }, [userID, role]);*/
 
   useEffect(() => {
     const handleScroll = () => {

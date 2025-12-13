@@ -18,7 +18,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaTrash } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
@@ -37,6 +37,8 @@ export default function PageBuilder() {
   const [serverData, setServerData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [edditComponents, setEdditComponents] = useState([]);
+  const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
+  const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
 
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
@@ -47,17 +49,17 @@ export default function PageBuilder() {
   const [openOptions, setOpenOptions] = useState(false);
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
-  const [autherized, setIsAutherizedUser] = useState(false)
+  const [autherized, setIsAutherizedUser] = useState(false);
 
   const { data: session, status } = useSession();
 
-if(status === "authenticated" && !autherized){
-  console.log("Signed in as:", session.user.id)
-  console.log("User Data:", session.user)
-  setUserID(session.user.id)
+  if (status === "authenticated" && !autherized) {
+    console.log("Signed in as:", session.user.id);
+    console.log("User Data:", session.user);
+    setUserID(session.user.id);
 
-  setIsAutherizedUser(true)
-}
+    setIsAutherizedUser(true);
+  }
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -74,37 +76,59 @@ if(status === "authenticated" && !autherized){
   // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
   useEffect(() => {
-    if(!userID){return}
+    if (!userID) return;
+
+    const controller = new AbortController();
+
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const cachedData = sessionStorage.getItem("serverData");
-        if (cachedData) setServerData(JSON.parse(cachedData));
+        // 1️⃣ Cache laden
+        const cached = sessionStorage.getItem(`serverData-${userID}`);
+        if (cached) {
+          setServerData(JSON.parse(cached));
+        } else {
+          setIsLoading(true);
+        }
 
-        const response = await fetch(
-          "/api/user/profil/getData",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userID }),
-          },
-          500
-        );
+        // 2️⃣ Timeout
+        const timeout = setTimeout(() => controller.abort(), 5000);
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const response = await fetch("/api/user/profil/getData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userID }),
+          signal: controller.signal,
+        });
 
+        clearTimeout(timeout);
+        console.log(response);
+        // 3️⃣ Auth-Handling
+        if (response.status === 401) {
+          window.alert("Bitte melden Sie sich an");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        // 4️⃣ Daten
         const freshData = await response.json();
-        console.log("server data:", freshData);
         setServerData(freshData);
-        sessionStorage.setItem("serverData", JSON.stringify(freshData));
+        sessionStorage.setItem(`serverData-${userID}`, JSON.stringify(freshData));
       } catch (error) {
-        console.error("Fetch failed:", error);
+        if (error.name !== "AbortError") {
+          console.error("Fetch failed:", error);
+        }
       } finally {
         setIsLoading(false);
       }
     };
-    fetchData()
-  }, [userID, userRole])
+
+    fetchData();
+
+    return () => controller.abort();
+  }, [userID]);
 
   const submitToServer = (data) => {
     const newSection = {
@@ -120,51 +144,84 @@ if(status === "authenticated" && !autherized){
     setOpenEditor(false);
   };
 
-const submitData = async () => {
-  const restaurantID = serverData.userData.restaurant.id;
-  const api_key = process.env.NEXT_PUBLIC_API_KEY;
-  console.log("API-KEY Abfrage:", api_key);
-  console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
+  const submitData = async () => {
+    const restaurantID = serverData.userData.restaurant.id;
+    const api_key = process.env.NEXT_PUBLIC_API_KEY;
+    console.log("API-KEY Abfrage:", api_key);
+    console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
+    console.log("Deleted Dishes:", deletedDishes);
+    console.log("Deleted Categories:", deletedCategories);
 
-  const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } =
-    await encrypt_data(userID, components, restaurantID, api_key);
+    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
 
-  console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
-  console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
-  console.log("!Encrypted Data vor dem Senden:", enc_data);
+    console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
+    console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
+    console.log("!Encrypted Data vor dem Senden:", enc_data);
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const response = await fetch("/api/user/profil/setData", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        encrypted_user_id,
-        encrypted_restaurant_id,
-        encrypted_data: enc_data,
-        encrypted_api_key,
-      }),
-    });
+    try {
+      // First, save the data
+      const response = await fetch("/api/user/profil/setData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          encrypted_user_id,
+          encrypted_restaurant_id,
+          encrypted_data: enc_data,
+          encrypted_api_key,
+        }),
+      });
 
-    // JSON parsen, um die Fehlernachricht zu erhalten
-    const resData = await response.json();
+      // JSON parsen, um die Fehlernachricht zu erhalten
+      const resData = await response.json();
 
-    if (!response.ok) {
-      throw new Error(
-        `HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`
-      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
+      }
+
+      // Then, handle deletions if any
+      if (deletedDishes.length > 0 || deletedCategories.length > 0) {
+        console.log("Processing deletions...");
+        const deleteData = {
+          dishes: deletedDishes,
+          categories: deletedCategories,
+        };
+        console.log(`Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`);
+        const { enc_data: enc_delete_data, encrypted_restaurant_id: enc_rest_id, encrypted_api_key: enc_api_key, encrypted_user_id: enc_user_id } = await encrypt_data(userID, deleteData, restaurantID, api_key);
+        console.log(`Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`);
+        const deleteResponse = await fetch("/api/user/profil/deleteData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            encrypted_user_id: enc_user_id,
+            encrypted_restaurant_id: enc_rest_id,
+            encrypted_data: enc_delete_data,
+            encrypted_api_key: enc_api_key,
+          }),
+        });
+
+        const deleteResData = await deleteResponse.json();
+
+        if (!deleteResponse.ok) {
+          throw new Error(`Delete error! status: ${deleteResponse.status}, Message: ${deleteResData.message || "N/A"}, Error: ${deleteResData.error || "N/A"}`);
+        }
+
+        // Clear the deleted lists after successful deletion
+        setDeletedDishes([]);
+        setDeletedCategories([]);
+      } else {
+        console.log("No deletions to process");
+      }
+
+      alert("Data saved and deletions processed successfully!");
+    } catch (err) {
+      console.error("Failed to save data:", err);
+      alert(`Failed to save data: ${err.message}`);
+    } finally {
+      setIsLoading(false);
     }
-
-    alert("Data saved successfully!");
-  } catch (err) {
-    console.error("Failed to save data:", err);
-    alert(`Failed to save data: ${err.message}`);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const encrypt_data = async (userID, components, restaurantID, api_key) => {
     console.log("components before stringify (function encrypt_data):", components, typeof components);
@@ -189,11 +246,9 @@ const submitData = async () => {
     router.push("../");
   };
 
-
-// Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
-// Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
-// Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola) 
-
+  // Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
+  // Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
+  // Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola)
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -385,7 +440,7 @@ const submitData = async () => {
     );
   }
 
-  const MenuSection = ({ title, menuItems }) => {
+  const MenuSection = ({ title, menuItems, categoryId }) => {
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -411,14 +466,51 @@ const submitData = async () => {
       setOpenItem(true);
     };
 
+    const deleteDish = (dishId) => {
+      console.log("Deleting dish:", dishId);
+      if (window.confirm("Sind Sie sicher, dass Sie dieses Gericht löschen möchten?")) {
+        setDeletedDishes((prev) => {
+          const newList = [...prev, dishId];
+          console.log("Updated deletedDishes:", newList);
+          return newList;
+        });
+        // Keep in UI but mark as deleted (will be styled red)
+      }
+    };
+
+    const deleteCategory = () => {
+      if (window.confirm("Sind Sie sicher, dass Sie diese gesamte Kategorie löschen möchten?")) {
+        setDeletedCategories((prev) => [...prev, categoryId]);
+        // Optionally, remove from UI immediately
+        // setServerData((prev) => ({
+        //   ...prev,
+        //   userData: {
+        //     ...prev,
+        //     restaurant: {
+        //       ...prev.userData.restaurant,
+        //       menu: prev.userData.restaurant.menu.map((menu) => ({
+        //         ...menu,
+        //         categories: menu.categories.filter((cat) => cat.id !== categoryId),
+        //       })),
+        //     },
+        //   },
+        // }));
+      }
+    };
+
     if (changedItems) {
       console.log("Changes", changedItems);
     }
     return (
-      <Table className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
-        <div className="mb-3">
-          <h3 className="text-center text-4xl font-semibold mt-3 mb-9">{title}</h3>
+      <Table className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}>
+        <div className="relative flex items-center justify-center">
+          <h3 className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
+
+          <Button className="absolute right-0" variant="destructive" onClick={deleteCategory}>
+            <FaTrash />
+          </Button>
         </div>
+
         <Table>
           <TableHeader>
             <TableRow>
@@ -431,22 +523,39 @@ const submitData = async () => {
           <TableBody>
             {menuItems?.map((item, index) => (
               <React.Fragment key={index}>
-                <TableRow className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer" onClick={() => toggleExpand(index)}>
+                <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-yellow-50"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
                   {changedItems}
 
                   <TableCell>
-                    <Button variant="secondary" onClick={() => openMenuItemEddit(item.id, item.name, item.price, item.description)}>
-                      <FaPen />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openMenuItemEddit(item.id, item.name, item.price, item.description);
+                        }}
+                      >
+                        <FaPen />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteDish(item.id);
+                        }}
+                      >
+                        <FaTrash />
+                      </Button>
+                    </div>
                   </TableCell>
-                  <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
-                  <TableCell className="text-gray-600">{item.description}</TableCell>
-                  <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
+                  <TableCell className={`font-serif ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>{item.name}</TableCell>
+                  <TableCell className={`text-gray-600 ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}>{item.description}</TableCell>
+                  <TableCell className={`text-right font-mono ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}€</TableCell>
                   <TableCell className="hidden">{item.id}</TableCell>
                 </TableRow>
                 {expandedIndex === index && (
                   <TableRow>
-                    <TableCell colSpan={3} className="px-6 py-4">
+                    <TableCell colSpan={4} className="px-6 py-4">
                       <Image src={schnitzel} alt="" />
                     </TableCell>
                   </TableRow>
@@ -477,7 +586,7 @@ const submitData = async () => {
           </header>
 
           <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
-            <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) || <div>Keine Daten vorhanden</div>}</div>
+            <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
 
             <p className="mt-4">Gesamtpreis:</p>
 

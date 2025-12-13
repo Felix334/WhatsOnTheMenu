@@ -22,6 +22,7 @@ export default function Home({ renderLogin, userID, role }) {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [userIP, setUserIP] = useState();
   const router = useRouter();
 
   const form = useForm({
@@ -76,6 +77,24 @@ export default function Home({ renderLogin, userID, role }) {
     reset();
   };
 
+    useEffect(() => {
+    const getIP = () => {
+      try {
+        fetch("https://api.ipify.org?format=json")
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("IP-Adresse:", data.ip);
+            setUserIP(data.ip);
+          })
+          .catch((error) => {
+            console.error("Error fetching IP:", error);
+          });
+      } catch (e) {
+        console.log("Fehler", e);
+      }
+    };
+    getIP();
+  });
   // -----------------------------------
   // Social Login Handlers
   // -----------------------------------

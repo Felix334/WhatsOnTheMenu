@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,6 +78,8 @@ export default function RestaurantList() {
     }
   }, []);
 
+  useEffect;
+
   // Prompt only if no permission
   useEffect(() => {
     if (!reqCookie) {
@@ -133,6 +135,27 @@ export default function RestaurantList() {
       { timeout: 10000 }
     );
   };
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        var resp = await fetch("/api/restaurant/List", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (resp.status === 401) {
+          console.log(status);
+        }
+        if(resp.status === 200){
+          console.log("Success:", status)
+        }
+        console.log("error", resp.status)
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getData();
+  });
 
   return (
     <div className="bg-amber-500 min-h-screen w-full">
