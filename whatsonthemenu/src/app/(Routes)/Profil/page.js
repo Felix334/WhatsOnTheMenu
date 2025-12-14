@@ -22,6 +22,7 @@ import { FaPen, FaTrash } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
+import { OptionMenu} from "./components/optionMenu"
 import { fetchData } from "next-auth/client/_utils";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
@@ -403,32 +404,6 @@ export default function PageBuilder() {
   );
 
   /* ---------- Options Sheet ---------- */
-  const OptionMenu = () => (
-    <Sheet open={openOptions} onOpenChange={setOpenOptions}>
-      <SheetTrigger asChild>
-        <Button variant="outline">|||</Button>
-      </SheetTrigger>
-
-      <SheetContent side="left" className="w-full max-w-3xl">
-        <SheetHeader>
-          <SheetTitle>Dashboard</SheetTitle>
-          <SheetDescription>Hier können Sie Ihre Seite individuell gestalten</SheetDescription>
-        </SheetHeader>
-
-        <div className="p-4 space-y-4">
-          <div>
-            <Label>Hintergrund</Label>
-            <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
-          </div>
-          <div>{/* Additional options can be added here */}</div>
-
-          <Button asChild>
-            <Link href={{ pathname: "/Profil/QRBuilder/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>QR-Code erstellen</Link>
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
 
   /* ---------- Menu Section Presentation ---------- */
 
@@ -574,7 +549,7 @@ export default function PageBuilder() {
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
-          <OptionMenu />
+          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} />
           <MenuEditor />
         </div>
         <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
@@ -603,3 +578,12 @@ export default function PageBuilder() {
     </div>
   );
 }
+
+const EdditCategoryMEnu = ({ categoryID }) => {
+  const [edditName, setEdditName] = useState("");
+  const [edditColor, setEdditColor] = useState("");
+  const [edditBorder, setEdditBorder] = useState("");
+  const [eddotPosition, setEdditPosition] = useState("");
+  const [catID, setCatID] = useState("");
+  setCatID(categoryID);
+};
