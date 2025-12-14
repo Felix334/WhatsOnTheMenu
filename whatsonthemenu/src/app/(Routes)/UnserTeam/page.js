@@ -3,7 +3,7 @@ import Head from 'next/head';
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
+    <div className="min-h-screen bg-linear-to-r from-red-900 via-red-600 to-red-400 flex flex-col items-center justify-center text-white font-sans p-8">
       <Head>
         <title>Unser Team</title>
         <link

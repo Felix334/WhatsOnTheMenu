@@ -168,7 +168,7 @@ export default function PageBuilder() {
           <SheetTitle>Menü-Dashboard</SheetTitle>
           <SheetDescription>Hier können sie ganz einfach ein neues Menü erstellen</SheetDescription>
         </SheetHeader>
-        <ScrollArea className="h-[89%] w-[100%] rounded-md border pt-2">
+        <ScrollArea className="h-[89%] w-full rounded-md border pt-2">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -388,7 +388,7 @@ export default function PageBuilder() {
               <div key={index}>{component.name === "menuSection" ? <MenuSection title={component.title} menuItems={component.content} /> : <h4 className="text-lg">{component.name}</h4>}</div>
             ))}
           </div>
-          <div className="min-h-screen bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
+          <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
             <header className="mb-12 text-center w-full">
               <h1 className="text-5xl font-serif font-semibold italic tracking-wide">
                 <input type="text" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />
