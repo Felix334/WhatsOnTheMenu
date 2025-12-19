@@ -22,8 +22,8 @@ import { FaPen, FaTrash } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
-import { OptionMenu} from "./components/optionMenu"
-import { fetchData } from "next-auth/client/_utils";
+import { OptionMenu } from "./components/optionMenu";
+import { EdditCategoryMenu } from "./components/edditCategoryWin"
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -419,8 +419,18 @@ export default function PageBuilder() {
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
+    const [edditCategoryData, setEdditCategoryData] = useState([
+      {
+        color: "",
+        position: "",
+        name: "",
+        boder: "",
+      },
+    ]);
     const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
     const [changedItems, setChangedItems] = useState([]);
+    const [changedCategories, setChangedCategories] = useState([]);
     const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
 
     const openMenuItemEddit = (id, name, price, description) => {
@@ -439,6 +449,10 @@ export default function PageBuilder() {
         description: description,
       }));
       setOpenItem(true);
+    };
+
+    const openCategoryMenu_ = () => {
+      setOpenCategoryMenu(!openCategoryMenu);
     };
 
     const deleteDish = (dishId) => {
@@ -480,8 +494,10 @@ export default function PageBuilder() {
       <Table className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}>
         <div className="relative flex items-center justify-center">
           <h3 className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
-
-          <Button className="absolute right-0" variant="destructive" onClick={deleteCategory}>
+          <Button className="absolute left-0 ml-3" onClick={openCategoryMenu_}>
+            <FaPen />
+          </Button>
+          <Button className="absolute right-0 mr-3" variant="destructive" onClick={deleteCategory}>
             <FaTrash />
           </Button>
         </div>
@@ -540,6 +556,7 @@ export default function PageBuilder() {
           </TableBody>
         </Table>
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
+        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{name: title, position: 0, color: "", border: ""}} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId}/>
       </Table>
     );
   };
@@ -578,12 +595,3 @@ export default function PageBuilder() {
     </div>
   );
 }
-
-const EdditCategoryMEnu = ({ categoryID }) => {
-  const [edditName, setEdditName] = useState("");
-  const [edditColor, setEdditColor] = useState("");
-  const [edditBorder, setEdditBorder] = useState("");
-  const [eddotPosition, setEdditPosition] = useState("");
-  const [catID, setCatID] = useState("");
-  setCatID(categoryID);
-};

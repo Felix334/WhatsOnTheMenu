@@ -1,0 +1,188 @@
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import Link from "next/link";
+import { useForm } from "react-hook-form"; // Removed unused useFieldArray
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Input } from "@/components/ui/input";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
+import { FaCircleInfo } from "react-icons/fa6";
+
+import CryptoJS from "crypto-js";
+
+//import { menuSchema, itemSchema } from "./menuSchema";
+
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, userID, category, restaurantId }) => {
+  const [edditName, setEdditName] = useState("");
+  const [edditPos, setEdditPos] = useState(0);
+  const [edditColor, setEdditColor] = useState("");
+  const [edditBorder, setEdditBorder] = useState("");
+  const [restaurantID_, setRestaurantID_] = useState("");
+  const [userID_, setUserID_] = useState("");
+
+  const formRef = useRef();
+
+  const form = useForm({
+    defaultValues: {
+      name: edditName,
+      position: edditPos,
+      color: edditColor,
+      border: edditBorder,
+    },
+  });
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
+
+  useEffect(() => {
+    setUserID_(userID);
+    setRestaurantID_(restaurantId);
+  }, [userID, restaurantId]);
+
+  useEffect(() => {
+    if (selectedCategory && formRef.current) {
+      setEdditName(selectedCategory.name || "");
+      setEdditPos(selectedCategory.position || 0);
+      setEdditColor(selectedCategory.color || "");
+      setEdditBorder(selectedCategory.border || "");
+      formRef.current.setValue("name", selectedCategory.name || "");
+      formRef.current.setValue("position", selectedCategory.position || 0);
+      formRef.current.setValue("color", selectedCategory.color || "");
+      formRef.current.setValue("border", selectedCategory.border || "");
+    }
+  }, [selectedCategory]);
+
+  const { handleSubmit, setValue } = form;
+
+  const onSubmit = async (data) => {
+    const api_key = process.env.NEXT_PUBLIC_API_KEY;
+    const categoryData = {
+      name: data.name,
+      position: data.position,
+      color: data.color,
+      border: data.border,
+      categoryId: selectedCategory.id || categoryId, // Assuming categoryId is passed or from selectedCategory
+    };
+
+    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID_, categoryData, restaurantID_, api_key);
+
+    try {
+      const response = await fetch("/api/user/profil/edditData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          encrypted_user_id,
+          encrypted_restaurant_id,
+          encrypted_data: enc_data,
+          encrypted_api_key,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Category updated:", result);
+
+      // Update parent state
+      setChangedCategory((prev) => [...prev, categoryData]);
+
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Failed to update category:", error);
+      alert(`Failed to update category: ${error.message}`);
+    }
+  };
+
+  const encrypt_data = async (userID, components, restaurantID, api_key) => {
+    const data = JSON.stringify(components);
+    const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+    return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Kategorie bearbeiten</DialogTitle>
+          <DialogDescription>Kategorie bearbeiten</DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name:</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="position"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Position:</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Farbe:</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="color" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="border"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ramen:</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-between pt-4">
+              <Button type="submit">Speichern</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Abbrechen
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export {EdditCategoryMenu}

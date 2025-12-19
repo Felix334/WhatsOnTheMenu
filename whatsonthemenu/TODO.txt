@@ -27,9 +27,6 @@ bei Anderungen zu aktualsieren
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)
 
-Ein Weg um die Cookies zu test (einen Knopf um sie zurück zu setzen(zum testen))
-Cookies Fertg machen
-
 Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
 Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => Wenn chat hinzugefügt dann auch
 
