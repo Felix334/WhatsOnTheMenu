@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
 import { FaCircleInfo } from "react-icons/fa6";
@@ -111,6 +113,80 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
   };
 
+  const colors = [
+    "black",
+    "silver",
+    "gray",
+    "white",
+    "maroon",
+    "red",
+    "purple",
+    "fuchsia",
+    "green",
+    "lime",
+    "olive",
+    "yellow",
+    "navy",
+    "blue",
+    "teal",
+    "aqua",
+    "orange",
+    "aliceblue",
+    "antiquewhite",
+    "aquamarine",
+    "azure",
+    "beige",
+    "bisque",
+    "brown",
+    "chocolate",
+    "coral",
+    "cornflowerblue",
+    "crimson",
+    "cyan",
+    "darkblue",
+    "darkcyan",
+    "darkgoldenrod",
+    "darkgray",
+    "darkgreen",
+    "darkorange",
+    "darkred",
+    "deeppink",
+    "deepskyblue",
+    "dodgerblue",
+    "firebrick",
+    "forestgreen",
+    "gold",
+    "hotpink",
+    "indigo",
+    "khaki",
+    "lavender",
+    "lawngreen",
+    "lightblue",
+    "lightgreen",
+    "lightskyblue",
+    "limegreen",
+    "mediumblue",
+    "mediumseagreen",
+    "mediumvioletred",
+    "orangered",
+    "orchid",
+    "palegreen",
+    "pink",
+    "plum",
+    "powderblue",
+    "rebeccapurple",
+    "royalblue",
+    "salmon",
+    "seagreen",
+    "skyblue",
+    "slateblue",
+    "springgreen",
+    "steelblue",
+    "tomato",
+    "turquoise",
+    "violet",
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -151,14 +227,26 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Farbe:</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="color" />
-                  </FormControl>
+                  <FormLabel>Farbe</FormLabel>
+                  <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+                    <input type="color" value={field.value} onChange={field.onChange} className="h-10 w-12 cursor-pointer rounded-md border" />
+                    <select value={field.value} onChange={(e) => field.onChange(e.target.value)} className="h-10 rounded-md border px-3 text-sm">
+                      <option value="">Farbe auswählen …</option>
+                      {colors.map((color) => (
+                        <option key={color.value} value={color.value}>
+                          {color.name} ({color.value})
+                        </option>
+                      ))}
+                    </select>
+                    <div className="h-10 w-10 rounded-md border" style={{ backgroundColor: field.value }} />
+                  </div>
+                  <p className="mt-1 font-mono text-xs text-muted-foreground">{field.value}</p>
+
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="border"
@@ -185,4 +273,4 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   );
 };
 
-export {EdditCategoryMenu}
+export { EdditCategoryMenu };
