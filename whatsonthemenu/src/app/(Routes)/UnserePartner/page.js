@@ -158,7 +158,7 @@ export default function RestaurantList() {
   });
 
   return (
-    <div className="bg-amber-500 min-h-screen w-full">
+    <div className="min-h-screen w-full">
       <div className="container mx-auto py-8">
         <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
           <div className="fixed right-2">

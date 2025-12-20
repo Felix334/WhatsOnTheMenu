@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form"; // Removed unused useFieldArray
 import { zodResolver } from "@hookform/resolvers/zod";
+import CryptoJS from "crypto-js";
 
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -16,7 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
 import { FaCircleInfo } from "react-icons/fa6";
 
-import CryptoJS from "crypto-js";
+import { colors, colors_german } from "./colorPalet";
 
 //import { menuSchema, itemSchema } from "./menuSchema";
 
@@ -113,80 +114,6 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     return { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id };
   };
 
-  const colors = [
-    "black",
-    "silver",
-    "gray",
-    "white",
-    "maroon",
-    "red",
-    "purple",
-    "fuchsia",
-    "green",
-    "lime",
-    "olive",
-    "yellow",
-    "navy",
-    "blue",
-    "teal",
-    "aqua",
-    "orange",
-    "aliceblue",
-    "antiquewhite",
-    "aquamarine",
-    "azure",
-    "beige",
-    "bisque",
-    "brown",
-    "chocolate",
-    "coral",
-    "cornflowerblue",
-    "crimson",
-    "cyan",
-    "darkblue",
-    "darkcyan",
-    "darkgoldenrod",
-    "darkgray",
-    "darkgreen",
-    "darkorange",
-    "darkred",
-    "deeppink",
-    "deepskyblue",
-    "dodgerblue",
-    "firebrick",
-    "forestgreen",
-    "gold",
-    "hotpink",
-    "indigo",
-    "khaki",
-    "lavender",
-    "lawngreen",
-    "lightblue",
-    "lightgreen",
-    "lightskyblue",
-    "limegreen",
-    "mediumblue",
-    "mediumseagreen",
-    "mediumvioletred",
-    "orangered",
-    "orchid",
-    "palegreen",
-    "pink",
-    "plum",
-    "powderblue",
-    "rebeccapurple",
-    "royalblue",
-    "salmon",
-    "seagreen",
-    "skyblue",
-    "slateblue",
-    "springgreen",
-    "steelblue",
-    "tomato",
-    "turquoise",
-    "violet",
-  ];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -227,17 +154,19 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Farbe</FormLabel>
+                  <FormLabel>Hintergrund</FormLabel>
                   <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
                     <input type="color" value={field.value} onChange={field.onChange} className="h-10 w-12 cursor-pointer rounded-md border" />
                     <select value={field.value} onChange={(e) => field.onChange(e.target.value)} className="h-10 rounded-md border px-3 text-sm">
                       <option value="">Farbe auswählen …</option>
+
                       {colors.map((color) => (
                         <option key={color.value} value={color.value}>
-                          {color.name} ({color.value})
+                          {color.label}
                         </option>
                       ))}
                     </select>
+
                     <div className="h-10 w-10 rounded-md border" style={{ backgroundColor: field.value }} />
                   </div>
                   <p className="mt-1 font-mono text-xs text-muted-foreground">{field.value}</p>

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +46,15 @@ async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T
 
 export async function POST(req: NextRequest) {
   try {
+ const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: "Nicht authentifiziert" }, { status: 401 });
+    }
+
+    // Optional: Owner-Rolle prüfen
+    if (session.user.role !== "OWNER") {
+      return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
+    }
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
 
     if (!encryptedData) {
@@ -86,7 +97,6 @@ export async function POST(req: NextRequest) {
 
     // --- VALIDATE USER / RESTAURANT ---
     const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
-
     const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique");
 
     if (!user || !restaurant) {

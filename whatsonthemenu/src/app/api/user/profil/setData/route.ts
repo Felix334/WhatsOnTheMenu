@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient, type Menu, type Category } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +46,10 @@ async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
 
@@ -104,8 +110,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Pick first menu or create
-    let menu: (Menu & { categories: Category[] }) | null =
-      restaurant.menu.length > 0 ? (restaurant.menu[0] as Menu & { categories: Category[] }) : null;
+    let menu: (Menu & { categories: Category[] }) | null = restaurant.menu.length > 0 ? (restaurant.menu[0] as Menu & { categories: Category[] }) : null;
 
     if (!menu) {
       const createdMenu = await safeDb(
@@ -122,14 +127,14 @@ export async function POST(req: NextRequest) {
         "menu.create"
       );
 
-      menu = await safeDb(
+      menu = (await safeDb(
         () =>
           prisma.menu.findUnique({
             where: { id: createdMenu.id },
             include: { categories: true },
           }),
         "menu.findUnique after create"
-      ) as Menu & { categories: Category[] };
+      )) as Menu & { categories: Category[] };
     }
 
     const menuId = menu.id;
@@ -145,10 +150,7 @@ export async function POST(req: NextRequest) {
       const items: any[] = Array.isArray(section.items) ? section.items : [];
 
       // find or create category
-      let category = await safeDb(
-        () => prisma.category.findFirst({ where: { menuId, name: title } }),
-        "category.findFirst"
-      );
+      let category = await safeDb(() => prisma.category.findFirst({ where: { menuId, name: title } }), "category.findFirst");
 
       if (!category) {
         category = await safeDb(
@@ -191,10 +193,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Daten erfolgreich verarbeitet", restaurantId, menuId }, { status: 200 });
   } catch (err: any) {
     console.error("Serverfehler:", err);
-    return NextResponse.json(
-      { message: "Serverfehler", error: err?.message ?? err },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Serverfehler", error: err?.message ?? err }, { status: 500 });
   }
 }
 

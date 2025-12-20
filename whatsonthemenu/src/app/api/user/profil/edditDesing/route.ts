@@ -1,6 +1,10 @@
+import { PrismaClient } from "@prisma/client";
 import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
-
+import NextAuth from "next-auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "src/lib/auth";
+const prisma = new PrismaClient();
 interface EncryptedData {
   encrypted_user_id: string;
   encrypted_restaurant_id: string;
@@ -38,6 +42,10 @@ async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T
 }
 
 export default async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const encrypted_data: EncryptedData | null = await req.json().catch(() => null);
 
@@ -73,6 +81,17 @@ export default async function POST(req: NextRequest) {
 
     if (!Array.isArray(parsedData)) {
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
+    }
+
+    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
+    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique");
+
+    if (!user || !restaurant || user.role != "Owner") {
+      return NextResponse.json({status: 401, message: "Ungültiger Nutzer oder Restaurant" });
+    }
+
+    if (restaurant.ownerId != userID) {
+      return NextResponse.json({status: 401, message: "Kein berrechtigter Benutzer" });
     }
   } catch (err) {
     console.log(err);
