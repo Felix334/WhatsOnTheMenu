@@ -120,7 +120,7 @@ model Dish {
   id          String       @id @default(cuid())
   name        String
   description String?
-  price       Float
+  price       Decimal      @db.Decimal(10, 2)
   imageUrl    String
   categoryId  String?
   menuId      String

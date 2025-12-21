@@ -26,6 +26,11 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const [edditPos, setEdditPos] = useState(0);
   const [edditColor, setEdditColor] = useState("");
   const [edditBorder, setEdditBorder] = useState("");
+  const [addItem, setAddItem] = useState({
+    name: "",
+    price: 0,
+    img: null,
+  });
   const [restaurantID_, setRestaurantID_] = useState("");
   const [userID_, setUserID_] = useState("");
 
@@ -37,6 +42,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       position: edditPos,
       color: edditColor,
       border: edditBorder,
+      addItem: addItem,
     },
   });
 
@@ -71,7 +77,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       position: data.position,
       color: data.color,
       border: data.border,
-      categoryId: selectedCategory.id || categoryId, // Assuming categoryId is passed or from selectedCategory
+      categoryId: selectedCategory.id || category.id, // Assuming categoryId is passed or from selectedCategory
     };
 
     const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID_, categoryData, restaurantID_, api_key);
@@ -189,6 +195,19 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="img"
+              render={({ field }) => {
+                <FormItem>
+                  <FormLabel>Bild</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                </FormItem>;
+              }}
+            ></FormField>
             <div className="flex justify-between pt-4">
               <Button type="submit">Speichern</Button>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -329,7 +329,7 @@ export default function PageBuilder() {
                           <FormItem>
                             <FormLabel>Preis</FormLabel>
                             <FormControl>
-                              <Input placeholder="z.B. 9.50" type="number" inputMode="decimal" step="0.01" {...field} />
+                              <Input placeholder="z.B. 9.50" type="text" inputMode="decimal" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -515,8 +515,6 @@ export default function PageBuilder() {
             {menuItems?.map((item, index) => (
               <React.Fragment key={index}>
                 <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-yellow-50"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
-                  {changedItems}
-
                   <TableCell>
                     <div className="flex gap-2">
                       <Button

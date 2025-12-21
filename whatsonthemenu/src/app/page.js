@@ -17,6 +17,8 @@ import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
 import PermControleLocation from "./components/LocasionPermission";
+import ExplainCards from "./components/explainCards";
+import FooterPart from "./components/footerPart";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -307,79 +309,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-
-          {/* Features Section */}
-          <section id="features" className="py-20 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Alles was du brauchst</h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">Von der Erstellung bis zur Veröffentlichung - alle Tools für professionelle digitale Speisekarten</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">🎨</div>
-                    <CardTitle>Einfach gehaltene Editoren</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Intuitives Erstellen ohne technische Kenntnisse. Einfaches Erstellen und Bearbeiten von Speisekarten.</CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">📱</div>
-                    <CardTitle>QR-Code Integration</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Automatische QR-Code Generierung für einfache Integration und Verwendung.</CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">🌍</div>
-                    <CardTitle>Premium-Features</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Für ein noch intensiveres und ansprechenderes Erlebniss für ihre Kunden</CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">⚡</div>
-                    <CardTitle>Echtzeit Updates</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Daten und Bilder sofort aktualisieren - ohne neue QR-Codes drucken zu müssen.</CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">📊</div>
-                    <CardTitle>Analytics Dashboard</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Detaillierte Einblicke in beliebte Gerichte und Kundenverhalten.</CardDescription>
-                  </CardContent>
-                </Card>
-
-                <Card className="card-hover">
-                  <CardHeader>
-                    <div className="feature-icon text-4xl mb-4">🎯</div>
-                    <CardTitle>Anpassbare Designs</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>Professionelle Vorlagen die zu ihrem Restaurant-Branding passen.</CardDescription>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </section>
-
+          <ExplainCards />
           {/* CTA Section */}
           <section className="py-20 bg-indigo-600 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -497,107 +427,9 @@ export default function Home() {
             </div>
           </section>
         </main>
-
+        <FooterPart />
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div>
-                <div className="text-2xl font-bold mb-4">🍽️ MenuMaker</div>
-                <p className="text-gray-400">Die einfachste Art, professionelle digitale Speisekarten zu erstellen.</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4">Produkt</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li>
-                    <a href="/features" className="hover:text-white transition-colors">
-                      Features
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/pricing" className="hover:text-white transition-colors">
-                      Preise
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/templates" className="hover:text-white transition-colors">
-                      Vorlagen
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/integrations" className="hover:text-white transition-colors">
-                      Integrationen
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4">Support</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li>
-                    <a href="/help" className="hover:text-white transition-colors">
-                      Hilfe Center
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/contact" className="hover:text-white transition-colors">
-                      Kontakt
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/tutorials" className="hover:text-white transition-colors">
-                      Tutorials
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/api-docs" className="hover:text-white transition-colors">
-                      API Docs
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4">Unternehmen</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li>
-                    <a href="/about" className="hover:text-white transition-colors">
-                      Über uns
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/blog" className="hover:text-white transition-colors">
-                      Blog
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/careers" className="hover:text-white transition-colors">
-                      Karriere
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/press" className="hover:text-white transition-colors">
-                      Presse
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-gray-400 text-sm">© 2024 MenuMaker. Alle Rechte vorbehalten.</p>
-              <div className="flex space-x-6 mt-4 md:mt-0">
-                <a href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Datenschutz
-                </a>
-                <a href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  AGB
-                </a>
-                <a href="/imprint" className="text-gray-400 hover:text-white text-sm transition-colors">
-                  Impressum
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
+
         <div className="fixed align-top grid z-10 mt-0 top-0">
           {renderLogin && <LoginForm renderLogin={setRenderLogin} />}
           {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}

@@ -14,11 +14,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
 import { FaCircleInfo } from "react-icons/fa6";
 
-import CryptoJS from 'crypto-js'; // Add this import for encryption
+import CryptoJS from "crypto-js"; // Add this import for encryption
 
 import { menuSchema, itemSchema } from "./menuSchema";
 
-const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, category, restaurantId }) => { // Add userID as prop (from parent/auth)
+const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, category, restaurantId }) => {
+  // Add userID as prop (from parent/auth)
   // State to toggle edit mode for fields (default false)
   const [editName, setEditName] = useState(false);
   const [editDescription, setEditDescription] = useState(false);
@@ -44,7 +45,8 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       reset({
         name: selectedItem.name || "",
         description: selectedItem.description || "",
-        price: selectedItem.price || 0,
+        price: selectedItem.price !== null && selectedItem.price !== undefined ? Number(selectedItem.price).toFixed(2) : "0.00",
+
         Bild: selectedItem.img || "", // Assume img is URL
       });
       setUpdatedItem(selectedItem); // Sync initial state
@@ -56,125 +58,159 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
     setEditImage(false);
   }, [selectedItem, reset]);
 
-  // Encryption function (fixed: stringify object, add IV, call properly) 
+  // Encryption function (fixed: stringify object, add IV, call properly)
   const encryptObject = useCallback((userID, itemToEncrypt, encryptionKey) => {
-    if (!encryptionKey) throw new Error('Encryption key missing');
+    if (!encryptionKey) throw new Error("Encryption key missing");
 
     const iv = CryptoJS.lib.WordArray.random(16);
     const ivBase64 = iv.toString(CryptoJS.enc.Base64);
 
     // Encrypt userID (assume string)
-    const enc_userID = CryptoJS.AES.encrypt(
-      userID,
-      CryptoJS.enc.Utf8.parse(encryptionKey),
-      { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
-    );
+    const enc_userID = CryptoJS.AES.encrypt(userID, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
 
     // Encrypt item as JSON string (key fix: stringify the object)
     const jsonString = JSON.stringify(itemToEncrypt);
-    const enc_data = CryptoJS.AES.encrypt(
-      jsonString,
-      CryptoJS.enc.Utf8.parse(encryptionKey),
-      { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
-    );
+    const enc_data = CryptoJS.AES.encrypt(jsonString, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
 
     // Encrypt API key (insecure client-side; avoid if possible)
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY || '';
-    const enc_api_key = CryptoJS.AES.encrypt(
-      apiKey,
-      CryptoJS.enc.Utf8.parse(encryptionKey),
-      { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
-    );
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY || "";
+    const enc_api_key = CryptoJS.AES.encrypt(apiKey, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
 
     return {
       userID: `${ivBase64}:${enc_userID.ciphertext.toString(CryptoJS.enc.Base64)}`,
       data: `${ivBase64}:${enc_data.ciphertext.toString(CryptoJS.enc.Base64)}`,
-      key: `${ivBase64}:${enc_api_key.ciphertext.toString(CryptoJS.enc.Base64)}`
+      key: `${ivBase64}:${enc_api_key.ciphertext.toString(CryptoJS.enc.Base64)}`,
     };
   }, []);
 
-  const onSubmit = useCallback(async (data) => {
-    if (!data || !selectedItem) {
-      window.alert("Keine Veränderung oder kein Item ausgewählt");
-      return;
-    }
-
-    console.log("Data-Ausgabe:", data);
-
-    // Build final updated item directly from form data + selectedItem (avoids state staleness)
-    const finalUpdatedItem = {
-      id: selectedItem.id,
-      name: data.name || selectedItem.name,
-      price: data.price != null ? data.price : selectedItem.price,
-      description: data.description || selectedItem.description,
-      image: data.Bild || selectedItem.img // For files: Upload first, set to URL (see notes)
-    };
-
-    // TODO: If Bild is a File, upload it separately before encryption
-    // Example: if (data.Bild && data.Bild instanceof File) {
-    //   const uploadResp = await fetch('/api/upload', { method: 'POST', body: formDataWithFile });
-    //   const { url } = await uploadResp.json();
-    //   finalUpdatedItem.image = url;
-    // }
-
-    // Format data as menu section for editData API
-    const menuSectionData = [{
-      type: "menuSection",
-      section: {
-        title: category,
-        items: [finalUpdatedItem]
-      }
-    }];
-
-    const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || '';
-    if (!encryptionKey || !userID || !restaurantId) {
-      console.error('Missing encryption key, userID, or restaurantId');
-      window.alert('Configuration error - cannot submit');
-      return;
-    }
-
-    // Encrypt the data
-    const enc_data = CryptoJS.AES.encrypt(JSON.stringify(menuSectionData), encryptionKey).toString();
-    const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantId, encryptionKey).toString();
-    const encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY || '', encryptionKey).toString();
-    const encrypted_user_id = CryptoJS.AES.encrypt(userID, encryptionKey).toString();
-
-    try {
-      const resp = await fetch("/api/user/profil/edditData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          encrypted_user_id,
-          encrypted_restaurant_id,
-          encrypted_data: enc_data,
-          encrypted_api_key
-        })
-      });
-
-      if (!resp.ok) {
-        const errorData = await resp.json().catch(() => ({}));
-        throw new Error(errorData.message || `API Error: ${resp.status}`);
+  const onSubmit = useCallback(
+    async (data) => {
+      if (!data || !selectedItem) {
+        window.alert("Keine Veränderung oder kein Item ausgewählt");
+        return;
       }
 
-      const result = await resp.json();
-      console.log('Success:', result);
+      console.log("Data-Ausgabe:", data);
 
-      // Update parent and reset
-      setChangedItem(finalUpdatedItem);
-      reset();
-      setUpdatedItem(finalUpdatedItem);
-      setEditName(false);
-      setEditDescription(false);
-      setEditPrice(false);
-      setEditImage(false);
+      // Build final updated item directly from form data + selectedItem (avoids state staleness)
+      const finalUpdatedItem = {
+        id: selectedItem.id,
+        name: data.name || selectedItem.name,
+        price: data.price != null ? data.price : selectedItem.price,
+        description: data.description || selectedItem.description,
+        image: data.Bild || selectedItem.img, // For files: Upload first, set to URL (see notes)
+      };
 
-      console.log("Updated Data:", finalUpdatedItem);
-      window.alert("Erfolgreich aktualisiert!"); // Optional success alert
-    } catch (error) {
-      console.error('Fetch/Encryption Error:', error);
-      window.alert("Ups etwas ist schief gelaufen! \nBitte versuchen sie es nochmal! \nFehler: " + error.message);
-    }
-  }, [selectedItem, userID, restaurantId, category, setChangedItem, reset]);
+      // TODO: If Bild is a File, upload it separately before encryption
+      // Example: if (data.Bild && data.Bild instanceof File) {
+      //   const uploadResp = await fetch('/api/upload', { method: 'POST', body: formDataWithFile });
+      //   const { url } = await uploadResp.json();
+      //   finalUpdatedItem.image = url;
+      // }
+
+      // Format data as menu section for editData API
+      const menuSectionData = [
+        {
+          type: "menuSection",
+          section: {
+            title: category,
+            items: [finalUpdatedItem],
+          },
+        },
+      ];
+
+      const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "";
+      if (!encryptionKey || !userID || !restaurantId) {
+        console.error("Missing encryption key, userID, or restaurantId");
+        window.alert("Configuration error - cannot submit");
+        return;
+      }
+
+      // Encrypt the data
+      const enc_data = CryptoJS.AES.encrypt(JSON.stringify(menuSectionData), encryptionKey).toString();
+      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantId, encryptionKey).toString();
+      const encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY || "", encryptionKey).toString();
+      const encrypted_user_id = CryptoJS.AES.encrypt(userID, encryptionKey).toString();
+
+      try {
+        const resp = await fetch("/api/user/profil/edditData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            encrypted_user_id,
+            encrypted_restaurant_id,
+            encrypted_data: enc_data,
+            encrypted_api_key,
+          }),
+        });
+        console.log(resp);
+
+        if (!resp.ok) {
+          const errorData = await resp.json().catch(() => ({}));
+          throw new Error(errorData.message || `API Error: ${resp.status}`);
+        }
+
+        const result = await resp.json();
+        console.log("Success:", result);
+
+        // Update parent and reset
+        setChangedItem(finalUpdatedItem);
+        reset();
+        setUpdatedItem(finalUpdatedItem);
+        setEditName(false);
+        setEditDescription(false);
+        setEditPrice(false);
+        setEditImage(false);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Der Preis Speicher ist kaputt =>  12.50 wird zu 12.5, 12.00 => 12, aber 12.05 funktioniert
+// Es liegt an der Datenbank
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        console.log("Updated Data:", finalUpdatedItem);
+        window.alert("Erfolgreich aktualisiert!"); // Optional success alert
+      } catch (error) {
+        console.error("Fetch/Encryption Error:", error);
+        window.alert("Ups etwas ist schief gelaufen! \nBitte versuchen sie es nochmal! \nFehler: " + error.message);
+      }
+    },
+    [selectedItem, userID, restaurantId, category, setChangedItem, reset]
+  );
 
   const toggleEdit = (field) => {
     switch (field) {
@@ -265,13 +301,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                         <FaPen />
                         Preis:
                       </FormLabel>
-                      {editPrice ? (
-                        <FormControl>
-                          <Input type="number" placeholder="Preis als Dezimalzahl (ohne € Zeichen)" {...field} />
-                        </FormControl>
-                      ) : (
-                        <div>{(watchedValues.price || selectedItem.price || 0)}€</div> // Fixed: Use value, not boolean
-                      )}
+                      {editPrice ? <Input type="text" inputMode="decimal" placeholder="z. B. 9.99" {...field} /> : <div>{Number(watchedValues.price ?? selectedItem.price ?? 0).toFixed(2)} €</div>}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -279,7 +309,9 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                 <FormField
                   control={control}
                   name="Bild"
-                  render={({ field: { onChange, ...field } }) => ( // Destructure to handle file
+                  render={(
+                    { field: { onChange, ...field } } // Destructure to handle file
+                  ) => (
                     <FormItem className="mb-6">
                       <FormLabel onClick={() => toggleEdit("img")}>
                         <FaPen />
@@ -287,8 +319,8 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                       </FormLabel>
                       {editImage ? (
                         <FormControl>
-                          <Input 
-                            type="file" 
+                          <Input
+                            type="file"
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Optional: Owner-Rolle prüfen
-    if (session.user.role !== "OWNER") {
+    if (session.user.role !== "Owner") {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
@@ -63,6 +63,8 @@ export async function POST(req: NextRequest) {
 
     // --- DECRYPTION ---
     const decryptResult = await decryption(encryptedData);
+    console.log(decryptResult);
+    decryptResult ? console.log(decryptResult) : console.log("Keine Daten vorhanden")
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
     }
@@ -178,14 +180,7 @@ export async function POST(req: NextRequest) {
       for (const item of items) {
         if (!item || !item.name) continue;
 
-        const price =
-          typeof item.price === "number"
-            ? item.price
-            : parseFloat(
-                String(item.price)
-                  .replace(",", ".")
-                  .replace(/[^\d.-]/g, "")
-              ) || 0;
+        const price = String(item.price).replace(",", ".");
 
         const existingDish = category.dishes.find((d) => d.name === item.name);
 

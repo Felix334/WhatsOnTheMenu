@@ -1,4 +1,3 @@
-
 import * as z from "zod";
 
 const menuSchema = z.object({
@@ -7,10 +6,8 @@ const menuSchema = z.object({
   items: z.array(
     z.object({
       name: z.string().min(2),
-      price: z
-        .string()
-        .min(1)
-        .regex(/^\d+([.,]\d{2})?$/, "Bitte eine gültige Zahl mit max. 2 Nachkommastellen eingeben"),
+      price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preis muss eine gültige Dezimalzahl mit bis zu 2 Nachkommastellen sein"),
+
       description: z.string().optional(),
       image: z.string().optional(), // base64 oder URL
     })
@@ -20,11 +17,7 @@ const menuSchema = z.object({
 const itemSchema = z.object({
   name: z.string().min(1, "Name erforderlich"),
   description: z.string().min(5, "Beschreibung erforderlich"),
-    price: z.preprocess(
-    (val) => (typeof val === "string" ? parseFloat(val) : val),
-    z.number().positive()
-  ),
-})
+  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preis muss eine gültige Dezimalzahl mit bis zu 2 Nachkommastellen sein"),
+});
 
-
-export {menuSchema, itemSchema};
+export { menuSchema, itemSchema };
