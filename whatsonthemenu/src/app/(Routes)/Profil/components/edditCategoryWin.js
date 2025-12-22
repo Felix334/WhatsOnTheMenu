@@ -19,6 +19,8 @@ import { FaCircleInfo } from "react-icons/fa6";
 
 import { colors, colors_german } from "./colorPalet";
 
+import { AddNewItems } from "./addNewItem";
+
 //import { menuSchema, itemSchema } from "./menuSchema";
 
 const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, userID, category, restaurantId }) => {
@@ -26,11 +28,13 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const [edditPos, setEdditPos] = useState(0);
   const [edditColor, setEdditColor] = useState("");
   const [edditBorder, setEdditBorder] = useState("");
-  const [addItem, setAddItem] = useState({
-    name: "",
-    price: 0,
-    img: null,
-  });
+  const [addItem, setAddItem] = useState([
+    {
+      name: "",
+      price: 0,
+      img: null,
+    },
+  ]);
   const [restaurantID_, setRestaurantID_] = useState("");
   const [userID_, setUserID_] = useState("");
 
@@ -160,12 +164,10 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hintergrund</FormLabel>
+                  <FormLabel>Hintergrund für Kategorie auswählen</FormLabel>
                   <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
                     <input type="color" value={field.value} onChange={field.onChange} className="h-10 w-12 cursor-pointer rounded-md border" />
                     <select value={field.value} onChange={(e) => field.onChange(e.target.value)} className="h-10 rounded-md border px-3 text-sm">
-                      <option value="">Farbe auswählen …</option>
-
                       {colors.map((color) => (
                         <option key={color.value} value={color.value}>
                           {color.label}
@@ -176,7 +178,6 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                     <div className="h-10 w-10 rounded-md border" style={{ backgroundColor: field.value }} />
                   </div>
                   <p className="mt-1 font-mono text-xs text-muted-foreground">{field.value}</p>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -204,6 +205,18 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                   <FormLabel>Bild</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                </FormItem>;
+              }}
+            />
+            <FormField
+              control={form.control}
+              name="item"
+              render={({ field }) => {
+                <FormItem>
+                  <FormLabel>Gerichte hinzufügen</FormLabel>
+                  <FormControl>
+                    <AddNewItems />
                   </FormControl>
                 </FormItem>;
               }}

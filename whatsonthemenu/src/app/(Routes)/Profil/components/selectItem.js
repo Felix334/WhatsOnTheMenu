@@ -162,45 +162,8 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
         setEditPrice(false);
         setEditImage(false);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Der Preis Speicher ist kaputt =>  12.50 wird zu 12.5, 12.00 => 12, aber 12.05 funktioniert
 // Es liegt an der Datenbank
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         console.log("Updated Data:", finalUpdatedItem);
         window.alert("Erfolgreich aktualisiert!"); // Optional success alert

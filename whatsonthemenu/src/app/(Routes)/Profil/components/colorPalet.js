@@ -1,8 +1,8 @@
 const colors_german = [
+  "weiß", // white
   "schwarz", // black
   "silber", // silver
   "grau", // gray
-  "weiß", // white
   "kastanienbraun", // maroon
   "rot", // red
   "lila", // purple
@@ -73,10 +73,10 @@ const colors_german = [
 ];
 
 const colors = [
+  { label: "Weiß", value: "white" },
   { label: "Schwarz", value: "black" },
   { label: "Silber", value: "silver" },
   { label: "Grau", value: "gray" },
-  { label: "Weiß", value: "white" },
   { label: "Kastanienbraun", value: "maroon" },
   { label: "Rot", value: "red" },
   { label: "Lila", value: "purple" },
@@ -146,4 +146,4 @@ const colors = [
   { label: "Violett", value: "violet" },
 ];
 
-export {colors, colors_german}
+export { colors, colors_german };

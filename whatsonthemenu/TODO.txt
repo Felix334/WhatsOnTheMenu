@@ -36,3 +36,4 @@ PROXMOX => als alternative zu Docker
 
 => Später Premium Fetaures hinzufügen(user anylytics, keine adds mehr Custom Optionen, Möglichkeit online essen zu bestellen, )
 => Ein Premium Feature: Statt der Vorgegeben Farbenauswahl => einen "Input type=Color" hinzufügen für 100% Kontrolle
+=> Zusätzliche Premium-Funktion => Beim Hintergrund eine from-to Auswahl(Bsp:  bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200)
