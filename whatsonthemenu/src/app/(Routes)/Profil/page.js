@@ -335,7 +335,7 @@ export default function PageBuilder() {
                           </FormItem>
                         )}
                       />
-                      {/* File input: do NOT spread field onto file input */}
+                      {/* File input: upload to server */}
                       <FormField
                         control={control}
                         name={`items.${index}.image`}
@@ -346,15 +346,29 @@ export default function PageBuilder() {
                               <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0];
                                   if (file) {
-                                    const reader = new FileReader();
-                                    reader.onloadend = () => {
-                                      // set the data URL into form value
-                                      setValue(`items.${index}.image`, reader.result, { shouldValidate: true, shouldDirty: true });
-                                    };
-                                    reader.readAsDataURL(file);
+                                    try {
+                                      const formData = new FormData();
+                                      formData.append('file', file);
+
+                                      const response = await fetch('/api/upload', {
+                                        method: 'POST',
+                                        body: formData,
+                                      });
+
+                                      if (response.ok) {
+                                        const result = await response.json();
+                                        setValue(`items.${index}.image`, result.imageUrl, { shouldValidate: true, shouldDirty: true });
+                                      } else {
+                                        console.error('Upload failed');
+                                        alert('Bild-Upload fehlgeschlagen');
+                                      }
+                                    } catch (error) {
+                                      console.error('Upload error:', error);
+                                      alert('Fehler beim Hochladen des Bildes');
+                                    }
                                   }
                                 }}
                                 className="block"
