@@ -344,6 +344,16 @@ export default function PageBuilder() {
                             <FormLabel>Bild</FormLabel>
                             <FormControl>
                               <input
+
+
+
+
+                              // Unfertig
+
+
+
+
+
                                 type="file"
                                 accept="image/*"
                                 onChange={async (e) => {
