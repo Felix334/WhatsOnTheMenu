@@ -1,5 +1,6 @@
 => Anmelden mit Credentials funktioniert nicht mehr
 
+// => Bei jeder API => werden die Daten vorher richtig verarbeitet(JSON.stringify usw)?
 
 Fix the Profil picture
 

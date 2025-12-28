@@ -23,7 +23,7 @@ import { FaPen, FaTrash } from "react-icons/fa";
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
-import { EdditCategoryMenu } from "./components/edditCategoryWin"
+import { EdditCategoryMenu } from "./components/edditCategoryWin";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -347,12 +347,10 @@ export default function PageBuilder() {
 
 
 
-
-                              // Unfertig
-
-
-
-
+                              // Bild wird wie der Rest erst denn hochgeladen wenn der Benutzer auf Speichern drückt!
+                              // Bilder bekommen vor dem senden eine temporaäre ID => später werden neue IDs vergeben
+                              // => Neu erstellte Items bekommen erst nach Eintrag in die DB eine ID also muss die nach
+                              // Erstellen des Items kopiert werden und dem Bild hinzugefügt werden oder anderst rum
 
                                 type="file"
                                 accept="image/*"
@@ -361,23 +359,22 @@ export default function PageBuilder() {
                                   if (file) {
                                     try {
                                       const formData = new FormData();
-                                      formData.append('file', file);
-
-                                      const response = await fetch('/api/upload', {
-                                        method: 'POST',
-                                        body: formData,
+                                      formData.append("file", file);
+                                      const response = await fetch("/api/user/profil/uploadImg", {
+                                        method: "POST",
+                                        body: JSON.stringify({ api_key: process.env.NEXT_PUBLIC_API_KEY, userID: userID, restaurantID: restaurantID, formData: formData }),
                                       });
 
                                       if (response.ok) {
                                         const result = await response.json();
                                         setValue(`items.${index}.image`, result.imageUrl, { shouldValidate: true, shouldDirty: true });
                                       } else {
-                                        console.error('Upload failed');
-                                        alert('Bild-Upload fehlgeschlagen');
+                                        console.error("Upload failed");
+                                        alert("Bild-Upload fehlgeschlagen");
                                       }
                                     } catch (error) {
-                                      console.error('Upload error:', error);
-                                      alert('Fehler beim Hochladen des Bildes');
+                                      console.error("Upload error:", error);
+                                      alert("Fehler beim Hochladen des Bildes");
                                     }
                                   }
                                 }}
@@ -578,7 +575,7 @@ export default function PageBuilder() {
           </TableBody>
         </Table>
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
-        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{name: title, position: 0, color: "", border: ""}} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId}/>
+        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{ name: title, position: 0, color: "", border: "" }} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId} />
       </Table>
     );
   };
