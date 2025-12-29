@@ -348,9 +348,10 @@ export default function PageBuilder() {
 
 
                               // Bild wird wie der Rest erst denn hochgeladen wenn der Benutzer auf Speichern drückt!
-                              // Bilder bekommen vor dem senden eine temporaäre ID => später werden neue IDs vergeben
                               // => Neu erstellte Items bekommen erst nach Eintrag in die DB eine ID also muss die nach
-                              // Erstellen des Items kopiert werden und dem Bild hinzugefügt werden oder anderst rum
+                              // => Autoincrement in der DB für die Bild-ID => Nach dem erstellen der Items => response
+                              // sendet die ID des erstellten Items und Bild-ID zurück => dann wird die Bild ID zusammen
+                              // mit dem Bild and die 2 API-gesendet und zugeordnet 
 
                                 type="file"
                                 accept="image/*"

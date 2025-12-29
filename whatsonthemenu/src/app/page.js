@@ -34,7 +34,6 @@ export default function Home() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Derive user state from NextAuth session
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
   const autherizedUser = userID && (role === "Owner" || role === "Admin");
@@ -150,6 +149,13 @@ export default function Home() {
                 <NavigationMenu>
                   <NavigationMenuList>
                     <NavigationMenuItem>
+                      {status === "authenticated" && adminAcc ? (
+                      <Button variant="ghost" asChild>
+                        <Link href={{ pathname: "/Admin", query: { ...router.queryString } }}>Admin Konsole</Link>
+                      </Button>
+                      ) : (<></>)}
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
                       <Button variant="ghost" asChild>
                         <Link href={{ pathname: "/UnserePartner", query: { ...router.queryString } }}>Unsere Partner</Link>
                       </Button>
@@ -229,12 +235,13 @@ export default function Home() {
                       <Button variant="ghost" asChild>
                         <Link href={{ pathname: "/UnserePartner", query: { ...router.queryString } }}>Unsere Partner</Link>
                       </Button>
-                      {userID ? null : (
+                      {status === "authenticated" || userID ? null : (
                         <Button
-                          variant=""
+                          variant="outlined"
+                          aria-label="Log in"
                           onClick={() => {
                             setMobileMenuOpen(false);
-                            renderLoginW();
+                            renderLoginWindow();
                           }}
                         >
                           Anmelden
