@@ -8,12 +8,22 @@ API-Key Abfrage ÜBERALL einfügen
 
 Die AGBs als PDF speichern/herrunterladen können
 
+
+
+
+
 => Wenn der Benutzer eine Seite lädt bei der Benutzer angezeigt werden(Admin Konsole, Unsere Partner)
 Dann wird in der DB eine bestimmte Anzahl genommen und nur eine bestimmte Anzahl angezeigt
 => Dann einen "Mehr"-Button einfügen
 => Mehr Button speichert vorherige ergebnisse + speichert anzahl der vorherigen ergebnisse
 => Sendet dann bereits gesuchte Anzahl
 => in der Datenbank => skip für Anzahl der gesuchten Ergbinsse
+
+
+
+
+
+
 
 wenn der Benutzer zum ersten mal eine Karte lädt dann wird ein Zeitpunkt gespeichert und wenn der Nutzer
 die Seite neu lädt(aber Daten vorhanden sind) wird nur gecheckt ob es eine Änderung gab und nicht alles
