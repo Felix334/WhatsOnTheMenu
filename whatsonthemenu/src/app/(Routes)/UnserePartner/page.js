@@ -43,6 +43,9 @@ const restaurants = [
   },
 ];
 
+/*TODO: Eine bestimmte Anazhl wird gesucht und die Menge wird gemerkt => Wennd er User scrollt
+wird die Anzahl gesendet => An DB und diese wird geskippt (take:10, skip: {skips}*/
+
 export default function RestaurantList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("Alle");

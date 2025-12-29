@@ -2286,7 +2286,7 @@ declare enum ModelAction {
     delete = "delete",
     deleteMany = "deleteMany",
     groupBy = "groupBy",
-    count = "count",// TODO: count does not actually exist in DMMF
+    count = "count",
     aggregate = "aggregate",
     findRaw = "findRaw",
     aggregateRaw = "aggregateRaw"

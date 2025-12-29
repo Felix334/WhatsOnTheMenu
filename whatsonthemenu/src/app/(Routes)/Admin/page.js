@@ -17,6 +17,7 @@ export default function AdminConsole() {
   const [filter, setFilter] = useState("all");
   const [setTrue, setSetTrue] = useState(false);
   const [userList, setUserList] = useState([]);
+  const [rolesMap, setRolesMap] = useState({}); // Stores role per user
 
   const router = useRouter();
   const pathname = usePathname();
@@ -46,16 +47,20 @@ export default function AdminConsole() {
       try {
         const resp = await fetch("/api/user/userList", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ search }),
         });
 
         if (!resp.ok) throw new Error("Failed to fetch users");
-
         const data = await resp.json();
-        setUserList(data.data || []);
+        setUserList(data.data || {});
+
+        // Initialize rolesMap
+        const map = {};
+        (data.data || []).forEach((u) => {
+          map[u.id] = u.role;
+        });
+        setRolesMap(map);
       } catch (err) {
         console.error(err);
       }
@@ -64,12 +69,15 @@ export default function AdminConsole() {
     getUserList();
   }, [status, session, search]);
 
-  if (!session || status === "unauthenticated") {
-    return <div>Bitte anmelden</div>;
-  }
+  if (!session || status === "unauthenticated") return <div>Bitte anmelden</div>;
 
   // Filter users based on search and role
   const filtered = userList.filter((u) => (filter === "all" || u.role === filter) && u.name.toLowerCase().includes(search.toLowerCase()));
+
+  const handleRoleChange = (userId, newRole) => {
+    setRolesMap((prev) => ({ ...prev, [userId]: newRole }));
+    // Optional: send PATCH/POST request to update role in DB
+  };
 
   return (
     <div className="min-h-screen grid grid-cols-12 bg-slate-50">
@@ -99,21 +107,19 @@ export default function AdminConsole() {
         <h1 className="text-2xl font-bold">Admin Konsole</h1>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[
-            { label: "Insgesammt", value: userList.length },
+            { label: "Insgesamt", value: userList.length },
             { label: "Admins", value: userList.filter((u) => u.role === "Admin").length },
             { label: "Owner", value: userList.filter((u) => u.role === "Owner").length },
             { label: "Benutzer", value: userList.filter((u) => u.role === "User").length },
           ].map((s) => (
-            <div key={s.label}>
-              <Card className="rounded-2xl shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-sm">{s.label}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-2xl font-semibold">{s.value}</CardContent>
-              </Card>
-            </div>
+            <Card key={s.label} className="rounded-2xl shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm">{s.label}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-2xl font-semibold">{s.value}</CardContent>
+            </Card>
           ))}
         </div>
 
@@ -161,7 +167,18 @@ export default function AdminConsole() {
                       <TableRow key={u.id}>
                         <TableCell>{u.name}</TableCell>
                         <TableCell>{u.email}</TableCell>
-                        <TableCell>{u.role}</TableCell>
+                        <TableCell>
+                          <Select value={rolesMap[u.id]} onValueChange={(val) => handleRoleChange(u.id, val)}>
+                            <SelectTrigger className="w-full md:w-40">
+                              <SelectValue placeholder="Role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="User">User</SelectItem>
+                              <SelectItem value="Admin">Admin</SelectItem>
+                              <SelectItem value="Owner">Owner</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
                         <TableCell>
                           <Badge variant={u.status === "active" ? "default" : u.status === "pending" ? "secondary" : "destructive"}>{u.status}</Badge>
                         </TableCell>
