@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
-export default function QRCodeScanner({ onScanSuccess, onScanError }) {
+export default function TestScanner2() {
   const [scanResult, setScanResult] = useState(null);
 
   useEffect(() => {
@@ -20,27 +20,22 @@ export default function QRCodeScanner({ onScanSuccess, onScanError }) {
     function success(result) {
       scanner.clear();
       setScanResult(result);
-      if (onScanSuccess) {
-        onScanSuccess(result);
-      }
     }
 
     function error(err) {
       console.warn(err);
-      if (onScanError) {
-        onScanError(err);
-      }
     }
 
     return () => {
       scanner.clear();
     };
-  }, [onScanSuccess, onScanError]);
+  }, []);
 
   return (
     <div>
+      <h1>QR Code Scanner</h1>
       {scanResult
-        ? <div>Scanned: <a href={scanResult} target="_blank" rel="noopener noreferrer">{scanResult}</a></div>
+        ? <div>Success: <a href={scanResult}>{scanResult}</a></div>
         : <div id="reader"></div>
       }
     </div>

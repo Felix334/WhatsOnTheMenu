@@ -1,55 +1,53 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import React from "react";
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const Menu = () => {
-  const router = useRouter();
-  const [userID, setUserID] = useState("");
-  const [menuItems, setMenuItems] = useState([]);
+  const searchParams = useSearchParams();
+  const [serverData, setServerData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0);
   const [name, setName] = useState("");
-  const [serverData, setServerData] = useState({});
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const params = new URLSearchParams(url.search);
-    const restaurantID = params.get("restaurantID");
-    console.log("Restaurant-ID:", restaurantID);
-
-    if (restaurantID) {
-      const apiCall = async () => {
-        try {
-          const resp = await fetch(`/api/restaurant/${restaurantID}/menu`);
-          if (!resp.ok) {
-            if(resp.status == 404){
-              throw new Error("Fehler beim Abrufen der Restaurantdaten: Restaurant nicht gefunden!")
-            } else if(resp.status == 500){
-              throw new Error("Fehler beim Abrufen der Restaurantdaten: Internal Server Error:", resp.status)
-            }
-            throw new Error("Fehler beim Abrufen der Restaurantdaten",);
-          }
-          const data = await resp.json();
-          setName(data.name);
-          setServerData(data);
-          console.log("Name: ", data.name);
-          console.log("Daten empfangen:", data);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      apiCall();
+    const restaurantID = searchParams.get("restaurantID");
+    if (!restaurantID) {
+      setError("Keine Restaurant-ID in der URL gefunden");
+      setLoading(false);
+      return;
     }
-  }, []);
 
+    const fetchMenu = async () => {
+      try {
+        const resp = await fetch(`/api/restaurant/${restaurantID}/menu`, {
+          method: "POST",
+        });
+        if (!resp.ok) {
+          if (resp.status === 404) throw new Error("Restaurant nicht gefunden!");
+          if (resp.status === 500) throw new Error("Internal Server Error");
+          throw new Error(`Fehler beim Abrufen der Daten: ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        console.log("Server-Data", data)
+        setServerData(data);
+        setName(data.name || "Unbenanntes Restaurant");
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, [searchParams]);
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Es tut uns sehr Leid, ein Fehler ist aufgetrten: {error}!</div>;
+  if (error) return <div>Es ist ein Fehler aufgetreten: {error}</div>;
 
   const MenuSection = ({ title, menuItems }) => {
     const [expandedIndex, setExpandedIndex] = useState(null);
@@ -57,46 +55,35 @@ const Menu = () => {
       setExpandedIndex(expandedIndex === index ? null : index);
     };
 
-    const calcPrice = (price) => {
-      setTotalPrice((oldPrice) => oldPrice + price);
-    };
-
-
-    const imageHandler = (new_img) => {
-      //Bild wird umbenannt => (enthält user-id menü-id, und img-id)
-      // Dann wir das Bild coprimiert
-      // Als letztes wird es im ./img gespeichert
-    }
-
     return (
-      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8">
+      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 px-8">
         <div className="mb-3">
           <h3 className="text-center text-4xl font-semibold">{title}</h3>
         </div>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-left">Speisen:</TableHead>
-              <TableHead className="text-left">Beschreibung:</TableHead>
-              <TableHead className="text-right">Preis:</TableHead>
+              <TableHead className="text-left">Speisen</TableHead>
+              <TableHead className="text-left">Beschreibung</TableHead>
+              <TableHead className="text-right">Preis</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {menuItems.map((item, index) => (
-              <React.Fragment key={index}>
+              <React.Fragment key={item.id}>
                 <TableRow
                   className="hover:bg-yellow-50 transition-colors duration-200 cursor-pointer"
                   onClick={() => toggleExpand(index)}
                 >
                   <TableCell className="font-serif text-gray-900">{item.name}</TableCell>
                   <TableCell className="text-gray-600">{item.description}</TableCell>
-                  <TableCell className="text-right font-mono text-gray-800">{item.price}€</TableCell>
+                  <TableCell className="text-right font-mono text-gray-800">{parseFloat(item.price).toFixed(2)}€</TableCell>
                 </TableRow>
-                {expandedIndex === index && (
+                {expandedIndex === index && item.imageUrl && (
                   <TableRow>
-                    <TableCell colSpan="3" className="px-6 py-4">
+                    <TableCell colSpan={3} className="px-6 py-4">
                       <Image
-                        src={require(`./img/${item.img}`)}
+                        src={item.imageUrl || "/placeholder.png"}
                         alt={item.name}
                         width={600}
                         height={400}
@@ -113,40 +100,34 @@ const Menu = () => {
     );
   };
 
-  const Kategorie = ({ menuItems, name }) => {
-    return (
-      <MenuSection
-        title={name}
-        menuItems={menuItems}
-      />
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8 absolute">
+    <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8 relative">
       <header className="mb-12 text-center w-full">
         <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
-        <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl">{/*description*/}</p>
       </header>
+
       <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
         <div className="max-w-7xl mx-auto grid gap-4">
-          {serverData.menu?.categories?.map((category) => (
-            <Kategorie
-              key={category.id}
-              menuItems={category.dishes}
-              name={category.name}
-            />
-          ))}
+          {serverData.menu?.[0]?.categories?.length > 0 ? (
+            serverData.menu[0].categories.map(category => (
+              <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />
+            ))
+          ) : (
+            <div>Keine Kategorien gefunden</div>
+          )}
         </div>
-        <p className="mt-4">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
-        {/* Display raw JSON data for testing */}
-        <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">
-          {JSON.stringify(serverData, null, 2)}
-        </pre>
+
+        <p className="mt-4 font-semibold">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
+
+        <details className="mt-8">
+          <summary>Debug Data</summary>
+          <pre className="mt-4 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">
+            {JSON.stringify(serverData, null, 2)}
+          </pre>
+        </details>
       </main>
-      <div><h1>{}</h1></div>
     </div>
   );
-}
+};
 
 export default Menu;

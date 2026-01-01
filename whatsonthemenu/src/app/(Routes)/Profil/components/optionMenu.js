@@ -10,27 +10,52 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, userID }) => (
-  <Sheet open={openOptions} onOpenChange={setOpenOptions}>
-    <SheetTrigger asChild>
-      <Button variant="outline">|||</Button>
-    </SheetTrigger>
-    <SheetContent side="left" className="w-full max-w-3xl">
-      <SheetHeader>
-        <SheetTitle>Dashboard</SheetTitle>
-        <SheetDescription>Hier können Sie Ihre Seite individuell gestalten</SheetDescription>
-      </SheetHeader>
-      <div className="p-4 space-y-4">
-        <div>
-          <Label>Hintergrund</Label>
-          <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, userID, restaurantID }) => {
+  const [newURL, setNewURL] = useState("");
+
+  if(restaurantID){
+    const url = new URL("/Profil", window.location.origin)
+    var params = URLSearchParams
+    console.log(params)
+    url.search = new URLSearchParams({
+      restaurantID: restaurantID
+    }).toString()
+    console.log(url.toString());
+  }
+
+  return (
+    <Sheet open={openOptions} onOpenChange={setOpenOptions}>
+      <SheetTrigger asChild>
+        <Button variant="outline">|||</Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-full max-w-3xl">
+        <SheetHeader>
+          <SheetTitle>Dashboard</SheetTitle>
+          <SheetDescription>Hier können Sie Ihre Seite individuell gestalten</SheetDescription>
+        </SheetHeader>
+        <div className="p-4 space-y-4">
+          <div>
+            <Label>Hintergrund</Label>
+            <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+          </div>
+          <div>{/* Additional options can be added here */}</div>
+          <Button asChild>
+            <Link
+              href={{
+                pathname: "/Profil/QRBuilder/",
+                query: {
+                  ...router.query,
+                  ...(userID ? { userID } : {}),
+                  ...(restaurantID ? { restaurantID } : {}),
+                },
+              }}
+            >
+              QR-Code erstellen
+            </Link>
+          </Button>
         </div>
-        <div>{/* Additional options can be added here */}</div>
-        <Button asChild>
-          <Link href={{ pathname: "/Profil/QRBuilder/", query: { ...router.query, ...(userID ? { userID: userID } : {}) } }}>QR-Code erstellen</Link>
-        </Button>
-      </div>
-    </SheetContent>
-  </Sheet>
-);
-export  {OptionMenu};
+      </SheetContent>
+    </Sheet>
+  );
+};
+export { OptionMenu };

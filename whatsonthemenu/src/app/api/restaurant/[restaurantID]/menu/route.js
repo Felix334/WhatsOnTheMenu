@@ -3,27 +3,19 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET(req, { params }) {
+export async function POST(req, { params }) {
   try {
-    const { restaurantID } = await params
-    console.log("Restaurant ID from URL:", restaurantID)
-    if (!restaurantID) {
-      return NextResponse.json(
-        { message: 'Restaurant ID is required' },
-        { status: 400 }
-      )
-    }
+  console.log("Ping");
+  const { restaurantID } = await params;
+  console.log("Restaurant ID from URL:", restaurantID)
+  if (!restaurantID) {
+    return NextResponse.json({ message: 'Restaurant ID is required' }, { status: 400 })
+  }
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
       include: {
-        owner: {
-          select: {
-            name: true,
-            email: true,
-            role: true
-          }
-        },
+        owner: { select: { name: true, email: true, role: true } },
         menu: {
           include: {
             categories: {
@@ -31,51 +23,41 @@ export async function GET(req, { params }) {
                 dishes: {
                   include: {
                     ingredients: true,
-                    reviews: {
-                      select: {
-                        id: true,
-                        rating: true,
-                        comment: true,
-                        createdAt: true
-                      }
-                    }
+                    reviews: { select: { id: true, rating: true, comment: true, createdAt: true } }
                   }
                 }
               }
             }
           }
         },
-        locations: {
-          include: {
-            reservation: true || false
-          }
-        }
+        locations: { include: { reservation: true } }
       }
     })
 
     if (!restaurant) {
-      return NextResponse.json(
-        { message: 'Restaurant not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ message: 'Restaurant not found' }, { status: 404 })
     }
 
-    const menuWithRatings = {
-      ...restaurant.menu,
-      categories: restaurant.menu?.categories.map(category => ({
-        ...category,
-        dishes: category.dishes.map(dish => {
-          const avgRating =
-            dish.reviews.reduce((sum, review) => sum + review.rating, 0) /
-              dish.reviews.length || 0
-          return {
-            ...dish,
-            averageRating: parseFloat(avgRating.toFixed(1)),
-            reviewCount: dish.reviews.length
-          }
-        })
-      }))
-    }
+    // Prüfen ob menu existiert, sonst fallback
+    const menuWithRatings = restaurant.menu
+      ? {
+          ...restaurant.menu,
+          categories: restaurant.menu.categories?.map(category => ({
+            ...category,
+            dishes: category.dishes?.map(dish => {
+              const avgRating =
+                dish.reviews && dish.reviews.length > 0
+                  ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length
+                  : 0
+              return {
+                ...dish,
+                averageRating: parseFloat(avgRating.toFixed(1)),
+                reviewCount: dish.reviews?.length || 0
+              }
+            }) || []
+          })) || []
+        }
+      : { categories: [] }
 
     const response = {
       id: restaurant.id,
@@ -90,10 +72,7 @@ export async function GET(req, { params }) {
     return NextResponse.json(response)
   } catch (error) {
     console.error('Error fetching restaurant:', error)
-    return NextResponse.json(
-      { message: 'Internal server error', error: error.message },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Internal server error', error: error.message }, { status: 500 })
   } finally {
     await prisma.$disconnect()
   }

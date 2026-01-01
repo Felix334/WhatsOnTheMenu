@@ -17,8 +17,9 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-import { FaPen, FaTrash } from "react-icons/fa";
+import { FaPen, FaTrash, FaInfo } from "react-icons/fa";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
@@ -43,6 +44,7 @@ export default function PageBuilder() {
 
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
+  const [restaurantID, setRestaurantID] = useState("");
   const [userRole, setUserRole] = useState("");
 
   // Controlled sheets
@@ -83,17 +85,6 @@ export default function PageBuilder() {
 
     const fetchData = async () => {
       try {
-        // 1️⃣ Cache laden
-        const cached = sessionStorage.getItem(`serverData-${userID}`);
-        if (cached) {
-          setServerData(JSON.parse(cached));
-        } else {
-          setIsLoading(true);
-        }
-
-        // 2️⃣ Timeout
-        const timeout = setTimeout(() => controller.abort(), 5000);
-
         const response = await fetch("/api/user/profil/getData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -101,9 +92,6 @@ export default function PageBuilder() {
           signal: controller.signal,
         });
 
-        clearTimeout(timeout);
-        console.log(response);
-        // 3️⃣ Auth-Handling
         if (response.status === 401) {
           window.alert("Bitte melden Sie sich an");
           return;
@@ -113,10 +101,10 @@ export default function PageBuilder() {
           throw new Error(`HTTP ${response.status}`);
         }
 
-        // 4️⃣ Daten
         const freshData = await response.json();
+
         setServerData(freshData);
-        sessionStorage.setItem(`serverData-${userID}`, JSON.stringify(freshData));
+        setRestaurantID(freshData.userData.restaurant.id);
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
@@ -253,8 +241,9 @@ export default function PageBuilder() {
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
+      <div></div>
       <SheetTrigger asChild>
-        <Button variant="outline">Menü erstellen</Button>
+        <Button variant="outline">Kategorie erstellen</Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full max-w-3xl">
         <SheetHeader>
@@ -344,14 +333,11 @@ export default function PageBuilder() {
                             <FormLabel>Bild</FormLabel>
                             <FormControl>
                               <input
-
-
-
-                              // Bild wird wie der Rest erst denn hochgeladen wenn der Benutzer auf Speichern drückt!
-                              // => Neu erstellte Items bekommen erst nach Eintrag in die DB eine ID also muss die nach
-                              // => Autoincrement in der DB für die Bild-ID => Nach dem erstellen der Items => response
-                              // sendet die ID des erstellten Items und Bild-ID zurück => dann wird die Bild ID zusammen
-                              // mit dem Bild and die 2 API-gesendet und zugeordnet 
+                                // Bild wird wie der Rest erst denn hochgeladen wenn der Benutzer auf Speichern drückt!
+                                // => Neu erstellte Items bekommen erst nach Eintrag in die DB eine ID also muss die nach
+                                // => Autoincrement in der DB für die Bild-ID => Nach dem erstellen der Items => response
+                                // sendet die ID des erstellten Items und Bild-ID zurück => dann wird die Bild ID zusammen
+                                // mit dem Bild and die 2 API-gesendet und zugeordnet
 
                                 type="file"
                                 accept="image/*"
@@ -586,7 +572,7 @@ export default function PageBuilder() {
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
-          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} />
+          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} />
           <MenuEditor />
         </div>
         <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
