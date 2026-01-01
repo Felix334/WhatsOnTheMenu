@@ -102,6 +102,7 @@ export default function PageBuilder() {
         }
 
         const freshData = await response.json();
+        console.log("Server Response:", freshData)
 
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
@@ -572,7 +573,7 @@ export default function PageBuilder() {
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
-          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} />
+          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData}/>
           <MenuEditor />
         </div>
         <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">

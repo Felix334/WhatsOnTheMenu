@@ -84,7 +84,8 @@ const logout = async () => {
             <div>
               <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
               <p className="text-sm text-gray-500">{session?.user?.email}</p>
-              {session?.user.role == "Admin" ? <div className="text-red-600">Admin</div>: <></>}
+              {session?.user.role == "Admin" ? <div className="text-red-600 font-bold">Admin</div>: <></>}
+              {session?.user.role == "Owner" ? <div className="text-blue-600 font-bold">Owner</div> : <></>}
             </div>
             <div className="space-y-2">
               <Button

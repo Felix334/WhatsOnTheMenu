@@ -44,6 +44,7 @@ async function main(userId) {
       include: {
         restaurant: {
           include: {
+            locations: true,
             menu: {
               include: {
                 categories: {

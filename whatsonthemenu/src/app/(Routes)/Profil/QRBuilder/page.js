@@ -86,7 +86,7 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -98,7 +98,7 @@ export default function Page() {
         </div>
 
         <div className="mb-6">
-          <h1 className="font-semibold mb-1">Ihre URL</h1>
+          <h1 className="font-semibold mb-1">Ihre Profil-URL:</h1>
           <p className="break-all text-sm text-blue-700">
             {restaurantURL || "Keine Restaurant-ID gefunden"}
           </p>
@@ -107,7 +107,7 @@ export default function Page() {
         <button
           onClick={generateQRCode}
           disabled={!restaurantURL || isGenerating}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold disabled:opacity-50 mb-6"
+          className="w-full bg-linear-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold disabled:opacity-50 mb-6"
         >
           {isGenerating ? "Erstellen…" : "QR-Code erstellen"}
         </button>
