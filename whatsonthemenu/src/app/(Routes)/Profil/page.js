@@ -102,23 +102,25 @@ export default function PageBuilder() {
         }
 
         const freshData = await response.json();
-        console.log("Server Response:", freshData)
+        console.log("Server Response:", freshData);
 
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
+        setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
         }
       } finally {
         setIsLoading(false);
+        if(!bgColor){console.log("Kein Hintergrund verfügbar")}
       }
     };
 
     fetchData();
 
     return () => controller.abort();
-  }, [userID]);
+  }, [userID, bgColor]);
 
   const submitToServer = (data) => {
     const newSection = {
@@ -569,14 +571,14 @@ export default function PageBuilder() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: bgColor }}>
+    <div className="min-h-screen">
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
-          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData}/>
+          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData} />
           <MenuEditor />
         </div>
-        <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8">
+        <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
           <header className="mb-12 text-center w-full">
             <div className="grid grid-col-1">
               <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}</h1>

@@ -6,21 +6,77 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 
+import FontSelector from "./fontList"
+
 const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, userID, restaurantID, serverData }) => {
   const [serverData_, setServerData_] = useState(null);
+  const [menuData, setMenuData] = useState(null);
+  const [isEditingMenu, setIsEditingMenu] = useState(false);
+  const [editedBgColor, setEditedBgColor] = useState(bgColor);
+  const [editedFont, setEditedFont] = useState(); // Assuming a default font; adjust as needed
 
   useEffect(() => {
     setServerData_(serverData || null);
-    console.log("Daten Check: ", serverData)
+    console.log("Daten Check: ", serverData);
   }, [serverData]);
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const resp = await fetch(`/api/restaurant/${restaurantID}/updateMenu`);
+        if (resp.ok) {
+          const data = await resp.json();
+          setMenuData(data.data);
+          setEditedBgColor(data.data.bgColor || bgColor);
+          setEditedFont(data.data.font || 'Arial');
+        } else {
+          console.error("Failed to fetch menu data");
+        }
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+    if (restaurantID) {
+      fetchMenuData();
+    }
+  }, [restaurantID, bgColor]);
+
+  const handleSaveMenu = async () => {
+    try {
+      const response = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          bgColor: editedBgColor,
+          font: editedFont,
+        }),
+      });
+      if (response.ok) {
+        const updatedData = await response.json();
+        setMenuData(updatedData.data);
+        setBgColor(editedBgColor); // Update the parent bgColor
+        setIsEditingMenu(false);
+      } else {
+        console.error('Failed to save menu changes:', response);
+      }
+    } catch (error) {
+      console.error('Error saving menu changes:', error);
+    }
+  };
+
+  const handleCancelMenu = () => {
+    setEditedBgColor(menuData?.bgColor || bgColor);
+    setEditedFont(menuData?.font || 'Arial');
+    setIsEditingMenu(false);
+  };
 
   if (restaurantID) {
     const url = new URL("/Profil", window.location.origin);
-
     url.search = new URLSearchParams({
       restaurantID,
     }).toString();
-
     console.log("Profil-URL:", url.toString());
   }
 
@@ -39,7 +95,29 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
         <div className="p-4 space-y-4">
           <div>
             <Label>Hintergrund</Label>
-            <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} />
+            {isEditingMenu ? (
+              <Input type="color" value={editedBgColor} onChange={(e) => setEditedBgColor(e.target.value)} />
+            ) : (
+              <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} disabled />
+            )}
+          </div>
+
+          {isEditingMenu && (
+            <div>
+              <Label>Schriftart</Label>
+              <FontSelector onFontChange={setEditedFont}/>
+            </div>
+          )}
+
+          <div>
+            {isEditingMenu ? (
+              <>
+                <Button onClick={handleSaveMenu} style={{ marginRight: 10 }}>Speichern</Button>
+                <Button onClick={handleCancelMenu}>Abbrechen</Button>
+              </>
+            ) : (
+              <Button onClick={() => setIsEditingMenu(true)}>Menü bearbeiten</Button>
+            )}
           </div>
 
           <Button asChild>
@@ -59,7 +137,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
         </div>
 
         {/* Nur rendern, wenn Daten da sind */}
-        {serverData_ && <RestaurantData serverData={serverData_} />}
+        {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} />}
       </SheetContent>
     </Sheet>
   );
@@ -67,19 +145,38 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
 
 export { OptionMenu };
 
-const RestaurantData = ({ serverData }) => {
+const RestaurantData = ({ serverData, setServerData, restaurantID }) => {
   const restaurant = serverData?.userData.restaurant ?? {};
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedRestaurant, setEditedRestaurant] = useState(restaurant);
   const [editedLocations, setEditedLocations] = useState(restaurant.locations || []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log("Speichere Änderungen:", editedRestaurant, editedLocations);
 
-    // TODO: API-Call hier einbauen
+    try {
+      const response = await fetch(`/api/restaurant/${restaurantID}/updateRestaurant`, { // Changed to a separate endpoint for clarity
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          restaurant: editedRestaurant,
+          locations: editedLocations,
+        }),
+      });
 
-    setIsEditing(false);
+      if (response.ok) {
+        const updatedData = await response.json();
+        setServerData(updatedData);
+        setIsEditing(false);
+      } else {
+        console.error('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
   };
 
   const handleCancel = () => {

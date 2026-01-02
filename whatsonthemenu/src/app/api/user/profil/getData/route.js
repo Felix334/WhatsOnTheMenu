@@ -46,7 +46,14 @@ async function main(userId) {
           include: {
             locations: true,
             menu: {
-              include: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                bgColor: true,
+                font: true,
+                createdAt: true,
+                updatedAt: true,
                 categories: {
                   include: {
                     dishes: {
