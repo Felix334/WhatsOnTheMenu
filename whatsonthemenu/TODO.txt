@@ -8,7 +8,7 @@ API-Key Abfrage ÜBERALL einfügen
 
 Die AGBs als PDF speichern/herrunterladen können
 
-
+=> Fonts Fertig stellen
 
 
 
@@ -21,17 +21,11 @@ Dann wird in der DB eine bestimmte Anzahl genommen und nur eine bestimmte Anzahl
 
 
 
-
-
-
-
 wenn der Benutzer zum ersten mal eine Karte lädt dann wird ein Zeitpunkt gespeichert und wenn der Nutzer
 die Seite neu lädt(aber Daten vorhanden sind) wird nur gecheckt ob es eine Änderung gab und nicht alles
 nochmal neu geladen(es sei denn es gab einen Fehler)
 
 DB ändern => Restauran an die Location binden => User => Restaurant => Location[] => Menü
-
-Die Änderungs-Funktion is noch nicht fertig
 
 In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
 
