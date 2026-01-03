@@ -53,6 +53,7 @@ export default function PageBuilder() {
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
+  const [fontNew, setFontNew] = useState("")
 
   const { data: session, status } = useSession();
 
@@ -107,6 +108,31 @@ export default function PageBuilder() {
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
+
+
+
+
+
+
+
+
+        // Fix das
+        setFontNew(freshData.userData.restaurant.menu.font)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
@@ -512,12 +538,11 @@ export default function PageBuilder() {
             <FaTrash />
           </Button>
         </div>
-
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead></TableHead>
-              <TableHead className="text-left">Speisen:</TableHead>
+              <TableHead className="text-left" style={{ fontFamily: fontNew }}>Speisen:</TableHead>
               <TableHead className="text-left">Beschreibung:</TableHead>
               <TableHead className="text-right">Preis:</TableHead>
             </TableRow>
@@ -569,13 +594,13 @@ export default function PageBuilder() {
       </Table>
     );
   };
-
   return (
     <div className="min-h-screen">
+      <link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap'></link>
       <div>
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
-          <Button onClick={goBackBtn}>Zurück</Button>
+          <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>Zurück</Button>
           <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData} />
           <MenuEditor />
         </div>
@@ -590,10 +615,10 @@ export default function PageBuilder() {
           <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
             <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
 
-            <p className="mt-4">Gesamtpreis:</p>
+            <p className="mt-4" style={{ fontFamily: fontNew }}>Gesamtpreis:</p>
 
             <details className="mt-8">
-              <summary>Debug Data</summary>
+              <summary >Debug Data</summary>
               <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
             </details>
           </main>

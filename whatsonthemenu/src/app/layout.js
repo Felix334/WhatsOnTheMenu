@@ -28,6 +28,14 @@ export const metadata = {
     index: true,
     follow: true,
   },
+  fonts: {
+    google: [
+      {
+        family: "Poppins",
+        weights: ["400", "600", "700"],
+      },
+    ],
+  }
 };
 
 export default function RootLayout({ children }) {
