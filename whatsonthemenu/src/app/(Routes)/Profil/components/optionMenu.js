@@ -146,11 +146,12 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
 export { OptionMenu };
 
 const RestaurantData = ({ serverData, setServerData, restaurantID }) => {
-  const restaurant = serverData?.userData.restaurant ?? {};
+  console.log(`ErrorCheck: ${serverData.userData} Test`)
+  const restaurant = serverData?.userData?.restaurant;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedRestaurant, setEditedRestaurant] = useState(restaurant);
-  const [editedLocations, setEditedLocations] = useState(restaurant.locations || []);
+  const [editedLocations, setEditedLocations] = useState(restaurant?.locations || []);
 
   const handleSave = async () => {
     console.log("Speichere Änderungen:", editedRestaurant, editedLocations);
@@ -200,45 +201,45 @@ const RestaurantData = ({ serverData, setServerData, restaurantID }) => {
       <h1>Ihre Restaurant-Daten:</h1>
 
       <div style={{ marginBottom: 20, border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
-        <h2>Restaurant-Informationen</h2>
+        <h2><strong>Restaurant-Informationen:</strong></h2>
 
         {isEditing ? (
           <div>
             <label>
               Name:
-              <input value={editedRestaurant.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} />
+              <input value={editedRestaurant?.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} />
             </label>
 
             <br />
 
             <label>
               Muttergesellschaft:
-              <input value={editedRestaurant.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} />
+              <input value={editedRestaurant?.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} />
             </label>
 
-            <p>Besitzer: {editedRestaurant.owner?.name || "Unbekannt"} (nicht bearbeitbar)</p>
-            <p>Erstellt am: {editedRestaurant.createdAt ? new Date(editedRestaurant.createdAt).toLocaleDateString() : "-"}</p>
+            <p>Besitzer: {editedRestaurant?.owner?.name || "Unbekannt"} (nicht bearbeitbar)</p>
+            <p>Erstellt am: {editedRestaurant?.createdAt ? new Date(editedRestaurant?.createdAt).toLocaleDateString() : "-"}</p>
           </div>
         ) : (
           <>
             <p>
-              <strong>Name:</strong> {restaurant.name}
+              <strong>Name:</strong> {restaurant?.name}
             </p>
             <p>
-              <strong>Muttergesellschaft:</strong> {restaurant.parentCompany}
+              <strong>Muttergesellschaft:</strong> {restaurant?.parentCompany}
             </p>
             <p>
-              <strong>Besitzer:</strong> {restaurant.owner?.name || "Unbekannt"}
+              <strong>Besitzer:</strong> {restaurant?.owner?.name || "Unbekannt"}
             </p>
             <p>
-              <strong>Erstellt am:</strong> {restaurant.createdAt ? new Date(restaurant.createdAt).toLocaleDateString() : "-"}
+              <strong>Erstellt am:</strong> {restaurant?.createdAt ? new Date(restaurant?.createdAt).toLocaleDateString() : "-"}
             </p>
           </>
         )}
       </div>
 
       <div style={{ marginBottom: 20, border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
-        <h2>Standorte</h2>
+
 
         {editedLocations.length === 0 ? (
           <p>Keine Standorte vorhanden.</p>
@@ -250,32 +251,32 @@ const RestaurantData = ({ serverData, setServerData, restaurantID }) => {
                   <>
                     <label>
                       Straße:
-                      <input value={location.street || ""} onChange={(e) => updateLocationField(index, "street", e.target.value)} />
+                      <input value={location?.street || ""} onChange={(e) => updateLocationField(index, "street", e.target.value)} />
                     </label>
                     <br />
                     <label>
                       Hausnummer:
-                      <input value={location.houseNumber || ""} onChange={(e) => updateLocationField(index, "houseNumber", e.target.value)} />
+                      <input value={location?.houseNumber || ""} onChange={(e) => updateLocationField(index, "houseNumber", e.target.value)} />
                     </label>
                     <br />
                     <label>
                       Stadt:
-                      <input value={location.city || ""} onChange={(e) => updateLocationField(index, "city", e.target.value)} />
+                      <input value={location?.city || ""} onChange={(e) => updateLocationField(index, "city", e.target.value)} />
                     </label>
                     <br />
                     <label>
                       Postleitzahl:
-                      <input value={location.postalCode || ""} onChange={(e) => updateLocationField(index, "postalCode", e.target.value)} />
+                      <input value={location?.postalCode || ""} onChange={(e) => updateLocationField(index, "postalCode", e.target.value)} />
                     </label>
                     <br />
                     <label>
                       Land:
-                      <input value={location.country || ""} onChange={(e) => updateLocationField(index, "country", e.target.value)} />
+                      <input value={location?.country || ""} onChange={(e) => updateLocationField(index, "country", e.target.value)} />
                     </label>
                   </>
                 ) : (
                   <p>
-                    <strong>Adresse:</strong> {location.street} {location.houseNumber}, {location.postalCode} {location.city}, {location.country}
+                    <strong>Adresse:</strong> {location?.street} {location?.houseNumber}, {location?.postalCode} {location?.city}, {location?.country}
                   </p>
                 )}
               </li>

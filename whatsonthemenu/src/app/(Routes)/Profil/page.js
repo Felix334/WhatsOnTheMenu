@@ -572,6 +572,7 @@ export default function PageBuilder() {
 
   return (
     <div className="min-h-screen">
+      <div>
       <div className="p-1">
         <div className="absolute top-5 flex gap-2 items-center">
           <Button onClick={goBackBtn}>Zurück</Button>
@@ -600,6 +601,7 @@ export default function PageBuilder() {
         <div className="fixed bottom-6 left-6 z-20">
           <Button onClick={() => submitData()}>Speichern (Server)</Button>
         </div>
+      </div>
       </div>
     </div>
   );
