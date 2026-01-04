@@ -53,7 +53,8 @@ export default function PageBuilder() {
   const [edditName, setEdditName] = useState(false);
   const [nameChangeWin, setNameChangeWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
-  const [fontNew, setFontNew] = useState("")
+  const [fontNew, setFontNew] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
 
   const { data: session, status } = useSession();
 
@@ -108,38 +109,17 @@ export default function PageBuilder() {
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
-
-
-
-
-
-
-
-
         // Fix das
-        setFontNew(freshData.userData.restaurant.menu.font)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        setFontNew(freshData.userData.restaurant.menu.font);
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
         }
       } finally {
         setIsLoading(false);
-        if(!bgColor){console.log("Kein Hintergrund verfügbar")}
+        if (!bgColor) {
+          console.log("Kein Hintergrund verfügbar");
+        }
       }
     };
 
@@ -157,9 +137,39 @@ export default function PageBuilder() {
     setComponents((prev) => [...prev, { type: "menuSection", section: newSection }]);
   };
 
-  const onSubmit = (data) => {
-    submitToServer(data);
+  const onSubmit = async (data) => {
+    // Upload selected images and update data with filePaths
+    const updatedItems = await Promise.all(data.items.map(async (item, index) => {
+      if (selectedFiles[index]) {
+        try {
+          const formData = new FormData();
+          formData.append("file", selectedFiles[index]);
+          const response = await fetch(`/api/restaurant/${restaurantID}/Images/uploadImg`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            return { ...item, image: result.filePath };
+          } else {
+            console.error("Upload failed for item", index);
+            alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
+            return item;
+          }
+        } catch (error) {
+          console.error("Upload error for item", index, error);
+          alert(`Fehler beim Hochladen des Bildes für Gericht ${index + 1}`);
+          return item;
+        }
+      }
+      return item;
+    }));
+
+    const updatedData = { ...data, items: updatedItems };
+    submitToServer(updatedData);
     setOpenEditor(false);
+    setSelectedFiles({}); // Clear selected files after adding section
   };
 
   const submitData = async () => {
@@ -233,6 +243,7 @@ export default function PageBuilder() {
       }
 
       alert("Data saved and deletions processed successfully!");
+      setSelectedFiles({}); // Clear selected files after successful save
     } catch (err) {
       console.error("Failed to save data:", err);
       alert(`Failed to save data: ${err.message}`);
@@ -362,39 +373,22 @@ export default function PageBuilder() {
                             <FormLabel>Bild</FormLabel>
                             <FormControl>
                               <input
-                                // Bild wird wie der Rest erst denn hochgeladen wenn der Benutzer auf Speichern drückt!
-                                // => Neu erstellte Items bekommen erst nach Eintrag in die DB eine ID also muss die nach
-                                // => Autoincrement in der DB für die Bild-ID => Nach dem erstellen der Items => response
-                                // sendet die ID des erstellten Items und Bild-ID zurück => dann wird die Bild ID zusammen
-                                // mit dem Bild and die 2 API-gesendet und zugeordnet
-
                                 type="file"
                                 accept="image/*"
-                                onChange={async (e) => {
+                                onChange={(e) => {
                                   const file = e.target.files?.[0];
-                                  if (file) {
-                                    try {
-                                      const formData = new FormData();
-                                      formData.append("file", file);
-                                      const response = await fetch("/api/user/profil/uploadImg", {
-                                        method: "POST",
-                                        body: JSON.stringify({ api_key: process.env.NEXT_PUBLIC_API_KEY, userID: userID, restaurantID: restaurantID, formData: formData }),
-                                      });
+                                  if (!file) return;
 
-                                      if (response.ok) {
-                                        const result = await response.json();
-                                        setValue(`items.${index}.image`, result.imageUrl, { shouldValidate: true, shouldDirty: true });
-                                      } else {
-                                        console.error("Upload failed");
-                                        alert("Bild-Upload fehlgeschlagen");
-                                      }
-                                    } catch (error) {
-                                      console.error("Upload error:", error);
-                                      alert("Fehler beim Hochladen des Bildes");
-                                    }
-                                  }
+                                  // nur merken — NICHT hochladen
+                                  setSelectedFiles((prev) => ({
+                                    ...prev,
+                                    [index]: file,
+                                  }));
+
+                                  // Preview anzeigen
+                                  const previewUrl = URL.createObjectURL(file);
+                                  setValue(`items.${index}.image`, previewUrl);
                                 }}
-                                className="block"
                               />
                             </FormControl>
                             {watch(`items.${index}.image`) && (
@@ -542,7 +536,9 @@ export default function PageBuilder() {
           <TableHeader>
             <TableRow>
               <TableHead></TableHead>
-              <TableHead className="text-left" style={{ fontFamily: fontNew }}>Speisen:</TableHead>
+              <TableHead className="text-left" style={{ fontFamily: fontNew }}>
+                Speisen:
+              </TableHead>
               <TableHead className="text-left">Beschreibung:</TableHead>
               <TableHead className="text-right">Preis:</TableHead>
             </TableRow>
@@ -596,37 +592,41 @@ export default function PageBuilder() {
   };
   return (
     <div className="min-h-screen">
-      <link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap'></link>
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
       <div>
-      <div className="p-1">
-        <div className="absolute top-5 flex gap-2 items-center">
-          <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>Zurück</Button>
-          <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData} />
-          <MenuEditor />
-        </div>
-        <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
-          <header className="mb-12 text-center w-full">
-            <div className="grid grid-col-1">
-              <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}</h1>
-            </div>
-            <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
-          </header>
+        <div className="p-1">
+          <div className="absolute top-5 flex gap-2 items-center">
+            <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
+              Zurück
+            </Button>
+            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData} />
+            <MenuEditor />
+          </div>
+          <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
+            <header className="mb-12 text-center w-full">
+              <div className="grid grid-col-1">
+                <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{!edditName ? <div>{serverData?.userData?.restaurant?.name ? <div>{serverData.userData.restaurant.name}</div> : null}</div> : <Input type="text" className="text-center" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />}</h1>
+              </div>
+              <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
+            </header>
 
-          <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
-            <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
+            <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
+              <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
 
-            <p className="mt-4" style={{ fontFamily: fontNew }}>Gesamtpreis:</p>
+              <p className="mt-4" style={{ fontFamily: fontNew }}>
+                Gesamtpreis:
+              </p>
 
-            <details className="mt-8">
-              <summary >Debug Data</summary>
-              <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
-            </details>
-          </main>
+              <details className="mt-8">
+                <summary>Debug Data</summary>
+                <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
+              </details>
+            </main>
+          </div>
+          <div className="fixed bottom-6 left-6 z-20">
+            <Button onClick={() => submitData()}>Speichern (Server)</Button>
+          </div>
         </div>
-        <div className="fixed bottom-6 left-6 z-20">
-          <Button onClick={() => submitData()}>Speichern (Server)</Button>
-        </div>
-      </div>
       </div>
     </div>
   );
