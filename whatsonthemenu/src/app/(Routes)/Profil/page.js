@@ -29,6 +29,7 @@ import { EdditCategoryMenu } from "./components/edditCategoryWin";
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
 const schnitzel = require("./img/SchnitzelMitSpätzle.jpg");
+//const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 export default function PageBuilder() {
   const searchParams = useSearchParams();
@@ -139,32 +140,34 @@ export default function PageBuilder() {
 
   const onSubmit = async (data) => {
     // Upload selected images and update data with filePaths
-    const updatedItems = await Promise.all(data.items.map(async (item, index) => {
-      if (selectedFiles[index]) {
-        try {
-          const formData = new FormData();
-          formData.append("file", selectedFiles[index]);
-          const response = await fetch(`/api/restaurant/${restaurantID}/Images/uploadImg`, {
-            method: "POST",
-            body: formData,
-          });
+    const updatedItems = await Promise.all(
+      data.items.map(async (item, index) => {
+        if (selectedFiles[index]) {
+          try {
+            const formData = new FormData();
+            formData.append("file", selectedFiles[index]);
+            const response = await fetch(`/api/restaurant/${restaurantID}/Images/uploadImg`, {
+              method: "POST",
+              body: formData,
+            });
 
-          if (response.ok) {
-            const result = await response.json();
-            return { ...item, image: result.filePath };
-          } else {
-            console.error("Upload failed for item", index);
-            alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
+            if (response.ok) {
+              const result = await response.json();
+              return { ...item, image: result.filePath };
+            } else {
+              console.error("Upload failed for item", index);
+              alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
+              return item;
+            }
+          } catch (error) {
+            console.error("Upload error for item", index, error);
+            alert(`Fehler beim Hochladen des Bildes für Gericht ${index + 1}`);
             return item;
           }
-        } catch (error) {
-          console.error("Upload error for item", index, error);
-          alert(`Fehler beim Hochladen des Bildes für Gericht ${index + 1}`);
-          return item;
         }
-      }
-      return item;
-    }));
+        return item;
+      })
+    );
 
     const updatedData = { ...data, items: updatedItems };
     submitToServer(updatedData);
@@ -451,6 +454,10 @@ export default function PageBuilder() {
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
+    const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
+    const [changedItems, setChangedItems] = useState([]);
+    const [changedCategories, setChangedCategories] = useState([]);
+    const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
     const [edditCategoryData, setEdditCategoryData] = useState([
       {
         color: "",
@@ -459,10 +466,6 @@ export default function PageBuilder() {
         boder: "",
       },
     ]);
-    const [itemData, setItemData] = useState({ id: "", name: "", price: 0, description: "" });
-    const [changedItems, setChangedItems] = useState([]);
-    const [changedCategories, setChangedCategories] = useState([]);
-    const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
 
     const openMenuItemEddit = (id, name, price, description) => {
       var newEddit = {
@@ -577,7 +580,7 @@ export default function PageBuilder() {
                 {expandedIndex === index && (
                   <TableRow>
                     <TableCell colSpan={4} className="px-6 py-4">
-                      <Image src={schnitzel} alt="" />
+                      {item.imageUrl? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
                     </TableCell>
                   </TableRow>
                 )}
