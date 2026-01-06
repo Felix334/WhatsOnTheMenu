@@ -10,7 +10,7 @@ Die AGBs als PDF speichern/herrunterladen können
 
 
 => Fonts Fertig stellen
-
+=> Bilder werden nicht richtig gelöscht => Die Datei bleibt nur der DB Eintrag wird entfernt
 
 
 => Wenn der Benutzer eine Seite lädt bei der Benutzer angezeigt werden(Admin Konsole, Unsere Partner)
@@ -29,10 +29,6 @@ nochmal neu geladen(es sei denn es gab einen Fehler)
 DB ändern => Restauran an die Location binden => User => Restaurant => Location[] => Menü
 
 In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
-
-Wenn das "Bild-Speicher" System fertig ist eine Möglichkeit finden den Speicher
-bei Anderungen zu aktualsieren
-
 
 => Ein Email-Postfach einrichten und email Adresse überall einfügen(z.B. in die AGBs)
 => Eine Email-Bestätigung für die erfolgreiche Registrierung(auch bei der Restaurant Registrierung)
