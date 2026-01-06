@@ -504,20 +504,6 @@ export default function PageBuilder() {
     const deleteCategory = () => {
       if (window.confirm("Sind Sie sicher, dass Sie diese gesamte Kategorie löschen möchten?")) {
         setDeletedCategories((prev) => [...prev, categoryId]);
-        // Optionally, remove from UI immediately
-        // setServerData((prev) => ({
-        //   ...prev,
-        //   userData: {
-        //     ...prev,
-        //     restaurant: {
-        //       ...prev.userData.restaurant,
-        //       menu: prev.userData.restaurant.menu.map((menu) => ({
-        //         ...menu,
-        //         categories: menu.categories.filter((cat) => cat.id !== categoryId),
-        //       })),
-        //     },
-        //   },
-        // }));
       }
     };
 
