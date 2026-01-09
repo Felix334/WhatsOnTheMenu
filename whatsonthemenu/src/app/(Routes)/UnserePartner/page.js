@@ -81,7 +81,11 @@ export default function RestaurantList() {
     }
   }, []);
 
-  useEffect;
+  useEffect(() =>{
+    const getRestaurants = async () => {
+      var resp = await fetch()
+    }
+  } ,[]);
 
   // Prompt only if no permission
   useEffect(() => {

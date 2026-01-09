@@ -567,6 +567,7 @@ export default function PageBuilder() {
                   <TableRow>
                     <TableCell colSpan={4} className="px-6 py-4">
                       {item.imageUrl? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
+                      <Image  src={"/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/WhatsApp Image 2026-01-03 at 23.36.00.jpeg"} alt="Test" width={2000} height={2000}/>
                     </TableCell>
                   </TableRow>
                 )}

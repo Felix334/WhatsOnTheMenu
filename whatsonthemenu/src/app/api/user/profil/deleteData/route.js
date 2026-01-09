@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 import * as CryptoJS from "crypto-js";
 import { setup_logger } from "@/logger";
 import path from "path";
-import { unlink } from "fs/promises";
+import { unlink, access } from "fs/promises";
 
 const prisma = new PrismaClient();
 const logger = setup_logger();
@@ -83,6 +83,7 @@ export async function POST(req) {
         );
 
         try {
+          await access(filePath);
           await unlink(filePath);
         } catch (err) {
           // Ignore "file not found"
