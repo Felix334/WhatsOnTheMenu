@@ -4,184 +4,190 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { LoadCoordinates } from "/components";
-
-const restaurants = [
-  {
-    id: "cmd4qojb6000255q0j5295w2o",
-    name: "Mein Restaurant",
-    cuisine: "French",
-    rating: 4.7,
-    priceRange: "1€-20€",
-    isNew: true,
-  },
-  {
-    id: "2eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    name: "Tokyo Sushi Bar",
-    cuisine: "Japanese",
-    rating: 4.5,
-    priceRange: "1€-20€",
-  },
-  {
-    id: "3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    name: "La Piazza",
-    cuisine: "Italian",
-    rating: 4.3,
-    priceRange: "1€-20€",
-  },
-  {
-    id: "4eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    name: "Burger Joint",
-    cuisine: "American",
-    rating: 4.1,
-    priceRange: "1€-20€",
-  },
-];
-
-/*TODO: Eine bestimmte Anazhl wird gesucht und die Menge wird gemerkt => Wennd er User scrollt
-wird die Anzahl gesendet => An DB und diese wird geskippt (take:10, skip: {skips}*/
 
 export default function RestaurantList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("Alle");
+  const [restaurantList, setRestaurantList] = useState([]);
   const [allowGeoLocation, setAllowGeoLocation] = useState(false);
-  const [reqCookie, setReqcookie] = useState(false);
+  const [reqCookie, setReqCookie] = useState(false);
   const [setTrue, setSetTrue] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
   const autherizedUser = userID && (role === "Owner" || role === "Admin");
 
+  /* ---------------- URL userID sync ---------------- */
+
   useEffect(() => {
     if (userID && !setTrue) {
       const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set("userID", userID); // Add or update userID
-      const newUrl = `${pathname}?${newSearchParams.toString()}`;
-      router.replace(newUrl);
+      newSearchParams.set("userID", userID);
+      router.replace(`${pathname}?${newSearchParams.toString()}`);
       setSetTrue(true);
     }
   }, [userID, setTrue, router, pathname, searchParams]);
 
+  /* ---------------- Cookie check ---------------- */
+
   useEffect(() => {
-    const consent = document.cookie.split("; ").find((row) => row.startsWith("geoLocation="));
-    if (consent?.split("=")[1] === "true") {
-      setAllowGeoLocation(true);
-    } else {
-      setAllowGeoLocation(false);
-    }
+    const consent = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("geoLocation="));
+
+    setAllowGeoLocation(consent?.split("=")[1] === "true");
   }, []);
 
-  useEffect(() =>{
-    const getRestaurants = async () => {
-      var resp = await fetch()
-    }
-  } ,[]);
+  /* ---------------- Fetch Restaurants ---------------- */
 
-  // Prompt only if no permission
   useEffect(() => {
-    if (!reqCookie) {
-      if (allowGeoLocation === false) {
-        const confirmConsent = window.confirm("Kein genauer Standort verfügbar.\nMöchten Sie Cookies zulassen, um Standortdaten zu aktivieren?");
-        if (confirmConsent) {
-          const expiry = new Date();
-          expiry.setFullYear(expiry.getFullYear() + 1);
-          document.cookie = `geoLocation=true; expires=${expiry.toUTCString()};`;
-          setAllowGeoLocation(true);
-        }
+    const getRestaurants = async () => {
+      try {
+        const resp = await fetch("/api/restaurant/List", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!resp.ok) return;
+
+        const result = await resp.json();
+
+        setRestaurantList(
+          result.data.map((r) => ({
+            id: r.id,
+            name: r.name,
+            cuisine: r.cuisine || "Unbekannt",
+            rating: 0,
+            priceRange: "—",
+            isNew: false,
+          }))
+        );
+      } catch (error) {
+        console.error("Fetch error:", error);
       }
+    };
+
+    getRestaurants();
+  }, []);
+
+  /* ---------------- Cookie Prompt ---------------- */
+
+  useEffect(() => {
+    if (!reqCookie && !allowGeoLocation) {
+      const confirmConsent = window.confirm(
+        "Kein genauer Standort verfügbar.\nMöchten Sie Cookies zulassen, um Standortdaten zu aktivieren?"
+      );
+
+      if (confirmConsent) {
+        const expiry = new Date();
+        expiry.setFullYear(expiry.getFullYear() + 1);
+        document.cookie = `geoLocation=true; expires=${expiry.toUTCString()};`;
+        setAllowGeoLocation(true);
+      }
+
+      setReqCookie(true);
     }
-    setReqcookie(true);
   }, [allowGeoLocation, reqCookie]);
 
-  const cuisines = ["Alle", "Französisch", "Asiatisch", "Italienisch", "Americanisch", "FastFood"];
+  /* ---------------- Filters ---------------- */
 
-  const filteredRestaurants = restaurants.filter((restaurant) => {
-    const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCuisine = selectedCuisine === "Alle" || restaurant.cuisine === selectedCuisine;
+  const cuisines = [
+    "Alle",
+    "Französisch",
+    "Asiatisch",
+    "Italienisch",
+    "Americanisch",
+    "FastFood",
+  ];
+
+  const filteredRestaurants = restaurantList.filter((restaurant) => {
+    const matchesSearch = restaurant.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesCuisine =
+      selectedCuisine === "Alle" ||
+      restaurant.cuisine === selectedCuisine;
+
     return matchesSearch && matchesCuisine;
   });
 
+  /* ---------------- Geolocation ---------------- */
+
   const checkCoordinates = () => {
     if (!navigator.geolocation) {
-      window.alert("Oops! \nWie es scheint, unterstützt Ihr Browser keine Standortermittlung! \nVerwenden Sie einen anderen Internetbrowser, um alle Funktionen unserer Seite nutzen zu können.");
+      alert("Ihr Browser unterstützt keine Standortermittlung.");
       return;
     }
 
-    // Geht nur in localhost oder mit https
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-        console.log("Koordinaten:", lat, long);
+      (pos) => {
+        console.log(
+          "Koordinaten:",
+          pos.coords.latitude,
+          pos.coords.longitude
+        );
       },
-      (error) => {
-        switch (error.code) {
-          case 1:
-            alert("Standortzugriff verweigert. Bitte erlauben Sie den Zugriff in Ihren Browsereinstellungen und laden Sie die Seite neu.");
-            break;
-          case 2:
-            alert("Standort konnte nicht ermittelt werden. Überprüfen Sie Ihre GPS-Einstellungen.");
-            break;
-          case 3:
-            alert("Zeitüberschreitung bei der Standortermittlung. Versuchen Sie es erneut.");
-            break;
-          default:
-            console.error("Unbekannter Fehler:", error);
-        }
+      (err) => {
+        alert("Standort konnte nicht ermittelt werden.");
+        console.error(err);
       },
       { timeout: 10000 }
     );
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        var resp = await fetch("/api/restaurant/List", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (resp.status === 401) {
-          console.log(status);
-        }
-        if(resp.status === 200){
-          console.log("Success:", status)
-        }
-        console.log("error", resp.status)
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getData();
-  });
+  /* ---------------- Render ---------------- */
 
   return (
     <div className="min-h-screen w-full">
       <div className="container mx-auto py-8">
         <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
           <div className="fixed right-2">
-            <Button onClick={checkCoordinates}></Button>
+            <Button onClick={checkCoordinates}>📍</Button>
           </div>
-          <Input placeholder="Suchen" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="md:w-1/3 bg-amber-50" />
+
+          <Input
+            placeholder="Suchen"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="md:w-1/3 bg-amber-50"
+          />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full md:w-auto">
+              <Button variant="outline">
                 Kategorien: {selectedCuisine}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {cuisines.map((cuisine) => (
-                <DropdownMenuItem key={cuisine} onSelect={() => setSelectedCuisine(cuisine)}>
+                <DropdownMenuItem
+                  key={cuisine}
+                  onSelect={() => setSelectedCuisine(cuisine)}
+                >
                   {cuisine}
                 </DropdownMenuItem>
               ))}
@@ -191,36 +197,34 @@ export default function RestaurantList() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRestaurants.map((restaurant) => (
-            <Card key={restaurant.id} className="hover:shadow-lg transition-shadow">
+            <Card key={restaurant.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle>{restaurant.name}</CardTitle>
                   {restaurant.isNew && (
-                    <Badge variant="secondary" className="ml-2">
-                      New
-                    </Badge>
+                    <Badge variant="secondary">New</Badge>
                   )}
                 </div>
                 <CardDescription>
                   {restaurant.cuisine} • {restaurant.priceRange}
                 </CardDescription>
               </CardHeader>
+
               <CardContent>
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-500">★</span>
                   <span>Bewertung: {restaurant.rating}</span>
-                  <span>Preise: {restaurant.priceRange}</span>
                 </div>
               </CardContent>
+
               <CardFooter className="flex justify-end">
                 <Button variant="outline" asChild>
                   <Link
                     href={{
                       pathname: "/UnserePartner/Restaurants/Menu",
                       query: {
-                        ...router.query,
                         ...(userID ? { userID } : {}),
-                        ...(restaurant.id ? { restaurantID: restaurant.id } : {}),
+                        restaurantID: restaurant.id,
                       },
                     }}
                   >
@@ -233,18 +237,11 @@ export default function RestaurantList() {
         </div>
 
         {filteredRestaurants.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No restaurants found matching your criteria</p>
-          </div>
+          <p className="text-center py-12 text-muted-foreground">
+            Keine Restaurants gefunden
+          </p>
         )}
       </div>
     </div>
   );
-}
-
-function getGeoLocation() {
-  var confGeo = window.confirm("Diese Webseite benutzt Cookies um ihren Standort zu erfassen! \nIn dem sie zustimmen können wir ihre Ergebnisse besser personaliesieren");
-  if (!navigator.geolocation) {
-    window.alert("Geographische Daten nicht verfügbar");
-  }
 }

@@ -18,7 +18,6 @@ export async function POST(req, { params }) {
         owner: { select: { name: true, email: true, role: true } },
         menu: {
           include: {
-            font: true,
             categories: {
               include: {
                 dishes: {
@@ -28,7 +27,7 @@ export async function POST(req, { params }) {
                   }
                 }
               }
-            }
+            },
           }
         },
         locations: { include: { reservation: true } }

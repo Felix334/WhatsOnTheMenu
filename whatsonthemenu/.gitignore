@@ -53,6 +53,7 @@ package-lock.json
 prisma/migrations/
 prisma/seedPrisma.js
 prisma/schema.prisma
+generated
 
 # Drawio
 /Roadmap.drawio

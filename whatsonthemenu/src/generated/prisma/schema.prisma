@@ -1,12 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -15,14 +11,51 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  email        String   @unique
-  passwordHash String
-  sessionID    String?
-  session      Session? @relation(fields: [sessionID], references: [id])
-  role         Role
-  createdAt    DateTime @default(now())
+  id            String      @id @default(cuid())
+  name          String
+  email         String      @unique
+  emailVerified DateTime?
+  password      String?
+  role          Role        @default(User)
+  session       Session?
+  restaurant    Restaurant?
+  accounts      Account[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  image         String
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String? @db.Text
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 enum Role {
@@ -31,93 +64,90 @@ enum Role {
   Owner
 }
 
-model Session {
-  id     String   @id @default(cuid())
-  users  User[]
-  timeIn DateTime
-}
-
 model Restaurant {
-  id             String         @id @default(cuid())
-  name           String
-  parentCompName String
-  parentCompID   String
-  menuId         String         @unique
-  menu           Menu?          @relation(name: "MenuRel")
-  memberSince    DateTime       @default(now())
-  locationID     String         @unique
-  location       Location[]     @relation(name: "locationRest")
-  reservierungen Reservierung[] @relation(name: "reservierung")
+  id            String     @id @default(cuid())
+  name          String
+  parentCompany String
+  ownerId       String     @unique
+  owner         User       @relation(fields: [ownerId], references: [id])
+  menu          Menu[] // A restaurant can have zero or multiple menus
+  locations     Location[]
+  createdAt     DateTime   @default(now())
 }
 
 model Location {
-  id           String        @id @default(cuid())
+  id           String       @id @default(cuid())
   street       String
   houseNumber  String
-  town         String
-  postcode     String
+  city         String
+  postalCode   String
   country      String
-  restaurantID String        @unique
-  restaurant   Restaurant    @relation(name: "locationRest", fields: [restaurantID], references: [id])
-  reservierung Reservierung? @relation(name: "reservierungLoc")
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  reservation  Reservation?
 }
 
-model Reservierung {
-  id           String     @id @default(cuid())
-  locationID   String     @unique
-  restaurantID String
-  location     Location   @relation(name: "reservierungLoc", fields: [locationID], references: [id])
-  restaurant   Restaurant @relation(name: "reservierung", fields: [restaurantID], references: [id])
-  phoneNum     String
+model Reservation {
+  id          String   @id @default(cuid())
+  locationId  String   @unique
+  phoneNumber String
+  location    Location @relation(fields: [locationId], references: [id])
+  createdAt   DateTime @default(now())
 }
 
 model Menu {
-  id           String      @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
   description  String?
-  kategorien   Kategorie[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  restaurantID String      @unique
-  restaurant   Restaurant  @relation(name: "MenuRel", fields: [restaurantID], references: [id])
+  restaurantId String // A menu belongs to one restaurant
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  categories   Category[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  bgColor      String
+  font         String
+  dishes       Dish[]
 }
 
-model Kategorie {
-  id          String    @id @default(cuid())
+model Category {
+  id          String  @id @default(cuid())
   name        String
   description String?
+  position    Int?
+  menuId      String?
+  menu        Menu?   @relation(fields: [menuId], references: [id])
+  dishes      Dish[]
+}
+
+model Dish {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal      @db.Decimal(10, 2)
+  imageUrl    String
+  categoryId  String?
   menuId      String
-  menu        Menu      @relation(fields: [menuId], references: [id])
-  gerichte    Gericht[]
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  menu        Menu         @relation(fields: [menuId], references: [id])
+  ingredients Ingredient[] @relation("DishIngredients")
+  reviews     Review[]     @relation("DishReviews")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
-model Gericht {
-  id          String      @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  kategorieId String
-  kategorie   Kategorie   @relation(fields: [kategorieId], references: [id])
-  zutaten     Zutat[]     @relation("GerichtZutaten")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  bewertungen Bewertung[] @relation("Bewertung Gericht")
-  img         String
-}
-
-model Zutat {
-  id         String    @id @default(cuid())
+model Ingredient {
+  id         String  @id @default(cuid())
   name       String
-  isAllergen Boolean   @default(false)
-  gerichte   Gericht[] @relation("GerichtZutaten")
+  isAllergen Boolean @default(false)
+  dishes     Dish[]  @relation("DishIngredients")
 }
 
-model Bewertung {
+model Review {
   id        String   @id @default(cuid())
-  gerichtId String
-  bewertung Int      @default(0)
-  kommentar String?
+  dishId    String
+  rating    Float    @default(0)
+  comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  gericht   Gericht  @relation("Bewertung Gericht", fields: [gerichtId], references: [id])
+  dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
 }

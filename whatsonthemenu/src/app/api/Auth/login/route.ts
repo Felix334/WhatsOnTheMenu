@@ -116,6 +116,11 @@ async function main(data: AuthData): Promise<MainResult> {
       return null;
     }
 
+    if (!user.password) {
+      console.log("User has no password set");
+      return null;
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       console.log("Password mismatch");

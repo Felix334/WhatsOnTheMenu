@@ -4,16 +4,31 @@ import { getSession } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { error } from "console";
+import { AwardIcon } from "lucide-react";
 
 const prisma = new PrismaClient();
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
+  /*const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  }*/
 
-  // dein Code hier
-  return NextResponse.json({ success: true });
+  const data = await readDB()
+  return NextResponse.json({status: 200, data: data})
+}
+
+async function readDB() {
+  try{
+      const restaurantList = await prisma.restaurant.findMany()
+  if(!restaurantList){
+    return null
+  }
+  return restaurantList;
+  }catch(err){
+    console.error(err)
+  }finally{
+    await prisma.$disconnect();
+  }
 }
