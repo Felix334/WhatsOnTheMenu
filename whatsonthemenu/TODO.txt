@@ -26,7 +26,8 @@ Dann wird in der DB eine bestimmte Anzahl genommen und nur eine bestimmte Anzahl
 => Sendet dann bereits gesuchte Anzahl
 => in der Datenbank => skip für Anzahl der gesuchten Ergbinsse
 
-
+=> Restaurant-Besitzer mit Google Place bestätigen?
+=> Bei der Registrierung darauf hinweisen dass das Buissnes Konto verwendet werden soll
 
 wenn der Benutzer zum ersten mal eine Karte lädt dann wird ein Zeitpunkt gespeichert und wenn der Nutzer
 die Seite neu lädt(aber Daten vorhanden sind) wird nur gecheckt ob es eine Änderung gab und nicht alles

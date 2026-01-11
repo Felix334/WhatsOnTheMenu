@@ -114,7 +114,7 @@ export default function Home({ renderLogin, userID, role }) {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google");
+    signIn("google", { callbackUrl: "/" });
   };
 
   // -----------------------------------

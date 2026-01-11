@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -10,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Menu, Users, UserPlus, Settings, Activity, Plus } from "lucide-react";
+import { Menu, Users, UserPlus, Settings, Activity, Plus, Mail, Landmark } from "lucide-react";
 
 export default function AdminConsole() {
   const [search, setSearch] = useState("");
@@ -26,7 +27,7 @@ export default function AdminConsole() {
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
-  const autherizedUser = userID && (role === "Owner" || role === "Admin");
+  const autherizedUser = userID && (role === "Admin");
 
   // Update URL with userID
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function AdminConsole() {
 
   // Fetch user list after authentication
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (status !== "authenticated" && !autherizedUser) return;
 
     const getUserList = async () => {
       try {
@@ -88,7 +89,8 @@ export default function AdminConsole() {
         </div>
         <nav className="flex flex-col gap-2">
           <Button variant="ghost" className="justify-start gap-2">
-            <Activity className="w-4 h-4" /> Dashboard
+            <Activity className="w-4 h-4"></Activity>
+            <Link href="./">Dashboard</Link>
           </Button>
           <Button variant="ghost" className="justify-start gap-2">
             <Users className="w-4 h-4" /> Users
@@ -98,6 +100,12 @@ export default function AdminConsole() {
           </Button>
           <Button variant="ghost" className="justify-start gap-2">
             <UserPlus className="w-4 h-4" /> Anfragen
+          </Button>
+          <Button variant="ghost" className="justify-start gap-2">
+            <Mail className="w-4 h-4" /> Nachrichten
+          </Button>
+          <Button variant="ghost" className="justify-start gap-2">
+            <Landmark className="w-4 h-4" /> Finanzen
           </Button>
         </nav>
       </aside>

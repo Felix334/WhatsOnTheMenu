@@ -10,26 +10,22 @@ export async function middleware(req) {
   }
 
   // 🔑 nur Secret aus ENV — kein authOptions!
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (pathname.startsWith("/Protected") && !token) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  if (pathname.startsWith("/Protected") && !token) return NextResponse.redirect(new URL("/login", req.url));
 
   if (pathname.startsWith("/Admin")) {
-    if (!token) return NextResponse.redirect(new URL("/login", req.url));
-    if (token.role !== "Admin")
-      return NextResponse.redirect(new URL("/", req.url));
+    if (!token || token.role !== "Admin") return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (pathname.startsWith("/Profil")) {
+    if (!token || token.role !== "Owner") return NextResponse.redirect(new URL("/", req.url));
   }
 
   const res = NextResponse.next();
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
   return res;
 }
 
