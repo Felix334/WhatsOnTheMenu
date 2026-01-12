@@ -12,10 +12,10 @@ export async function middleware(req) {
   // 🔑 nur Secret aus ENV — kein authOptions!
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (pathname.startsWith("/Protected") && !token) return NextResponse.redirect(new URL("/login", req.url));
+  if (pathname.startsWith("/Protected") && !token) return NextResponse.redirect(new URL("/", req.url));
 
   if (pathname.startsWith("/Admin")) {
-    if (!token || token.role !== "Admin") return NextResponse.redirect(new URL("/login", req.url));
+    if (!token || token.role !== "Admin") return NextResponse.redirect(new URL("/", req.url));
   }
 
   if (pathname.startsWith("/Profil")) {

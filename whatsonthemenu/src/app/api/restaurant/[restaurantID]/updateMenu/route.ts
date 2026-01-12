@@ -1,51 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-import { NextAuthHandlerParams } from 'next-auth/core'
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { NextAuthHandlerParams } from "next-auth/core";
+import { getServerSession } from "next-auth";
+import { authOptions } from "src/lib/auth";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { restaurantID: string } }
-) {
-  const { restaurantID } = await params
+export async function GET(req: NextRequest, { params }: { params: { restaurantID: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.role !== "Owner") {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const { restaurantID } = await params;
 
   if (!restaurantID) {
-    return NextResponse.json({ message: 'Invalid restaurant ID' }, { status: 400 })
+    return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
   }
 
   try {
     const menu = await prisma.menu.findFirst({
       where: { restaurantId: restaurantID },
-    })
+    });
 
     if (!menu) {
-      return NextResponse.json({ message: 'Menu not found' }, { status: 404 })
+      return NextResponse.json({ message: "Menu not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Menu data retrieved', data: menu })
+    return NextResponse.json({ message: "Menu data retrieved", data: menu });
   } catch (error) {
-    console.error(error)
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
+    console.error(error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { restaurantID: string } }
-) {
-  const { restaurantID } = await params
-  const { bgColor, font } = await req.json()
-  console.log(bgColor, font)
-
-  if (!restaurantID) {
-    return NextResponse.json({ message: 'Invalid restaurant ID' }, { status: 400 })
+export async function POST(req: NextRequest, { params }: { params: { restaurantID: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.role !== "Owner") {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  console.log("Neuer Hintergrund:", bgColor, "Neuer Font:", font)
+  const { restaurantID } = await params;
+  const { bgColor, font } = await req.json();
+  console.log(bgColor, font);
+
+  if (!restaurantID) {
+    return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
+  }
+
+  console.log("Neuer Hintergrund:", bgColor, "Neuer Font:", font);
 
   if (!bgColor || !font) {
-    return NextResponse.json({ message: 'bgColor and font are required' }, { status: 400 })
+    return NextResponse.json({ message: "bgColor and font are required" }, { status: 400 });
   }
 
   try {
@@ -55,20 +61,20 @@ export async function POST(
         bgColor,
         font,
       },
-    })
+    });
 
     if (updatedMenu.count === 0) {
-      return NextResponse.json({ message: 'Menu not found' }, { status: 404 })
+      return NextResponse.json({ message: "Menu not found" }, { status: 404 });
     }
 
     // Fetch the updated menu
     const menu = await prisma.menu.findFirst({
       where: { restaurantId: restaurantID },
-    })
+    });
 
-    return NextResponse.json({ message: 'Menu updated successfully', data: menu })
+    return NextResponse.json({ message: "Menu updated successfully", data: menu });
   } catch (error) {
-    console.error(error)
-    return NextResponse.json({ message: 'Failed to update menu' }, { status: 500 })
+    console.error(error);
+    return NextResponse.json({ message: "Failed to update menu" }, { status: 500 });
   }
 }

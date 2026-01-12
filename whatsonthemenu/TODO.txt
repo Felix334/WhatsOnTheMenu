@@ -45,5 +45,7 @@ PROXMOX => als alternative zu Docker
 => Ein Premium Feature: Statt der Vorgegeben Farbenauswahl => einen "Input type=Color" hinzufügen für 100% Kontrolle
 => Zusätzliche Premium-Funktion => Beim Hintergrund eine from-to Auswahl(Bsp:  bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200)
 
-=> NextJS-Feature: serberAction => setzt erlaubte URLs fest
+=> NextJS-Feature: serverAction => setzt erlaubte URLs fest
 => Die AGBs als PDF speichern/herrunterladen können
+
+=> Bei Admin-Zugriff die IPs speichern und bei neuer IP eine Email schicken

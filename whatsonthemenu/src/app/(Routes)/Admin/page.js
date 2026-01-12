@@ -68,7 +68,7 @@ export default function AdminConsole() {
     };
 
     getUserList();
-  }, [status, session, search]);
+  }, [status, session, search, autherizedUser]);
 
   if (!session || status === "unauthenticated") return <div>Bitte anmelden</div>;
 
@@ -88,10 +88,6 @@ export default function AdminConsole() {
           <Menu className="w-5 h-5" /> Admin
         </div>
         <nav className="flex flex-col gap-2">
-          <Button variant="ghost" className="justify-start gap-2">
-            <Activity className="w-4 h-4"></Activity>
-            <Link href="./">Dashboard</Link>
-          </Button>
           <Button variant="ghost" className="justify-start gap-2">
             <Users className="w-4 h-4" /> Users
           </Button>
