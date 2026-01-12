@@ -16,7 +16,6 @@ import { Menu, Users, UserPlus, Settings, Activity, Plus, Mail, Landmark } from 
 export default function AdminConsole() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [setTrue, setSetTrue] = useState(false);
   const [userList, setUserList] = useState([]);
   const [rolesMap, setRolesMap] = useState({}); // Stores role per user
 
@@ -27,22 +26,22 @@ export default function AdminConsole() {
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
-  const autherizedUser = userID && (role === "Admin");
+  const autherizedUser = userID && role === "Admin";
 
   // Update URL with userID
   useEffect(() => {
-    if (userID && !setTrue) {
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set("userID", userID);
-      const newUrl = `${pathname}?${newSearchParams.toString()}`;
-      router.replace(newUrl);
-      setSetTrue(true);
-    }
-  }, [userID, setTrue, router, pathname, searchParams]);
+    if (!userID) return;
+
+    const params = new URLSearchParams(searchParams);
+    if (params.get("userID") === userID) return;
+
+    params.set("userID", userID);
+    router.replace(`${pathname}?${params.toString()}`);
+  }, [userID, pathname, router, searchParams]);
 
   // Fetch user list after authentication
   useEffect(() => {
-    if (status !== "authenticated" && !autherizedUser) return;
+    if (status !== "authenticated" || !autherizedUser) return;
 
     const getUserList = async () => {
       try {
