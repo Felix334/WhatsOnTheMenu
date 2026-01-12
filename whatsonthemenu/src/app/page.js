@@ -150,10 +150,12 @@ export default function Home() {
                   <NavigationMenuList>
                     <NavigationMenuItem>
                       {status === "authenticated" && adminAcc ? (
-                      <Button variant="ghost" asChild>
-                        <Link href={{ pathname: "/Admin", query: { ...router.queryString } }}>Admin Konsole</Link>
-                      </Button>
-                      ) : (<></>)}
+                        <Button variant="ghost" asChild>
+                          <Link href={{ pathname: "/Admin", query: { ...router.queryString } }}>Admin Konsole</Link>
+                        </Button>
+                      ) : (
+                        <></>
+                      )}
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button variant="ghost" asChild>
@@ -342,26 +344,33 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <Card>
+                <Card className="flex flex-col h-full">
                   <CardHeader>
                     <CardTitle>Starter</CardTitle>
                     <div className="text-3xl font-bold text-indigo-600">Kostenlos</div>
                   </CardHeader>
-                  <CardContent>
+
+                  <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>7 Speisekarte
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Basis Templates
+                        <span className="text-green-500 mr-2">✓</span>
+                        Basis Templates
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>QR-Code
+                        <span className="text-green-500 mr-2">✓</span>
+                        QR-Code
                       </li>
                     </ul>
-                    <Button variant="secondary" asChild className="w-full">
-                      <a href="/register?plan=starter">Kostenlos starten</a>
-                    </Button>
+
+                    {/* Button nach unten drücken */}
+                    <div className="mt-auto">
+                      <Button variant="secondary" asChild className="w-full">
+                        <a href="/register?plan=starter">Kostenlos starten</a>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -402,32 +411,42 @@ export default function Home() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="flex flex-col h-full">
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
                     <div className="text-3xl font-bold text-indigo-600">Individuell</div>
                   </CardHeader>
-                  <CardContent>
+
+                  <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Alles aus Professional
+                        <span className="text-green-500 mr-2">✓</span>
+                        Alles aus Professional
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>White Label
+                        <span className="text-green-500 mr-2">✓</span>
+                        White Label
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>API Zugang
+                        <span className="text-green-500 mr-2">✓</span>
+                        API Zugang
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Priority Support
+                        <span className="text-green-500 mr-2">✓</span>
+                        Priority Support
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>QR-Code-Generierung
+                        <span className="text-green-500 mr-2">✓</span>
+                        QR-Code-Generierung
                       </li>
                     </ul>
-                    <Button asChild className="w-full">
-                      <a href="/contact">Kontakt aufnehmen</a>
-                    </Button>
+
+                    {/* Button nach unten */}
+                    <div className="mt-auto">
+                      <Button asChild className="w-full">
+                        <a href="/contact">Kontakt aufnehmen</a>
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
