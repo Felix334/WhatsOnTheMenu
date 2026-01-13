@@ -1,67 +1,68 @@
-import Link from "next/link"; import z from "zod" 
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardContent } from "@/components/ui/card"; 
-import { ScrollArea } from "@/components/ui/scroll-area"; 
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 
 import addressSchema from "./Schema/adressSchema";
-import FontSelector from "./fontList"; 
+import FontSelector from "./fontList";
 
+/* ===================== OPTION MENU ===================== */
 
-const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, userID, restaurantID, serverData }) => {
+const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, restaurantID, serverData }) => {
   const [serverData_, setServerData_] = useState(null);
   const [menuData, setMenuData] = useState(null);
   const [isEditingMenu, setIsEditingMenu] = useState(false);
   const [editedBgColor, setEditedBgColor] = useState(bgColor);
-  const [editedFont, setEditedFont] = useState();
+  const [editedFont, setEditedFont] = useState("Arial");
+
+  const { data: session } = useSession();
+  const userID = session?.user?.id;
+  const role = session?.user?.role || "";
+  const authorizedUser = userID && role === "Owner";
 
   useEffect(() => {
     setServerData_(serverData || null);
-    console.log("Daten Check: ", serverData);
   }, [serverData]);
 
   useEffect(() => {
+    if (!authorizedUser || !restaurantID) return;
+
     const fetchMenuData = async () => {
-      try {
-        const resp = await fetch(`/api/restaurant/${restaurantID}/updateMenu`);
-        if (resp.ok) {
-          const data = await resp.json();
-          setMenuData(data.data);
-          setEditedBgColor(data.data.bgColor || bgColor);
-          setEditedFont(data.data.font || "Arial");
-        } else {
-          console.error("Failed to fetch menu data");
-        }
-      } catch (error) {
-        console.error("Error fetching menu data:", error);
+      const resp = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, { credentials: "include" });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        setMenuData(data.data);
+        setEditedBgColor(data.data.bgColor || bgColor);
+        setEditedFont(data.data.font || "Arial");
       }
     };
-    if (restaurantID) {
-      fetchMenuData();
-    }
-  }, [restaurantID, bgColor]);
+
+    fetchMenuData();
+  }, [restaurantID, authorizedUser, bgColor]);
 
   const handleSaveMenu = async () => {
-    try {
-      const response = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bgColor: editedBgColor, font: editedFont }),
-      });
-      if (response.ok) {
-        const updatedData = await response.json();
-        setMenuData(updatedData.data);
-        setBgColor(editedBgColor);
-        setIsEditingMenu(false);
-      } else {
-        console.error("Failed to save menu changes", response);
-      }
-    } catch (error) {
-      console.error("Error saving menu changes:", error);
+    const response = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        bgColor: editedBgColor,
+        font: editedFont,
+      }),
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const updated = await response.json();
+      setMenuData(updated.data);
+      setBgColor(editedBgColor);
+      setIsEditingMenu(false);
     }
   };
 
@@ -70,12 +71,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
     setEditedFont(menuData?.font || "Arial");
     setIsEditingMenu(false);
   };
-
-  if (restaurantID) {
-    const url = new URL("/Profil", window.location.origin);
-    url.search = new URLSearchParams({ restaurantID }).toString();
-    console.log("Profil-URL:", url.toString());
-  }
 
   return (
     <Sheet open={openOptions} onOpenChange={setOpenOptions}>
@@ -91,50 +86,29 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
           </SheetHeader>
 
           <div className="p-4 space-y-4">
-            <div>
-              <Label>Hintergrund</Label>
-              {isEditingMenu ? (
-                <Input type="color" value={editedBgColor} onChange={(e) => setEditedBgColor(e.target.value)} />
-              ) : (
-                <Input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} disabled />
-              )}
-            </div>
+            <Label>Hintergrund</Label>
+            <Input type="color" value={isEditingMenu ? editedBgColor : bgColor} disabled={!isEditingMenu} onChange={(e) => setEditedBgColor(e.target.value)} />
 
             {isEditingMenu && (
-              <div>
+              <>
                 <Label>Schriftart</Label>
                 <FontSelector onFontChange={setEditedFont} />
-              </div>
+              </>
             )}
 
-            <div>
-              {isEditingMenu ? (
-                <>
-                  <Button onClick={handleSaveMenu} style={{ marginRight: 10 }}>Speichern</Button>
-                  <Button onClick={handleCancelMenu}>Abbrechen</Button>
-                </>
-              ) : (
-                <Button onClick={() => setIsEditingMenu(true)}>Menü bearbeiten</Button>
-              )}
-            </div>
-
-            <Button asChild>
-              <Link
-                href={{
-                  pathname: "/Profil/QRBuilder/",
-                  query: {
-                    ...router?.query,
-                    ...(userID ? { userID } : {}),
-                    ...(restaurantID ? { restaurantID } : {}),
-                  },
-                }}
-              >
-                QR-Code erstellen
-              </Link>
-            </Button>
+            {isEditingMenu ? (
+              <>
+                <Button onClick={handleSaveMenu}>Speichern</Button>
+                <Button variant="outline" onClick={handleCancelMenu}>
+                  Abbrechen
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => setIsEditingMenu(true)}>Menü bearbeiten</Button>
+            )}
           </div>
 
-          {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} />}
+          {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
         </ScrollArea>
       </SheetContent>
     </Sheet>
@@ -143,154 +117,184 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, router, 
 
 export { OptionMenu };
 
-const RestaurantData = ({ serverData, setServerData, restaurantID }) => {
+/* ===================== RESTAURANT DATA ===================== */
+
+const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => {
   const restaurant = serverData?.userData?.restaurant;
+
   const [isEditing, setIsEditing] = useState(false);
-  const [editedRestaurant, setEditedRestaurant] = useState(restaurant);
-  const [editedLocations, setEditedLocations] = useState(restaurant?.locations || []);
+  const [editedRestaurant, setEditedRestaurant] = useState(null);
+  const [editedLocations, setEditedLocations] = useState([]);
   const [errors, setErrors] = useState({});
 
-  const handleSave = async () => {
-    // Validate all locations using Zod
-    try {
-      editedLocations.forEach((loc, idx) => {
-        addressSchema.parse({
-          street: loc.street ?? "",
-          housNumber: Number(loc.houseNumber ?? 0),
-          city: loc.city ?? "",
-          postalCode: loc.postalCode ?? "",
-          country: loc.country ?? "",
-        });
-      });
-      setErrors({});
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        const fieldErrors = {};
-        err.issues.forEach((i) => {
-          fieldErrors[i.path.join(".")] = i.message;
-        });
-        setErrors(fieldErrors);
-        return;
-      }
+  useEffect(() => {
+    if (isEditing && restaurant) {
+      setEditedRestaurant(restaurant);
+      setEditedLocations(restaurant.locations ?? []);
     }
+  }, [isEditing, restaurant]);
 
-    try {
-      const response = await fetch(`/api/restaurant/${restaurantID}/updateRestaurant`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurant: editedRestaurant, locations: editedLocations }),
-      });
-
-      if (response.ok) {
-        const updatedData = await response.json();
-        setServerData(updatedData);
-        setIsEditing(false);
-      } else {
-        console.error("Failed to save changes");
-      }
-    } catch (error) {
-      console.error("Error saving changes:", error);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditedRestaurant(restaurant);
-    setEditedLocations(restaurant.locations || []);
-    setIsEditing(false);
-    setErrors({});
+  const addNewLocation = () => {
+    setEditedLocations((prev) => [
+      ...prev,
+      {
+        street: "",
+        houseNumber: "",
+        city: "",
+        postalCode: "",
+        country: "",
+      },
+    ]);
   };
 
   const updateRestaurantField = (field, value) => {
-    setEditedRestaurant({ ...editedRestaurant, [field]: value });
+    setEditedRestaurant((prev) => ({ ...prev, [field]: value }));
   };
 
   const updateLocationField = (index, field, value) => {
-    const updated = [...editedLocations];
-    updated[index] = { ...updated[index], [field]: value };
-    setEditedLocations(updated);
+    setEditedLocations((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
+    });
+  };
+
+  const handleSave = async () => {
+    console.log("Post to API");
+    const fieldErrors = {};
+
+    editedLocations.forEach((loc, index) => {
+      const result = addressSchema.safeParse({
+        street: loc.street,
+        houseNumber: Number(loc.houseNumber),
+        city: loc.city,
+        postalCode: loc.postalCode,
+        country: loc.country,
+      });
+
+      if (!result.success) {
+        console.log("Fehler in reslut:", result);
+        result.error.issues.forEach((i) => {
+          fieldErrors[`${index}.${i.path[0]}`] = i.message;
+        });
+      }
+    });
+
+    if (Object.keys(fieldErrors).length) {
+      setErrors(fieldErrors);
+      return;
+    }
+
+    const response = await fetch(`/api/restaurant/${restaurantID}/updateRestaurant`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restaurant: editedRestaurant,
+        locations: editedLocations,
+      }),
+    });
+
+    if (!response.ok) return;
+
+    const updated = await response.json();
+    setServerData(updated.data);
+    setIsEditing(false);
   };
 
   return (
-    <div className="min-h-screen bg-muted py-6 sm:py-10">
-      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <header>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Restaurantverwaltung</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">Übersicht & Bearbeitung Ihrer Restaurant-Daten</p>
-        </header>
-
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg sm:text-xl font-semibold">Restaurant-Informationen</h2>
-          </CardHeader>
-          <CardContent>
-            {isEditing ? (
-              <div className="space-y-4">
-                <div>
-                  <Label>Name</Label>
-                  <Input value={editedRestaurant?.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} className="mt-1" />
-                </div>
-                <div>
-                  <Label>Muttergesellschaft</Label>
-                  <Input value={editedRestaurant?.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} className="mt-1" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm"><span className="font-medium">Besitzer:</span> {editedRestaurant?.owner?.name || "Unbekannt"} — nicht bearbeitbar</p>
-                  <p className="text-sm"><span className="font-medium">Erstellt am:</span> {editedRestaurant?.createdAt ? new Date(editedRestaurant?.createdAt).toLocaleDateString() : "-"}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-1 text-sm">
-                <p><strong>Name:</strong> {restaurant?.name}</p>
-                <p><strong>Muttergesellschaft:</strong> {restaurant?.parentCompany}</p>
-                <p><strong>Besitzer:</strong> {restaurant?.owner?.name || "Unbekannt"}</p>
-                <p><strong>Erstellt am:</strong> {restaurant?.createdAt ? new Date(restaurant?.createdAt).toLocaleDateString() : "-"}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <h2 className="text-lg sm:text-xl font-semibold">Standorte</h2>
-          </CardHeader>
-          <CardContent>
-            {editedLocations.length === 0 ? (
-              <p className="text-muted-foreground">Keine Standorte vorhanden.</p>
-            ) : (
-              <div className="space-y-5">
-                {editedLocations.map((location, index) => (
-                  <div key={location.id || index} className="rounded-xl border p-4 bg-background space-y-3">
-                    {isEditing ? (
-                      <div className="grid grid-cols-1 gap-4">
-                        {[ ["street", "Straße"], ["houseNumber", "Hausnummer"], ["city", "Stadt"], ["postalCode", "Postleitzahl"], ["country", "Land"] ].map(([field, label]) => (
-                          <div key={field} className="space-y-1">
-                            <Label>{label}</Label>
-                            <Input className="mt-1" value={location?.[field] || ""} onChange={(e) => updateLocationField(index, field, e.target.value)} />
-                            {errors[`${field}`] && <p className="text-red-500 text-xs">{errors[`${field}`]}</p>}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p><strong>Adresse:</strong> {location?.street} {location?.houseNumber}, {location?.postalCode} {location?.city}, {location?.country}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col sm:flex-row justify-end gap-3">
+    <div className="p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold">Restaurant</h2>
+        </CardHeader>
+        <CardContent className="space-y-2">
           {isEditing ? (
             <>
-              <Button variant="outline" onClick={handleCancel} className="w-full sm:w-auto">Abbrechen</Button>
-              <Button onClick={handleSave} className="w-full sm:w-auto">Speichern</Button>
+              <Label>Name</Label>
+              <Input value={editedRestaurant?.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} />
+              <Label>Muttergesellschaft</Label>
+              <Input value={editedRestaurant?.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} />
             </>
           ) : (
-            <Button onClick={() => setIsEditing(true)} className="w-full sm:w-auto">Bearbeiten</Button>
+            <>
+              <p>
+                <strong>Name:</strong> {restaurant?.name}
+              </p>
+              <p>
+                <strong>Muttergesellschaft:</strong> {restaurant?.parentCompany}
+              </p>
+            </>
           )}
-        </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold">Standorte</h2>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {(isEditing ? editedLocations : restaurant?.locations || []).map((loc, index) => (
+            <div key={index} className="border p-4 rounded space-y-2">
+              {!isEditing && (
+                <p>
+                  <strong>Adresse:</strong> {loc.street} {loc.houseNumber} {loc.postalCode} {loc.city}, {loc.country}
+                </p>
+              )}
+
+              {/* Inputs nur im Bearbeitungsmodus */}
+              {isEditing && (
+                <>
+                  {[
+                    { value: "street", name: "Straße" },
+                    { value: "houseNumber", name: "Hausnummer" },
+                    { value: "city", name: "Stadt" },
+                    { value: "postalCode", name: "Postleitzahl" },
+                    { value: "country", name: "Land" },
+                  ].map((field) => (
+                    <div key={field.value}>
+                      <Label>{field.name}</Label>
+                      <Input value={loc[field.value] || ""} onChange={(e) => updateLocationField(index, field.value, e.target.value)} />
+                      {errors[`${index}.${field.value}`] && <p className="text-xs text-red-500">{errors[`${index}.${field.value}`]}</p>}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          ))}
+
+          {isEditing && (
+            <Button variant="secondary" onClick={addNewLocation}>
+              + Neue Adresse hinzufügen
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end gap-3">
+        {isEditing ? (
+          <>
+            <Button variant="outline" onClick={() => setIsEditing(false)}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleSave}>Speichern</Button>
+          </>
+        ) : (
+          <Button onClick={() => setIsEditing(true)}>Bearbeiten</Button>
+        )}
       </div>
+      <Button asChild>
+        <Link
+          href={{
+            pathname: "/Profil/QRBuilder/",
+            query: {
+              ...(userID && { userID }),
+              ...(restaurantID && { restaurantID }),
+            },
+          }}
+        >
+          QR-Code erstellen
+        </Link>
+      </Button>
     </div>
   );
 };

@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { NextAuthHandlerParams } from "next-auth/core";
-import { getServerSession } from "next-auth";
-import { authOptions } from "src/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest, { params }: { params: { restaurantID: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.role !== "Owner") {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "Owner") {
+    return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
   }
 
   const { restaurantID } = await params;
@@ -35,9 +34,9 @@ export async function GET(req: NextRequest, { params }: { params: { restaurantID
 }
 
 export async function POST(req: NextRequest, { params }: { params: { restaurantID: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.role !== "Owner") {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "Owner") {
+    return NextResponse.json({ message: "Unauthorized?" }, { status: 401 });
   }
 
   const { restaurantID } = await params;
@@ -46,6 +45,19 @@ export async function POST(req: NextRequest, { params }: { params: { restaurantI
 
   if (!restaurantID) {
     return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
+  }
+
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: restaurantID },
+    select: { ownerId: true }
+  });
+
+  if (!restaurant) {
+    return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
+  }
+
+  if (restaurant.ownerId !== token.id) {
+    return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
   }
 
   console.log("Neuer Hintergrund:", bgColor, "Neuer Font:", font);

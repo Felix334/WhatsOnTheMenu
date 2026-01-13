@@ -59,7 +59,7 @@ export default function PageBuilder() {
 
   const { data: session, status } = useSession();
 
-  if (status === "authenticated" && !autherized) {
+  if (status === "authenticated" && !autherized && session.user.role === "Owner") {
     console.log("Signed in as:", session.user.id);
     console.log("User Data:", session.user);
     setUserID(session.user.id);
@@ -589,7 +589,7 @@ export default function PageBuilder() {
             <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
               Zurück
             </Button>
-            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} userID={userID} restaurantID={restaurantID} serverData={serverData} />
+            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} />
             <MenuEditor />
           </div>
           <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
