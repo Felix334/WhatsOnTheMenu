@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     // --- DECRYPTION ---
     const decryptResult = await decryption(encryptedData);
-    console.log(decryptResult);
+    console.log("Decryted Result:",decryptResult);
     decryptResult ? console.log(decryptResult) : console.log("Keine Daten vorhanden")
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
@@ -127,94 +127,114 @@ export async function POST(req: NextRequest) {
 
     // --- PROCESS DATA ---
     for (const entry of parsedData) {
-      if (!entry || entry.type !== "menuSection") continue;
+      if (!entry) continue;
 
-      const section = entry.section || {};
-      const title = String(section.title ?? "").trim();
-      if (!title) continue;
+      if (entry.type === "menuSection") {
+        const section = entry.section || {};
+        const title = String(section.title ?? "").trim();
+        if (!title) continue;
 
-      const items: any[] = Array.isArray(section.items) ? section.items : [];
+        const items: any[] = Array.isArray(section.items) ? section.items : [];
 
-      // --- FIND OR CREATE CATEGORY ---
-      let category = menu.categories.find((c) => c.name === title);
+        // --- FIND OR CREATE CATEGORY ---
+        let category = menu.categories.find((c) => c.name === title);
 
-      if (!category) {
-        category = await safeDb(
-          () =>
-            prisma.category.create({
-              data: {
-                name: title,
-                description: section.description ?? null,
-                position: section.position ?? null,
-                menuId,
-              },
-              include: { dishes: true },
-            }),
-          "category.create"
-        );
+        if (!category) {
+          category = await safeDb(
+            () =>
+              prisma.category.create({
+                data: {
+                  name: title,
+                  description: section.description ?? null,
+                  position: section.position ?? null,
+                  menuId,
+                },
+                include: { dishes: true },
+              }),
+            "category.create"
+          );
 
-        menu.categories.push(category);
-      } else {
-        // Werte aus category entnehmen, BEVOR wir async/await aufrufen.
-        const { id: categoryId, description: currentDescription, position: currentPosition } = category;
+          menu.categories.push(category);
+        } else {
+          // Werte aus category entnehmen, BEVOR wir async/await aufrufen.
+          const { id: categoryId, description: currentDescription, position: currentPosition } = category;
+
+          await safeDb(
+            () =>
+              prisma.category.update({
+                where: { id: categoryId },
+                data: {
+                  description: section.description ?? currentDescription,
+                  position: section.position ?? currentPosition,
+                },
+              }),
+            "category.update"
+          );
+        }
+
+        // 🔥 FIX: ab hier ist category garantiert vorhanden – ohne Null-Typ
+
+        // --- FIX: TypeScript weiß jetzt sicher, dass category existiert ---
+        if (!category) continue;
+
+        // --- PROCESS DISHES ---
+        for (const item of items) {
+          if (!item || !item.name) continue;
+
+          const price = String(item.price).replace(",", ".");
+
+          const existingDish = category.dishes.find((d) => d.id === item.id);
+
+          if (!existingDish) {
+            const newDish = await safeDb(
+              () =>
+                prisma.dish.create({
+                  data: {
+                    name: item.name,
+                    description: item.description ?? null,
+                    price,
+                    imageUrl: item.image ?? "",
+                    categoryId: category.id,
+                    menuId,
+                  },
+                }),
+              `dish.create (${item.name})`
+            );
+
+            category.dishes.push(newDish);
+          } else {
+            await safeDb(
+              () =>
+                prisma.dish.update({
+                  where: { id: existingDish.id },
+                  data: {
+                    name: item.name,
+                    description: item.description,
+                    price,
+                    imageUrl: item.image,
+                  },
+                }),
+              `dish.update (${item.name})`
+            );
+          }
+        }
+      } else if (entry.type === "categoryUpdate") {
+        const cat = entry.category || {};
+        if (!cat.id) continue;
 
         await safeDb(
           () =>
             prisma.category.update({
-              where: { id: categoryId },
+              where: { id: cat.id },
               data: {
-                description: section.description ?? currentDescription,
-                position: section.position ?? currentPosition,
+                name: cat.name,
+                position: cat.position,
+                color: cat.color,
+                border: cat.border,
               },
             }),
-          "category.update"
+          `category.update (${cat.name})`
         );
-      }
-
-      // 🔥 FIX: ab hier ist category garantiert vorhanden – ohne Null-Typ
-
-      // --- FIX: TypeScript weiß jetzt sicher, dass category existiert ---
-      if (!category) continue;
-
-      // --- PROCESS DISHES ---
-      for (const item of items) {
-        if (!item || !item.name) continue;
-
-        const price = String(item.price).replace(",", ".");
-
-        const existingDish = category.dishes.find((d) => d.name === item.name);
-
-        if (!existingDish) {
-          const newDish = await safeDb(
-            () =>
-              prisma.dish.create({
-                data: {
-                  name: item.name,
-                  description: item.description ?? null,
-                  price,
-                  imageUrl: item.image ?? "",
-                  categoryId: category.id,
-                  menuId,
-                },
-              }),
-            `dish.create (${item.name})`
-          );
-
-          category.dishes.push(newDish);
-        } else {
-          await safeDb(
-            () =>
-              prisma.dish.update({
-                where: { id: existingDish.id },
-                data: {
-                  description: item.description ?? existingDish.description,
-                  price,
-                  imageUrl: item.image ?? existingDish.imageUrl,
-                },
-              }),
-            `dish.update (${item.name})`
-          );
-        }
       }
     }
 

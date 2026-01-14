@@ -576,7 +576,7 @@ export default function PageBuilder() {
           </TableBody>
         </Table>
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
-        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{ name: title, position: 0, color: "", border: "" }} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId} />
+        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{ name: title, position: 0, color: "", border: "", id: categoryId}} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId} />
       </Table>
     );
   };

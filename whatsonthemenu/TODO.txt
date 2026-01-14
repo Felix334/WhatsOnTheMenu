@@ -1,3 +1,11 @@
+
+
+=> Liste mit Datenbank änderungen anlegen
+
+
+
+
+
 => Bilder nur im Premium Abo => Restaurant ohne Premium kosten dann nix (SupabaseDB, Vercel)
 
 // => Bei jeder API => werden die Daten vorher richtig verarbeitet(JSON.stringify usw)?

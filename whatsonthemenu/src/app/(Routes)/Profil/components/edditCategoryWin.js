@@ -20,6 +20,7 @@ import { FaCircleInfo } from "react-icons/fa6";
 import { colors, colors_german } from "./colorPalet";
 
 import { AddNewItems } from "./addNewItem";
+import { type } from "os";
 
 //import { menuSchema, itemSchema } from "./menuSchema";
 
@@ -28,6 +29,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const [edditPos, setEdditPos] = useState(0);
   const [edditColor, setEdditColor] = useState("");
   const [edditBorder, setEdditBorder] = useState("");
+  const [ID, setID] = useState("")
   const [addItem, setAddItem] = useState([
     {
       name: "",
@@ -65,6 +67,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       setEdditPos(selectedCategory.position || 0);
       setEdditColor(selectedCategory.color || "");
       setEdditBorder(selectedCategory.border || "");
+      setID(selectedCategory.id)
       formRef.current.setValue("name", selectedCategory.name || "");
       formRef.current.setValue("position", selectedCategory.position || 0);
       formRef.current.setValue("color", selectedCategory.color || "");
@@ -76,13 +79,19 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
 
   const onSubmit = async (data) => {
     const api_key = process.env.NEXT_PUBLIC_API_KEY;
-    const categoryData = {
-      name: data.name,
-      position: data.position,
-      color: data.color,
-      border: data.border,
-      categoryId: selectedCategory.id || category.id, // Assuming categoryId is passed or from selectedCategory
-    };
+    console.log("Überprüfe Kattegorie ID vor dem senden:", category.id)
+    const categoryData = [
+      {
+        type: "categoryUpdate",
+        category: {
+          id: selectedCategory.id || category.id,
+          name: data.name,
+          position: data.position,
+          color: data.color,
+          border: data.border,
+        },
+      },
+    ];
 
     const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID_, categoryData, restaurantID_, api_key);
 
@@ -129,7 +138,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Kategorie bearbeiten</DialogTitle>
-          <DialogDescription>Kategorie bearbeiten</DialogDescription>
+          <DialogDescription>Kategoriedaten/Aussehen bearbeiten</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
