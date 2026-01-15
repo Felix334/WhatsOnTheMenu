@@ -2,10 +2,6 @@
 
 => Liste mit Datenbank änderungen anlegen
 
-
-
-
-
 => Bilder nur im Premium Abo => Restaurant ohne Premium kosten dann nix (SupabaseDB, Vercel)
 
 // => Bei jeder API => werden die Daten vorher richtig verarbeitet(JSON.stringify usw)?
@@ -57,3 +53,5 @@ PROXMOX => als alternative zu Docker
 => Die AGBs als PDF speichern/herrunterladen können
 
 => Bei Admin-Zugriff die IPs speichern und bei neuer IP eine Email schicken
+
+=> In the AGBs schreiben dass wir keine Verantwortung für Griefing oder Datenmissbrauch übernehmen

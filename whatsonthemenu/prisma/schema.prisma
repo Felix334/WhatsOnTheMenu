@@ -17,9 +17,21 @@ model User {
   emailVerified DateTime?
   password      String?
   role          Role        @default(User)
+  subscription  Subscription @default(Basic)
+  parentId      String?
+  parent        User?       @relation("UserHierarchy", fields: [parentId], references: [id])
+  children      User[]      @relation("UserHierarchy")
   session       Session?
   restaurant    Restaurant?
   accounts      Account[]
+  company       Company?   @relation("CompanyOwner")
+  employeeOf    Company?   @relation("CompanyEmployees", fields: [companyId], references: [id])
+  companyId     String?
+  dashboard     Dashboard?
+  payments      Payment[]
+  reports       Report[]
+  restaurantQueues RestaurantQueue[]
+  emails        EmailInbox[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   image         String
@@ -62,6 +74,14 @@ enum Role {
   User
   Admin
   Owner
+  Manager
+  Executive
+}
+
+enum Subscription {
+  Basic
+  Premium
+  Pro
 }
 
 model Restaurant {
@@ -114,6 +134,9 @@ model Category {
   name        String
   description String?
   position    Int?
+  bgColor     String?
+  font        String?
+  fontColor   String?
   menuId      String?
   menu        Menu?   @relation(fields: [menuId], references: [id])
   dishes      Dish[]
@@ -131,6 +154,7 @@ model Dish {
   menu        Menu         @relation(fields: [menuId], references: [id])
   ingredients Ingredient[] @relation("DishIngredients")
   reviews     Review[]     @relation("DishReviews")
+  reports     Report[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -150,4 +174,70 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
+}
+
+model RestaurantQueue {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  status      String   @default("pending") // pending, approved, rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  ownerId     String   @unique
+  owner       User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  employees   User[]   @relation("CompanyEmployees")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Dashboard {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  data      Json?    // Store dashboard data as JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("EUR")
+  status      String   @default("pending") // pending, completed, failed
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  dishId    String?
+  dish      Dish?    @relation(fields: [dishId], references: [id])
+  reason    String
+  details   String?
+  status    String   @default("open") // open, resolved
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailInbox {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  subject   String
+  body      String
+  from      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
