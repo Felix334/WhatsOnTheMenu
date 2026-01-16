@@ -11,6 +11,7 @@
     "strict": true,
     "noEmit": true,
     "incremental": true,
+    "types": "module",
     "module": "esnext",
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -32,7 +33,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/middleware.js", "src/app/api/user/profil/setData/route.ts", "src/app/(Routes)/TestScanner/page.jsx"  ],
+, "src/middleware.js", "src/app/api/user/profil/setData/route.ts", "src/app/(Routes)/TestScanner/page.jsx", "prisma/prisma.config.ts"  ],
   "exclude": [
     "node_modules"
   ]
