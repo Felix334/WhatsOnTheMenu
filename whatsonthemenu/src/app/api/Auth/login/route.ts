@@ -1,9 +1,30 @@
+/*
+import { NextRequest, NextResponse } from "next/server"; import { PrismaClient } from "generated/prisma/client"; import * as CryptoJS from "crypto-js"; import NextAuth from "next-auth"; import GithubProvider from "next-auth/providers/github"; import EmailProvider from "next-auth/providers/email"; import GoogleProvider from "next-auth/providers/google"; import FacebookProvider from "next-auth/providers/facebook"; import CredentialsProvider from "next-auth/providers/credentials"; import { PrismaAdapter } from "@next-auth/prisma-adapter"; //import { prisma } from "@/lib/prisma"; import bcrypt from "bcryptjs";
+*/
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import * as CryptoJS from "crypto-js";
+import { PrismaClient } from "generated/prisma/client";
+import CryptoJS from "crypto-js";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+/* ------------------------------------------------------------------ */
+/* Prisma Client (Accelerate)                                          */
+/* ------------------------------------------------------------------ */
+
+const accelerateUrl = process.env.DATABASE_URL;
+
+if (!accelerateUrl) {
+  console.error("USERNAME_LOGIN: DATABASE_URL is not defined");
+  throw new Error("USERNAME_LOGIN: DATABASE_URL is not defined");
+}
+
+const prisma = new PrismaClient({
+  accelerateUrl,
+  errorFormat: "pretty",
+});
+
+/* ------------------------------------------------------------------ */
+/* Types                                                               */
+/* ------------------------------------------------------------------ */
 
 interface EncryptedData {
   encrypted_email: string;
@@ -18,121 +39,118 @@ interface AuthData {
   userIP: string;
 }
 
-type MainResult =
-  | { userID: string; role: string }
-  | { error: string; status: number }
-  | null;
+type MainResult = { userID: string; role: string } | { error: string; status: number };
 
-// Type guard to check if result is a success object
-function isSuccessResult(result: MainResult): result is { userID: string; role: string } {
-  return result !== null && "userID" in result && "role" in result;
-}
-
-// Type guard to check if result is an error object
-function isErrorResult(result: MainResult): result is { error: string; status: number } {
-  return result !== null && "error" in result && "status" in result;
-}
+/* ------------------------------------------------------------------ */
+/* POST Handler                                                        */
+/* ------------------------------------------------------------------ */
 
 export async function POST(req: NextRequest) {
   try {
-    const encrypted_data: EncryptedData = await req.json();
-    if (!encrypted_data) {
-      return NextResponse.json({ message: "No data received" }, { status: 400 });
+    const encryptedData: EncryptedData = await req.json();
+
+    const decrypted = decrypt(encryptedData);
+    if ("status" in decrypted) {
+      return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
-    const decrypted = await decrypt(encrypted_data);
-    const { email, password, userIP, status } = decrypted;
-    if (status === 401) {
-      return NextResponse.json({ status: 401, message: "Not Authorized" });
+    const result = await main(decrypted);
+
+    if ("error" in result) {
+      return NextResponse.json({ message: result.error }, { status: result.status });
     }
 
-    const result: MainResult = await main({ email, password, userIP });
-    if (isSuccessResult(result)) {
-      // Instead of setting cookie manually, return success message and user info
-      return NextResponse.json({
-        message: "Login Successful",
-        id: result.userID,
-        role: result.role,
-      });
-    } else {
-      let errorMessage = "Login Failed";
-      let errorStatus = 401;
-      if (isErrorResult(result)) {
-        errorMessage = result.error;
-        errorStatus = result.status;
-      }
-      return NextResponse.json(
-        {
-          message: errorMessage,
-          databaselog: { message: errorMessage, status: errorStatus },
-        },
-        { status: 401 }
-      );
-    }
-  } catch (error) {
-    console.error("Error in POST handler:", error);
+    return NextResponse.json({
+      message: "Login Successful",
+      id: result.userID,
+      role: result.role,
+    });
+  } catch (err) {
+    console.error("USERNAME_LOGIN ERROR:", err);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
-async function decrypt(data: EncryptedData): Promise<AuthData & { status?: number }> {
-  const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-  if (!encryptionKey) {
-    console.error("Encryption key is missing from environment variables");
-    return { email: "", password: "", userIP: "", status: 500 };
+/* ------------------------------------------------------------------ */
+/* Decrypt                                                             */
+/* ------------------------------------------------------------------ */
+
+function decrypt(data: EncryptedData): AuthData | { status: 401 } {
+  const encryptionKey = process.env.ENCRYPTION_KEY;
+  const apiKey = process.env.INTERNAL_API_KEY;
+
+  if (!encryptionKey || !apiKey) {
+    console.error("Missing ENCRYPTION_KEY or INTERNAL_API_KEY");
+    return { status: 401 };
   }
 
-  const { encrypted_email, encrypted_password, encrypted_IP, encrypted_API_KEY } = data;
+  const email = CryptoJS.AES.decrypt(data.encrypted_email, encryptionKey).toString(CryptoJS.enc.Utf8);
 
-  const emailBytes = CryptoJS.AES.decrypt(encrypted_email, encryptionKey);
-  const passwordBytes = CryptoJS.AES.decrypt(encrypted_password, encryptionKey);
-  const userIPBytes = CryptoJS.AES.decrypt(encrypted_IP, encryptionKey);
-  const keyBytes = CryptoJS.AES.decrypt(encrypted_API_KEY, encryptionKey);
+  const password = CryptoJS.AES.decrypt(data.encrypted_password, encryptionKey).toString(CryptoJS.enc.Utf8);
 
-  const email = emailBytes.toString(CryptoJS.enc.Utf8);
-  const password = passwordBytes.toString(CryptoJS.enc.Utf8);
-  const userIP = userIPBytes.toString(CryptoJS.enc.Utf8);
-  const key = keyBytes.toString(CryptoJS.enc.Utf8);
+  const userIP = CryptoJS.AES.decrypt(data.encrypted_IP, encryptionKey).toString(CryptoJS.enc.Utf8);
 
-  if (email && password && userIP && key && key === process.env.NEXT_PUBLIC_API_KEY) {
-    return { email, password, userIP };
-  } else {
-    return { email: "", password: "", userIP: "", status: 401 };
+  const providedKey = CryptoJS.AES.decrypt(data.encrypted_API_KEY, encryptionKey).toString(CryptoJS.enc.Utf8);
+
+  if (!email || !password || providedKey !== apiKey) {
+    return { status: 401 };
   }
+
+  return { email, password, userIP };
 }
+
+/* ------------------------------------------------------------------ */
+/* Main Auth Logic                                                     */
+/* ------------------------------------------------------------------ */
 
 async function main(data: AuthData): Promise<MainResult> {
-  const { email, password, userIP } = data;
-  console.log("Checking user with email, password and IP:", email, password, userIP);
+  const { email, password } = data;
+
   try {
     const user = await prisma.user.findUnique({
       where: { email },
     });
 
+    /* -------------------------------------------------------------- */
+    /* Auto-Register (optional)                                       */
+    /* -------------------------------------------------------------- */
     if (!user) {
-      console.log("User not found");
-      return null;
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      const newUser = await prisma.user.create({
+        data: {
+          email: email,
+          password: hashedPassword,
+          role: "User",
+          name: "FelixMayer",
+          image: "https://liebeart.de/cdn/shop/files/phoenix-aus-eis-und-feuer-malen-nach-zahlen.jpg?v=1731648615"
+        },
+      });
+
+      return {
+        userID: newUser.id,
+        role: newUser.role,
+      };
     }
 
+    /* -------------------------------------------------------------- */
+    /* Login                                                          */
+    /* -------------------------------------------------------------- */
     if (!user.password) {
-      console.log("User has no password set");
-      return null;
+      return { error: "No password set", status: 401 };
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      console.log("Password mismatch");
-      return null;
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return { error: "Invalid credentials", status: 401 };
     }
 
-    console.log("User authenticated:", user.id, user.role);
-    return { userID: user.id, role: user.role };
+    return {
+      userID: user.id,
+      role: user.role,
+    };
   } catch (err) {
-    console.error("An error occurred:", err);
-    return { error: (err as Error).message, status: 500 };
-  } finally {
-    await prisma.$disconnect();
+    console.error("DB ERROR:", err);
+    return { error: "Database error", status: 500 };
   }
 }

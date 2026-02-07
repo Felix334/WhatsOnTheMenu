@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { NextAuthHandlerParams } from "next-auth/core";
+import { prisma } from "@/lib/prisma"
 import { getToken } from "next-auth/jwt";
 
-const prisma = new PrismaClient();
+
 
 export async function GET(req: NextRequest, { params }: { params: { restaurantID: string } }) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

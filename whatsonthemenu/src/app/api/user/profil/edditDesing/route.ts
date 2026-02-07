@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({});
 interface EncryptedData {
   encrypted_user_id: string;
   encrypted_restaurant_id: string;

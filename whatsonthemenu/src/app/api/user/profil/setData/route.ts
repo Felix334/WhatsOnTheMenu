@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, type Menu, type Category } from "@prisma/client";
+import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 
 export const dynamic = "force-dynamic";
 
-const prisma = new PrismaClient();
 
 interface EncryptedData {
   encrypted_user_id: string;

@@ -1,14 +1,12 @@
 import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
+//import GithubProvider from "next-auth/providers/github";
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
@@ -64,7 +62,7 @@ export const authOptions = {
           where: { email: credentials.email },
         });
         if (user && (await bcrypt.compare(credentials.password, user.password))) {
-          console.log("Benutzer gefunden:", user)
+          console.log("Benutzer gefunden:", user);
           return { id: user.id, email: user.email, name: user.name };
         }
         return null; // Invalid credentials
@@ -74,12 +72,12 @@ export const authOptions = {
   session: { strategy: "jwt" }, // Or 'database'
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
+      name: process.env.NODE_ENV === "production" ? `__Secure-next-auth.session-token` : `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_USE_SECURE_COOKIE === 'true',
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production" && process.env.NEXTAUTH_USE_SECURE_COOKIE === "true",
       },
     },
   },

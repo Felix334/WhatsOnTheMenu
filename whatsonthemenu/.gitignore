@@ -54,7 +54,20 @@ prisma/migrations/
 prisma/seedPrisma.js
 prisma/schema.prisma
 generated
+.prisma/client
 
 # Drawio
 /Roadmap.drawio
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma
+
+/generated/prisma
+
 /generated/prisma

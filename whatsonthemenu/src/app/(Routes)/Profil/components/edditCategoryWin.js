@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
 import { FaCircleInfo } from "react-icons/fa6";
@@ -24,7 +25,7 @@ import { type } from "os";
 
 //import { menuSchema, itemSchema } from "./menuSchema";
 
-const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, userID, category, restaurantId }) => {
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, userID, category, restaurantId, position }) => {
   const [edditName, setEdditName] = useState("");
   const [edditPos, setEdditPos] = useState(0);
   const [edditColor, setEdditColor] = useState("");
@@ -149,7 +150,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                 <FormItem>
                   <FormLabel>Name:</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,7 +163,13 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                 <FormItem>
                   <FormLabel>Position:</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input type="number" {...field}>
+                    <ScrollArea>
+                      {position.map((num) => {
+                        <div>{num}</div>
+                      })}
+                      </ScrollArea>
+                      </Input>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

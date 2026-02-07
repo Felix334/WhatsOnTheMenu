@@ -46,7 +46,6 @@ export default function PageBuilder() {
   const [bgColor, setBgColor] = useState("");
   const [userID, setUserID] = useState("");
   const [restaurantID, setRestaurantID] = useState("");
-  const [userRole, setUserRole] = useState("");
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -56,6 +55,7 @@ export default function PageBuilder() {
   const [autherized, setIsAutherizedUser] = useState(false);
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
+  const [positionNum, setPositionNum] = useState(0);
 
   const { data: session, status } = useSession();
 
@@ -112,6 +112,9 @@ export default function PageBuilder() {
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
         // Fix das
         setFontNew(freshData.userData.restaurant.menu.font);
+        const count = freshData.userData.restaurant.menu.reduce((total, menu) => total + menu.categories.length, 0);
+        console.log(count)
+        setPositionNum(count);
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
@@ -166,7 +169,7 @@ export default function PageBuilder() {
           }
         }
         return item;
-      })
+      }),
     );
 
     const updatedData = { ...data, items: updatedItems };
@@ -566,8 +569,8 @@ export default function PageBuilder() {
                 {expandedIndex === index && (
                   <TableRow>
                     <TableCell colSpan={4} className="px-6 py-4">
-                      {item.imageUrl? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
-                      <Image  src={"/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/image.png"} alt="Test" width={2000} height={2000}/>
+                      {item.imageUrl ? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
+                      <Image src={"/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/image.png"} alt="Test" width={2000} height={2000} />
                     </TableCell>
                   </TableRow>
                 )}
@@ -576,7 +579,7 @@ export default function PageBuilder() {
           </TableBody>
         </Table>
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
-        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{ name: title, position: 0, color: "", border: "", id: categoryId}} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId} />
+        <EdditCategoryMenu open={openCategoryMenu} onOpenChange={setOpenCategoryMenu} selectedCategory={{ name: title, position: 0, color: "", border: "", id: categoryId }} setChangedCategory={setChangedCategories} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} categoryId={categoryId} position={positionNum}/>
       </Table>
     );
   };

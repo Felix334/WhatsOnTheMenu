@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: process.cwd(),
   // Removed swcMinify as it's deprecated in Next.js 15
   // swcMinify: true,
   // Removed redirect that breaks routing to /Routes/*

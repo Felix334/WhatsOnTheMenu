@@ -6,11 +6,11 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 model User {
@@ -24,7 +24,7 @@ model User {
   parentId         String?
   parent           User?             @relation("UserHierarchy", fields: [parentId], references: [id])
   children         User[]            @relation("UserHierarchy")
-  session          Session?
+  session          Session[]
   restaurant       Restaurant?
   accounts         Account[]
   company          Company?          @relation("CompanyOwner")
@@ -38,6 +38,8 @@ model User {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   image            String
+  @@index([companyId])
+  @@index([parentId])
 }
 
 model Account {
@@ -55,14 +57,18 @@ model Account {
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user User @relation( fields: [userId],references: [id],onDelete: Cascade,map: "fk_session_user")
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -108,6 +114,7 @@ model Location {
   restaurantId String
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   reservation  Reservation?
+  @@index([restaurantId])
 }
 
 model Reservation {
@@ -130,6 +137,7 @@ model Menu {
   bgColor      String
   font         String
   dishes       Dish[]
+  @@index([restaurantId])
 }
 
 model Category {
@@ -143,6 +151,7 @@ model Category {
   menuId      String?
   menu        Menu?   @relation(fields: [menuId], references: [id])
   dishes      Dish[]
+  @@index([menuId])
 }
 
 model Dish {
@@ -160,6 +169,8 @@ model Dish {
   reports     Report[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  @@index([categoryId])
+  @@index([menuId])
 }
 
 model Ingredient {
@@ -177,6 +188,7 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
+  @@index([dishId])
 }
 
 model RestaurantQueue {
@@ -188,6 +200,7 @@ model RestaurantQueue {
   status      String   @default("pending") // pending, approved, rejected
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  @@index([ownerId])
 }
 
 model Company {
@@ -219,6 +232,7 @@ model Payment {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  @@index([userId])
 }
 
 model Report {
@@ -232,6 +246,8 @@ model Report {
   status    String   @default("open") // open, resolved
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@index([dishId])
+  @@index([userId])
 }
 
 model EmailInbox {
@@ -243,4 +259,5 @@ model EmailInbox {
   from      String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  @@index([userId])
 }

@@ -1,15 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse, NextRequest } from "next/server";
 import { authOptions } from "src/lib/auth";
 import { getToken } from "next-auth/jwt";
 
-const prisma = new PrismaClient();
-
 export async function GET(req: NextRequest, { params }: { params: { restaurantID: string } }) {
   const session = await getServerSession(authOptions);
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (!token || token.role !== "Owner") {
+  if ((!token || token.role !== "Owner") || !session) {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
   }
 
