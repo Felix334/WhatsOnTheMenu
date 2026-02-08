@@ -25,8 +25,8 @@ const Profile = () => {
     }
   };
 
-const logout = async () => {
-  signOut({ callbackUrl: '/'})
+  const logout = async () => {
+    signOut({ callbackUrl: "/" });
     /*const pathname_ = router.pathname;
     window.localStorage.removeItem("userID");
     const params = new URLSearchParams(window.location.search);
@@ -65,6 +65,19 @@ const logout = async () => {
     }
   };
 
+  const goToPartnerProgramm = async () => {
+    const userID = session?.user.id;
+    if (userID) {
+      const newQuery = new URLSearchParams(searchParams.toString());
+      newQuery.set("userID", userID);
+      const queryString = newQuery.toString();
+      await router.replace(`/ErstelleRestaurantAccount/?${queryString}`);
+      await router.refresh();
+    } else {
+      window.alert("Bitte anmelden");
+    }
+  };
+
   return (
     <div className="relative">
       <div onClick={toggleWindow}>
@@ -84,19 +97,33 @@ const logout = async () => {
             <div>
               <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
               <p className="text-sm text-gray-500">{session?.user?.email}</p>
-              {session?.user.role == "Admin" ? <div className="text-red-600 font-bold">Admin</div>: <></>}
+              {session?.user.role == "Admin" ? <div className="text-red-600 font-bold">Admin</div> : <></>}
               {session?.user.role == "Owner" ? <div className="text-blue-600 font-bold">Owner</div> : <></>}
             </div>
             <div className="space-y-2">
-              <Button
-                className="w-full"
-                onClick={() => {
-                  goToProfil();
-                }}
-              >
-                Profil
-              </Button>
-
+              {session?.user.role == "Owner" || session?.user.role == "Admin" ? (
+                <>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      goToProfil();
+                    }}
+                  >
+                    Profil
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      goToPartnerProgramm();
+                    }}
+                  >
+                    Unser Partnerprogram
+                  </Button>
+                </>
+              )}
               <Link href="/settings">
                 <Button variant="outline" className="w-full bg-grey-100 text-black mb-2">
                   Einstellungen
@@ -120,4 +147,3 @@ const logout = async () => {
 };
 
 export default Profile;
-

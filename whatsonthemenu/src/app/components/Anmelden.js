@@ -28,9 +28,10 @@ export default function Home({ renderLogin, userID, role }) {
     },
   });
 
-  const supabaseUrl = "https://awtxsktldyykatnhests.supabase.co";
+  /*const supabaseUrl = "https://awtxsktldyykatnhests.supabase.co";
   const supabaseKey = process.env.SUPABASE_KEY;
   const supabase = createClient(supabaseUrl, supabaseKey);
+  */
 
   const { control, handleSubmit, formState, reset } = form;
 
