@@ -7,14 +7,9 @@ import loginSchema from "./components/loginSchema.js";
 import { useRouter } from "next/navigation";
 import { signIn, getSession } from "next-auth/react";
 
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+import { createClient } from "@supabase/supabase-js";
+
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -32,6 +27,10 @@ export default function Home({ renderLogin, userID, role }) {
       password: "",
     },
   });
+
+  const supabaseUrl = "https://awtxsktldyykatnhests.supabase.co";
+  const supabaseKey = process.env.SUPABASE_KEY;
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   const { control, handleSubmit, formState, reset } = form;
 
@@ -56,7 +55,6 @@ export default function Home({ renderLogin, userID, role }) {
         const session = await getSession();
         if (session?.user) {
           userID(session.user.id);
-
         }
 
         setLoginSuccess(true);
@@ -77,7 +75,7 @@ export default function Home({ renderLogin, userID, role }) {
     reset();
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const getIP = () => {
       try {
         fetch("https://api.ipify.org?format=json")
@@ -100,7 +98,7 @@ export default function Home({ renderLogin, userID, role }) {
   // -----------------------------------
   const handleEmailSignIn = () => {
     const email = form.getValues("email");
-    console.log("Email-Login",email)
+    console.log("Email-Login", email);
     if (!email) {
       setError("Bitte geben Sie eine E-Mail-Adresse ein.");
       return;
@@ -144,16 +142,10 @@ export default function Home({ renderLogin, userID, role }) {
       )}
 
       <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md relative z-20 min-h-75 top-40 md:top-30">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">
-          Login
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-900">Login</h1>
 
         {/* Error Message */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
 
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -164,12 +156,7 @@ export default function Home({ renderLogin, userID, role }) {
                 <FormItem className="mb-4">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Email"
-                      {...field}
-                      className="text-black bg-white"
-                    />
+                    <Input type="email" placeholder="Email" {...field} className="text-black bg-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -183,12 +170,7 @@ export default function Home({ renderLogin, userID, role }) {
                 <FormItem className="mb-6">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      {...field}
-                      className="text-black bg-white"
-                    />
+                    <Input type="password" placeholder="Password" {...field} className="text-black bg-white" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,11 +184,7 @@ export default function Home({ renderLogin, userID, role }) {
         </Form>
 
         {/* Google Login */}
-        <Button
-          type="button"
-          onClick={handleGoogleSignIn}
-          className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white"
-        >
+        <Button type="button" onClick={handleGoogleSignIn} className="w-full mb-4 bg-blue-600 hover:bg-blue-700 text-white">
           Mit Google anmelden
         </Button>
       </div>

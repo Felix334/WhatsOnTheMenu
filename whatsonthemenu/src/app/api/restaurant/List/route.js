@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma"
 import { getSession } from "next-auth/react";
 import { getServerSession } from "next-auth";
 //import { authOptions } from "../../auth/[...nextauth]/route";
 import { authOptions } from '@/lib/auth';
 import { error } from "console";
-import { AwardIcon } from "lucide-react";
 
-const prisma = new PrismaClient();
+
 
 export async function POST(req) {
   const data = await readDB()

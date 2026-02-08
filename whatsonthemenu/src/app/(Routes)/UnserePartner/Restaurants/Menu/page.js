@@ -36,6 +36,7 @@ const Menu = () => {
 
         const data = await resp.json();
         console.log("Server-Data", data);
+        console.log("Data:", data.menu[0].bgColor);
 
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
@@ -111,7 +112,11 @@ const Menu = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200 flex flex-col items-center justify-center text-gray-900 font-sans p-8 relative">
+    <div
+      className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 relative
+    ${serverData?.menu?.[0]?.bgColor ? "" : "bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`}
+      style={serverData?.menu?.[0]?.bgColor ? { backgroundColor: serverData?.menu?.[0]?.bgColor } : undefined}
+    >
       <header className="mb-12 text-center w-full">
         <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
       </header>
