@@ -87,10 +87,10 @@ export default function Home() {
     }
   };
   useEffect(() => {
-    const testDB = async() => {
-      var resp = await fetch("/api/findAll")
-    }
-  })
+    const testDB = async () => {
+      var resp = await fetch("/api/findAll");
+    };
+  });
 
   return (
     <div>
@@ -149,7 +149,7 @@ export default function Home() {
               <div className="flex items-center justify-center md:justify-start">
                 <div className="text-2xl font-bold text-indigo-600 text-center md:text-left">🍽️ WhatsOnMyMenu</div>
               </div>
-<Button >TstDB</Button>
+              <Button>TstDB</Button>
               <div className="hidden right-0 md:block">
                 <NavigationMenu>
                   <NavigationMenuList>

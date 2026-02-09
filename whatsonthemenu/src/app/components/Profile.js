@@ -1,50 +1,39 @@
 "use client";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+
+import { useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import profileImage from "./img/account_profile_user_avatar_icon_219236.jpg";
 import { useState, useRef, useEffect } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+
 const Profile = () => {
   const [openProfil, setOpenProfil] = useState(false);
   const modalRef = useRef(null);
-  const router = useRouter();
-  const pathname = usePathname();
+
   const searchParams = useSearchParams();
   const { data: session } = useSession();
 
+  const role = session?.user?.role;
+
+  // Toggle
   const toggleWindow = () => {
-    setOpenProfil(!openProfil);
+    setOpenProfil((prev) => !prev);
   };
 
-  const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
+  // Outside click
+  const handleClickOutside = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
       setOpenProfil(false);
     }
   };
 
-  const logout = async () => {
-    signOut({ callbackUrl: "/" });
-    /*const pathname_ = router.pathname;
-    window.localStorage.removeItem("userID");
-    const params = new URLSearchParams(window.location.search);
-    params.delete("userID");
-    const newUrl = `${pathname_}${params.toString() ? "?" + params.toString() : ""}`;
-    await router.replace(newUrl, { shallow: true });
-    setOpenProfil(false);
-    setCloseLogout(false);
-    router.refresh();
-    window.location.reload();
-    await router.push("./");*/
-  };
-
+  // Listener
   useEffect(() => {
     if (openProfil) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
@@ -52,89 +41,102 @@ const Profile = () => {
     };
   }, [openProfil]);
 
-  const goToProfil = async () => {
-    const userID = session?.user?.id;
-    if (userID) {
-      const newQuery = new URLSearchParams(searchParams.toString());
-      newQuery.set("userID", userID);
-      const queryString = newQuery.toString();
-      await router.replace(`/Profil/?${queryString}`);
-      await router.refresh();
-    } else {
-      window.alert("Bitte anmelden");
-    }
+  // Logout
+  const logout = async () => {
+    await signOut({ callbackUrl: "/" });
   };
 
-  const goToPartnerProgramm = async () => {
-    const userID = session?.user.id;
-    if (userID) {
-      const newQuery = new URLSearchParams(searchParams.toString());
-      newQuery.set("userID", userID);
-      const queryString = newQuery.toString();
-      await router.replace(`/ErstelleRestaurantAccount/?${queryString}`);
-      await router.refresh();
-    } else {
-      window.alert("Bitte anmelden");
-    }
-  };
+  // Query bauen
+  const userID = session?.user?.id;
+
+  const params = new URLSearchParams(searchParams.toString());
+
+  if (userID) {
+    params.set("userID", userID);
+  }
+
+  const queryString = params.toString();
 
   return (
     <div className="relative">
+      {/* Avatar */}
       <div onClick={toggleWindow}>
-        <Avatar className="w-12 h-12 cursor-pointer z-50">
+        <Avatar className="w-12 h-12 cursor-pointer">
           <AvatarImage src={profileImage.src} alt="Profilbild" />
           <AvatarFallback>PR</AvatarFallback>
         </Avatar>
       </div>
 
+      {/* Modal */}
       {openProfil && (
-        <div className="fixed inset-0 z-100 ag-opacity-zero flex items-center justify-center">
-          <div ref={modalRef} className="bg-white rounded-2xl shadow-lg p-6 w-80 max-w-full text-center space-y-4 z-50">
+        <div className="fixed inset-0 z-[100] bg-black/20 flex items-center justify-center">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl shadow-lg p-6 w-80 text-center space-y-4"
+          >
+            {/* Avatar groß */}
             <Avatar className="w-20 h-20 mx-auto">
               <AvatarImage src={profileImage.src} alt="Profilbild" />
               <AvatarFallback>PR</AvatarFallback>
             </Avatar>
+
+            {/* User Info */}
             <div>
-              <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
-              <p className="text-sm text-gray-500">{session?.user?.email}</p>
-              {session?.user.role == "Admin" ? <div className="text-red-600 font-bold">Admin</div> : <></>}
-              {session?.user.role == "Owner" ? <div className="text-blue-600 font-bold">Owner</div> : <></>}
+              <h2 className="text-lg font-semibold">
+                {session?.user?.name || "User"}
+              </h2>
+
+              <p className="text-sm text-gray-500">
+                {session?.user?.email}
+              </p>
+
+              {role === "Admin" && (
+                <p className="text-red-600 font-bold">Admin</p>
+              )}
+
+              {role === "Owner" && (
+                <p className="text-blue-600 font-bold">Owner</p>
+              )}
             </div>
-            <div className="space-y-2">
-              {session?.user.role == "Owner" || session?.user.role == "Admin" ? (
-                <>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      goToProfil();
-                    }}
-                  >
+
+            {/* Buttons */}
+            <div className="space-y-2 grid">
+
+              {(role === "Owner" || role === "Admin") && (
+                <Link
+                  href={`/Profil?${queryString}`}
+                  onClick={() => setOpenProfil(false)}
+                >
+                  <Button variant="outline" className="w-full">
                     Profil
                   </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      goToPartnerProgramm();
-                    }}
-                  >
-                    Unser Partnerprogram
-                  </Button>
-                </>
+                </Link>
               )}
-              <Link href="/settings">
-                <Button variant="outline" className="w-full bg-grey-100 text-black mb-2">
+
+              {role !== "Owner" && role !== "Admin" && (
+                <Link
+                  href={`/ErstelleRestaurantAccount?${queryString}`}
+                  onClick={() => setOpenProfil(false)}
+                >
+                  <Button className="w-full">
+                    Unser Partnerprogramm
+                  </Button>
+                </Link>
+              )}
+
+              <Link
+                 href={`/settings?${queryString}`}
+                onClick={() => setOpenProfil(false)}
+              >
+                <Button variant="outline" className="w-full">
                   Einstellungen
                 </Button>
               </Link>
+
               <Button
                 variant="destructive"
                 className="w-full"
-                onClick={() => {
-                  logout();
-                }}
+                onClick={logout}
               >
                 Abmelden
               </Button>

@@ -1,6 +1,18 @@
 
 
-=> Liste mit Datenbank änderungen anlegen
+
+
+
+
+
+
+=> Login ändern => Zu Supabase Auth => Spart DB RW und funktioniert mit 
+
+
+
+
+
+
 
 => Bilder nur im Premium Abo => Restaurant ohne Premium kosten dann nix (SupabaseDB, Vercel)
 
@@ -13,8 +25,8 @@ Fix the Profil picture
 API-Key Abfrage ÜBERALL einfügen
 
 => Fonts Fertig stellen
-=> Bilder werden nicht richtig gelöscht => Datein in /public können nicht während Laufzeit gelöscht werden
 => Eddit Fenster schließt automatisch wenn man kurz das den Tab wechselt => Soll offen bleiben
+=> Adress Speicher an den das neue Eingabefeld anpassen
 
 => Wenn der Benutzer eine Seite lädt bei der Benutzer angezeigt werden(Admin Konsole, Unsere Partner)
 Dann wird in der DB eine bestimmte Anzahl genommen und nur eine bestimmte Anzahl angezeigt
