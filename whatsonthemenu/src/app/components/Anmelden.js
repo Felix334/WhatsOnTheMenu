@@ -112,8 +112,19 @@ export default function Home({ renderLogin, userID, role }) {
     });
   };
 
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" });
+  const handleGoogleSignIn = async () => {
+    try {
+      // signIn mit redirect: false, damit wir selbst weiterleiten können
+      const result = await signIn("google", { redirect: false });
+
+      if (result?.url) {
+        // replace, damit Google Login nicht in der History bleibt
+        window.location.replace(result.url);
+      }
+    } catch (err) {
+      console.error("Google SignIn error:", err);
+      setError("Google Login fehlgeschlagen.");
+    }
   };
 
   // -----------------------------------
