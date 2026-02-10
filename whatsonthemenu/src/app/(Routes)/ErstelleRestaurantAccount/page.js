@@ -55,7 +55,7 @@ export default function RestaurantForm() {
     try {
       restaurantSchema.parse(restaurant);
 
-      const res = await fetch("/api/restaurants", {
+      const res = await fetch("/api/restaurant/requestRegister", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(restaurant),
