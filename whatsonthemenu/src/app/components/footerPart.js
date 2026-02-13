@@ -4,7 +4,7 @@ const FooterPart = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <div className="text-2xl font-bold mb-4">🍽️ MenuMaker</div>
+            <div className="text-2xl font-bold mb-4">🍽️ WhatsOnMyMenu</div>
             <p className="text-gray-400">Die einfachste Art, professionelle digitale Speisekarten zu erstellen.</p>
           </div>
           <div>
