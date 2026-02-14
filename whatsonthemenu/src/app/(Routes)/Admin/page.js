@@ -132,7 +132,7 @@ export default function AdminConsole() {
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("supabase")}>
-            <Landmark className="w-4 h-4" /> Supabase-Nutzng
+            <Landmark className="w-4 h-4" /> Supabase-Nutzung
           </Button>
         </nav>
       </aside>
@@ -191,7 +191,7 @@ export default function AdminConsole() {
             <CardTitle>Users</CardTitle>
 
             <div className="flex gap-3 ml-auto">
-              <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder="Suchen..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger className="w-40">
