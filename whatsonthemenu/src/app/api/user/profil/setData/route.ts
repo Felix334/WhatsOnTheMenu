@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
+import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = "force-dynamic";
 

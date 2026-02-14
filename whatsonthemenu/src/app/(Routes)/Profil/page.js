@@ -66,8 +66,7 @@ const restaurant_icon = require("./img/restaurantLabelIcon.png");
 //const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 export default function PageBuilder() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+
   const router = useRouter();
 
   const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }

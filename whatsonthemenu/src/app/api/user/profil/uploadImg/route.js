@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from '@supabase/supabase-js'
+
+const api_url = process.env.SUPABASE_API_URL
+
+const supabase = createClient({
+    api_url, 
+})
 
 export default async function POST(req) {
     const data = await req.json();
