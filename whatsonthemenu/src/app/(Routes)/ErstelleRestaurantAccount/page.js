@@ -5,14 +5,15 @@ import { z } from "zod";
 
 // Zod Schema für das Restaurant
 const restaurantSchema = z.object({
-  name: z.string().min(1, "Name ist erforderlich"),
-  address: z.string().min(1, "Adresse ist erforderlich"),
+  ownerName: z.string().min(2, "Ein Name ist erforderlich"),
+  name: z.string().min(1, "Ein Restaurantname ist erforderlich"),
+  address: z.string().min(1, "Eine Adresse ist erforderlich"),
   phone: z
     .string()
-    .min(7, "Telefonnummer zu kurz")
-    .max(15, "Telefonnummer zu lang")
-    .regex(/^\+?\d+$/, "Telefonnummer ungültig"),
-  website: z.string().url("Website muss eine gültige URL sein").optional().or(z.literal("")),
+    .min(7, "Die Telefonnummer zu kurz")
+    .max(20, "Die Telefonnummer zu lang")
+    .regex(/^\+?\d+$/, "Die Telefonnummer ungültig"),
+  website: z.string().url("Die Website muss eine gültige URL sein").optional().or(z.literal("")),
   openingHours: z.string().optional(),
   category: z.string(),
   description: z.string().optional(),
@@ -20,7 +21,9 @@ const restaurantSchema = z.object({
 
 export default function RestaurantForm() {
   const [restaurant, setRestaurant] = useState({
+    ownerName: "",
     name: "",
+    email: "",
     address: "",
     phone: "",
     website: "",
@@ -68,7 +71,9 @@ export default function RestaurantForm() {
 
       setSuccess(true);
       setRestaurant({
+        ownerName: "",
         name: "",
+        email: "",
         address: "",
         phone: "",
         website: "",
@@ -96,6 +101,13 @@ export default function RestaurantForm() {
       <p className="text-gray-600 text-center mb-8">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
+            Name (Voller legaler Name) <span className="text-red-500">*</span>
+          </label>
+          <input id="name" name="name" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          {errors.ownerName && <p className="text-red-500 mt-1">{errors.ownerName}</p>}
+        </div>
         {/* Name */}
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
@@ -103,6 +115,14 @@ export default function RestaurantForm() {
           </label>
           <input id="name" name="name" type="text" value={restaurant.name} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.name ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.name && <p className="text-red-500 mt-1">{errors.name}</p>}
+        </div>
+
+        <div>
+          <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
+            Email<span className="text-red-500">*</span>
+          </label>
+          <input id="name" name="name" type="text" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
 
         {/* Adresse */}
@@ -154,7 +174,9 @@ export default function RestaurantForm() {
           <input id="openingHours" name="openingHours" type="text" value={restaurant.openingHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Mo-Fr 09:00-18:00" />
         </div>
         <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="category">Kategorie wählen:</label>
+          <label className="block font-medium text-gray-700 mb-1" htmlFor="category">
+            Kategorie wählen:
+          </label>
           <select id="category" name="category" value={restaurant.category} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="">Bitte wählen</option>
             <option value="italienisch">Italienisch</option>

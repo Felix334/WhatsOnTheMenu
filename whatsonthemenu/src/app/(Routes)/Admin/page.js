@@ -115,12 +115,12 @@ export default function AdminConsole() {
             <Users className="w-4 h-4" /> Users
           </Button>
 
-          <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("settings")}>
-            <Settings className="w-4 h-4" /> Settings
-          </Button>
-
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("requests")}>
             <UserPlus className="w-4 h-4" /> Anfragen
+          </Button>
+
+          <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("settings")}>
+            <Settings className="w-4 h-4" /> Settings
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("messages")}>
@@ -254,12 +254,12 @@ export default function AdminConsole() {
     );
   }
 
-  function renderSettings() {
-    return <div>Settings (coming soon)</div>;
-  }
-
   function renderRequests() {
     return <div>Anfragen (coming soon)</div>;
+  }
+
+  function renderSettings() {
+    return <div>Settings (coming soon)</div>;
   }
 
   function renderMessages() {
@@ -273,3 +273,15 @@ export default function AdminConsole() {
     return <div>Supabase-Nutzung</div>;
   }
 }
+
+
+/*
+-Name des Restaurants
+-Postleitzahl
+-Stadt
+Straße
+Hausnummer
+Telefonnummmer
+Öffnungszeiten
+Kategorie
+*/
