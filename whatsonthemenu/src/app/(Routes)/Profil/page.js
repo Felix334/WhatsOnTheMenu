@@ -84,7 +84,6 @@ export default function PageBuilder() {
   const [openEditor, setOpenEditor] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
   const [edditName, setEdditName] = useState(false);
-  const [nameChangeWin, setNameChangeWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
@@ -171,7 +170,7 @@ export default function PageBuilder() {
     fetchData();
 
     return () => controller.abort();
-  }, [userID, bgColor]);
+  }, [userID, bgColor, fontNew]);
 
   const submitToServer = (data) => {
     const newSection = {
