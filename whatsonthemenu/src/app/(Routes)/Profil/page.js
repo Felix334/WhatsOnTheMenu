@@ -849,7 +849,7 @@ export default function PageBuilder() {
               </div>
               <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
             </header>
-            <main className="w-full max-w-9xl bg-opacity-20 rounded-xl shadow-lg p-8 backdrop-blur-md z-10">
+            <main className="w-full">
               <div className="max-w-7xl mx-auto grid gap-4">
                 {serverData?.userData?.restaurant?.menu?.[0]?.categories?.map(
                   (category) => (

@@ -518,34 +518,3 @@ export default function Home() {
     </div>
   );
 }
-
-function printUserDevice() {
-  console.log("Device:", navigator.userAgent);
-  console.log("Sprache:", navigator.language);
-  console.log("Sprachen:", navigator.languages);
-  console.log("Browser Online?: ", navigator.onLine);
-  console.log("Cookies erlaubt?: ", navigator.cookieEnabled);
-  console.log("Gerätespeicher: ", navigator.deviceMemory);
-  console.log("Hardware-Prozessoren: ", navigator.hardwareConcurrency);
-}
-
-function goToMobile() {
-  var touchp = window.navigator.maxTouchPoints;
-  if (touchp > 1) {
-    return (
-      <Link
-        href={{
-          pathname: "/Routes/Mobile/",
-          query: { ...router.query, ...(userID ? { userID: userID } : {}) },
-        }}
-      >
-        Mobile Funktionen
-      </Link>
-    );
-  }
-}
-
-function recreateDB() {
-  //const dbPush = fetch("")
-  console.log(process.env.NEXT_PUBLIC_API_KEY);
-}
