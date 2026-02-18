@@ -21,9 +21,6 @@ model User {
   password         String?
   role             Role              @default(User)
   subscription     Subscription      @default(Basic)
-  parentId         String?
-  parent           User?             @relation("UserHierarchy", fields: [parentId], references: [id])
-  children         User[]            @relation("UserHierarchy")
   session          Session[]
   restaurant       Restaurant?
   accounts         Account[]
@@ -38,8 +35,13 @@ model User {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   image            String
+
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  subscriptionStatus   String?   // active, canceled, trialing, unpaid
+
   @@index([companyId])
-  @@index([parentId])
 }
 
 model Account {
@@ -57,8 +59,8 @@ model Account {
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -66,7 +68,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user User @relation( fields: [userId],references: [id],onDelete: Cascade,map: "fk_session_user")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_session_user")
 
   @@index([userId])
 }
@@ -105,15 +107,17 @@ model Restaurant {
 }
 
 model Location {
-  id           String       @id @default(cuid())
-  street       String
-  houseNumber  String
-  city         String
-  postalCode   String
-  country      String
-  restaurantId String
-  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
-  reservation  Reservation?
+  id               String            @id @default(cuid())
+  street           String
+  houseNumber      String
+  city             String
+  postalCode       String
+  country          String
+  restaurantId     String
+  restaurant       Restaurant        @relation(fields: [restaurantId], references: [id])
+  reservation      Reservation?
+  restaurantQueues RestaurantQueue[]
+
   @@index([restaurantId])
 }
 
@@ -137,6 +141,7 @@ model Menu {
   bgColor      String
   font         String
   dishes       Dish[]
+
   @@index([restaurantId])
 }
 
@@ -151,6 +156,7 @@ model Category {
   menuId      String?
   menu        Menu?   @relation(fields: [menuId], references: [id])
   dishes      Dish[]
+
   @@index([menuId])
 }
 
@@ -169,6 +175,7 @@ model Dish {
   reports     Report[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
   @@index([categoryId])
   @@index([menuId])
 }
@@ -188,30 +195,44 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
+
   @@index([dishId])
 }
 
 model RestaurantQueue {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id])
-  status      String   @default("pending") // pending, approved, rejected
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  ownerId        String
+  owner          User         @relation(fields: [ownerId], references: [id])
+  status         String       @default("pending") // pending, approved, rejected
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  restaurantName String
+  email          String
+  location       Location     @relation(fields: [locationId], references: [id])
+  phoneNumber    String
+  category       String
+  locationId     String
+  subscription   Subscription
+
   @@index([ownerId])
 }
 
 model Company {
   id        String   @id @default(cuid())
   name      String
+
+  stripeAccountId String?
+
   ownerId   String   @unique
   owner     User     @relation("CompanyOwner", fields: [ownerId], references: [id])
   employees User[]   @relation("CompanyEmployees")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 
 model Dashboard {
   id        String   @id @default(cuid())
@@ -223,17 +244,33 @@ model Dashboard {
 }
 
 model Payment {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  amount      Decimal  @db.Decimal(10, 2)
-  currency    String   @default("EUR")
-  status      String   @default("pending") // pending, completed, failed
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+
+  // Stripe
+  stripePaymentId   String   @unique // payment_intent.id
+  stripeInvoiceId   String?
+  stripeSessionId   String?
+
+  amount            Int      // IMMER in Cent! (999 = 9.99€)
+  currency          String   @default("eur")
+
+  status            String   // pending, succeeded, failed, refunded
+  description       String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
   @@index([userId])
 }
+
+model StripeEvent {
+  id        String   @id   // evt_xxx von Stripe
+  type      String
+  createdAt DateTime @default(now())
+}
+
 
 model Report {
   id        String   @id @default(cuid())
@@ -246,6 +283,7 @@ model Report {
   status    String   @default("open") // open, resolved
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@index([dishId])
   @@index([userId])
 }
@@ -259,5 +297,6 @@ model EmailInbox {
   from      String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
   @@index([userId])
 }
