@@ -118,8 +118,9 @@ export default function Home({ renderLogin, userID, role }) {
       const result = await signIn("google", { redirect: false });
 
       if (result?.url) {
-        // replace, damit Google Login nicht in der History bleibt
+        console.log(result)
         window.location.replace(result.url);
+        console.log("Imag-URL",result?.user?.image)
       }
     } catch (err) {
       console.error("Google SignIn error:", err);

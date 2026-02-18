@@ -17,6 +17,7 @@ const Profile = () => {
   const { data: session } = useSession();
 
   const role = session?.user?.role;
+  const googleImg = session?.user?.image;
 
   // Toggle
   const toggleWindow = () => {
@@ -62,7 +63,7 @@ const Profile = () => {
       {/* Avatar */}
       <div onClick={toggleWindow}>
         <Avatar className="w-12 h-12 cursor-pointer">
-          <AvatarImage src={profileImage.src} alt="Profilbild" />
+          <AvatarImage src={googleImg || profileImage.src} alt="Profilbild" />
           <AvatarFallback>PR</AvatarFallback>
         </Avatar>
       </div>
@@ -70,43 +71,29 @@ const Profile = () => {
       {/* Modal */}
       {openProfil && (
         <div className="fixed inset-0 z-[100] bg-black/20 flex items-center justify-center">
-          <div
-            ref={modalRef}
-            className="bg-white rounded-2xl shadow-lg p-6 w-80 text-center space-y-4"
-          >
+          <div ref={modalRef} className="bg-white rounded-2xl shadow-lg p-6 w-80 text-center space-y-4">
             {/* Avatar groß */}
             <Avatar className="w-20 h-20 mx-auto">
-              <AvatarImage src={profileImage.src} alt="Profilbild" />
+              <AvatarImage src={googleImg || profileImage.src} alt="Profilbild" />
+
               <AvatarFallback>PR</AvatarFallback>
             </Avatar>
 
             {/* User Info */}
             <div>
-              <h2 className="text-lg font-semibold">
-                {session?.user?.name || "User"}
-              </h2>
+              <h2 className="text-lg font-semibold">{session?.user?.name || "User"}</h2>
 
-              <p className="text-sm text-gray-500">
-                {session?.user?.email}
-              </p>
+              <p className="text-sm text-gray-500">{session?.user?.email}</p>
 
-              {role === "Admin" && (
-                <p className="text-red-600 font-bold">Admin</p>
-              )}
+              {role === "Admin" && <p className="text-red-600 font-bold">Admin</p>}
 
-              {role === "Owner" && (
-                <p className="text-blue-600 font-bold">Owner</p>
-              )}
+              {role === "Owner" && <p className="text-blue-600 font-bold">Owner</p>}
             </div>
 
             {/* Buttons */}
             <div className="space-y-2 grid">
-
               {(role === "Owner" || role === "Admin") && (
-                <Link
-                  href={`/Profil?${queryString}`}
-                  onClick={() => setOpenProfil(false)}
-                >
+                <Link href={`/Profil?${queryString}`} onClick={() => setOpenProfil(false)}>
                   <Button variant="outline" className="w-full">
                     Profil
                   </Button>
@@ -114,30 +101,18 @@ const Profile = () => {
               )}
 
               {role !== "Owner" && role !== "Admin" && (
-                <Link
-                  href={`/ErstelleRestaurantAccount?${queryString}`}
-                  onClick={() => setOpenProfil(false)}
-                >
-                  <Button className="w-full">
-                    Unser Partnerprogramm
-                  </Button>
+                <Link href={`/ErstelleRestaurantAccount?${queryString}`} onClick={() => setOpenProfil(false)}>
+                  <Button className="w-full">Unser Partnerprogramm</Button>
                 </Link>
               )}
 
-              <Link
-                 href={`/settings?${queryString}`}
-                onClick={() => setOpenProfil(false)}
-              >
+              <Link href={`/settings?${queryString}`} onClick={() => setOpenProfil(false)}>
                 <Button variant="outline" className="w-full">
                   Einstellungen
                 </Button>
               </Link>
 
-              <Button
-                variant="destructive"
-                className="w-full"
-                onClick={logout}
-              >
+              <Button variant="destructive" className="w-full" onClick={logout}>
                 Abmelden
               </Button>
             </div>

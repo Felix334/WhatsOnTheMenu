@@ -67,14 +67,14 @@ const Menu = () => {
         </div>
 
         <div className="space-y-6">
-          <Table className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm w-full table-fixed">
+          <Table className="rounded-2xl overflow-hidden w-full md:table-fixed">
             <colgroup>
               <col className="w-2/5" />
               <col className="w-2/5" />
               <col className="w-1/5" />
             </colgroup>
 
-            <TableHeader className="bg-gray-50">
+            <TableHeader className="">
               <TableRow>
                 <TableHead className="text-left">Speisen</TableHead>
                 <TableHead className="text-left">Beschreibung</TableHead>
