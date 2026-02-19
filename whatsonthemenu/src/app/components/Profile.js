@@ -17,7 +17,11 @@ const Profile = () => {
   const { data: session } = useSession();
 
   const role = session?.user?.role;
-  const googleImg = session?.user?.image;
+  const googleImg = window.sessionStorage.getItem("googleProfileImg");
+  if (!googleImg) {
+    const setGoogleImg = session.user?.image;
+    window.sessionStorage.setItem("googleProfileImg", setGoogleImg);
+  }
 
   // Toggle
   const toggleWindow = () => {
@@ -44,6 +48,7 @@ const Profile = () => {
 
   // Logout
   const logout = async () => {
+    sessionStorage.removeItem("googleProfileImg");
     await signOut({ callbackUrl: "/" });
   };
 

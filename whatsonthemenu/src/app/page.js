@@ -342,7 +342,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white rounded-lg p-2 mb-4 overflow-hidden">
+                <div id="examples" className="bg-white rounded-lg p-2 mb-4 overflow-hidden">
                   <Image src={BeispielKarte} alt="Beispiel Speisekarte" width={400} height={600} className="rounded-lg object-cover w-full h-auto" priority />
                 </div>
                 <div className="bg-white rounded-lg p-2 mb-4 overflow-hidden">
