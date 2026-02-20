@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
+import CryptoJS from "crypto-js";
+
 const prisma = new PrismaClient({});
 interface EncryptedData {
   encrypted_user_id: string;
