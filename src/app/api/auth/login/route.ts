@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server"; import { PrismaClient } from "generated/prisma/client"; import * as CryptoJS from "crypto-js"; import NextAuth from "next-auth"; import GithubProvider from "next-auth/providers/github"; import EmailProvider from "next-auth/providers/email"; import GoogleProvider from "next-auth/providers/google"; import FacebookProvider from "next-auth/providers/facebook"; import CredentialsProvider from "next-auth/providers/credentials"; import { PrismaAdapter } from "@next-auth/prisma-adapter"; //import { prisma } from "@/lib/prisma"; import bcrypt from "bcryptjs";
 */
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import CryptoJS from "crypto-js";
 import bcrypt from "bcryptjs";
 
