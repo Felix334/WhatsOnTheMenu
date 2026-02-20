@@ -42,7 +42,6 @@ process.env
 next-env.d.ts
 
 #package.json
-package.json
 package-lock.json
 
 #sql
