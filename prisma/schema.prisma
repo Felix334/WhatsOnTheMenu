@@ -1,0 +1,302 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  emailVerified    DateTime?
+  password         String?
+  role             Role              @default(User)
+  subscription     Subscription      @default(Basic)
+  session          Session[]
+  restaurant       Restaurant?
+  accounts         Account[]
+  company          Company?          @relation("CompanyOwner")
+  employeeOf       Company?          @relation("CompanyEmployees", fields: [companyId], references: [id])
+  companyId        String?
+  dashboard        Dashboard?
+  payments         Payment[]
+  reports          Report[]
+  restaurantQueues RestaurantQueue[]
+  emails           EmailInbox[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  image            String
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  subscriptionStatus   String?   // active, canceled, trialing, unpaid
+
+  @@index([companyId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_session_user")
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  User
+  Admin
+  Owner
+  Manager
+  Executive
+}
+
+enum Subscription {
+  Basic
+  Premium
+  Pro
+}
+
+model Restaurant {
+  id            String     @id @default(cuid())
+  name          String
+  parentCompany String
+  ownerId       String     @unique
+  owner         User       @relation(fields: [ownerId], references: [id])
+  menu          Menu[] // A restaurant can have zero or multiple menus
+  locations     Location[]
+  createdAt     DateTime   @default(now())
+}
+
+model Location {
+  id               String            @id @default(cuid())
+  street           String
+  houseNumber      String
+  city             String
+  postalCode       String
+  country          String
+  restaurantId     String
+  restaurant       Restaurant        @relation(fields: [restaurantId], references: [id])
+  reservation      Reservation?
+  restaurantQueues RestaurantQueue[]
+
+  @@index([restaurantId])
+}
+
+model Reservation {
+  id          String   @id @default(cuid())
+  locationId  String   @unique
+  phoneNumber String
+  location    Location @relation(fields: [locationId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Menu {
+  id           String     @id @default(cuid())
+  name         String
+  description  String?
+  restaurantId String // A menu belongs to one restaurant
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  categories   Category[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  bgColor      String
+  font         String
+  dishes       Dish[]
+
+  @@index([restaurantId])
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  position    Int?
+  bgColor     String?
+  font        String?
+  fontColor   String?
+  menuId      String?
+  menu        Menu?   @relation(fields: [menuId], references: [id])
+  dishes      Dish[]
+
+  @@index([menuId])
+}
+
+model Dish {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal      @db.Decimal(10, 2)
+  imageUrl    String
+  categoryId  String?
+  menuId      String
+  category    Category?    @relation(fields: [categoryId], references: [id])
+  menu        Menu         @relation(fields: [menuId], references: [id])
+  ingredients Ingredient[] @relation("DishIngredients")
+  reviews     Review[]     @relation("DishReviews")
+  reports     Report[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([categoryId])
+  @@index([menuId])
+}
+
+model Ingredient {
+  id         String  @id @default(cuid())
+  name       String
+  isAllergen Boolean @default(false)
+  dishes     Dish[]  @relation("DishIngredients")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  dishId    String
+  rating    Float    @default(0)
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  dish      Dish     @relation("DishReviews", fields: [dishId], references: [id])
+
+  @@index([dishId])
+}
+
+model RestaurantQueue {
+  id             String       @id @default(cuid())
+  name           String
+  description    String?
+  ownerId        String
+  owner          User         @relation(fields: [ownerId], references: [id])
+  status         String       @default("pending") // pending, approved, rejected
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  restaurantName String
+  email          String
+  location       Location     @relation(fields: [locationId], references: [id])
+  phoneNumber    String
+  category       String
+  locationId     String
+  subscription   Subscription
+
+  @@index([ownerId])
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+
+  stripeAccountId String?
+
+  ownerId   String   @unique
+  owner     User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  employees User[]   @relation("CompanyEmployees")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Dashboard {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  data      Json? // Store dashboard data as JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+
+  // Stripe
+  stripePaymentId   String   @unique // payment_intent.id
+  stripeInvoiceId   String?
+  stripeSessionId   String?
+
+  amount            Int      // IMMER in Cent! (999 = 9.99€)
+  currency          String   @default("eur")
+
+  status            String   // pending, succeeded, failed, refunded
+  description       String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model StripeEvent {
+  id        String   @id   // evt_xxx von Stripe
+  type      String
+  createdAt DateTime @default(now())
+}
+
+
+model Report {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  dishId    String?
+  dish      Dish?    @relation(fields: [dishId], references: [id])
+  reason    String
+  details   String?
+  status    String   @default("open") // open, resolved
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dishId])
+  @@index([userId])
+}
+
+model EmailInbox {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  subject   String
+  body      String
+  from      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
