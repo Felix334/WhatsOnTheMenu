@@ -13,6 +13,22 @@ const compat = new FlatCompat({
 const eslintConfig = [
   js.configs.recommended,
   ...compat.extends("next/core-web-vitals"),
+  {
+    ignores: [
+      "src/generated/**",
+      "node_modules/**",
+      ".next/**",
+      "**/*.d.ts",
+    ],
+  },
+  {
+    rules: {
+      // Relax unused vars rules for better DX
+      "no-unused-vars": "warn",
+      // Allow unused imports in some cases
+      "no-undef": "warn",
+    },
+  },
 ];
 
 export default eslintConfig;

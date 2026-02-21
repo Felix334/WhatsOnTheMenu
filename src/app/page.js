@@ -16,7 +16,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
-import PermControleLocation from "./components/LocasionPermission";
+//import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
 const BeispielKarte = require("./components/img/Beispiel-Karte.png");
@@ -142,7 +142,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center md:justify-between items-center h-16">
               <div className="absolute right-0  md:block">
-                {userID && (
+                {autherizedUser && (
                   <div>
                     <Profile />
                   </div>

@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from '@supabase/supabase-js'
-
-const api_url = process.env.SUPABASE_API_URL
-
-const supabase = createClient({
-    api_url, 
-})
+import { supabase } from "@/lib/supabase"
 
 export default async function POST(req) {
     const data = await req.json();
@@ -22,5 +16,9 @@ export default async function POST(req) {
 }
 
 async function processData(userID, restaurantID, formData) {
-    
+    const { data, error } = await supabase.storage.form("images").upload("user_images", formData.image)
+    if(error){
+        console.error("Ein Fehler ist aufgetreten:", error);
+        return NextResponse.json({status: 401, message: `Ein Supabase-Fehler ist aufgetreten: ${error}`})
+    }
 }

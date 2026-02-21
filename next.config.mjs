@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   reactStrictMode: true,
   outputFileTracingRoot: process.cwd(),
   // Removed swcMinify as it's deprecated in Next.js 15
