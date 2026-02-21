@@ -10,47 +10,14 @@ import * as CryptoJS from "crypto-js";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableHeader,
-} from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { FaPen, FaTrash, FaInfo } from "react-icons/fa";
 
@@ -66,7 +33,6 @@ const restaurant_icon = require("./img/restaurantLabelIcon.png");
 //const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 export default function PageBuilder() {
-
   const router = useRouter();
 
   const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }
@@ -88,20 +54,19 @@ export default function PageBuilder() {
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
   const [positionNum, setPositionNum] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: session, status } = useSession();
 
-  if (
-    status === "authenticated" &&
-    !autherized &&
-    session.user.role === "Owner"
-  ) {
-    console.log("Signed in as:", session.user.id);
-    console.log("User Data:", session.user);
-    setUserID(session.user.id);
+  useEffect(() => {
+    if (status === "authenticated" && !autherized && session.user.role === "Owner") {
+      console.log("Signed in as:", session.user.id);
+      console.log("User Data:", session.user);
+      setUserID(session.user.id);
 
-    setIsAutherizedUser(true);
-  }
+      setIsAutherizedUser(true);
+    }
+  }, [status, autherized, session]);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -148,11 +113,10 @@ export default function PageBuilder() {
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
         // Fix das
         setFontNew(freshData.userData.restaurant.menu.font);
-        if(fontNew){}
-        const count = freshData.userData.restaurant.menu.reduce(
-          (total, menu) => total + menu.categories.length,
-          0,
-        );
+        if (fontNew) {
+          console.log("FontNew:(Unfertig?)", fontNew)
+        }
+        const count = freshData.userData.restaurant.menu.reduce((total, menu) => total + menu.categories.length, 0);
         console.log(count);
         setPositionNum(count);
       } catch (error) {
@@ -178,10 +142,7 @@ export default function PageBuilder() {
       items: data.items,
     };
 
-    setComponents((prev) => [
-      ...prev,
-      { type: "menuSection", section: newSection },
-    ]);
+    setComponents((prev) => [...prev, { type: "menuSection", section: newSection }]);
   };
 
   const onSubmit = async (data) => {
@@ -189,29 +150,32 @@ export default function PageBuilder() {
     const updatedItems = await Promise.all(
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
-          try {
-            const formData = new FormData();
-            formData.append("file", selectedFiles[index]);
-            const response = await fetch(
-              `/api/restaurant/${restaurantID}/Images/uploadImg`,
-              {
-                method: "POST",
-                body: formData,
-              },
-            );
+          if (selectedFiles[index]) {
+            try {
+              const uploadData = new FormData();
 
-            if (response.ok) {
-              const result = await response.json();
-              return { ...item, image: result.filePath };
-            } else {
-              console.error("Upload failed for item", index);
-              alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
-              return item;
+              uploadData.append("image", selectedFiles[index]);
+              uploadData.append("restaurantID", restaurantID);
+              uploadData.append("userID", userID);
+
+              const response = await fetch("/api/user/profil/uploadImg", {
+                method: "POST",
+                body: uploadData,
+              });
+
+              if (response.ok) {
+                const result = await response.json();
+
+                return {
+                  ...item,
+                  image: result.path,
+                };
+              } else {
+                alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
+              }
+            } catch (error) {
+              console.error(error);
             }
-          } catch (error) {
-            console.error("Upload error for item", index, error);
-            alert(`Fehler beim Hochladen des Bildes für Gericht ${index + 1}`);
-            return item;
           }
         }
         return item;
@@ -228,18 +192,11 @@ export default function PageBuilder() {
     const restaurantID = serverData.userData.restaurant.id;
     const api_key = process.env.NEXT_PUBLIC_API_KEY;
     console.log("API-KEY Abfrage:", api_key);
-    console.log(
-      `!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`,
-    );
+    console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
     console.log("Deleted Dishes:", deletedDishes);
     console.log("Deleted Categories:", deletedCategories);
 
-    const {
-      enc_data,
-      encrypted_restaurant_id,
-      encrypted_api_key,
-      encrypted_user_id,
-    } = await encrypt_data(userID, components, restaurantID, api_key);
+    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
 
     console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
     console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
@@ -264,9 +221,7 @@ export default function PageBuilder() {
       const resData = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          `HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`,
-        );
+        throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
       }
 
       // Then, handle deletions if any
@@ -276,18 +231,9 @@ export default function PageBuilder() {
           dishes: deletedDishes,
           categories: deletedCategories,
         };
-        console.log(
-          `Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`,
-        );
-        const {
-          enc_data: enc_delete_data,
-          encrypted_restaurant_id: enc_rest_id,
-          encrypted_api_key: enc_api_key,
-          encrypted_user_id: enc_user_id,
-        } = await encrypt_data(userID, deleteData, restaurantID, api_key);
-        console.log(
-          `Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`,
-        );
+        console.log(`Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`);
+        const { enc_data: enc_delete_data, encrypted_restaurant_id: enc_rest_id, encrypted_api_key: enc_api_key, encrypted_user_id: enc_user_id } = await encrypt_data(userID, deleteData, restaurantID, api_key);
+        console.log(`Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`);
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -302,9 +248,7 @@ export default function PageBuilder() {
         const deleteResData = await deleteResponse.json();
 
         if (!deleteResponse.ok) {
-          throw new Error(
-            `Delete error! status: ${deleteResponse.status}, Message: ${deleteResData.message || "N/A"}, Error: ${deleteResData.error || "N/A"}`,
-          );
+          throw new Error(`Delete error! status: ${deleteResponse.status}, Message: ${deleteResData.message || "N/A"}, Error: ${deleteResData.error || "N/A"}`);
         }
 
         // Clear the deleted lists after successful deletion
@@ -325,38 +269,17 @@ export default function PageBuilder() {
   };
 
   const encrypt_data = async (userID, components, restaurantID, api_key) => {
-    console.log(
-      "components before stringify (function encrypt_data):",
-      components,
-      typeof components,
-    );
+    console.log("components before stringify (function encrypt_data):", components, typeof components);
     console.log("Vor dem Verschlüsseln: (userID)", userID);
     console.log("Vor dem Verschlüsseln: (api_key)", api_key);
     console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
     const data = JSON.stringify(components);
     try {
-      const enc_data = CryptoJS.AES.encrypt(
-        data,
-        process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
-      ).toString();
-      const encrypted_restaurant_id = CryptoJS.AES.encrypt(
-        restaurantID,
-        process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
-      ).toString();
-      const encrypted_api_key = CryptoJS.AES.encrypt(
-        api_key,
-        process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
-      ).toString();
-      const encrypted_user_id = CryptoJS.AES.encrypt(
-        userID,
-        process.env.NEXT_PUBLIC_ENCRYPTION_KEY,
-      ).toString();
-      console.log(
-        "Daten nach encryption (function encrypt_data):",
-        enc_data,
-        encrypted_api_key,
-        encrypted_restaurant_id,
-      );
+      const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
+      console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
       return {
         enc_data,
         encrypted_restaurant_id,
@@ -386,9 +309,7 @@ export default function PageBuilder() {
       <SheetContent side="right" className="w-full max-w-3xl">
         <SheetHeader>
           <SheetTitle>Menü-Dashboard</SheetTitle>
-          <SheetDescription>
-            Hier können Sie ganz einfach ein neues Menü erstellen
-          </SheetDescription>
+          <SheetDescription>Hier können Sie ganz einfach ein neues Menü erstellen</SheetDescription>
         </SheetHeader>
         <ScrollArea className="h-[70vh]">
           <div className="p-4">
@@ -407,10 +328,7 @@ export default function PageBuilder() {
                     </FormItem>
                   )}
                 />
-                <h1>
-                  Der Neue aber kaputte Code = der useFieldArray stört die
-                  Sheets und schließt sie
-                </h1>
+                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets und schließt sie</h1>
                 <FormField
                   control={control}
                   name="menu_name"
@@ -427,10 +345,7 @@ export default function PageBuilder() {
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold">Gerichte:</h3>
                   {fields.map((item, index) => (
-                    <div
-                      key={item.id}
-                      className="p-4 border rounded-xl bg-gray-50 relative"
-                    >
+                    <div key={item.id} className="p-4 border rounded-xl bg-gray-50 relative">
                       <FormField
                         control={control}
                         name={`items.${index}.name`}
@@ -451,10 +366,7 @@ export default function PageBuilder() {
                           <FormItem>
                             <FormLabel>Beschreibung</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="z.B. Mit Sahnesauce"
-                                {...field}
-                              />
+                              <Input placeholder="z.B. Mit Sahnesauce" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -467,12 +379,7 @@ export default function PageBuilder() {
                           <FormItem>
                             <FormLabel>Preis</FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="z.B. 9.50"
-                                type="text"
-                                inputMode="decimal"
-                                {...field}
-                              />
+                              <Input placeholder="z.B. 9.50" type="text" inputMode="decimal" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -507,25 +414,14 @@ export default function PageBuilder() {
                             </FormControl>
                             {watch(`items.${index}.image`) && (
                               <div className="mt-2">
-                                <Image
-                                  src={String(watch(`items.${index}.image`))}
-                                  alt="Vorschau"
-                                  width={200}
-                                  height={150}
-                                  className="mt-2 rounded-lg border"
-                                />
+                                <Image src={String(watch(`items.${index}.image`))} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />
                               </div>
                             )}
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="absolute top-2 right-2 text-red-500"
-                        onClick={() => remove(index)}
-                      >
+                      <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
                         Entfernen
                       </Button>
                     </div>
@@ -551,13 +447,7 @@ export default function PageBuilder() {
         </ScrollArea>
 
         <SheetFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() =>
-              append({ name: "", price: 0, description: "", image: "" })
-            }
-          >
+          <Button type="button" variant="outline" onClick={() => append({ name: "", price: 0, description: "", image: "" })}>
             Gericht hinzufügen
           </Button>
         </SheetFooter>
@@ -590,8 +480,7 @@ export default function PageBuilder() {
     });
     const [changedItems, setChangedItems] = useState([]);
     const [changedCategories, setChangedCategories] = useState([]);
-    const toggleExpand = (index) =>
-      setExpandedIndex(expandedIndex === index ? null : index);
+    const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
     const [edditCategoryData, setEdditCategoryData] = useState([
       {
         color: "",
@@ -625,11 +514,7 @@ export default function PageBuilder() {
 
     const deleteDish = (dishId) => {
       console.log("Deleting dish:", dishId);
-      if (
-        window.confirm(
-          "Sind Sie sicher, dass Sie dieses Gericht löschen möchten?",
-        )
-      ) {
+      if (window.confirm("Sind Sie sicher, dass Sie dieses Gericht löschen möchten?")) {
         setDeletedDishes((prev) => {
           const newList = [...prev, dishId];
           console.log("Updated deletedDishes:", newList);
@@ -640,11 +525,7 @@ export default function PageBuilder() {
     };
 
     const deleteCategory = () => {
-      if (
-        window.confirm(
-          "Sind Sie sicher, dass Sie diese gesamte Kategorie löschen möchten?",
-        )
-      ) {
+      if (window.confirm("Sind Sie sicher, dass Sie diese gesamte Kategorie löschen möchten?")) {
         setDeletedCategories((prev) => [...prev, categoryId]);
       }
     };
@@ -653,23 +534,13 @@ export default function PageBuilder() {
       console.log("Changes", changedItems);
     }
     return (
-      <Table
-        className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}
-      >
+      <Table className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}>
         <div className="relative flex items-center justify-center">
-          <h3
-            className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}
-          >
-            {title}
-          </h3>
+          <h3 className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
           <Button className="absolute left-0 ml-3" onClick={openCategoryMenu_}>
             <FaPen />
           </Button>
-          <Button
-            className="absolute right-0 mr-3"
-            variant="destructive"
-            onClick={deleteCategory}
-          >
+          <Button className="absolute right-0 mr-3" variant="destructive" onClick={deleteCategory}>
             <FaTrash />
           </Button>
         </div>
@@ -687,22 +558,14 @@ export default function PageBuilder() {
           <TableBody>
             {menuItems?.map((item, index) => (
               <React.Fragment key={index}>
-                <TableRow
-                  className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-yellow-50"} transition-colors duration-200 cursor-pointer`}
-                  onClick={() => toggleExpand(index)}
-                >
+                <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-yellow-50"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         variant="secondary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          openMenuItemEddit(
-                            item.id,
-                            item.name,
-                            item.price,
-                            item.description,
-                          );
+                          openMenuItemEddit(item.id, item.name, item.price, item.description);
                         }}
                       >
                         <FaPen />
@@ -718,45 +581,16 @@ export default function PageBuilder() {
                       </Button>
                     </div>
                   </TableCell>
-                  <TableCell
-                    className={`font-serif ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}
-                  >
-                    {item.name}
-                  </TableCell>
-                  <TableCell
-                    className={`text-gray-600 ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}
-                  >
-                    {item.description}
-                  </TableCell>
-                  <TableCell
-                    className={`text-right font-mono ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}
-                  >
-                    {item.price}0€
-                  </TableCell>
+                  <TableCell className={`font-serif ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>{item.name}</TableCell>
+                  <TableCell className={`text-gray-600 ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}>{item.description}</TableCell>
+                  <TableCell className={`text-right font-mono ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
                   <TableCell className="hidden">{item.id}</TableCell>
                 </TableRow>
                 {expandedIndex === index && (
                   <TableRow>
                     <TableCell colSpan={4} className="px-6 py-4">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt="Vorschau"
-                          width={800}
-                          height={800}
-                          className="mt-2 rounded-lg border center relative"
-                        />
-                      ) : (
-                        <p>No image available:{item.imageUrl}</p>
-                      )}
-                      <Image
-                        src={
-                          "/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/image.png"
-                        }
-                        alt="Test"
-                        width={2000}
-                        height={2000}
-                      />
+                      {item.imageUrl ? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
+                      <Image src={"/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/image.png"} alt="Test" width={2000} height={2000} />
                     </TableCell>
                   </TableRow>
                 )}
@@ -764,15 +598,7 @@ export default function PageBuilder() {
             ))}
           </TableBody>
         </Table>
-        <SelectItem
-          open={openItem}
-          onOpenChange={setOpenItem}
-          selectedItem={selectedItem}
-          setChangedItem={setChangedItems}
-          category={title}
-          restaurantId={serverData?.userData?.restaurant?.id}
-          userID={userID}
-        />
+        <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
         <EdditCategoryMenu
           open={openCategoryMenu}
           onOpenChange={setOpenCategoryMenu}
@@ -794,7 +620,7 @@ export default function PageBuilder() {
     );
   };
   return (
-    <div className="min-h-screen" style={{fontFamily: fontNew}}>
+    <div className="min-h-screen" style={{ fontFamily: fontNew }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
       <div>
         <div className="p-1">
@@ -802,65 +628,29 @@ export default function PageBuilder() {
             <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
               Zurück
             </Button>
-            <OptionMenu
-              openOptions={openOptions}
-              setOpenOptions={setOpenOptions}
-              bgColor={bgColor}
-              setBgColor={setBgColor}
-              router={router}
-              restaurantID={restaurantID}
-              serverData={serverData}
-            />
+            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} />
             <MenuEditor />
           </div>
-          <div
-            className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`}
-            style={bgColor ? { backgroundColor: bgColor } : {}}
-          >
+          <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
             <header className="mb-12 text-center w-full sm:grid sm:grid-col1">
               <div className="flex items-center justify-center gap-3">
                 {!edditName ? (
                   <>
                     {serverData?.userData?.restaurant?.name && (
                       <>
-                        <h1 className="text-5xl font-serif font-semibold italic tracking-wide">
-                          {serverData.userData.restaurant.name}
-                        </h1>
-                        <Image
-                          src={restaurant_icon}
-                          width={100}
-                          height={100}
-                          alt="RestaurantIcon"
-                        />
+                        <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{serverData.userData.restaurant.name}</h1>
+                        <Image src={restaurant_icon} width={100} height={100} alt="RestaurantIcon" />
                       </>
                     )}
                   </>
                 ) : (
-                  <Input
-                    type="text"
-                    className="text-center text-5xl"
-                    placeholder={
-                      serverData?.userData?.restaurant?.name ||
-                      "Bitte einen Namen für die Überschrift wählen"
-                    }
-                  />
+                  <Input type="text" className="text-center text-5xl" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />
                 )}
               </div>
               <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
             </header>
             <main className="w-full">
-              <div className="max-w-7xl mx-auto grid gap-4">
-                {serverData?.userData?.restaurant?.menu?.[0]?.categories?.map(
-                  (category) => (
-                    <MenuSection
-                      key={category.id}
-                      title={category.name}
-                      menuItems={category.dishes}
-                      categoryId={category.id}
-                    />
-                  ),
-                ) || <div>Keine Daten vorhanden</div>}
-              </div>
+              <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
 
               <p className="mt-4" style={{ fontFamily: fontNew }}>
                 Gesamtpreis:
@@ -868,9 +658,7 @@ export default function PageBuilder() {
 
               <details className="mt-8">
                 <summary>Debug Data</summary>
-                <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">
-                  {JSON.stringify(serverData, null, 2)}
-                </pre>
+                <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
               </details>
             </main>
           </div>

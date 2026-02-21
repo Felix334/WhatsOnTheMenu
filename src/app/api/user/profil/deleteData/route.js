@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import {prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import * as CryptoJS from "crypto-js";
@@ -7,7 +7,6 @@ import { setup_logger } from "@/logger";
 import path from "path";
 import { unlink, access } from "fs/promises";
 
-const prisma = new PrismaClient();
 const logger = setup_logger();
 
 export async function POST(req) {

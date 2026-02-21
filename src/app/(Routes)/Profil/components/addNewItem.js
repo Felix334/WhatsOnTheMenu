@@ -115,19 +115,22 @@ const AddNewItems = () => {
                               if (file) {
                                 try {
                                   const formData = new FormData();
-                                  formData.append("file", file);
+                                  formData.append("image", file);
+                                  formData.append("restaurantID", restaurantId);
+                                  formData.append("userID", userID);
 
-                                  const response = await fetch("/api/upload", {
+                                  const response = await fetch("/api/user/profil/uploadImg", {
                                     method: "POST",
                                     body: formData,
                                   });
 
                                   if (response.ok) {
                                     const result = await response.json();
-                                    field.onChange(result.imageUrl);
+                                    field.onChange(result.path);
                                   } else {
-                                    console.error("Upload failed");
-                                    alert("Bild-Upload fehlgeschlagen");
+                                    const errorData = await response.json();
+                                    console.error("Upload failed:", errorData);
+                                    alert("Bild-Upload fehlgeschlagen: " + errorData.message);
                                   }
                                 } catch (error) {
                                   console.error("Upload error:", error);

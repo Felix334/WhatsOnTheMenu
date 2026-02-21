@@ -273,7 +273,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                   control={control}
                   name="Bild"
                   render={(
-                    { field: { onChange, ...field } } // Destructure to handle file
+                    { field: { onChange, value, ...field } } // Destructure to handle file
                   ) => (
                     <FormItem className="mb-6">
                       <FormLabel onClick={() => toggleEdit("img")}>
@@ -284,12 +284,32 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                         <FormControl>
                           <Input
                             type="file"
-                            onChange={(e) => {
+                            accept="image/*"
+                            onChange={async (e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                // For files: Convert to URL or upload (placeholder)
-                                // onChange(URL.createObjectURL(file)); // Temp URL for preview
-                                onChange(file); // But note: Files aren't JSON-serializable - upload separately
+                                try {
+                                  const formData = new FormData();
+                                  formData.append("image", file);
+                                  formData.append("restaurantID", restaurantId);
+                                  formData.append("userID", userID);
+
+                                  const response = await fetch("/api/user/profil/uploadImg", {
+                                    method: "POST",
+                                    body: formData,
+                                  });
+
+                                  if (response.ok) {
+                                    const result = await response.json();
+                                    onChange(result.path);
+                                  } else {
+                                    console.error("Upload failed");
+                                    alert("Bild-Upload fehlgeschlagen");
+                                  }
+                                } catch (error) {
+                                  console.error("Upload error:", error);
+                                  alert("Fehler beim Hochladen des Bildes");
+                                }
                               }
                             }}
                             {...field}
@@ -299,7 +319,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                         <div>{selectedItem.img || "-"}</div> // Show URL or placeholder
                       )}
                       <FormMessage />
-                      {/* Note: For real file uploads, add upload logic in onSubmit before encryption */}
                     </FormItem>
                   )}
                 />
