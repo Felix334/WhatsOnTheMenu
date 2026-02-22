@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
 import QRCode from "qrcode";
 import { useSearchParams } from "next/navigation";
 
-export default function Page() {
+/* ---------------- Content Component ---------------- */
+
+function QRContent() {
   const searchParams = useSearchParams();
 
   const [qrCode, setQrCode] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const canvasRef = useRef(null);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [restaurantURL, setRestaurantURL] = useState("");
+
+  /* ---------------- URL Build ---------------- */
 
   useEffect(() => {
     const id = searchParams.get("restaurantID");
@@ -23,13 +28,12 @@ export default function Page() {
       window.location.origin
     );
 
-    url.search = new URLSearchParams({
-      restaurantID: id,
-    });
+    url.searchParams.set("restaurantID", id);
 
-    const full = url.toString();
-    setRestaurantURL(full);
+    setRestaurantURL(url.toString());
   }, [searchParams]);
+
+  /* ---------------- QR Generator ---------------- */
 
   const generateQRCode = async () => {
     if (!restaurantURL) return;
@@ -37,7 +41,7 @@ export default function Page() {
     setIsGenerating(true);
 
     try {
-      const url = await QRCode.toDataURL(restaurantURL, {
+      const qrDataURL = await QRCode.toDataURL(restaurantURL, {
         width: 256,
         margin: 2,
         color: {
@@ -46,16 +50,13 @@ export default function Page() {
         },
       });
 
-      setQrCode(url);
+      setQrCode(qrDataURL);
 
-      if (canvasRef.current) {
-        await QRCode.toCanvas(canvasRef.current, restaurantURL, {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        await QRCode.toCanvas(canvas, restaurantURL, {
           width: 256,
           margin: 2,
-          color: {
-            dark: "#000000",
-            light: "#FFFFFF",
-          },
         });
       }
     } catch (error) {
@@ -66,28 +67,40 @@ export default function Page() {
     }
   };
 
+  /* ---------------- Download ---------------- */
+
   const downloadQRCode = () => {
     if (!qrCode) return;
 
     const link = document.createElement("a");
     link.href = qrCode;
     link.download = "qrcode.png";
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  /* ---------------- Clear ---------------- */
+
   const clearQRCode = () => {
     setQrCode("");
-    if (canvasRef.current) {
-      const ctx = canvasRef.current.getContext("2d");
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
+
+  /* ---------------- Render ---------------- */
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-2xl p-8">
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             QR Code Generator
@@ -99,6 +112,7 @@ export default function Page() {
 
         <div className="mb-6">
           <h1 className="font-semibold mb-1">Ihre Profil-URL:</h1>
+
           <p className="break-all text-sm text-blue-700">
             {restaurantURL || "Keine Restaurant-ID gefunden"}
           </p>
@@ -114,13 +128,14 @@ export default function Page() {
 
         {qrCode && (
           <div className="text-center mb-6">
+
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-4">
               <Image
                 src={qrCode}
                 alt="Generated QR Code"
-                className="mx-auto"
                 width={256}
                 height={256}
+                className="mx-auto"
               />
             </div>
 
@@ -131,6 +146,7 @@ export default function Page() {
               >
                 Download
               </button>
+
               <button
                 onClick={clearQRCode}
                 className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg"
@@ -138,9 +154,21 @@ export default function Page() {
                 Löschen
               </button>
             </div>
+
           </div>
         )}
+
       </div>
     </div>
+  );
+}
+
+/* ---------------- Page Wrapper (Next 15 Suspense Fix) ---------------- */
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Loading...</div>}>
+      <QRContent />
+    </Suspense>
   );
 }

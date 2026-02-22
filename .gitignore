@@ -50,11 +50,6 @@ package-lock.json
 
 # prisma migrations
 prisma/migrations/
-prisma/seedPrisma.js
-
-generated
-.prisma/client
 
 # Drawio
 /Roadmap.drawio
-/generated/prisma

@@ -43,13 +43,13 @@ export default function RestaurantList() {
   /* ---------------- URL userID sync ---------------- */
 
   useEffect(() => {
-    if (userID && !setTrue) {
+    if (autherizedUser) {
       const newSearchParams = new URLSearchParams(searchParams);
       newSearchParams.set("userID", userID);
       router.replace(`${pathname}?${newSearchParams.toString()}`);
       setSetTrue(true);
     }
-  }, [userID, setTrue, router, pathname, searchParams]);
+  }, [userID, setTrue, router, pathname, searchParams, autherizedUser]);
 
   /* ---------------- Cookie check ---------------- */
 

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"
+import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
-import { supabase } from "@/lib/supabase.js"
+import { supabase } from "src/lib/supabase.js"
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +21,28 @@ type SuccessResponse = {
   restaurantId: string;
   data: string;
   apiKey: string;
+};
+
+type Menu = {
+  id: string;
+  name: string;
+  description: string | null;
+  restaurantId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  bgColor: string;
+  font: string;
+};
+
+type Category = {
+  id: string;
+  name: string;
+  description: string | null;
+  position: number | null;
+  bgColor: string | null;
+  font: string | null;
+  fontColor: string | null;
+  menuId: string | null;
 };
 
 type ErrorResponse = { error: string; status: number };

@@ -2,29 +2,10 @@
 import { NextRequest, NextResponse } from "next/server"; import { PrismaClient } from "generated/prisma/client"; import * as CryptoJS from "crypto-js"; import NextAuth from "next-auth"; import GithubProvider from "next-auth/providers/github"; import EmailProvider from "next-auth/providers/email"; import GoogleProvider from "next-auth/providers/google"; import FacebookProvider from "next-auth/providers/facebook"; import CredentialsProvider from "next-auth/providers/credentials"; import { PrismaAdapter } from "@next-auth/prisma-adapter"; //import { prisma } from "@/lib/prisma"; import bcrypt from "bcryptjs";
 */
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "src/lib/prisma";
 import CryptoJS from "crypto-js";
 import bcrypt from "bcryptjs";
 
-/* ------------------------------------------------------------------ */
-/* Prisma Client (Accelerate)                                          */
-/* ------------------------------------------------------------------ */
-
-const accelerateUrl = process.env.DATABASE_URL;
-
-if (!accelerateUrl) {
-  console.error("USERNAME_LOGIN: DATABASE_URL is not defined");
-  throw new Error("USERNAME_LOGIN: DATABASE_URL is not defined");
-}
-
-const prisma = new PrismaClient({
-  accelerateUrl,
-  errorFormat: "pretty",
-});
-
-/* ------------------------------------------------------------------ */
-/* Types                                                               */
-/* ------------------------------------------------------------------ */
 
 interface EncryptedData {
   encrypted_email: string;

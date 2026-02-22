@@ -1,0 +1,86 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getToken } from "next-auth/jwt";
+import { authOptions } from "src/lib/auth";
+import { getServerSession } from "next-auth";
+
+export async function GET(req, { params }) {
+  try {
+    const session = await getServerSession(authOptions);
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner" || session) {
+      return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    }
+
+    // Next.js 15 App Router liefert params direkt als Objekt
+    const restaurantID = params.restaurantID;
+
+    if (!restaurantID) {
+      return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
+    }
+
+    const menu = await prisma.menu.findFirst({
+      where: { restaurantId: restaurantID },
+    });
+
+    if (!menu) {
+      return NextResponse.json({ message: "Menu not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Menu data retrieved", data: menu });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function POST(req, { params }) {
+  try {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner") {
+      return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    }
+
+    const restaurantID = params.restaurantID;
+    const { bgColor, font } = await req.json();
+
+    if (!restaurantID) {
+      return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
+    }
+
+    if (!bgColor || !font) {
+      return NextResponse.json({ message: "bgColor and font are required" }, { status: 400 });
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantID },
+      select: { ownerId: true },
+    });
+
+    if (!restaurant) {
+      return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
+    }
+
+    if (restaurant.ownerId !== token.id) {
+      return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    }
+
+    const updatedMenu = await prisma.menu.updateMany({
+      where: { restaurantId: restaurantID },
+      data: { bgColor, font },
+    });
+
+    if (updatedMenu.count === 0) {
+      return NextResponse.json({ message: "Menu not found" }, { status: 404 });
+    }
+
+    const menu = await prisma.menu.findFirst({
+      where: { restaurantId: restaurantID },
+    });
+
+    return NextResponse.json({ message: "Menu updated successfully", data: menu });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ message: "Failed to update menu" }, { status: 500 });
+  }
+}

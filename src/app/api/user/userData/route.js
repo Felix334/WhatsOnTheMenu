@@ -1,8 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "src/lib/prisma";
 const cryptoJS = require("crypto-js");
 
-const prisma = new PrismaClient();
 
 export async function POST(req) {
   console.log("Ping");

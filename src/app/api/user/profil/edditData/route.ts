@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
@@ -43,12 +43,13 @@ async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T
 
 export async function POST(req: NextRequest) {
   try {
- const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ message: "Nicht authentifiziert" }, { status: 401 });
+    const session = await getServerSession(authOptions);
+    console.log("ServerSession2:", session);
+
+    if (!session || !session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Optional: Owner-Rolle prüfen
     if (session.user.role !== "Owner") {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
@@ -60,8 +61,8 @@ export async function POST(req: NextRequest) {
 
     // --- DECRYPTION ---
     const decryptResult = await decryption(encryptedData);
-    console.log("Decryted Result:",decryptResult);
-    decryptResult ? console.log(decryptResult) : console.log("Keine Daten vorhanden")
+    console.log("Decryted Result:", decryptResult);
+    decryptResult ? console.log(decryptResult) : console.log("Keine Daten vorhanden");
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
     }
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
           where: { restaurantId },
           include: { categories: { include: { dishes: true } } },
         }),
-      "menu.findFirst"
+      "menu.findFirst",
     );
 
     if (!menu) {
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
                 },
                 include: { dishes: true },
               }),
-            "category.create"
+            "category.create",
           );
 
           menu.categories.push(category);
@@ -165,7 +166,7 @@ export async function POST(req: NextRequest) {
                   position: section.position ?? currentPosition,
                 },
               }),
-            "category.update"
+            "category.update",
           );
         }
 
@@ -195,7 +196,7 @@ export async function POST(req: NextRequest) {
                     menuId,
                   },
                 }),
-              `dish.create (${item.name})`
+              `dish.create (${item.name})`,
             );
 
             category.dishes.push(newDish);
@@ -211,7 +212,7 @@ export async function POST(req: NextRequest) {
                     imageUrl: item.image,
                   },
                 }),
-              `dish.update (${item.name})`
+              `dish.update (${item.name})`,
             );
           }
         }
@@ -230,7 +231,7 @@ export async function POST(req: NextRequest) {
                 //border: cat.border,
               },
             }),
-          `category.update (${cat.name})`
+          `category.update (${cat.name})`,
         );
       }
     }

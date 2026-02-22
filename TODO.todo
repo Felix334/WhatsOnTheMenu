@@ -1,6 +1,7 @@
 
 
-
+=> Jeder Owner bekommt neben der userID noch eine extra OwnerID die bei der Abfrage übereinstimmen muss
+=> DeviceID werden auch gespeichert
 
 => Bei der Speisekarte bekommt jeder einen Header den er gestallten kann => Ein Bild oder ähnliches=> Drunter die Speisekarte
 => In der kostenlosen Version ist Bestellung über Webseite mit dabei => Um Nutzer anzukurbeln (Aber Kommision enthalten)
