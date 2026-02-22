@@ -13,7 +13,7 @@ export async function GET(req, { params }) {
     }
 
     // Next.js 15 App Router liefert params direkt als Objekt
-    const restaurantID = params.restaurantID;
+    const restaurantID = await params.restaurantID;
 
     if (!restaurantID) {
       return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });

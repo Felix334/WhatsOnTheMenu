@@ -114,7 +114,7 @@ export default function PageBuilder() {
         // Fix das
         setFontNew(freshData.userData.restaurant.menu.font);
         if (fontNew) {
-          console.log("FontNew:(Unfertig?)", fontNew)
+          console.log("FontNew:(Unfertig?)", fontNew);
         }
         const count = freshData.userData.restaurant.menu.reduce((total, menu) => total + menu.categories.length, 0);
         console.log(count);
@@ -537,12 +537,14 @@ export default function PageBuilder() {
       <Table className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}>
         <div className="relative flex items-center justify-center">
           <h3 className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
-          <Button className="absolute left-0 ml-3" onClick={openCategoryMenu_}>
-            <FaPen />
-          </Button>
-          <Button className="absolute right-0 mr-3" variant="destructive" onClick={deleteCategory}>
-            <FaTrash />
-          </Button>
+          <div className="absolute left-2">
+            <Button onClick={openCategoryMenu_}>
+              <FaPen />
+            </Button>
+            <Button variant="destructive" className="absolute ml-2" onClick={deleteCategory}>
+              <FaTrash />
+            </Button>
+          </div>
         </div>
         <Table>
           <TableHeader>
@@ -558,9 +560,10 @@ export default function PageBuilder() {
           <TableBody>
             {menuItems?.map((item, index) => (
               <React.Fragment key={index}>
-                <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-yellow-50"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
-                  <TableCell>
-                    <div className="flex gap-2">
+                <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-100"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
+                  <TableCell className="rounded-l-xl"></TableCell>
+                  <TableCell className="overflow-hidden rounded-xl">
+                    <div className="flex gap-2 overflow-hidden">
                       <Button
                         variant="secondary"
                         onClick={(e) => {
