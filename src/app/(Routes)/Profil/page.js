@@ -533,75 +533,129 @@ export default function PageBuilder() {
     if (changedItems) {
       console.log("Changes", changedItems);
     }
+    
     return (
-      <Table className={`bg-white rounded-xl shadow-lg max-w-6xl w-full py-12 p-8 ${deletedCategories.includes(categoryId) ? "border-red-500 border-2" : ""}`}>
-        <div className="relative flex items-center justify-center">
-          <h3 className={`text-center text-4xl font-semibold mt-3 mb-9 ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
-          <div className="absolute left-2">
-            <Button onClick={openCategoryMenu_}>
+      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
+        {/* Category Header - outside Table, as a separate header */}
+        <div className="relative flex items-center justify-center py-6 px-4 border-b bg-gray-50">
+          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>
+            {title}
+          </h3>
+
+          {/* Category Buttons (left side) */}
+          <div className="absolute left-2 sm:left-4 flex gap-2">
+            <Button onClick={openCategoryMenu_} size="icon" variant="outline">
               <FaPen />
             </Button>
-            <Button variant="destructive" className="absolute ml-2" onClick={deleteCategory}>
+
+            <Button variant="destructive" size="icon" onClick={deleteCategory}>
               <FaTrash />
             </Button>
           </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead></TableHead>
-              <TableHead className="text-left" style={{ fontFamily: fontNew }}>
-                Speisen:
-              </TableHead>
-              <TableHead className="text-left">Beschreibung:</TableHead>
-              <TableHead className="text-right">Preis:</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {menuItems?.map((item, index) => (
-              <React.Fragment key={index}>
-                <TableRow className={`${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-100"} transition-colors duration-200 cursor-pointer`} onClick={() => toggleExpand(index)}>
-                  <TableCell className="rounded-l-xl"></TableCell>
-                  <TableCell className="overflow-hidden rounded-xl">
-                    <div className="flex gap-2 overflow-hidden">
-                      <Button
-                        variant="secondary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openMenuItemEddit(item.id, item.name, item.price, item.description);
-                        }}
-                      >
-                        <FaPen />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteDish(item.id);
-                        }}
-                      >
-                        <FaTrash />
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell className={`font-serif ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>{item.name}</TableCell>
-                  <TableCell className={`text-gray-600 ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}>{item.description}</TableCell>
-                  <TableCell className={`text-right font-mono ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
-                  <TableCell className="hidden">{item.id}</TableCell>
-                </TableRow>
-                {expandedIndex === index && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="px-6 py-4">
-                      {item.imageUrl ? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border center relative" /> : <p>No image available:{item.imageUrl}</p>}
-                      <Image src={"/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/image.png"} alt="Test" width={2000} height={2000} />
+
+        {/* Table - responsive design with fixed layout */}
+        <div className="overflow-x-auto">
+          <Table className="w-full min-w-[700px] table-fixed">
+            <colgroup>
+              <col className="w-20" />
+              <col className="w-1/4" />
+              <col className="w-1/2" />
+              <col className="w-24" />
+            </colgroup>
+            <TableHeader>
+              <TableRow className="bg-gray-100 hover:bg-gray-100">
+                <TableHead className="text-left">Aktionen</TableHead>
+                <TableHead className="text-left" style={{ fontFamily: fontNew }}>
+                  Speisen
+                </TableHead>
+                <TableHead className="text-left" style={{ fontFamily: fontNew }}>
+                  Beschreibung
+                </TableHead>
+                <TableHead className="text-right">Preis</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {menuItems?.map((item, index) => (
+                <React.Fragment key={index}>
+                  <TableRow 
+                    className={`
+                      ${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-50"} 
+                      transition-colors duration-200 cursor-pointer border-b
+                    `} 
+                    onClick={() => toggleExpand(index)}
+                  >
+                    {/* Button Column - fixed width */}
+                    <TableCell className="align-middle">
+                      <div className="flex gap-1">
+                        <Button
+                          size="icon"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openMenuItemEddit(item.id, item.name, item.price, item.description);
+                          }}
+                        >
+                          <FaPen />
+                        </Button>
+
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteDish(item.id);
+                          }}
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </TableCell>
+
+                    {/* Name */}
+                    <TableCell className={`font-serif align-middle truncate ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
+                      {item.name}
+                    </TableCell>
+
+                    {/* Description - takes remaining space */}
+                    <TableCell className={`text-gray-600 align-middle ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}>
+                      {item.description}
+                    </TableCell>
+
+                    {/* Price */}
+                    <TableCell className={`text-right font-mono align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>
+                      {item.price}0€
                     </TableCell>
                   </TableRow>
-                )}
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
+
+                  {/* Expanded Image Row */}
+                  {expandedIndex === index && (
+                    <TableRow className="bg-gray-50">
+                      <TableCell colSpan={4} className="px-4 sm:px-6 py-4">
+                        {item.imageUrl ? (
+                          <Image 
+                            src={item.imageUrl} 
+                            alt="Vorschau" 
+                            width={800} 
+                            height={800} 
+                            className="mt-2 rounded-lg border max-w-full h-auto" 
+                          />
+                        ) : (
+                          <p className="text-gray-500">Kein Bild vorhanden</p>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Modals */}
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
+
         <EdditCategoryMenu
           open={openCategoryMenu}
           onOpenChange={setOpenCategoryMenu}
@@ -619,7 +673,7 @@ export default function PageBuilder() {
           categoryId={categoryId}
           position={positionNum}
         />
-      </Table>
+      </div>
     );
   };
   return (

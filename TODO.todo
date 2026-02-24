@@ -15,11 +15,6 @@
 => Login ändern => Zu Supabase Auth => Spart DB RW und funktioniert mit 
 
 
-
-
-
-
-
 => Bilder nur im Premium Abo => Restaurant ohne Premium kosten dann nix (SupabaseDB, Vercel)
 
 // => Bei jeder API => werden die Daten vorher richtig verarbeitet(JSON.stringify usw)?
