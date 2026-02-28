@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-export default function RestaurantList() {
+function RestaurantListContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCuisine, setSelectedCuisine] = useState("Alle");
   const [restaurantList, setRestaurantList] = useState([]);
@@ -243,5 +243,31 @@ export default function RestaurantList() {
         )}
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen w-full">
+      <div className="container mx-auto py-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8 justify-center">
+          <div className="h-10 w-1/3 bg-amber-50 animate-pulse rounded"></div>
+          <div className="h-10 w-32 bg-gray-200 animate-pulse rounded"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-48 bg-gray-200 animate-pulse rounded"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function RestaurantList() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <RestaurantListContent />
+    </Suspense>
   );
 }

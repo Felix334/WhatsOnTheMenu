@@ -4,7 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,7 @@ import Profile from "./components/Profile";
 //import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
-const BeispielKarte = require("./components/img/Beispiel-Karte.png");
-const BeispielKarte2 = require("./components/img/Beispiel-Karte2.png");
-
-export default function Home() {
+function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [navShadow, setNavShadow] = useState(false);
@@ -517,5 +514,22 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="h-16 bg-white shadow-lg"></div>
+      <div className="h-96 gradient-bg"></div>
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <HomeContent />
+    </Suspense>
   );
 }

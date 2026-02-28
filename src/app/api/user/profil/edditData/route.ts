@@ -3,6 +3,7 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
+import { Restaurant } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
     /* ---------------- LOAD USER & RESTAURANT ---------------- */
 
     const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
-    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique");
+    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique") as Restaurant | null;
 
     if (!user || !restaurant) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
