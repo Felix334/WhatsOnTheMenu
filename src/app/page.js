@@ -28,6 +28,9 @@ function HomeContent() {
   const [setTrue, setSetTrue] = useState(false);
   const [adminAcces, setAdminAccess] = useState(false);
 
+  const BeispielKarte = require("./components/img/Beispiel-Karte.png");
+  const BeispielKarte2 = require("./components/img/Beispiel-Karte2.png");
+
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,7 +39,7 @@ function HomeContent() {
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
   // const autherizedUser = userID && (role === "Owner" || role === "Admin") && status === "authenticated";
-  const autherizedUser = userID && status === "authenticated"
+  const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
 
   useEffect(() => {
@@ -447,7 +450,7 @@ function HomeContent() {
                       <Link
                         href={{
                           pathname: "./ErstelleRestaurantAccount/Professional",
-                         query: { ...router.queryString },
+                          query: { ...router.queryString },
                         }}
                       >
                         Jetzt starten
@@ -457,7 +460,7 @@ function HomeContent() {
                 </Card>
 
                 <Card className="flex flex-col h-full">
-                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Empfohlen</Badge>
+                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Empfohlen</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
                     <div className="text-3xl font-bold text-red-800">Individuell</div>
