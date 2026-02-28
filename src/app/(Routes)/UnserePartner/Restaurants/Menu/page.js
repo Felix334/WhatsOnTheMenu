@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import React from "react";
@@ -13,7 +13,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-const Menu = () => {
+const MenuContent = () => {
   const searchParams = useSearchParams();
   const [serverData, setServerData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -202,4 +202,18 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+function MenuSkeleton() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      Loading...
+    </div>
+  );
+}
+
+export default function Menu() {
+  return (
+    <Suspense fallback={<MenuSkeleton />}>
+      <MenuContent />
+    </Suspense>
+  );
+}
