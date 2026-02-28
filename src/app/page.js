@@ -38,8 +38,9 @@ export default function Home() {
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
-  const autherizedUser = userID && (role === "Owner" || role === "Admin") && status === "authenticated";
-  const adminAcc = userID && role === "Admin";
+  // const autherizedUser = userID && (role === "Owner" || role === "Admin") && status === "authenticated";
+  const autherizedUser = userID && status === "authenticated"
+  const adminAcc = userID && role === "Admin" && status === "authenticated";
 
   useEffect(() => {
     if (userID && !setTrue) {

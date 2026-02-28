@@ -680,13 +680,25 @@ export default function PageBuilder() {
     <div className="min-h-screen" style={{ fontFamily: fontNew }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
       <div>
-        <div className="p-1">
-          <div className="absolute top-5 flex gap-2 items-center">
+        <div className="">
+          <div className="absolute top-5 flex gap-2 items-center pl-1">
             <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
               Zurück
             </Button>
             <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} />
             <MenuEditor />
+          </div>
+          <div className="absolute right-1 top-5">
+            <Button>
+              <Link
+              href={{
+                pathname: "/UnserePartner/Restaurants/Menu",
+                query: {
+                  userID: userID,
+                  restaurantID: restaurantID
+                }
+              }}>User-Ansicht</Link>
+            </Button>
           </div>
           <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
             <header className="mb-12 text-center w-full sm:grid sm:grid-col1">
@@ -710,10 +722,10 @@ export default function PageBuilder() {
               <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
 
               <p className="mt-4" style={{ fontFamily: fontNew }}>
-                Gesamtpreis:
+                Gesamtpreis: 0€
               </p>
 
-              <details className="mt-8">
+              <details className="absolute right-1">
                 <summary>Debug Data</summary>
                 <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
               </details>

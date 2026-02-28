@@ -98,6 +98,9 @@ export async function POST(req: NextRequest) {
     // --- VALIDATE USER / RESTAURANT ---
     const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
     const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique");
+    if(restaurant){
+      console.log("Restaurant-Daten-Check",restaurant)
+    }
 
     if (!user || !restaurant) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });

@@ -27,7 +27,6 @@ export default function AdminConsole() {
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   /* ---------------- Auth ---------------- */
 
@@ -41,13 +40,13 @@ export default function AdminConsole() {
   useEffect(() => {
     if (!userID) return;
 
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(window.location.search);
 
     if (params.get("userID") !== userID) {
       params.set("userID", userID);
       router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [userID]);
+  }, [userID, pathname, router]);
 
   /* ---------------- Fetch Users ---------------- */
 
@@ -273,7 +272,6 @@ export default function AdminConsole() {
     return <div>Supabase-Nutzung</div>;
   }
 }
-
 
 /*
 -Name des Restaurants
