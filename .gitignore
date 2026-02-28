@@ -41,9 +41,6 @@ process.env
 *.tsbuildinfo
 next-env.d.ts
 
-#package.json
-package-lock.json
-
 #sql
 .sql
 /migration
