@@ -5,6 +5,7 @@ import NextAuth from "next-auth";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import CryptoJS from "crypto-js";
+import { User, Restaurant } from "@prisma/client";
 
 interface EncryptedData {
   encrypted_user_id: string;
@@ -84,8 +85,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
     }
 
-    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
-    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique");
+    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique") as User | null;
+    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique") as Restaurant | null;
 
     if (!user || !restaurant || user.role != "Owner") {
       return NextResponse.json({status: 401, message: "Ungültiger Nutzer oder Restaurant" });

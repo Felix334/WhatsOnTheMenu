@@ -4,6 +4,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 import { supabase } from "src/lib/supabase.js"
+import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory } from "@prisma/client";
+
+type MenuWithRelations = PrismaMenu & { categories: PrismaCategory[] };
 
 export const dynamic = "force-dynamic";
 
@@ -112,8 +115,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
     }
 
-    // fetch user & restaurant
-    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
+    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique") as User | null;
     const restaurant = await safeDb(
       () =>
         prisma.restaurant.findUnique({
@@ -121,7 +123,7 @@ export async function POST(req: NextRequest) {
           include: { menu: { include: { categories: true } } },
         }),
       "restaurant.findUnique"
-    );
+    ) as (Restaurant & { menu: MenuWithRelations[] }) | null;
 
     if (!user || !restaurant) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
@@ -147,7 +149,7 @@ export async function POST(req: NextRequest) {
             },
           }),
         "menu.create"
-      );
+      ) as PrismaMenu;
 
       menu = (await safeDb(
         () =>
@@ -172,7 +174,7 @@ export async function POST(req: NextRequest) {
       const items: any[] = Array.isArray(section.items) ? section.items : [];
 
       // find or create category
-      let category = await safeDb(() => prisma.category.findFirst({ where: { menuId, name: title } }), "category.findFirst");
+      let category = await safeDb(() => prisma.category.findFirst({ where: { menuId, name: title } }), "category.findFirst") as PrismaCategory | null;
 
       if (!category) {
         category = await safeDb(
@@ -181,7 +183,7 @@ export async function POST(req: NextRequest) {
               data: { name: title, description: null, position: null, menuId },
             }),
           "category.create"
-        );
+        ) as PrismaCategory;
       }
 
       // create dishes

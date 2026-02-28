@@ -3,7 +3,11 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
-import { Restaurant } from "@prisma/client";
+import { Restaurant, Menu, Category, Dish } from "@prisma/client";
+
+type MenuWithRelations = Menu & {
+  categories: (Category & { dishes: Dish[] })[];
+};
 
 export const dynamic = "force-dynamic";
 
@@ -118,7 +122,7 @@ export async function POST(req: NextRequest) {
           include: { categories: { include: { dishes: true } } },
         }),
       "menu.findFirst",
-    );
+    ) as MenuWithRelations | null;
 
     if (!menu) {
       return NextResponse.json({ message: "Kein Menü gefunden" }, { status: 404 });
@@ -150,7 +154,7 @@ export async function POST(req: NextRequest) {
                 include: { dishes: true },
               }),
             "category.create",
-          );
+          ) as Category & { dishes: Dish[] };
 
           menu.categories.push(category);
         } else {
@@ -192,7 +196,7 @@ export async function POST(req: NextRequest) {
                   },
                 }),
               `dish.create (${item.name})`,
-            );
+            ) as Dish;
 
             category.dishes.push(newDish);
           } else {
