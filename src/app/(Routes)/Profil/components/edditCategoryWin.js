@@ -1,27 +1,16 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form"; // Removed unused useFieldArray
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect, useState, useRef } from "react";
+import { useForm } from "react-hook-form";
 import CryptoJS from "crypto-js";
 
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
-import { FaCircleInfo } from "react-icons/fa6";
-
-import { colors, colors_german } from "./colorPalet";
+import { colors } from "./colorPalet";
 
 import { AddNewItems } from "./addNewItem";
-import { type } from "os";
 
 //import { menuSchema, itemSchema } from "./menuSchema";
 
@@ -163,14 +152,13 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                 <FormItem>
                   <FormLabel>Position:</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field}>
-                    <ScrollArea>
-                      {position.map((num) => {
-                        <div>{num}</div>
-                      })}
-                      </ScrollArea>
-                      </Input>
+                    <Input type="number" {...field} />
                   </FormControl>
+                  <ScrollArea className="h-[100px] w-full rounded-md border p-2">
+                    {Array.isArray(position) && position.map((num, index) => (
+                      <div key={index}>{num}</div>
+                    ))}
+                  </ScrollArea>
                   <FormMessage />
                 </FormItem>
               )}
@@ -216,27 +204,27 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
             <FormField
               control={form.control}
               name="img"
-              render={({ field }) => {
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Bild</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                </FormItem>;
-              }}
+                </FormItem>
+              )}
             />
             <FormField
               control={form.control}
               name="item"
-              render={({ field }) => {
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Gerichte hinzufügen</FormLabel>
                   <FormControl>
                     <AddNewItems />
                   </FormControl>
-                </FormItem>;
-              }}
-            ></FormField>
+                </FormItem>
+              )}
+            />
             <div className="flex justify-between pt-4">
               <Button type="submit">Speichern</Button>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

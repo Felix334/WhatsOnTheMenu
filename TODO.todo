@@ -1,6 +1,8 @@
 => Kategorie kann nicht ohne Fehler bearbeitet werden
 => Letztes Item verändert die Border bei hover
 
+=> Console Logs am ende entfernen => aber nicht die console.errors => wird alles auf vercel angezeigt
+
 => Jeder Owner bekommt neben der userID noch eine extra OwnerID die bei der Abfrage übereinstimmen muss
 => DeviceID werden auch gespeichert
 
