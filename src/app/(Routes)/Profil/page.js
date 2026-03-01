@@ -533,14 +533,12 @@ export default function PageBuilder() {
     if (changedItems) {
       console.log("Changes", changedItems);
     }
-    
+
     return (
       <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
         {/* Category Header - outside Table, as a separate header */}
         <div className="relative flex items-center justify-center py-6 px-4 border-b bg-gray-50">
-          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>
-            {title}
-          </h3>
+          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           {/* Category Buttons (left side) */}
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -558,32 +556,29 @@ export default function PageBuilder() {
         <div className="overflow-x-auto">
           <Table className="w-full min-w-[700px] table-fixed">
             <colgroup>
-              <col className="w-20" />
+              <col className="sm:w-20 md:w-full md:absolute" />
               <col className="w-1/4" />
               <col className="w-1/2" />
               <col className="w-24" />
             </colgroup>
             <TableHeader>
-              <TableRow className="bg-gray-100 hover:bg-gray-100">
+              <TableRow className="bg-gray-100 hover:bg-gray-100 w-full">
                 <TableHead className="text-left">Aktionen</TableHead>
                 <TableHead className="text-left" style={{ fontFamily: fontNew }}>
                   Speisen
                 </TableHead>
-                <TableHead className="text-left" style={{ fontFamily: fontNew }}>
-                  Beschreibung
-                </TableHead>
-                <TableHead className="text-right">Preis</TableHead>
+                <TableHead className="text-right right-1 absolute">Preis:</TableHead>
               </TableRow>
             </TableHeader>
 
-            <TableBody>
+            <TableBody className="">
               {menuItems?.map((item, index) => (
                 <React.Fragment key={index}>
-                  <TableRow 
+                  <TableRow
                     className={`
                       ${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-50"} 
                       transition-colors duration-200 cursor-pointer border-b
-                    `} 
+                    `}
                     onClick={() => toggleExpand(index)}
                   >
                     {/* Button Column - fixed width */}
@@ -613,37 +608,22 @@ export default function PageBuilder() {
                       </div>
                     </TableCell>
 
-                    {/* Name */}
-                    <TableCell className={`font-serif align-middle truncate ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
-                      {item.name}
-                    </TableCell>
-
-                    {/* Description - takes remaining space */}
-                    <TableCell className={`text-gray-600 align-middle ${deletedDishes.includes(item.id) ? "text-red-500 line-through" : ""}`}>
-                      {item.description}
+                    <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
+                      <div className="flex flex-col">
+                        <span className="font-serif truncate">{item.name}</span>
+                        {item.description && <span className="text-sm text-gray-500 break-words">{item.description}</span>}
+                      </div>
                     </TableCell>
 
                     {/* Price */}
-                    <TableCell className={`text-right font-mono align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>
-                      {item.price}0€
-                    </TableCell>
+                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
                   </TableRow>
 
                   {/* Expanded Image Row */}
                   {expandedIndex === index && (
                     <TableRow className="bg-gray-50">
                       <TableCell colSpan={4} className="px-4 sm:px-6 py-4">
-                        {item.imageUrl ? (
-                          <Image 
-                            src={item.imageUrl} 
-                            alt="Vorschau" 
-                            width={800} 
-                            height={800} 
-                            className="mt-2 rounded-lg border max-w-full h-auto" 
-                          />
-                        ) : (
-                          <p className="text-gray-500">Kein Bild vorhanden</p>
-                        )}
+                        {item.imageUrl ? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border max-w-full h-auto" /> : <p className="text-gray-500">Kein Bild vorhanden</p>}
                       </TableCell>
                     </TableRow>
                   )}
@@ -691,13 +671,16 @@ export default function PageBuilder() {
           <div className="absolute right-1 top-5">
             <Button>
               <Link
-              href={{
-                pathname: "/UnserePartner/Restaurants/Menu",
-                query: {
-                  userID: userID,
-                  restaurantID: restaurantID
-                }
-              }}>User-Ansicht</Link>
+                href={{
+                  pathname: "/UnserePartner/Restaurants/Menu",
+                  query: {
+                    userID: userID,
+                    restaurantID: restaurantID,
+                  },
+                }}
+              >
+                User-Ansicht
+              </Link>
             </Button>
           </div>
           <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
