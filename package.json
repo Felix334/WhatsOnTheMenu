@@ -1,18 +1,18 @@
 {
   "name": "whatsonthemenu",
   "version": "0.1.0",
-"scripts": {
-  "dev": "next dev",
-  "build": "prisma generate && next build",
-  "start": "next start",
-  "lint": "next lint",
-  "postinstall": "prisma generate",
-  "docker:build": "docker build -t my-nextjs-app .",
-  "docker:run": "docker run -p 3000:3000 my-nextjs-app",
-  "docker:dev": "docker run -p 3000:3000 -v $(pwd):/app my-nextjs-app npm run dev",
-  "docker:prod": "npm run docker:build && npm run docker:run",
-  "prismaseed": "node prisma/seedPrisma"
-},
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "docker:build": "docker build -t my-nextjs-app .",
+    "docker:run": "docker run -p 3000:3000 my-nextjs-app",
+    "docker:dev": "docker run -p 3000:3000 -v $(pwd):/app my-nextjs-app npm run dev",
+    "docker:prod": "npm run docker:build && npm run docker:run",
+    "prismaseed": "node prisma/seedPrisma"
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@next-auth/prisma-adapter": "^1.0.7",
@@ -38,6 +38,7 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.95.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@vercel/analytics": "^1.6.1",
     "@yudiel/react-qr-scanner": "^2.3.1",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
