@@ -4,13 +4,11 @@
 => Jeder Owner bekommt neben der userID noch eine extra OwnerID die bei der Abfrage übereinstimmen muss
 => DeviceID werden auch gespeichert
 
-=> QR-Code-Generierung
-
 => Bei der Speisekarte bekommt jeder einen Header den er gestallten kann => Ein Bild oder ähnliches=> Drunter die Speisekarte
 => In der kostenlosen Version ist Bestellung über Webseite mit dabei => Um Nutzer anzukurbeln (Aber Kommision enthalten)
 => Erst Bestellungs-Anfrage(Kann vom Restaurant abgeleht oder bestätigt werden)
 
-
+=> Essen kann gelich über die Webseite im Restaurant bestellt/bezahlt werden => QR scannen => Essen wählen => 
 
 => Login ändern => Zu Supabase Auth => Spart DB RW und funktioniert mit 
 

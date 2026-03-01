@@ -28,8 +28,8 @@ function HomeContent() {
   const [setTrue, setSetTrue] = useState(false);
   const [adminAcces, setAdminAccess] = useState(false);
 
-  const BeispielKarte = require("./components/img/Beispiel-Karte.png");
-  const BeispielKarte2 = require("./components/img/Beispiel-Karte2.png");
+  const BeispielKarte = require("./components/img/Beispiel-Karte.webp");
+  const BeispielKarte2 = require("./components/img/Beispiel-Karte2.webp");
 
   const { data: session, status } = useSession();
   const router = useRouter();
