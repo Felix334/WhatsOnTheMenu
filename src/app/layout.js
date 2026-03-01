@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CookieBanner from "./components/cookieWin";
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import Providers from "./components/Providers.js";
 
 const geistSans = Geist({
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <Analytics />
+          <SpeedInsights />
           <CookieBanner />
         </Providers>
       </body>
