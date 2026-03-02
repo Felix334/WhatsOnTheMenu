@@ -48,7 +48,15 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <Analytics />
-          <Script async strategy="afterInteractive" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossOrigin="anonymous" />
+          <Script 
+            async 
+            strategy="afterInteractive" 
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" 
+            crossOrigin="anonymous"
+          />
+          <Script id="adsbygoogle-init" strategy="afterInteractive">
+            {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+          </Script>
           <SpeedInsights />
           <CookieBanner />
         </Providers>

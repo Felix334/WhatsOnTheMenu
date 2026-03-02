@@ -1,0 +1,6 @@
+# ads.txt - Authorized Digital Sellers
+# This file is required for Google AdSense verification
+# Replace the publisher ID below with your actual AdSense Publisher ID
+# You can find your Publisher ID in your AdSense account (e.g., ca-pub-4153577229204032)
+
+google.com, pub-4153577229204032, DIRECT, f08c47fec0942fa0
