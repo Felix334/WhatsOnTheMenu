@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Head from "next/head";
 import Image from "next/image";
@@ -136,6 +136,7 @@ function HomeContent() {
             border: 1px solid rgba(255, 255, 255, 0.2);
           }
         `}</style>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossorigin="anonymous"></script>
       </Head>
       <div className="h-full bg-gray-50 hero-bg">
         {/* Navigation */}
@@ -405,7 +406,7 @@ function HomeContent() {
                         <Link
                           href={{
                             pathname: "./ErstelleRestaurantAccount/FreeTier",
-                            query: { ...router.queryString, },
+                            query: { ...router.queryString },
                           }}
                         >
                           Jetzt starten
