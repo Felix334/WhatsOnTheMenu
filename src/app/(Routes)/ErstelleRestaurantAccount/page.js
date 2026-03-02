@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -15,38 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export default function Page() {
+function PricingContent() {
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
   const queryString = searchParams.toString();
-  console.log(session)
+  const { data: session } = useSession();
 
-  /* -------------------------
-     Loading & Auth Check
-  -------------------------- */
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Lade...
-      </div>
-    );
-  }
-
-  if (!session?.user?.id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Bitte anmelden
-      </div>
-    );
-  }
-
-  /* -------------------------
-     Role & Subscription Logic
-  -------------------------- */
-
-  const role = session.user.role;
-  const tier = session.user.subscription?.tier ?? "FREE";
+  const tier = session?.user?.subscription?.tier ?? "FREE";
 
   const isFree = tier === "FREE";
   const isPro = tier === "PRO";
@@ -225,5 +200,43 @@ export default function Page() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function Page() {
+  const { data: session, status } = useSession();
+
+  /* -------------------------
+     Loading & Auth Check
+  -------------------------- */
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Lade...
+      </div>
+    );
+  }
+
+  if (!session?.user?.id) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Bitte anmelden
+      </div>
+    );
+  }
+
+  /* -------------------------
+     Role & Subscription Logic
+  -------------------------- */
+
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        Lade...
+      </div>
+    }>
+      <PricingContent />
+    </Suspense>
   );
 }
