@@ -2,6 +2,7 @@
 => Letztes Item verändert die Border bei hover
 
 => Console Logs am ende entfernen => aber nicht die console.errors => wird alles auf vercel angezeigt
+=> Routing noch kaputt => für alle direkte routen einfügen
 
 => Jeder Owner bekommt neben der userID noch eine extra OwnerID die bei der Abfrage übereinstimmen muss
 => DeviceID werden auch gespeichert

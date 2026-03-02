@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import Head from "next/head";
 import Image from "next/image";
@@ -405,7 +405,7 @@ function HomeContent() {
                         <Link
                           href={{
                             pathname: "./ErstelleRestaurantAccount/FreeTier",
-                            query: { ...router.queryString },
+                            query: { ...router.queryString, },
                           }}
                         >
                           Jetzt starten
