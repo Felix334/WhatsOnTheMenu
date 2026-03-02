@@ -136,7 +136,6 @@ function HomeContent() {
             border: 1px solid rgba(255, 255, 255, 0.2);
           }
         `}</style>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossorigin="anonymous"></script>
         <meta name="google-adsense-account" content="ca-pub-4153577229204032"></meta>
       </Head>
       <div className="h-full bg-gray-50 hero-bg">
