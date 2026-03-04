@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
+// Cache configuration - cache for 5 minutes at CDN level, revalidate after 10 minutes
+export const dynamic = 'force-dynamic';
+
+const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
 
 
 export async function POST(req, { params }) {
@@ -69,7 +72,12 @@ export async function POST(req, { params }) {
       createdAt: restaurant.createdAt,
     };
 
-    return NextResponse.json(response);
+    // Return with cache headers
+    return NextResponse.json(response, {
+      headers: {
+        'Cache-Control': CACHE_CONTROL,
+      },
+    });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
     return NextResponse.json({ message: "Internal server error", error: error.message }, { status: 500 });

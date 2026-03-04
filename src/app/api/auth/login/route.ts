@@ -6,6 +6,9 @@ import { prisma } from "src/lib/prisma";
 import CryptoJS from "crypto-js";
 import bcrypt from "bcryptjs";
 
+// Force dynamic rendering - login should never be statically cached
+export const dynamic = 'force-dynamic';
+
 
 interface EncryptedData {
   encrypted_email: string;

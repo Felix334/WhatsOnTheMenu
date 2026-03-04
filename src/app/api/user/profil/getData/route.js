@@ -3,6 +3,9 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 
+// Force dynamic rendering - this route should never be statically generated
+export const dynamic = 'force-dynamic';
+
 
 
 export async function POST(req) {

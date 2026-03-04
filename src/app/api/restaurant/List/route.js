@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma"
-import { getSession } from "next-auth/react";
-import { getServerSession } from "next-auth";
-//import { authOptions } from "../../auth/[...nextauth]/route";
-import { authOptions } from '@/lib/auth';
-import { error } from "console";
+
+// Cache configuration - cache for 2 minutes at CDN level, revalidate after 5 minutes
+export const dynamic = 'force-dynamic';
+
+const CACHE_CONTROL = 'public, s-maxage=120, stale-while-revalidate=300';
 
 
 
 export async function POST(req) {
   const data = await readDB()
-  return NextResponse.json({status: 200, data: data})
+  return NextResponse.json({status: 200, data: data}, {
+    headers: {
+      'Cache-Control': CACHE_CONTROL,
+    },
+  })
 }
 
 async function readDB() {
