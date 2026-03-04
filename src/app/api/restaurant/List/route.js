@@ -22,7 +22,5 @@ async function readDB() {
   return restaurantList;
   }catch(err){
     console.error(err)
-  }finally{
-    await prisma.$disconnect();
   }
 }

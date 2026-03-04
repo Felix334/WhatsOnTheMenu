@@ -67,8 +67,5 @@ async function main(ID, data) {
     }
   } catch (e) {
     console.log("Database Error", e);
-  } finally {
-    console.log()
-    await prisma.$disconnect();
   }
 }

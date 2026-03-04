@@ -31,8 +31,6 @@ export async function POST(req) {
   } catch (err) {
     console.error("API Error:", err);
     return NextResponse.json({ status: 500, message: "Server error" });
-  } finally {
-    await prisma.$disconnect();
   }
 }
 

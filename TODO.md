@@ -1,14 +1,25 @@
-# Database Adjustments Implementation Plan
+# Edge Functions Optimization - TODO List
 
-## Steps to Complete:
-- [x] Add RestaurantQueue model for pending restaurant submissions with user verification
-- [x] Modify Category model: add bgColor, font, fontColor fields
-- [x] Add parentId field to User model for hierarchical accounts (parent accounts for chains)
-- [x] Add Company model for parent companies with sub-accounts for employees
-- [x] Expand Role enum to include Manager, Executive, etc. for executive rights
-- [x] Add Dashboard model linked to User for employee dashboards
-- [x] Add Subscription enum and subscription field to User model for different subscription accounts
-- [x] Add Payment model to store payments in DB
-- [x] Add Report model linked to Dish (and possibly others) for report system, viewable in admin dashboard
-- [x] Add EmailInbox model for email inbox functionality
-- [x] Run Prisma migration to apply schema changes
+## Step 1: Update Prisma for Edge Compatibility
+- [x] Create Edge-optimized Prisma client setup
+- [ ] Remove manual `$disconnect()` calls from all routes
+
+## Step 2: Optimize API Routes
+- [ ] Add Edge runtime to `/api/restaurant/[restaurantID]/menu/route.js`
+- [ ] Add Edge runtime to `/api/restaurant/List/route.js`
+- [ ] Add Edge runtime to `/api/user/profil/getData/route.js`
+- [ ] Add Edge runtime to `/api/auth/login/route.ts`
+- [ ] Add Edge runtime to other GET routes
+
+## Step 3: Add Caching Headers
+- [ ] Add cache headers to read-only GET routes
+- [ ] Add revalidation times where appropriate
+
+## Step 4: Optimize Database Queries
+- [ ] Optimize menu route - select only needed fields
+- [ ] Add pagination to list endpoints
+
+## Step 5: Edge-Compatible Authentication
+- [ ] Install @node-rs/argon2
+- [ ] Replace bcrypt with argon2 in login/register routes
+

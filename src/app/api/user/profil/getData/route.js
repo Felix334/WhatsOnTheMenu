@@ -77,7 +77,5 @@ async function main(userId) {
   } catch (error) {
     console.error("Error fetching user data: ", error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
