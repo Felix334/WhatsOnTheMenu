@@ -27,7 +27,6 @@ export default function RestaurantForm() {
     address: "",
     phone: "",
     website: "",
-    openingHours: "",
     category: "",
     description: "",
   });
@@ -58,7 +57,7 @@ export default function RestaurantForm() {
     try {
       restaurantSchema.parse(restaurant);
 
-      const res = await fetch("/api/restaurant/requestRegister", {
+      const res = await fetch("/api/restaurant/requestRegister/FreeTier", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(restaurant),
@@ -74,12 +73,8 @@ export default function RestaurantForm() {
         ownerName: "",
         name: "",
         email: "",
-        address: "",
-        phone: "",
-        website: "",
-        openingHours: "",
-        category: "",
-        description: "",
+        postalCode: "",
+        city: "",
       });
       setErrors({});
     } catch (err) {
@@ -105,7 +100,7 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
             Name (Voller legaler Name) <span className="text-red-500">*</span>
           </label>
-          <input id="name" name="name" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="ownerName" name="Name des Besitzers" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.ownerName && <p className="text-red-500 mt-1">{errors.ownerName}</p>}
         </div>
         {/* Name */}
@@ -113,7 +108,7 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
             Name des Restaurants <span className="text-red-500">*</span>
           </label>
-          <input id="name" name="name" type="text" value={restaurant.name} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.name ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="name" name="Name" type="text" value={restaurant.name} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.name ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.name && <p className="text-red-500 mt-1">{errors.name}</p>}
         </div>
 
@@ -121,7 +116,7 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
             Email<span className="text-red-500">*</span>
           </label>
-          <input id="name" name="name" type="text" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="email" name="email" type="email" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
 
@@ -130,28 +125,28 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
             Postleitzahl <span className="text-red-500">*</span>
           </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
+          <input id="postalCode" name="Postleitzahl" type="text" value={restaurant.postalCode} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.postalCode ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          {errors.address && <p className="text-red-500 mt-1">{errors.postalCode}</p>}
         </div>
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
             Stadt <span className="text-red-500">*</span>
           </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
+          <input id="town" name="town" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.city ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          {errors.address && <p className="text-red-500 mt-1">{errors.city}</p>}
         </div>
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
             Straße <span className="text-red-500">*</span>
           </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="street" name="Straße" type="text" value={restaurant.street} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.street ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
         </div>
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
             Hausnummer <span className="text-red-500">*</span>
           </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="houseNumber" name="Hausnummer" type="text" value={restaurant.houseNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
         </div>
 
@@ -167,12 +162,6 @@ export default function RestaurantForm() {
         {/* Website */}
 
         {/* Öffnungszeiten */}
-        <div>
-          <label className="block font-medium text-red-700 mb-1" htmlFor="openingHours">
-            Öffnungszeiten(noch nicht möglich)
-          </label>
-          <input id="openingHours" name="openingHours" type="text" value={restaurant.openingHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Mo-Fr 09:00-18:00" />
-        </div>
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="category">
             Kategorie wählen:

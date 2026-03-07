@@ -8,7 +8,7 @@
 
 
 => Kategorie kann nicht ohne Fehler bearbeitet werden
-=> Letztes Item verändert die Border bei hover
+
 
 => Console Logs am ende entfernen => aber nicht die console.errors => wird alles auf vercel angezeigt
 => Routing noch kaputt => für alle direkte routen einfügen
@@ -31,7 +31,7 @@
 
 => Bild sollte auf die Bildschirmgröße angepasst werden
 
-Fix the Profil picture
+=> Google Profil-Bild funktioniert (nur in der webversion)
 
 API-Key Abfrage ÜBERALL einfügen
 

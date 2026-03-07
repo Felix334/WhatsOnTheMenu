@@ -62,7 +62,7 @@ function PricingContent() {
             <CardContent className="flex flex-col flex-1">
               <ul className="space-y-4 mb-10">
                 {[
-                  "Bis zu 7 Speisekarten",
+                  "1 Speisekarte",
                   "Basis Templates",
                   "QR-Code",
                 ].map((feature) => (

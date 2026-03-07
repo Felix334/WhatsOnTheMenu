@@ -8,7 +8,7 @@ const CACHE_CONTROL = 'public, s-maxage=120, stale-while-revalidate=300';
 
 
 
-export async function POST(req) {
+export async function POST() {
   const data = await readDB()
   return NextResponse.json({status: 200, data: data}, {
     headers: {
