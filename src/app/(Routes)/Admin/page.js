@@ -11,8 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus } from "lucide-react";
+import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, User, Store } from "lucide-react";
 
 export default function AdminConsole() {
   /* ---------------- State ---------------- */
@@ -21,6 +22,7 @@ export default function AdminConsole() {
   const [filter, setFilter] = useState("all");
   const [userList, setUserList] = useState([]);
   const [rolesMap, setRolesMap] = useState({});
+  const [requestList, setRequestList] = useState([]);
   const [activePage, setActivePage] = useState("users");
 
   const { data: session, status } = useSession();
@@ -82,6 +84,39 @@ export default function AdminConsole() {
     fetchUsers();
   }, [status, search, authorizedUser]);
 
+  useEffect(() => {
+    const fetchRestaurantRequests = async () => {
+      const key = process.env.API_KEY;
+      try {
+        const resp = await fetch("/api/Admin/getData/getRequests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            api_key: key,
+          }),
+        });
+
+        if (!resp.ok) throw new Error("Fetch failed");
+
+        const json = await resp.json();
+        console.log("Requests:", json);
+
+        setRequestList(json || []);
+
+        const map = {};
+
+        (json.data || []).forEach((u) => {
+          map[u.id] = u.role;
+        });
+
+        setRolesMap(map);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchRestaurantRequests();
+  }, []);
+
   /* ---------------- Guards ---------------- */
 
   if (status === "loading") return <div>Lade...</div>;
@@ -140,7 +175,7 @@ export default function AdminConsole() {
       <main className="col-span-12 md:col-span-10 p-4">
         {activePage === "users" && renderUsers()}
         {activePage === "settings" && renderSettings()}
-        {activePage === "requests" && renderRequests()}
+        {activePage === "requests" && renderRequests(requestList)}
         {activePage === "messages" && renderMessages()}
         {activePage === "finances" && renderFinances()}
         {activePage === "supabase" && renderSupabaseUsage()}
@@ -253,8 +288,72 @@ export default function AdminConsole() {
     );
   }
 
-  function renderRequests() {
-    return <div>Anfragen (coming soon)</div>;
+  function renderRequests(requests) {
+    console.log("Render Reuests", requests);
+    const requestArray = Array.isArray(requests) ? requests : [];
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <h1 className="text-3xl font-bold mb-6">Restaurant Anfragen</h1>
+
+        {requestArray.length === 0 && <p className="text-gray-500">Keine Anfragen vorhanden</p>}
+
+        <ScrollArea className="h-[85vh] pr-4">
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {requestArray.map((req) => (
+              <Card key={req.id} className="rounded-2xl shadow-sm hover:shadow-md transition">
+                <CardHeader className="flex flex-row justify-between items-center">
+                  <h2 className="text-xl font-semibold truncate">{req.restaurantName}</h2>
+
+                  <Badge variant={req.status === "pending" ? "secondary" : req.status === "approved" ? "default" : "destructive"}>{req.status || "unknown"}</Badge>
+                </CardHeader>
+
+                <CardContent className="space-y-3 text-sm text-gray-700">
+                  <p className="text-gray-600 line-clamp-2">{req.description || "Keine Beschreibung"}</p>
+
+                  <div className="flex items-center gap-2">
+                    <User size={16} />
+                    {req.owner?.name || req.name || "Unbekannt"}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Mail size={16} />
+                    {req.email}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Phone size={16} />
+                    {req.phoneNumber}
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <MapPin size={16} className="mt-1" />
+
+                    <div>
+                      {req.street} {req.houseNumber}
+                      <br />
+                      {req.postalCode} {req.city}
+                      <br />
+                      {req.country}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Store size={16} />
+                    Kategorie: {req.category}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
+                    <Calendar size={14} />
+                    {req.createdAt && new Date(req.createdAt).toLocaleDateString("de-DE")}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    );
   }
 
   function renderSettings() {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 
 const restaurantSchema = z.object({
   ownerName: z.string().min(2, "Ein Name ist erforderlich"),
-  name: z.string().min(1, "Ein Restaurantname ist erforderlich"),
+  restaurantName: z.string().min(1, "Ein Restaurantname ist erforderlich"),
   email: z.string().email("Ungültige Email"),
   postalCode: z.string().min(4, "Postleitzahl erforderlich"),
   city: z.string().min(1, "Stadt erforderlich"),
@@ -21,13 +21,13 @@ const restaurantSchema = z.object({
   category: z.string().min(1, "Kategorie auswählen"),
   description: z.string().optional(),
   openingHours: z.string().optional(),
-  ownerID: z.string()
+  ownerID: z.string(),
 });
 
 export default function RestaurantForm() {
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
-    name: "",
+    restaurantName: "",
     email: "",
     postalCode: "",
     city: "",
@@ -45,7 +45,14 @@ export default function RestaurantForm() {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-    const { data: session, status } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div>Seite wird geladen</div>;
+  } else {
+    restaurant.ownerID = session.user.id;
+    console.log(session.user.id);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,7 +86,7 @@ export default function RestaurantForm() {
 
     try {
       restaurantSchema.parse(restaurant);
-      console.log("Sende Daten: ", restaurant)
+      console.log("Sende Daten: ", restaurant);
 
       const res = await fetch("/api/restaurant/requestRegister/FreeTier", {
         method: "POST",
@@ -91,7 +98,7 @@ export default function RestaurantForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        console.log(data)
+        console.log(data);
         throw new Error(data.message || "Fehler beim Speichern");
       }
 
@@ -99,7 +106,7 @@ export default function RestaurantForm() {
 
       setRestaurant({
         ownerName: "",
-        name: "",
+        restaurantName: "",
         email: "",
         postalCode: "",
         city: "",
@@ -110,7 +117,7 @@ export default function RestaurantForm() {
         category: "",
         description: "",
         openingHours: "",
-        ownerID: session.user.id
+        ownerID: session.user.id,
       });
 
       setErrors({});
@@ -149,9 +156,9 @@ export default function RestaurantForm() {
         <div>
           <label className="block font-medium mb-1">Restaurantname *</label>
 
-          <input name="name" value={restaurant.name} onChange={handleChange} className={inputStyle("name")} />
+          <input name="restaurantName" value={restaurant.restaurantName} onChange={handleChange} className={inputStyle("name")} />
 
-          {errors.name && <p className="text-red-500">{errors.name}</p>}
+          {errors.restaurantName && <p className="text-red-500">{errors.restaurantName}</p>}
         </div>
 
         <div>
@@ -248,7 +255,7 @@ export default function RestaurantForm() {
             <option value="doener">Döner / Kebab</option>
             <option value="shawarma">Shawarma</option>
             <option value="fastfood">Fast Food</option>
-            <option value="foodtruck">Food Truck</option> 
+            <option value="foodtruck">Food Truck</option>
             <option value="streetfood">Street Food</option>
             <option value="pizza">Pizza</option>
             <option value="pasta">Pasta</option>
@@ -266,7 +273,7 @@ export default function RestaurantForm() {
             <option value="eiscafe">Eiscafé</option>
             <option value="bubbletea">Bubble Tea</option>
             <option value="dessertbar">Dessert Bar</option>
-            <option value="waffeln">Waffeln / Crêpes</option> 
+            <option value="waffeln">Waffeln / Crêpes</option>
             <option value="vegan">Vegan</option>
             <option value="vegetarisch">Vegetarisch</option>
             <option value="bio">Bio / Organic</option>
@@ -283,7 +290,7 @@ export default function RestaurantForm() {
             <option value="fine_dining">Fine Dining</option>
             <option value="all_you_can_eat">All You Can Eat</option>
             <option value="buffet">Buffet</option>
-            <option value="familienrestaurant">Familienrestaurant</option> 
+            <option value="familienrestaurant">Familienrestaurant</option>
             <option value="im_angebot">Imbiss</option>
             <option value="lieferservice">Lieferservice</option>
             <option value="takeaway">Take Away</option>

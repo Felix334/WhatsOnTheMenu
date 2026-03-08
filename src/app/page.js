@@ -426,9 +426,6 @@ function HomeContent() {
                   <CardContent>
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Keine Adds in ihrem Menü
-                      </li>
-                      <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>
                         15 Karten
                       </li>

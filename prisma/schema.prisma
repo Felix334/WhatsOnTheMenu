@@ -13,31 +13,31 @@ datasource db {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  name             String
-  email            String            @unique
-  emailVerified    DateTime?
-  password         String?
-  role             Role              @default(User)
-  subscription     Subscription      @default(Basic)
-  session          Session[]
-  restaurant       Restaurant?
-  accounts         Account[]
-  company          Company?          @relation("CompanyOwner")
-  employeeOf       Company?          @relation("CompanyEmployees", fields: [companyId], references: [id])
-  companyId        String?
-  dashboard        Dashboard?
-  payments         Payment[]
-  reports          Report[]
-  restaurantQueues RestaurantQueue[]
-  emails           EmailInbox[]
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  image            String
-  stripeCustomerId     String?   @unique
+  id                   String            @id @default(cuid())
+  name                 String
+  email                String            @unique
+  emailVerified        DateTime?
+  password             String?
+  role                 Role              @default(User)
+  subscription         Subscription      @default(Basic)
+  session              Session[]
+  restaurant           Restaurant?
+  accounts             Account[]
+  company              Company?          @relation("CompanyOwner")
+  employeeOf           Company?          @relation("CompanyEmployees", fields: [companyId], references: [id])
+  companyId            String?
+  dashboard            Dashboard?
+  payments             Payment[]
+  reports              Report[]
+  restaurantQueues     RestaurantQueue[]
+  emails               EmailInbox[]
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  image                String
+  stripeCustomerId     String?           @unique
   stripeSubscriptionId String?
   stripePriceId        String?
-  subscriptionStatus   String?   // active, canceled, trialing, unpaid
+  subscriptionStatus   String?
 
   @@index([companyId])
 }
@@ -60,7 +60,6 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
-
 
 model Session {
   id           String   @id @default(cuid())
@@ -115,7 +114,6 @@ model Location {
   restaurantId     String
   restaurant       Restaurant        @relation(fields: [restaurantId], references: [id])
   reservation      Reservation?
-  restaurantQueues RestaurantQueue[]
 
   @@index([restaurantId])
 }
@@ -209,29 +207,31 @@ model RestaurantQueue {
   updatedAt      DateTime     @updatedAt
   restaurantName String
   email          String
-  location       Location     @relation(fields: [locationId], references: [id])
   phoneNumber    String
   category       String
-  locationId     String
+  street         String
+  houseNumber    String
+  city           String
+  postalCode     String
+  country        String
   subscription   Subscription
 
   @@index([ownerId])
 }
 
 model Company {
-  id        String   @id @default(cuid())
-  name      String
+  id   String @id @default(cuid())
+  name String
 
   stripeAccountId String?
 
-  ownerId   String   @unique
-  owner     User     @relation("CompanyOwner", fields: [ownerId], references: [id])
-  employees User[]   @relation("CompanyEmployees")
+  ownerId   String @unique
+  owner     User   @relation("CompanyOwner", fields: [ownerId], references: [id])
+  employees User[] @relation("CompanyEmployees")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 model Dashboard {
   id        String   @id @default(cuid())
@@ -243,33 +243,32 @@ model Dashboard {
 }
 
 model Payment {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id])
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   // Stripe
-  stripePaymentId   String   @unique // payment_intent.id
-  stripeInvoiceId   String?
-  stripeSessionId   String?
+  stripePaymentId String  @unique // payment_intent.id
+  stripeInvoiceId String?
+  stripeSessionId String?
 
-  amount            Int      // IMMER in Cent! (999 = 9.99€)
-  currency          String   @default("eur")
+  amount   Int // IMMER in Cent! (999 = 9.99€)
+  currency String @default("eur")
 
-  status            String   // pending, succeeded, failed, refunded
-  description       String?
+  status      String // pending, succeeded, failed, refunded
+  description String?
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
 
 model StripeEvent {
-  id        String   @id   // evt_xxx von Stripe
+  id        String   @id // evt_xxx von Stripe
   type      String
   createdAt DateTime @default(now())
 }
-
 
 model Report {
   id        String   @id @default(cuid())

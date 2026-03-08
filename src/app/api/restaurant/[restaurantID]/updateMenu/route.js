@@ -8,7 +8,7 @@ export async function GET(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (!token || token.role !== "Owner" || session) {
+    if (!token || token.role !== "Owner" || !session) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
 
