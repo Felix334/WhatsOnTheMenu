@@ -168,7 +168,7 @@ model Dish {
   imageUrl    String
   categoryId  String?
   menuId      String
-  category    Category?    @relation(fields: [categoryId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   menu        Menu         @relation(fields: [menuId], references: [id])
   ingredients Ingredient[] @relation("DishIngredients")
   reviews     Review[]     @relation("DishReviews")
