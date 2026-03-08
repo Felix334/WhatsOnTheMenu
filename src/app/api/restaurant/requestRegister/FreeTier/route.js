@@ -9,7 +9,7 @@ export async function POST(req) {
     const session = await getServerSession(authOptions);
     const token = getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    if (!token || session) {
+    if (!token || !session) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
     if(session.user.role === "Owner"){

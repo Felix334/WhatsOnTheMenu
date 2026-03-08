@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
@@ -7,36 +7,167 @@ import { getToken } from "next-auth/jwt";
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
     if (!session && !token) {
-      return NextResponse.json({ message: "Unautherized" }, { status: 401 });
-    }else {
-        var body = await req
-        if(body){
-            var result = await processData(body)
-        }
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
+    const body = await req.json();
+    const requests = body?.requests || [];
+
+    console.log("Erstelle Restaurants:", requests);
+
+    const results = [];
+
+    for (const reqItem of requests) {
+      const result = await processRequest(reqItem);
+      results.push(result);
+    }
+
+    return NextResponse.json({ results });
   } catch (err) {
-    console.log(err);
-    return NextResponse.json({ status: 500 });
+    console.error("Server Error:", err);
+
+    return NextResponse.json({ message: "Server Error" }, { status: 500 });
   }
 }
 
-async function processData(new_restataurant) {
-    var data = new_restataurant;
+async function processRequest(data) {
+  const { category, city, country, description, email, houseNumber, phoneNumber, postalCode, restaurantName, street, subscription, owner } = data;
 
-    if(data){
-        const searchRestaurant = await prisma.restaurant.findFirst({
+  const ownerId = owner?.id;
+
+  console.log("Check Before Save:", {
+    category,
+    city,
+    country,
+    description,
+    email,
+    houseNumber,
+    phoneNumber,
+    postalCode,
+    restaurantName,
+    street,
+    subscription,
+    ownerId,
+  });
+
+  // Pflichtfelder prüfen
+  if (!category || !city || !country || !email || !houseNumber || !ownerId || !postalCode || !restaurantName || !street) {
+    return {
+      status: 400,
+      message: "Fehlende Felder",
+    };
+  }
+
+  // Prüfen ob User existiert
+  const user = await prisma.user.findUnique({
+    where: {
+      id: ownerId,
+    },
+  });
+
+  if (!user) {
+    console.log("User nicht gefunden:", ownerId);
+
+    return {
+      status: 404,
+      message: "Owner nicht gefunden",
+    };
+  }
+
+  // Prüfen ob Restaurant an Adresse existiert
+  const existingLocation = await prisma.location.findFirst({
+    where: {
+      street,
+      houseNumber,
+      postalCode,
+    },
+  });
+
+  if (existingLocation) {
+    return {
+      status: 409,
+      message: "Restaurant existiert bereits",
+    };
+  }
+
+  try {
+    const restaurant = await prisma.restaurant.create({
+      data: {
+        name: restaurantName,
+        parentCompany: "Parent Company",
+        category,
+
+        owner: {
+          connect: {
+            id: ownerId,
+          },
+        },
+
+        menu: {
+          create: {
+            name: "Standard Menü",
+            description: "Default Menü",
+            bgColor: "#ffffff",
+            font: "Inter",
+          },
+        },
+
+        locations: {
+          create: {
+            street,
+            houseNumber,
+            city,
+            postalCode,
+            country,
+          },
+        },
+      },
+    });
+
+    return {
+      status: 200,
+      restaurant,
+    };
+  } catch (err) {
+    console.error("Database Fehler:", err);
+
+    return {
+      status: 500,
+      message: "Database Fehler",
+    };
+  } finally {
+    const checkrestaurant = await prisma.restaurant.findUnique({
+      where: {
+        ownerId: ownerId,
+      },
+    });
+    if (checkrestaurant) {
+      console.log("Lösche:", checkrestaurant);
+      try {
+        await prisma.restaurantQueue.delete({
             where: {
-                locations: {
-                    postalCode: new_restataurant.adress.postalCode,
-                    street: new_restataurant.adress.street,
-                    houseNumber: new_restataurant.adress.houseNumber
-                }
-            }
-        })
-        if(searchRestaurant){
-            return(409)
-        }
+              ownerId: ownerId,
+            },
+          })
+          .then(async () => {
+            await prisma.user.update({
+              where: {
+                id: ownerId,
+              },
+              data: {
+                role: "Owner",
+              },
+            });
+          });
+      } catch (err) {
+        console.log(err);
+      }
     }
+  }
 }

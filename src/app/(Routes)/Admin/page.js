@@ -149,13 +149,10 @@ export default function AdminConsole() {
             <Users className="w-4 h-4" /> Users
           </Button>
 
-          <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("requests")}>
-            <div>
-              <div>
-                <UserPlus className="w-4 h-4" /> Anfragen
-              </div>
-              <div>{requestList.lenght}</div>
-            </div>
+          <Button variant="ghost" className="justify-start gap-2 flex flex-row items-center" onClick={() => setActivePage("requests")}>
+            <UserPlus className="w-4 h-4" />
+            <span>Anfragen</span>
+            <span>({requestList.length})</span>
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("settings")}>
@@ -294,6 +291,17 @@ export default function AdminConsole() {
   }
 
   function renderRequests(requests) {
+    const confirmRequest = async () => {
+      console.log("Sende:", requests)
+      const resp = await fetch("/api/restaurant/Admin/postRequests", {
+        method: "POST",
+        body: JSON.stringify({requests})
+      });
+      if (!resp.ok) {
+        window.alert("Ein Fehler ist aufgetreten:", resp);
+      }
+    };
+
     console.log("Render Reuests", requests);
     const requestArray = Array.isArray(requests) ? requests : [];
 
@@ -347,10 +355,18 @@ export default function AdminConsole() {
                     <Store size={16} />
                     Kategorie: {req.category}
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Store size={16} />
+                    Subscription: {req.subscription}
+                  </div>
 
                   <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
                     <Calendar size={14} />
                     {req.createdAt && new Date(req.createdAt).toLocaleDateString("de-DE")}
+                  </div>
+                  <div className="grid gap-1">
+                    <Button onClick={() => confirmRequest(req)}>Bestätigen</Button>
+                    <Button variant="destructive">Löschen</Button>
                   </div>
                 </CardContent>
               </Card>

@@ -94,26 +94,29 @@ enum Subscription {
 }
 
 model Restaurant {
-  id            String     @id @default(cuid())
+  id            String @id @default(cuid())
   name          String
   parentCompany String
-  ownerId       String     @unique
-  owner         User       @relation(fields: [ownerId], references: [id])
-  menu          Menu[] // A restaurant can have zero or multiple menus
-  locations     Location[]
-  createdAt     DateTime   @default(now())
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  menu      Menu[]
+  locations Location[]
+  category  String   @default("NONE")
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
 }
 
 model Location {
-  id               String            @id @default(cuid())
-  street           String
-  houseNumber      String
-  city             String
-  postalCode       String
-  country          String
-  restaurantId     String
-  restaurant       Restaurant        @relation(fields: [restaurantId], references: [id])
-  reservation      Reservation?
+  id          String @id @default(cuid())
+  street      String
+  houseNumber String
+  city        String
+  postalCode  String
+  country     String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  reservation Reservation?
 
   @@index([restaurantId])
 }
@@ -122,7 +125,7 @@ model Reservation {
   id          String   @id @default(cuid())
   locationId  String   @unique
   phoneNumber String
-  location    Location @relation(fields: [locationId], references: [id])
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 }
 
@@ -131,7 +134,7 @@ model Menu {
   name         String
   description  String?
   restaurantId String // A menu belongs to one restaurant
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   categories   Category[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -151,7 +154,7 @@ model Category {
   font        String?
   fontColor   String?
   menuId      String?
-  menu        Menu?   @relation(fields: [menuId], references: [id])
+  menu        Menu?   @relation(fields: [menuId], references: [id], onDelete: Cascade)
   dishes      Dish[]
 
   @@index([menuId])
@@ -200,7 +203,7 @@ model RestaurantQueue {
   id             String       @id @default(cuid())
   name           String
   description    String?
-  ownerId        String
+  ownerId        String       @unique
   owner          User         @relation(fields: [ownerId], references: [id])
   status         String       @default("pending") // pending, approved, rejected
   createdAt      DateTime     @default(now())
