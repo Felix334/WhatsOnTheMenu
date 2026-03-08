@@ -150,7 +150,12 @@ export default function AdminConsole() {
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("requests")}>
-            <UserPlus className="w-4 h-4" /> Anfragen
+            <div>
+              <div>
+                <UserPlus className="w-4 h-4" /> Anfragen
+              </div>
+              <div>{requestList.lenght}</div>
+            </div>
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("settings")}>
