@@ -19,6 +19,8 @@ export async function POST(req) {
       ownerId
     } = body;
 
+    console.log(body)
+
     const errors = [];
 
     if (!ownerId) {
@@ -38,7 +40,7 @@ export async function POST(req) {
       errors.push("Email ungültig.");
     }
 
-    const plzRegex = /^[0-9]{5}$/;
+    const plzRegex = /^[0-9]$/;
     if (!plz || !plzRegex.test(plz)) {
       errors.push("PLZ muss 5-stellig sein.");
     }
@@ -53,6 +55,7 @@ export async function POST(req) {
 
     if (!category) {
       errors.push("Kategorie fehlt.");
+      console
     }
 
     if (errors.length > 0) {

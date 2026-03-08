@@ -7,6 +7,7 @@
 
 
 
+
 => Kategorie kann nicht ohne Fehler bearbeitet werden
 
 
@@ -79,3 +80,8 @@ PROXMOX => als alternative zu Docker
 => Bei Admin-Zugriff die IPs speichern und bei neuer IP eine Email schicken
 
 => In the AGBs schreiben dass wir keine Verantwortung für Griefing oder Datenmissbrauch übernehmen
+
+
+
+
+=> Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt
