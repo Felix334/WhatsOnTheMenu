@@ -25,6 +25,7 @@ import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
+import { TierSystem } from "./components/TierLimits"
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -55,6 +56,7 @@ export default function PageBuilder() {
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
   const [positionNum, setPositionNum] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [Limit, setLimit] = useState({})
 
   const { data: session, status } = useSession();
 
@@ -63,6 +65,19 @@ export default function PageBuilder() {
       console.log("Signed in as:", session.user.id);
       console.log("User Data:", session.user);
       setUserID(session.user.id);
+      switch(session.user.subscription){
+        case session.user.subscription === "Basic":
+          setLimit(TierSystem.FreeTier)
+          break;
+        case session.user.subscription === "Premium":
+          setLimit(TierSystem.PremiumTier)
+          break;
+        case session.user.subscription === "Advantst":
+          setLimit(TierSystem.Advantst)
+          break;
+        default:
+          break;
+      }
 
       setIsAutherizedUser(true);
     }
@@ -222,6 +237,8 @@ export default function PageBuilder() {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
+      }else{
+        location.reload()
       }
 
       // Then, handle deletions if any
@@ -256,6 +273,7 @@ export default function PageBuilder() {
         setDeletedCategories([]);
       } else {
         console.log("No deletions to process");
+        location.reload()
       }
 
       alert("Data saved and deletions processed successfully!");

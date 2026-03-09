@@ -1,4 +1,4 @@
-const TierSysmtem = {
+const TierSystem = {
     FreeTier: {
         DishLimit: 30,
         CategoryLimit: 8,
@@ -14,4 +14,4 @@ const TierSysmtem = {
     }
 }
 
-export {TierSysmtem}
+export {TierSystem}

@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, User, Store } from "lucide-react";
+import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, User, Store, HandCoinsIcon } from "lucide-react";
 
 export default function AdminConsole() {
   /* ---------------- State ---------------- */
@@ -151,8 +151,12 @@ export default function AdminConsole() {
 
           <Button variant="ghost" className="justify-start gap-2 flex flex-row items-center" onClick={() => setActivePage("requests")}>
             <UserPlus className="w-4 h-4" />
-            <span>Anfragen</span>
+            <span>Restaurant-Anfragen</span>
             <span>({requestList.length})</span>
+          </Button>
+          <Button variant="ghost" className="justify-start gap-2 flex flex-row items-center" onClick={() => setActivePage("abboRequests")}>
+            <HandCoinsIcon className="w-4 h-4" />
+            <span>Abbo-Upgrades</span>
           </Button>
 
           <Button variant="ghost" className="justify-start gap-2" onClick={() => setActivePage("settings")}>
@@ -178,6 +182,7 @@ export default function AdminConsole() {
         {activePage === "users" && renderUsers()}
         {activePage === "settings" && renderSettings()}
         {activePage === "requests" && renderRequests(requestList)}
+        {activePage === "abboRequests" && renderAbboRequests()}
         {activePage === "messages" && renderMessages()}
         {activePage === "finances" && renderFinances()}
         {activePage === "supabase" && renderSupabaseUsage()}
@@ -375,6 +380,10 @@ export default function AdminConsole() {
         </ScrollArea>
       </div>
     );
+  }
+
+  function renderAbboRequests() {
+    return <div>Abbo-Anfrage</div>
   }
 
   function renderSettings() {

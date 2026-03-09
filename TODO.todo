@@ -1,6 +1,8 @@
 
 
-=> Nicht extra die Seite neu laden um Daten anzuzeigen
+
+=> API-Routen sind komplett durcheinander
+=> Kattegoreien können nicht gelöscht werden
 
 => Format bei neu erstellten Restaurant kaputt(Und in der Konsole auch)
 => Es ist möglich auch ein leeres Datenpacket an den Server zu schicken => Kontrolle einfügeb
