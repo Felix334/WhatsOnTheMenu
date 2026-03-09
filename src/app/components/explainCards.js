@@ -1,87 +1,133 @@
 "use client";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import profileImage from "./img/account_profile_user_avatar_icon_219236.jpg";
-import { useState, useRef, useEffect } from "react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+/**
+ * ExplainCards
+ * --------------------------------
+ * Responsive Feature Section für eine Landingpage
+ * - Mobile First Design
+ * - Anpassung an alle Bildschirmgrößen
+ * - Dynamische Feature Cards
+ */
 
-const ExplainCards = () => {
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+/**
+ * Feature Liste
+ * --------------------------------
+ * Inhalte werden hier zentral definiert.
+ * Neue Features können einfach ergänzt werden.
+ */
+const features = [
+  {
+    icon: "🎨",
+    title: "Einfach gehaltene Editoren",
+    description:
+      "Mit unserem intuitiven Editor können Sie Speisekarten ohne technische Kenntnisse erstellen, bearbeiten und jederzeit aktualisieren.",
+  },
+  {
+    icon: "📱",
+    title: "QR-Code Integration",
+    description:
+      "Automatische Generierung eines QR-Codes für Ihre digitale Speisekarte. Gäste scannen einfach den Code und sehen sofort Ihr Menü.",
+  },
+  {
+    icon: "🌍",
+    title: "Premium Features",
+    description:
+      "Erweiterte Funktionen für ein moderneres und interaktiveres Erlebnis für Ihre Gäste.",
+  },
+  {
+    icon: "⚡",
+    title: "Echtzeit Updates",
+    description:
+      "Ändern Sie Preise, Bilder oder Gerichte sofort – ohne neue QR-Codes drucken zu müssen.",
+  },
+  {
+    icon: "📊",
+    title: "Analytics Dashboard",
+    description:
+      "Analysieren Sie, welche Gerichte besonders beliebt sind und wie Gäste mit Ihrer digitalen Karte interagieren.",
+  },
+  {
+    icon: "🎯",
+    title: "Anpassbare Designs",
+    description:
+      "Professionelle Design-Vorlagen, die perfekt zu Ihrem Restaurant-Branding passen.",
+  },
+];
+
+export default function ExplainCards() {
   return (
-    <section id="features" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Alles was du brauchst</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">Von der Erstellung bis zur Veröffentlichung - alle Tools für professionelle digitale Speisekarten</p>
+    <section
+      id="features"
+      className="py-16 sm:py-20 lg:py-24 bg-white"
+    >
+      {/* Container */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* Titelbereich */}
+        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            Alles was du brauchst
+          </h2>
+
+          <p className="mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+            Von der Erstellung bis zur Veröffentlichung – alle Tools für
+            professionelle digitale Speisekarten.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">🎨</div>
-              <CardTitle>Einfach gehaltene Editoren</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Intuitives Erstellen ohne technische Kenntnisse. Einfaches Erstellen und Bearbeiten von Speisekarten.</CardDescription>
-            </CardContent>
-          </Card>
+        {/* Responsive Grid */}
+        <div
+          className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+          sm:gap-8
+        "
+        >
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="
+                transition-all
+                duration-300
+                hover:shadow-xl
+                hover:-translate-y-1
+              "
+            >
+              <CardHeader>
 
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">📱</div>
-              <CardTitle>QR-Code Integration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Automatische QR-Code Generierung für einfache Integration und Verwendung.</CardDescription>
-            </CardContent>
-          </Card>
+                {/* Icon */}
+                <div className="text-3xl sm:text-4xl mb-4">
+                  {feature.icon}
+                </div>
 
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">🌍</div>
-              <CardTitle>Premium-Features</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Für ein noch intensiveres und ansprechenderes Erlebniss für ihre Kunden</CardDescription>
-            </CardContent>
-          </Card>
+                {/* Titel */}
+                <CardTitle className="text-lg sm:text-xl">
+                  {feature.title}
+                </CardTitle>
 
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">⚡</div>
-              <CardTitle>Echtzeit Updates</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Daten und Bilder sofort aktualisieren - ohne neue QR-Codes drucken zu müssen.</CardDescription>
-            </CardContent>
-          </Card>
+              </CardHeader>
 
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">📊</div>
-              <CardTitle>Analytics Dashboard</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Detaillierte Einblicke in beliebte Gerichte und Kundenverhalten.</CardDescription>
-            </CardContent>
-          </Card>
-
-          <Card className="card-hover">
-            <CardHeader>
-              <div className="feature-icon text-4xl mb-4">🎯</div>
-              <CardTitle>Anpassbare Designs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>Professionelle Vorlagen die zu ihrem Restaurant-Branding passen.</CardDescription>
-            </CardContent>
-          </Card>
+              <CardContent>
+                <CardDescription className="text-sm sm:text-base text-gray-600">
+                  {feature.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+
       </div>
     </section>
   );
-};
-
-export default ExplainCards;
+}

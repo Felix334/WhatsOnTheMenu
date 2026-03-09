@@ -292,10 +292,10 @@ export default function AdminConsole() {
 
   function renderRequests(requests) {
     const confirmRequest = async () => {
-      console.log("Sende:", requests)
+      console.log("Sende:", requests);
       const resp = await fetch("/api/restaurant/Admin/postRequests", {
         method: "POST",
-        body: JSON.stringify({requests})
+        body: JSON.stringify({ requests }),
       });
       if (!resp.ok) {
         window.alert("Ein Fehler ist aufgetreten:", resp);
