@@ -26,7 +26,6 @@ export async function middleware(req) {
 
 export const config = {
   matcher: [
-    "/Protected/:path*",
     "/Admin/:path*",
     "/Profil/:path*",
   ],

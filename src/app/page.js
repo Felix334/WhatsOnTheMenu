@@ -82,19 +82,6 @@ function HomeContent() {
     }
   };
 
-  const renderRegisterW = () => {
-    if (!renderRegister) {
-      setRenderRegister(true);
-    } else {
-      setRenderRegister(false);
-    }
-  };
-  useEffect(() => {
-    const testDB = async () => {
-      var resp = await fetch("/api/findAll");
-    };
-  });
-
   return (
     <div>
       <Head>
