@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
-import { TierSystem } from "./components/TierLimits"
+import { TierSystem } from "./components/TierLimits";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -56,7 +56,10 @@ export default function PageBuilder() {
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
   const [positionNum, setPositionNum] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [Limit, setLimit] = useState({})
+  const [Limit, setLimit] = useState({});
+  const [exeedCatLimit, setExeedCatLimit] = useState(false);
+  const [exeedDishLimit, setExeedDishLimit] = useState(false);
+  const [allowPremiumColor, setAllowPremiumColor] = useState(false)
 
   const { data: session, status } = useSession();
 
@@ -64,16 +67,21 @@ export default function PageBuilder() {
     if (status === "authenticated" && !autherized && session.user.role === "Owner") {
       console.log("Signed in as:", session.user.id);
       console.log("User Data:", session.user);
+      console.log("User Subscription:",session.user.subscription)
       setUserID(session.user.id);
-      switch(session.user.subscription){
-        case session.user.subscription === "Basic":
-          setLimit(TierSystem.FreeTier)
+      switch (session.user.subscription) {
+        case "Basic":
+          setLimit(TierSystem.FreeTier);
+          console.log("Show-Limit:", Limit);
           break;
-        case session.user.subscription === "Premium":
-          setLimit(TierSystem.PremiumTier)
+        case "Premium":
+          setLimit(TierSystem.PremiumTier);
+          setAllowPremiumColor(true)
+          console.log("Show-Limit:", Limit);
           break;
-        case session.user.subscription === "Advantst":
-          setLimit(TierSystem.Advantst)
+        case "Advantst":
+          setLimit(TierSystem.Advantst);
+          console.log("Show-Limit:", Limit);
           break;
         default:
           break;
@@ -81,7 +89,23 @@ export default function PageBuilder() {
 
       setIsAutherizedUser(true);
     }
-  }, [status, autherized, session]);
+  }, [status, autherized, session, Limit]);
+
+  const calculateLimit = useCallback(() => {
+    if (!serverData) return;
+    const catCount = (serverData.userData.restaurant.menu[0].categories?.length || 0) + (components.length || 0);
+    const dishCount = serverData.userData.restaurant.menu[0].categories.flatMap((c) => c.dishes || []).length + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
+    console.log("Limit:", Limit)
+    console.log("TierSystem:", TierSystem)
+    console.log("Calc Limit",catCount, dishCount);
+    console.log(exeedCatLimit, exeedDishLimit)
+    setExeedCatLimit(catCount >= Limit.CategoryLimit);
+    setExeedDishLimit(dishCount >= Limit.DishLimit);
+  }, [serverData, components, Limit, exeedCatLimit, exeedDishLimit]);
+
+  useEffect(() => {
+    calculateLimit();
+  }, [components, serverData, Limit, calculateLimit]);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -237,8 +261,8 @@ export default function PageBuilder() {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
-      }else{
-        location.reload()
+      } else {
+        location.reload();
       }
 
       // Then, handle deletions if any
@@ -273,7 +297,7 @@ export default function PageBuilder() {
         setDeletedCategories([]);
       } else {
         console.log("No deletions to process");
-        location.reload()
+        location.reload();
       }
 
       alert("Data saved and deletions processed successfully!");
@@ -465,9 +489,20 @@ export default function PageBuilder() {
         </ScrollArea>
 
         <SheetFooter>
-          <Button type="button" variant="outline" onClick={() => append({ name: "", price: 0, description: "", image: "" })}>
-            Gericht hinzufügen
-          </Button>
+          {exeedDishLimit ? (
+            <div>Gericht-Limit erreicht</div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                append({ name: "", price: 0, description: "", image: "" });
+                calculateLimit();
+              }}
+            >
+              Gericht hinzufügen
+            </Button>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -683,8 +718,8 @@ export default function PageBuilder() {
             <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
               Zurück
             </Button>
-            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} />
-            <MenuEditor />
+            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor}/>
+            {exeedCatLimit ? <div></div> : <MenuEditor />}
           </div>
           <div className="absolute right-1 top-5">
             <Button>

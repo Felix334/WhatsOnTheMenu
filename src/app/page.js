@@ -285,7 +285,7 @@ function HomeContent() {
                           aria-label="Log in"
                           onClick={() => {
                             setMobileMenuOpen(false);
-                            renderLoginWindow();
+
                           }}
                         >
                           Anmelden
