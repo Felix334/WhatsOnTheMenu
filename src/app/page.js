@@ -368,6 +368,7 @@ function HomeContent() {
               </div>
             </div>
           </section>
+          <section></section>
 
           {/* Pricing Preview */}
           <section id="pricing" className="py-20 bg-gray-50">
@@ -387,7 +388,10 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>7 Speisekarte
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 8 Kategorien
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 30 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
@@ -396,6 +400,10 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
                         QR-Code
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-500 mr-2">✓</span>
+                        Perfekt für Veranstaltungen und kleine Restaurants
                       </li>
                     </ul>
 
@@ -427,10 +435,13 @@ function HomeContent() {
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>
-                        15 Karten
+                        Bis zu 20 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Premium Templates
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 200 Gerichte
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-300 mr-2">✓</span>Premium Designs
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>
@@ -457,7 +468,6 @@ function HomeContent() {
                 </Card>
 
                 <Card className="flex flex-col h-full">
-                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Empfohlen</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
                     <div className="text-3xl font-bold text-red-800">Individuell</div>
@@ -479,10 +489,6 @@ function HomeContent() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Analytics
-                      </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        Priority Support
                       </li>
                     </ul>
 

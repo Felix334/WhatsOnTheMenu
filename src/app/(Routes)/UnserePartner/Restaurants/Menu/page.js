@@ -25,7 +25,10 @@ const MenuContent = () => {
 
     const fetchMenu = async () => {
       try {
-        const resp = await fetch(`/api/restaurant/${restaurantID}/menu`, { method: "POST" });
+        const resp = await fetch(`/api/restaurant/${restaurantID}/menu`, {
+          method: "POST",
+          next: { revalidate: 300 },
+        });
 
         if (!resp.ok) {
           if (resp.status === 404) throw new Error("Restaurant nicht gefunden!");

@@ -28,7 +28,7 @@ const features = [
     icon: "🎨",
     title: "Einfach gehaltene Editoren",
     description:
-      "Mit unserem intuitiven Editor können Sie Speisekarten ohne technische Kenntnisse erstellen, bearbeiten und jederzeit aktualisieren.",
+      "Mit unserem intuitiven Editor können Sie Speisekarten ohne technische Kenntnisse erstellen, bearbeiten und aktualisieren.",
   },
   {
     icon: "📱",
@@ -46,7 +46,7 @@ const features = [
     icon: "⚡",
     title: "Echtzeit Updates",
     description:
-      "Ändern Sie Preise, Bilder oder Gerichte sofort – ohne neue QR-Codes drucken zu müssen.",
+      "Ändern Sie Preise, Bilder oder Gerichte sofort - Aktualisieren in Echtzeit möglich",
   },
   {
     icon: "📊",

@@ -6,8 +6,8 @@ const TierSystem = {
         allowedColorPallet: {},
     },
     PremiumTier: {
-        DishLimit: 100,
-        CategoryLimit: 30,
+        DishLimit: 200,
+        CategoryLimit: 20,
         allowedFonts: {},
         allowedColorPallet: {allAllowed: true},
         allowedCalendarLimit: {}
