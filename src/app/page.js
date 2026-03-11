@@ -285,7 +285,6 @@ function HomeContent() {
                           aria-label="Log in"
                           onClick={() => {
                             setMobileMenuOpen(false);
-
                           }}
                         >
                           Anmelden
@@ -375,7 +374,7 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 8 Kategorien
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 7 Kategorien
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Bis zu 30 Gerichte
@@ -422,23 +421,25 @@ function HomeContent() {
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>
-                        Bis zu 20 Kategorien
+                        Bis zu 15 Kategorien
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Bis zu 200 Gerichte
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Premium Designs
+                        <span className="text-green-500 mr-2">✓</span>Bild zu jedem Gericht
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>
-                        Mehrsprachig
+                        <span className="text-green-300 mr-2">✓</span>Premium Templates
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>QR-Code
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Event-Planer
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300">

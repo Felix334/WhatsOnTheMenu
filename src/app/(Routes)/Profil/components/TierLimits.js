@@ -1,17 +1,17 @@
 const TierSystem = {
     FreeTier: {
-        DishLimit: 20,
+        DishLimit: 30,
         CategoryLimit: 7,
         allowedFonts: {},
         allowedColorPallet: {},
     },
     PremiumTier: {
-        DishLimit: 100,
+        DishLimit: 200,
         CategoryLimit: 15,
         allowedFonts: {},
         allowedColorPallet: {allAllowed: true},
-        allowedCalendarLimit: {}
-    }
+        allowedCalendarLimit: {days: 365}
+    },
 }
 
 export {TierSystem}

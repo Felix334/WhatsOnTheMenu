@@ -94,29 +94,42 @@ enum Subscription {
 }
 
 model Restaurant {
-  id            String @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String
   parentCompany String
-  ownerId String @unique
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  menu      Menu[]
-  locations Location[]
-  category  String   @default("NONE")
-  createdAt DateTime @default(now())
+  ownerId       String     @unique
+  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  menu          Menu[]
+  locations     Location[]
+  category      String     @default("NONE")
+  createdAt     DateTime   @default(now())
+  calendar      Calendar[]
 
   @@index([ownerId])
 }
 
+model Calendar {
+  id               String     @id @default(cuid())
+  date             DateTime
+  eventName        String
+  eventDescription String
+  startTime        String
+  endTime          String
+  type             String
+  restaurantID     String
+  restaurant       Restaurant @relation(fields: [restaurantID], references: [id], onDelete: Cascade)
+}
+
 model Location {
-  id          String @id @default(cuid())
-  street      String
-  houseNumber String
-  city        String
-  postalCode  String
-  country     String
+  id           String       @id @default(cuid())
+  street       String
+  houseNumber  String
+  city         String
+  postalCode   String
+  country      String
   restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  reservation Reservation?
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  reservation  Reservation?
 
   @@index([restaurantId])
 }
