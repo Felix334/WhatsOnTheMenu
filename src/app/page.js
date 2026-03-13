@@ -414,7 +414,7 @@ function HomeContent() {
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
                     <div className="text-3xl font-bold">
-                      9.99€<span className="text-lg font-normal">/Monat</span>
+                      14.99€<span className="text-lg font-normal">/Monat</span>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -436,7 +436,7 @@ function HomeContent() {
                         <span className="text-green-300 mr-2">✓</span>QR-Code
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Event-Planer
+                        <span className="text-green-300 mr-2">✓</span>Event-Kalender
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants

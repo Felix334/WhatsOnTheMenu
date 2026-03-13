@@ -59,7 +59,7 @@ export default function PageBuilder() {
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
-  const [allowPremiumColor, setAllowPremiumColor] = useState(false)
+  const [allowPremiumColor, setAllowPremiumColor] = useState(false);
 
   const { data: session, status } = useSession();
 
@@ -67,7 +67,7 @@ export default function PageBuilder() {
     if (status === "authenticated" && !autherized && session.user.role === "Owner") {
       console.log("Signed in as:", session.user.id);
       console.log("User Data:", session.user);
-      console.log("User Subscription:",session.user.subscription)
+      console.log("User Subscription:", session.user.subscription);
       setUserID(session.user.id);
       switch (session.user.subscription) {
         case "Basic":
@@ -76,7 +76,7 @@ export default function PageBuilder() {
           break;
         case "Premium":
           setLimit(TierSystem.PremiumTier);
-          setAllowPremiumColor(true)
+          setAllowPremiumColor(true);
           console.log("Show-Limit:", Limit);
           break;
         case "Advantst":
@@ -95,10 +95,10 @@ export default function PageBuilder() {
     if (!serverData) return;
     const catCount = (serverData.userData.restaurant.menu[0].categories?.length || 0) + (components.length || 0);
     const dishCount = serverData.userData.restaurant.menu[0].categories.flatMap((c) => c.dishes || []).length + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
-    console.log("Limit:", Limit)
-    console.log("TierSystem:", TierSystem)
-    console.log("Calc Limit",catCount, dishCount);
-    console.log(exeedCatLimit, exeedDishLimit)
+    console.log("Limit:", Limit);
+    console.log("TierSystem:", TierSystem);
+    console.log("Calc Limit", catCount, dishCount);
+    console.log(exeedCatLimit, exeedDishLimit);
     setExeedCatLimit(catCount >= Limit.CategoryLimit);
     setExeedDishLimit(dishCount >= Limit.DishLimit);
   }, [serverData, components, Limit, exeedCatLimit, exeedDishLimit]);
@@ -714,27 +714,33 @@ export default function PageBuilder() {
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
       <div>
         <div className="">
-          <div className="absolute top-5 flex gap-2 items-center pl-1">
-            <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
-              Zurück
-            </Button>
-            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor}/>
-            {exeedCatLimit ? <div></div> : <MenuEditor />}
-          </div>
-          <div className="absolute right-1 top-5">
-            <Button>
-              <Link
-                href={{
-                  pathname: "/UnserePartner/Restaurants/Menu",
-                  query: {
-                    userID: userID,
-                    restaurantID: restaurantID,
-                  },
-                }}
-              >
-                User-Ansicht
-              </Link>
-            </Button>
+          <div className="sticky top-0 z-50 w-full bg-white shadow-md border-b">
+            <div className="max-w-[1280px] mx-auto flex items-center justify-between py-3 ">
+              {/* Linke Seite */}
+              <div className="flex gap-3">
+                <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
+                  Zurück
+                </Button>
+
+                <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+
+                {!exeedCatLimit && <MenuEditor />}
+              </div>
+
+              {/* Rechte Seite */}
+              <div>
+                <Button asChild>
+                  <Link
+                    href={{
+                      pathname: "/UnserePartner/Restaurants/Menu",
+                      query: { userID, restaurantID },
+                    }}
+                  >
+                    User-Ansicht
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
           <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
             <header className="mb-12 text-center w-full sm:grid sm:grid-col1">
