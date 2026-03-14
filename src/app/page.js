@@ -410,7 +410,7 @@ function HomeContent() {
                 </Card>
 
                 <Card className="bg-red-800 text-white border-2 border-red-600 relative">
-                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Empfohlen</Badge>
+                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
                     <div className="text-3xl font-bold">
@@ -456,6 +456,7 @@ function HomeContent() {
                 </Card>
 
                 <Card className="flex flex-col h-full">
+                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
                     <div className="text-3xl font-bold text-red-800">Individuell</div>

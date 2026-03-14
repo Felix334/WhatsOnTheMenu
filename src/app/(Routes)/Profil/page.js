@@ -589,11 +589,9 @@ export default function PageBuilder() {
 
     return (
       <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
-        {/* Category Header - outside Table, as a separate header */}
         <div className="relative flex items-center justify-center py-6 px-4 border-b bg-gray-50">
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
-          {/* Category Buttons (left side) */}
           <div className="absolute left-2 sm:left-4 flex gap-2">
             <Button onClick={openCategoryMenu_} size="icon" variant="outline">
               <FaPen />
@@ -604,8 +602,6 @@ export default function PageBuilder() {
             </Button>
           </div>
         </div>
-
-        {/* Table - responsive design with fixed layout */}
         <div className="overflow-x-auto">
           <Table className="w-full min-w-[700px] table-fixed">
             <colgroup>
@@ -634,7 +630,6 @@ export default function PageBuilder() {
                     `}
                     onClick={() => toggleExpand(index)}
                   >
-                    {/* Button Column - fixed width */}
                     <TableCell className="align-middle">
                       <div className="flex gap-1">
                         <Button
@@ -667,12 +662,9 @@ export default function PageBuilder() {
                         {item.description && <span className="text-sm text-gray-500 break-words">{item.description}</span>}
                       </div>
                     </TableCell>
-
-                    {/* Price */}
                     <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
                   </TableRow>
 
-                  {/* Expanded Image Row */}
                   {expandedIndex === index && (
                     <TableRow className="bg-gray-50">
                       <TableCell colSpan={4} className="px-4 sm:px-6 py-4">
@@ -686,7 +678,6 @@ export default function PageBuilder() {
           </Table>
         </div>
 
-        {/* Modals */}
         <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
 
         <EdditCategoryMenu
@@ -726,8 +717,6 @@ export default function PageBuilder() {
 
                 {!exeedCatLimit && <MenuEditor />}
               </div>
-
-              {/* Rechte Seite */}
               <div>
                 <Button asChild>
                   <Link
