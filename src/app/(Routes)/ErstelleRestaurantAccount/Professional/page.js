@@ -7,7 +7,11 @@ import { z } from "zod";
 const restaurantSchema = z.object({
   ownerName: z.string().min(2, "Ein Name ist erforderlich"),
   name: z.string().min(1, "Ein Restaurantname ist erforderlich"),
-  address: z.string().min(1, "Eine Adresse ist erforderlich"),
+  email: z.string().email("Ungültige Email"),
+  postalCode: z.string().min(4, "PLZ zu kurz"),
+  city: z.string().min(1, "Stadt erforderlich"),
+  street: z.string().min(1, "Straße erforderlich"),
+  houseNumber: z.string().min(1, "Hausnummer erforderlich"),
   phone: z
     .string()
     .min(7, "Die Telefonnummer zu kurz")
@@ -24,7 +28,10 @@ export default function RestaurantForm() {
     ownerName: "",
     name: "",
     email: "",
-    address: "",
+    postalCode: "",
+    city: "",
+    street: "",
+    houseNumber: "",
     phone: "",
     website: "",
     openingHours: "",
@@ -54,11 +61,10 @@ export default function RestaurantForm() {
     setSubmitError(null);
     setSuccess(false);
 
-    // Validierung mit Zod
     try {
       restaurantSchema.parse(restaurant);
 
-      const res = await fetch("/api/restaurant/requestRegister", {
+      const res = await fetch("/api/restaurant/requestRegister/ProfessionalTier", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(restaurant),
@@ -74,7 +80,10 @@ export default function RestaurantForm() {
         ownerName: "",
         name: "",
         email: "",
-        address: "",
+        postalCode: "",
+        city: "",
+        street: "",
+        houseNumber: "",
         phone: "",
         website: "",
         openingHours: "",
@@ -95,20 +104,37 @@ export default function RestaurantForm() {
     }
   };
 
+  const handleProCheckout = async () => {
+    try {
+      const res = await fetch("/api/payment/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier: "pro", restaurant }),
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setSubmitError("Fehler beim Starten des Checkout.");
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dein Restaurant registrieren</h1>
       <p className="text-gray-600 text-center mb-8">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Owner Name */}
         <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
+          <label className="block font-medium text-gray-700 mb-1" htmlFor="ownerName">
             Name (Voller legaler Name) <span className="text-red-500">*</span>
           </label>
-          <input id="name" name="name" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="ownerName" name="ownerName" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.ownerName && <p className="text-red-500 mt-1">{errors.ownerName}</p>}
         </div>
-        {/* Name */}
+
+        {/* Restaurant Name */}
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
             Name des Restaurants <span className="text-red-500">*</span>
@@ -117,66 +143,58 @@ export default function RestaurantForm() {
           {errors.name && <p className="text-red-500 mt-1">{errors.name}</p>}
         </div>
 
+        {/* Email */}
         <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
+          <label className="block font-medium text-gray-700 mb-1" htmlFor="email">
             Email<span className="text-red-500">*</span>
           </label>
-          <input id="name" name="name" type="text" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="email" name="email" type="email" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
           {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
 
         {/* Adresse */}
-        <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
-            Postleitzahl <span className="text-red-500">*</span>
-          </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
-            Stadt <span className="text-red-500">*</span>
-          </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
-            Straße <span className="text-red-500">*</span>
-          </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="address">
-            Hausnummer <span className="text-red-500">*</span>
-          </label>
-          <input id="address" name="address" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.address ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.address && <p className="text-red-500 mt-1">{errors.address}</p>}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="postalCode" className="block font-medium text-gray-700 mb-1">Postleitzahl <span className="text-red-500">*</span></label>
+            <input id="postalCode" name="postalCode" type="text" value={restaurant.postalCode} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.postalCode ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          </div>
+          <div>
+            <label htmlFor="city" className="block font-medium text-gray-700 mb-1">Stadt <span className="text-red-500">*</span></label>
+            <input id="city" name="city" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.city ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          </div>
         </div>
 
-        {/* Telefonnummer */}
+        {/* Straße / Hausnummer */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="street" className="block font-medium text-gray-700 mb-1">Straße <span className="text-red-500">*</span></label>
+            <input id="street" name="street" type="text" value={restaurant.street} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.street ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          </div>
+          <div>
+            <label htmlFor="houseNumber" className="block font-medium text-gray-700 mb-1">Hausnummer <span className="text-red-500">*</span></label>
+            <input id="houseNumber" name="houseNumber" type="text" value={restaurant.houseNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.houseNumber ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          </div>
+        </div>
+
+        {/* Telefon */}
         <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="phone">
-            Telefonnummer <span className="text-red-500">*</span>
-          </label>
+          <label htmlFor="phone" className="block font-medium text-gray-700 mb-1">Telefonnummer <span className="text-red-500">*</span></label>
           <input id="phone" name="phone" type="tel" value={restaurant.phone} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.phone ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
-          {errors.phone && <p className="text-red-500 mt-1">{errors.phone}</p>}
         </div>
 
-        {/* Website */}
-
-        {/* Öffnungszeiten */}
+        {/* Website / Öffnungszeiten */}
         <div>
-          <label className="block font-medium text-red-700 mb-1" htmlFor="openingHours">
-            Öffnungszeiten(noch nicht möglich)
-          </label>
+          <label htmlFor="website" className="block font-medium text-gray-700 mb-1">Website</label>
+          <input id="website" name="website" type="text" value={restaurant.website} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+        <div>
+          <label htmlFor="openingHours" className="block font-medium text-gray-700 mb-1">Öffnungszeiten</label>
           <input id="openingHours" name="openingHours" type="text" value={restaurant.openingHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Mo-Fr 09:00-18:00" />
         </div>
+
+        {/* Kategorie */}
         <div>
-          <label className="block font-medium text-gray-700 mb-1" htmlFor="category">
-            Kategorie wählen:
-          </label>
+          <label htmlFor="category" className="block font-medium text-gray-700 mb-1">Kategorie</label>
           <select id="category" name="category" value={restaurant.category} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="">Bitte wählen</option>
             <option value="italienisch">Italienisch</option>
@@ -253,10 +271,19 @@ export default function RestaurantForm() {
         {submitError && <p className="text-red-500 font-medium">{submitError}</p>}
         {success && <p className="text-green-500 font-medium">Restaurant erfolgreich registriert!</p>}
 
-        {/* Button */}
-        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
-          Registrieren
-        </button>
+        {/* Buttons */}
+        <div className="grid grid-cols-1 gap-3">
+          <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-xl hover:bg-emerald-700 transition-all shadow-lg text-lg">
+            ✅ Pro Tier registrieren (nach Abo)
+          </button>
+          <button 
+            type="button"
+            onClick={handleProCheckout}
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-xl text-lg border-2 border-transparent hover:border-indigo-300"
+          >
+            💳 Pro Abo aktivieren (€19/Monat)
+          </button>
+        </div>
       </form>
     </div>
   );

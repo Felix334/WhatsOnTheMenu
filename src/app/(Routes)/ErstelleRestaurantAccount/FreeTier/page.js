@@ -312,9 +312,26 @@ export default function RestaurantForm() {
 
         {success && <p className="text-green-600 font-medium">Restaurant erfolgreich registriert!</p>}
 
-        <button type="submit" className="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600">
-          Registrieren
-        </button>
+        <div className="space-y-3">
+          <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
+            FreeTier registrieren
+          </button>
+          <button 
+            type="button"
+            onClick={async () => {
+              const res = await fetch("/api/payment/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tier: "pro" }),
+              });
+              const { url } = await res.json();
+              if (url) window.location.href = url;
+            }}
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700"
+          >
+            💳 Zu Pro upgrade (€19/Monat)
+          </button>
+        </div>
       </form>
     </div>
   );
