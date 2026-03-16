@@ -103,6 +103,7 @@ export default function RestaurantForm() {
       }
 
       setSuccess(true);
+      window.alert("Restaurant erfolgreich registriert! \nHerzlichen Glückwunsch!");
 
       setRestaurant({
         ownerName: "",
@@ -313,10 +314,16 @@ export default function RestaurantForm() {
         {success && <p className="text-green-600 font-medium">Restaurant erfolgreich registriert!</p>}
 
         <div className="space-y-3">
-          <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
-            FreeTier registrieren
-          </button>
-          <button 
+          {success ? (
+            <></>
+          ) : (
+            <>
+              <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
+                FreeTier registrieren
+              </button>
+            </>
+          )}
+          <button
             type="button"
             onClick={async () => {
               const res = await fetch("/api/payment/checkout", {

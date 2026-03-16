@@ -37,7 +37,7 @@ export async function POST(req) {
 }
 
 async function processRequest(data) {
-  const { category, city, country, description, email, houseNumber, phoneNumber, postalCode, restaurantName, street, subscription, owner } = data;
+  const { category, city, country, description, email, houseNumber, phoneNumber, postalCode, restaurantName, street, subscription, owner, name } = data;
 
   const ownerId = owner?.id;
 
@@ -54,14 +54,31 @@ async function processRequest(data) {
     street,
     subscription,
     ownerId,
+    name,
   });
 
   // Pflichtfelder prüfen
-  if (!category || !city || !country || !email || !houseNumber || !ownerId || !postalCode || !restaurantName || !street) {
-    return {
-      status: 400,
-      message: "Fehlende Felder",
-    };
+  const requiredFields = {
+    category,
+    city,
+    country,
+    description,
+    email,
+    houseNumber,
+    ownerId,
+    postalCode,
+    restaurantName,
+    street,
+    name,
+    subscription,
+  };
+
+  const missingField = Object.entries(requiredFields).find(([, value]) => !value);
+
+  if (missingField) {
+    console.log(`Fehlendes Feld: ${missingField[0]}`);
+
+    return NextResponse.json({ status: 400, message: `Fehlendes Feld: ${missingField[0]}` }, { status: 400 });
   }
 
   // Prüfen ob User existiert
@@ -101,7 +118,8 @@ async function processRequest(data) {
       data: {
         name: restaurantName,
         parentCompany: "Parent Company",
-        category,
+        category: category,
+        ownerName: name,
 
         owner: {
           connect: {
@@ -120,11 +138,11 @@ async function processRequest(data) {
 
         locations: {
           create: {
-            street,
-            houseNumber,
-            city,
-            postalCode,
-            country,
+            street: street,
+            houseNumber: houseNumber,
+            city: houseNumber,
+            postalCode: postalCode,
+            country: country,
           },
         },
       },
@@ -150,7 +168,8 @@ async function processRequest(data) {
     if (checkrestaurant) {
       console.log("Lösche:", checkrestaurant);
       try {
-        await prisma.restaurantQueue.delete({
+        await prisma.restaurantQueue
+          .delete({
             where: {
               ownerId: ownerId,
             },
