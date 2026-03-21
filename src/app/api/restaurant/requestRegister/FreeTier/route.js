@@ -32,7 +32,7 @@ export async function POST(req) {
       errors.push("Name zu kurz.");
     }
 
-    if (!restaurantName || restaurantName.length < 2) {
+    if (!restaurantName|| restaurantName.length < 2) {
       errors.push("Restaurantname fehlt.");
     }
 

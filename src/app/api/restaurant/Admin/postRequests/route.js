@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
+import { metadata } from "src/app/layout";
+const Stripe = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST ?? process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
 
 export async function POST(req) {
   try {
@@ -41,7 +44,7 @@ async function processRequest(data) {
 
   const ownerId = owner?.id;
 
-  console.log("Check Before Save:", {
+  console.log("Check Before Save Restaurant:", {
     category,
     city,
     country,
@@ -96,6 +99,9 @@ async function processRequest(data) {
       message: "Owner nicht gefunden",
     };
   }
+  if (user) {
+    console.log("Benutzer gefunden(postRequest):", user);
+  }
 
   // Prüfen ob Restaurant an Adresse existiert
   const existingLocation = await prisma.location.findFirst({
@@ -107,10 +113,8 @@ async function processRequest(data) {
   });
 
   if (existingLocation) {
-    return {
-      status: 409,
-      message: "Restaurant existiert bereits",
-    };
+    console.log("Restaurant existiert bereits an dieser Adresse");
+    return NextResponse.json({ message: "Restaurant existiert bereits an dieser Adresse" }, { status: 409 });
   }
 
   try {
@@ -140,7 +144,7 @@ async function processRequest(data) {
           create: {
             street: street,
             houseNumber: houseNumber,
-            city: houseNumber,
+            city: city,
             postalCode: postalCode,
             country: country,
           },
@@ -181,11 +185,74 @@ async function processRequest(data) {
               },
               data: {
                 role: "Owner",
+                subscription: subscription,
               },
             });
+          })
+          .then(async () => {
+            try {
+              const customer = await stripe.customers.create({
+                email: owner.email,
+                metadata: { userId: ownerId },
+              });
+              console.log("Stripe-Event:", customer);
+            } catch (err) {
+              switch (err.type) {
+                case "StripeCardError":
+                  // A declined card error
+                  console.log("Status:", err.statusCode);
+                  console.log("Code:", err.code);
+                  if (err.decline_code) console.log("Decline code:", err.decline_code);
+                  if (err.param) console.log("Param:", err.param);
+                  console.log("Message:", err.message);
+                  console.log("Request ID:", err.requestId);
+                  break;
+                case "StripeRateLimitError":
+                  // Too many requests made to the API too quickly
+                  console.log("Request ID:", err.requestId);
+                  break;
+                case "StripeInvalidRequestError":
+                  // Invalid parameters were supplied to Stripe's API
+                  console.log("Message:", err.message);
+                  if (err.param) console.log("Param:", err.param);
+                  console.log("Request ID:", err.requestId);
+                  break;
+                case "StripeAPIError":
+                  // An error occurred internally with Stripe's API
+                  console.log("Request ID:", err.requestId);
+                  break;
+                case "StripeConnectionError":
+                  // Some kind of error occurred during the HTTPS communication
+                  console.log("Request ID:", err.requestId);
+                  break;
+                case "StripeAuthenticationError":
+                  // You probably used an incorrect API key
+                  console.log("Request ID:", err.requestId);
+                  break;
+                default:
+                  if (err instanceof stripe.errors.StripeError) {
+                    // All other Stripe errors
+                    console.log("Status: " + err.statusCode);
+                    console.log("Code: " + err.code);
+                    console.log("Message: " + err.message);
+                    console.log("Request ID: " + err.requestId);
+                  } else {
+                    // Handle any other types of unexpected errors
+                    throw err;
+                  }
+                  break;
+              }
+            }
           });
       } catch (err) {
         console.log(err);
+      }finally{
+        try{
+          const subscription = await stripe.subscription.create({
+            customer: customer.id,
+            item: []
+          })
+        }
       }
     }
   }

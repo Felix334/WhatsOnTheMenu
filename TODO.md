@@ -1,32 +1,19 @@
-# Stripe Payment Integration - Approved Plan
+# Stripe System Fix TODO
 
-## Steps (6/13 completed):
+## [x] Step 1: Create this TODO.md (done)
 
-### Backend Updates (3 steps)
-1. [x] Update `src/app/api/payment/checkout/route.js` - Accept tier/user, create customer, use real price_id.
-2. [x] Update `src/app/api/payment/webhook/route.js` - Parse metadata userId, update User subscription/status.
-3. [x] Create `src/app/api/restaurant/requestRegister/ProfessionalTier/route.js` - Handle post-payment restaurant creation.
+## [x] Step 2: Fix webhook/route.js - Retrieve subscription price, create restaurantQueue on success, handle invoice.paid
 
-### Frontend Integration (6 steps)
-4. [x] Create `src/app/(Routes)/pricing/page.js` - Tier selection page.
-5. [x] Create `src/app/(Routes)/pricing/success/page.js` - Success page with redirect.
-6. [x] Create `src/app/(Routes)/pricing/cancel/page.js` - Cancel page with retry.
-7. [x] Edit `src/app/(Routes)/ErstelleRestaurantAccount/Professional/page.js` - Add Stripe checkout button.
-8. [x] Edit `src/app/(Routes)/ErstelleRestaurantAccount/FreeTier/page.js` - Add upgrade to Pro button.
-9. [x] Edit `src/app/(Routes)/Profil/page.js` - Add subscription management/upgrade UI.
+## [x] Step 3: Fix checkout/route.js - Remove premature DB writes, pass restaurant via metadata, support multiple tiers if env set
 
-### Frontend Integration (6 steps)
-4. [ ] Create `src/app/(Routes)/pricing/page.js` - Tier selection page.
-5. [ ] Create `src/app/(Routes)/success/page.js` - Success page with redirect.
-6. [ ] Create `src/app/(Routes)/cancel/page.js` - Cancel page with retry.
-7. [ ] Edit `src/app/(Routes)/ErstelleRestaurantAccount/Professional/page.js` - Add Stripe checkout button.
-8. [ ] Edit `src/app/(Routes)/ErstelleRestaurantAccount/FreeTier/page.js` - Add upgrade to Pro button.
-9. [ ] Edit `src/app/(Routes)/Profil/page.js` - Add subscription management/upgrade UI.
+## [x] Step 4: Update pricing/page.js - Add form to collect restaurant details before checkout for Pro tier
 
-### Testing & Env (4 steps)
-10. [ ] Add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to .env (user action).
-11. [x] price_pro_monthly placeholder - replace with real Stripe ID.
-12. [ ] Test full flow: dev server, checkout, webhook.
-13. [ ] Prisma push if needed, complete.
+## [ ] Step 5: Test locally - Check env vars, use Stripe CLI for webhook, verify flow: pricing -> checkout -> success -> DB updates
 
-**Notes:** Backend core updated. Add STRIPE_WEBHOOK_SECRET to .env. Next: ProfessionalTier API (step 3).
+## [ ] Step 6: Add server verification to success page (optional)
+
+**Run after all edits:**
+- `npm run dev`
+- Test Pro checkout from /pricing
+- Check console/DB for correct updates only on payment success
+

@@ -17,7 +17,7 @@ export async function POST(req) {
     }
     const body = await req.json();
 
-    const { ownerName, restaurantName, email, postalCode, city, street, houseNumber, phone, category, description, ownerID } = body;
+    const { ownerName, restaurantName, email, postalCode, city, street, houseNumber, phone, category, description, ownerID, subscription } = body;
 
     console.log(`OwnerName:${ownerName}, RestaurantName:${restaurantName}, Email:${email}, PLZ:${postalCode}, Stadt:${city}, Straße: ${street}`);
     console.log(`Hausnummer:${houseNumber}, Nummer:${phone}, Kattegory:${category}, Beschreibung:${description}, OwnerID:${ownerID}`);
@@ -80,7 +80,7 @@ export async function POST(req) {
         city: city,
         postalCode: postalCode,
         country: "Deutschland",
-        subscription: "Basic",
+        subscription: subscription,
         owner: { connect: { id: ownerID } },
       },
     });
