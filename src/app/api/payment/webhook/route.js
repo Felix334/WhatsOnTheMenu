@@ -60,33 +60,42 @@ export async function POST(req) {
               select: { name: true }
             });
 
-            await prisma.restaurant.create({
-              data: {
-                name: restaurantDetails.restaurantName || 'New Restaurant',
-                parentCompany: 'Single',
-                ownerName: user.name || 'Owner',
-                category: restaurantDetails.category || 'Other',
-                owner: { connect: { id: userId } },
-                menu: {
-                  create: {
-                    name: "Standard Menü",
-                    description: "Default Menü",
-                    bgColor: "#ffffff",
-                    font: "Inter"
-                  }
-                },
-                locations: {
-                  create: {
-                    street: restaurantDetails.street,
-                    houseNumber: restaurantDetails.houseNumber,
-                    city: restaurantDetails.city,
-                    postalCode: restaurantDetails.postalCode,
-                    country: restaurantDetails.country || "DE"
+            // Check if restaurant already exists
+            const existingRestaurant = await prisma.restaurant.findUnique({
+              where: { ownerId: userId }
+            });
+
+            if (existingRestaurant) {
+              console.log(`✅ Restaurant already exists for ${userId}, skipping creation`);
+            } else {
+              await prisma.restaurant.create({
+                data: {
+                  name: restaurantDetails.restaurantName || 'New Restaurant',
+                  parentCompany: 'Single',
+                  ownerName: user.name || 'Owner',
+                  category: restaurantDetails.category || 'Other',
+                  ownerId: userId,
+                  menu: {
+                    create: {
+                      name: "Standard Menü",
+                      description: "Default Menü",
+                      bgColor: "#ffffff",
+                      font: "Inter"
+                    }
+                  },
+                  locations: {
+                    create: {
+                      street: restaurantDetails.street,
+                      houseNumber: restaurantDetails.houseNumber,
+                      city: restaurantDetails.city,
+                      postalCode: restaurantDetails.postalCode,
+                      country: restaurantDetails.country || "DE"
+                    }
                   }
                 }
-              }
-            });
-            console.log(`Restaurant created for ${userId}`);
+              });
+              console.log(`✅ New restaurant created for ${userId}`);
+            }
           }
         }
         break;
