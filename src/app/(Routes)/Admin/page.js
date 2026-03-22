@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Removed useSearchParams
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -18,7 +17,7 @@ import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus, Calendar, Phone,
 export default function AdminConsole() {
   /* ---------------- State ---------------- */
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch ] = useState("");
   const [filter, setFilter] = useState("all");
   const [userList, setUserList] = useState([]);
   const [rolesMap, setRolesMap] = useState({});
@@ -412,3 +411,4 @@ Telefonnummmer
 Öffnungszeiten
 Kategorie
 */
+

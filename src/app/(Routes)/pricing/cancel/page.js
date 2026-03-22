@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card"; // Removed unused CardContent, CardHeader, CardDescription
 
 export default function CancelPage() {
   const searchParams = useSearchParams();
@@ -20,12 +20,12 @@ export default function CancelPage() {
               </svg>
             </div>
             <CardTitle className="text-3xl font-bold text-gray-900 mb-4">Abgesagt</CardTitle>
-            <CardDescription className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 mb-8">
               {cancelled 
-                ? "Zahlung wurde abgebrochen. Dein Pro-Tarif wurde nicht aktiviert." 
+                ? "Die Zahlung wurde abgebrochen. Dein Abonnement wurde nicht aktiviert." 
                 : "Etwas ist schiefgelaufen. Versuche es erneut."
               }
-            </CardDescription>
+            </p>
             <div className="space-y-3">
               <Button onClick={() => router.push("/(Routes)/pricing")} size="lg" className="w-full">
                 Erneut versuchen
@@ -43,3 +43,4 @@ export default function CancelPage() {
     </div>
   );
 }
+

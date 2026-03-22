@@ -1,19 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getToken } from "next-auth/jwt";
-import { authOptions } from "src/lib/auth";
 import { getServerSession } from "next-auth";
+import { authOptions } from "src/lib/auth";
 
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-    const token = getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-    if (!token || !session) {
+    if (!session) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
     if(session.user.role === "Owner"){
-      return NextResponse.json({message: "User hat berreits Rolle: Owner", status: 409})
+      return NextResponse.json({message: "User hat bereits Rolle Owner"}, { status: 409 })
     }
     const body = await req.json();
 
@@ -57,16 +54,25 @@ export async function POST(req) {
 
     if (!category) {
       errors.push("Kategorie fehlt.");
-      console;
     }
 
     if (errors.length > 0) {
       return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
+    // Check existing queue
+    const existingQueue = await prisma.restaurantQueue.findUnique({
+      where: { ownerId: ownerID },
+    });
+    if (existingQueue) {
+      return NextResponse.json({ success: false, message: "Du hast bereits eine ausstehende Restaurant-Anfrage." }, { status: 409 });
+    }
+
     // Location erstellen
     // Restaurant in Queue speichern
-    await prisma.restaurantQueue.create({
+    let owner
+    try{
+    owner = await prisma.restaurantQueue.create({
       data: {
         name: ownerName,
         restaurantName: restaurantName,
@@ -84,10 +90,20 @@ export async function POST(req) {
         owner: { connect: { id: ownerID } },
       },
     });
+  }catch(err){
+    console.log(err)
+    if(err){
+      return NextResponse.json({success: false, status: 500, message: "Es ist ein Fehler beim Speichern aufgetreten"})
+    }
+  }
+  if(owner){
+    console.log(owner)
+  }
 
     return NextResponse.json({
       success: true,
       message: "Restaurant wurde zur Prüfung eingereicht",
+      owner: owner
     });
   } catch (error) {
     console.error(error);

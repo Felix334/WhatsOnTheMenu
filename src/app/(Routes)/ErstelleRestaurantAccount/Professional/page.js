@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
-import { Subscription } from "@prisma/client";
+
+import { Button } from "@/components/ui/button";
 
 // Zod Schema für das Restaurant
 const restaurantSchema = z.object({
@@ -40,12 +41,13 @@ export default function RestaurantForm() {
     category: "",
     description: "",
     ownerID: "",
-    subscription: "Premium"
+    subscription: "Premium",
   });
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [renderRequestBtn, setRenderRequestBtn] = useState(false);
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -80,6 +82,14 @@ export default function RestaurantForm() {
     }
   };
 
+  const isFormValid = () => {
+    try {
+      restaurantSchema.parse(restaurant);
+      return true;
+    } catch {
+      return false;
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError(null);
@@ -131,10 +141,11 @@ export default function RestaurantForm() {
 
   const handleProCheckout = async () => {
     try {
+      console.log("Sende Daten:", restaurant);
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: "pro", restaurant }),
+        body: JSON.stringify({ tier: "Premium", restaurant }),
       });
       const { url } = await res.json();
       if (url) window.location.href = url;
@@ -323,13 +334,16 @@ export default function RestaurantForm() {
         {success && <p className="text-green-500 font-medium">Restaurant erfolgreich registriert!</p>}
 
         {/* Buttons */}
-        <div className="grid grid-cols-1 gap-3">
-          <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-xl hover:bg-emerald-700 transition-all shadow-lg text-lg">
-            ✅ Pro Tier registrieren (nach Abo)
-          </button>
-          <button type="button" onClick={handleProCheckout} className="w-full bg-linear-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-xl text-lg border-2 border-transparent hover:border-indigo-300">
+        <div className="pt-4">
+          <Button
+            type="button"
+            onClick={handleProCheckout}
+            disabled={!isFormValid()}
+            className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
+    ${isFormValid() ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+          >
             💳 Pro Abo aktivieren (€19/Monat)
-          </button>
+          </Button>
         </div>
       </form>
     </div>
