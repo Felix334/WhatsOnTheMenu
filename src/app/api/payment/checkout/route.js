@@ -56,7 +56,7 @@ export async function POST(request) {
   // URLs
   // ---------------------------
   const baseUrl =
-    process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+    process.env.NEXT_PUBLIC_URL || "https://whats-on-the-menu.vercel.app/";
 
   const successUrl =
     `${baseUrl}/pricing/success?session_id={CHECKOUT_SESSION_ID}`;
