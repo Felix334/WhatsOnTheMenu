@@ -1,11 +1,9 @@
-"use client";
-export const dynamic = "force-dynamic";
+"use client"
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card"; // Removed unused CardContent, CardHeader, CardDescription
+import { Card, CardTitle } from "@/components/ui/card";
 
-export default function CancelPage() {
-  const searchParams = useSearchParams();
+export default function CancelPage({ searchParams }) {
   const router = useRouter();
   const cancelled = searchParams.get("cancelled");
 
@@ -22,13 +20,13 @@ export default function CancelPage() {
             <CardTitle className="text-3xl font-bold text-gray-900 mb-4">Abgesagt</CardTitle>
             <p className="text-lg text-gray-600 mb-8">{cancelled ? "Die Zahlung wurde abgebrochen. Dein Abonnement wurde nicht aktiviert." : "Etwas ist schiefgelaufen. Versuche es erneut."}</p>
             <div className="space-y-3">
-              <Button onClick={() => router.push("/(Routes)/pricing")} size="lg" className="w-full">
+              <Button onClick={() => router.push("/pricing")} size="lg" className="w-full">
                 Erneut versuchen
               </Button>
-              <Button variant="outline" onClick={() => router.push("/(Routes)/ErstelleRestaurantAccount/FreeTier")} className="w-full">
+              <Button variant="outline" onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")} className="w-full">
                 Free Tier wählen
               </Button>
-              <Button variant="link" onClick={() => router.push("/(Routes)/Profil")}>
+              <Button variant="link" onClick={() => router.push("/Profil")}>
                 Zum Profil
               </Button>
             </div>

@@ -1,45 +1,28 @@
 "use client";
-export const dynamic = "force-dynamic";
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
-export default function SuccessPage() {
-  const searchParams = useSearchParams();
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+export default function SuccessClient({ searchParams }) {
   const router = useRouter();
   const { data: session } = useSession();
+
   const [loading, setLoading] = useState(true);
 
+  const sessionId = searchParams.get("session_id");
+
   useEffect(() => {
-    const sessionId = searchParams.get("session_id");
-
-    /*const approveRequest = async () => {
-      if (!sessionId || !session?.user?.id) return;
-
-      try {
-        const req = await fetch("/api/payment/webhook", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userID: session.user.id,
-            stripeID: sessionId,
-          }),
-        });
-        if (!req.ok) {
-          console.error("Approve request failed");
-        }
-      } catch (err) {
-        console.error("Approve error:", err);
-      }
-    };*/
     if (sessionId) {
       console.log("Stripe session ID:", sessionId);
-      //approveRequest();
     }
+
     setLoading(false);
-  }, [searchParams]);
+  }, [sessionId]);
+
 
   if (loading) {
     return (
@@ -56,18 +39,17 @@ export default function SuccessPage() {
       <div className="max-w-md mx-auto px-4">
         <Card className="shadow-2xl border-green-200">
           <div className="p-8 text-center">
-            <div className="w-24 h-24 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Zahlung erfolgreich!</h1>
-            <p className="text-lg text-gray-600 mb-8">Dein {tier} Abonnement ist aktiviert. Dein Restaurant wurde automatisch erstellt und ist sofort verfügbar!</p>
-            <Button onClick={() => router.push("/")} size="lg" className="w-full bg-green-600 hover:bg-green-700">
+            <h1 className="text-3xl font-bold">Zahlung erfolgreich!</h1>
+
+            <p className="mt-4 text-gray-600">
+              Dein {tier} Abonnement ist aktiv
+            </p>
+
+            <Button
+              className="mt-6 w-full"
+              onClick={() => router.push("/")}
+            >
               Zurück
-            </Button>
-            <Button variant="link" onClick={() => router.push("/(Routes)/pricing")} className="mt-4">
-              Tarife ansehen
             </Button>
           </div>
         </Card>

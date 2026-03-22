@@ -1,24 +1,3 @@
-=> Stripe Webhook erstellen => auf Stripe
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 => API-Routen sind komplett durcheinander
 => Kattegoreien können nicht gelöscht werden
 
@@ -108,6 +87,7 @@ PROXMOX => als alternative zu Docker
 => In the AGBs schreiben dass wir keine Verantwortung für Griefing oder Datenmissbrauch übernehmen
 
 
-
+=> Stripe Webhook-URL ändern wenn ich eine richtige URL habe
+=> Vercel ENVs ändern
 
 => Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt

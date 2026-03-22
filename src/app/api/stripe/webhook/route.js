@@ -7,7 +7,6 @@ export async function POST(req) {
   const body = await req.text();
   console.log("Stripe Webhook:", body)
 
-  // ✅ FIX: headers() must be awaited in Next.js App Router
   const headerList = await headers();
   const signature = headerList.get("stripe-signature");
 
@@ -37,10 +36,6 @@ export async function POST(req) {
 
   try {
     switch (event.type) {
-
-      // =========================
-      // CHECKOUT COMPLETED
-      // =========================
       case "checkout.session.completed": {
         const session = event.data.object;
 
