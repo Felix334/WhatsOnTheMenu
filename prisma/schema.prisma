@@ -19,7 +19,7 @@ model User {
   emailVerified        DateTime?
   password             String?
   role                 Role              @default(User)
-  subscription         Subscription      @default(Basic)
+  subscription         Subscription      @default(FreeTier)
   session              Session[]
   restaurant           Restaurant?
   accounts             Account[]
@@ -88,9 +88,9 @@ enum Role {
 }
 
 enum Subscription {
-  Basic
-  Premium
-  Pro
+  FreeTier
+  Professional
+  Individuell
 }
 
 model Restaurant {

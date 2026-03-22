@@ -5,13 +5,13 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
-      subscription: 'Basic' | 'Premium' | 'Pro';
+      subscription: 'FreeTier' | 'Professional' | 'Individuell';
     } & DefaultSession["user"];
   }
 
   interface User {
     id: string;
     role: string;
-    subscription: 'Basic' | 'Premium' | 'Pro';
+    subscription: 'FreeTier' | 'Professional' | 'Individuell';
   }
 }

@@ -40,14 +40,14 @@ export function getPriceId(tier: string): string | null {
 /**
  * Maps internal tier naming
  */
-export function getSubscriptionTier(tier: string): "Pro" | "Premium" | "Basic" {
+export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" | "Individuell" {
   const normalized = tier.toLowerCase();
 
-  const TIER_MAP: Record<string, "Pro" | "Premium" | "Basic"> = {
-    pro: "Pro",
-    premium: "Premium",
-    basic: "Basic",
+  const TIER_MAP: Record<string, "FreeTier" | "Professional" | "Individuell"> = {
+    FreeTier: "FreeTier",
+    Professional: "Professional",
+    Individuell: "Individuell",
   };
 
-  return TIER_MAP[normalized] ?? "Pro";
+  return TIER_MAP[normalized] ?? "Professional";
 }
