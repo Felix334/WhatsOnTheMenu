@@ -88,6 +88,6 @@ PROXMOX => als alternative zu Docker
 
 
 => Stripe Webhook-URL ändern wenn ich eine richtige URL habe
-=> Vercel ENVs ändern
+=> Vercel ENVs ändern (Stripe, URL, Public-Keys)
 
 => Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt
