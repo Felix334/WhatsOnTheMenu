@@ -136,4 +136,4 @@ export function RegisterLink() {
 
 
 
-// Alle dynamischen Links nach und nach ersetzen damit die Seite statisch geladen werden kann
+// Alle dynamischen Links nach und nach ersetzen damit die Seite statisch geladen und gecached werden können
