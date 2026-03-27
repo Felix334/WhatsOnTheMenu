@@ -1,8 +1,9 @@
-"use client";
-
+"use client"
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+
+// export const revalidate = 60
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -19,6 +20,7 @@ import Profile from "./components/Profile";
 //import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
+import RenderUserID from "./components/renderUserID"
 
 import BeispielKarte from "./components/img/Beispiel-Karte.png"
 import BeispielKarte2 from "./components/img/Beispiel-Karte2.png"
@@ -29,13 +31,10 @@ function HomeContent() {
   const [navShadow, setNavShadow] = useState(false);
   const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [renderLogin, setRenderLogin] = useState(false);
-  const [setTrue, setSetTrue] = useState(false);
   const [adminAcces, setAdminAccess] = useState(false);
 
   const { data: session, status } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
@@ -43,20 +42,10 @@ function HomeContent() {
   const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
 
-  useEffect(() => {
-    if (userID && !setTrue) {
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set("userID", userID); // Add or update userID
-      const newUrl = `${pathname}?${newSearchParams.toString()}`;
-      router.replace(newUrl);
-      setSetTrue(true);
-    }
-  }, [userID, setTrue, router, pathname, searchParams]); // Dependencies to re-run only when needed
 
   useEffect(() => {
     if (adminAcc) {
       setAdminAccess(true);
-      console.log("Admin");
     }
   }, [adminAcc]);
 
@@ -130,6 +119,7 @@ function HomeContent() {
       </Head>
       <div className="h-full bg-gray-50 hero-bg">
         {/* Navigation */}
+        <RenderUserID />
         <nav className={`bg-white shadow-lg sticky top-0 z-50 ${navShadow ? "shadow-xl" : ""}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-center md:justify-between items-center h-16">

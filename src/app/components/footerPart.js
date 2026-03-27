@@ -1,3 +1,5 @@
+export const revalidate = 600;
+
 const FooterPart = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">

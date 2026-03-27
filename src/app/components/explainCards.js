@@ -1,4 +1,4 @@
-"use client";
+// Removed "use client" - now server component for static caching
 
 /**
  * ExplainCards
