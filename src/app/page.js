@@ -4,7 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,10 @@ import Profile from "./components/Profile";
 //import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
+
+import BeispielKarte from "./components/img/Beispiel-Karte.png"
+import BeispielKarte2 from "./components/img/Beispiel-Karte2.png"
+
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
@@ -27,9 +31,6 @@ function HomeContent() {
   const [renderLogin, setRenderLogin] = useState(false);
   const [setTrue, setSetTrue] = useState(false);
   const [adminAcces, setAdminAccess] = useState(false);
-
-  const BeispielKarte = require("./components/img/Beispiel-Karte.webp");
-  const BeispielKarte2 = require("./components/img/Beispiel-Karte2.webp");
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -81,6 +82,9 @@ function HomeContent() {
       setRenderLogin(false);
     }
   };
+  const memoizedQuery = useMemo(() => {
+  return { ...router.queryString };
+}, [router.queryString]);
 
   return (
     <div>
@@ -446,7 +450,7 @@ function HomeContent() {
                       <Link
                         href={{
                           pathname: "./ErstelleRestaurantAccount/Professional",
-                          query: { ...router.queryString },
+                          query: memoizedQuery,
                         }}
                       >
                         Jetzt starten
@@ -470,11 +474,7 @@ function HomeContent() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
-                        White Label
-                      </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        API Zugang
+                        Eigene Domain
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Analytics
@@ -490,7 +490,7 @@ function HomeContent() {
                             query: { ...router.queryString },
                           }}
                         >
-                          Jetzt Kontakt aufnehmen
+                          Jetzt prüfen
                         </Link>
                       </Button>
                     </div>
