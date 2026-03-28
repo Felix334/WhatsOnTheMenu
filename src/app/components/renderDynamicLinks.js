@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 /**
  * Hilfs-Hook: Query-Parameter in Objekt umwandeln und memoizen
@@ -28,12 +29,14 @@ function useQueryObject() {
  */
 function useAuth() {
   const { data: session, status } = useSession();
+
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
-  const autherizedUser = userID && status === "authenticated";
-  const adminAcc = autherizedUser && role === "Admin";
 
-  return { userID, role, autherizedUser, adminAcc };
+  const authorizedUser = !!userID && status === "authenticated";
+  const adminAcc = authorizedUser && role === "Admin";
+
+  return { userID, role, authorizedUser, adminAcc };
 }
 
 /* -------------------- Links -------------------- */
@@ -46,9 +49,7 @@ export function HomeLink() {
 // Profil-Link
 export function ProfilLink() {
   const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
   const { autherizedUser } = useAuth();
 
   if (!autherizedUser) return null;
@@ -56,17 +57,15 @@ export function ProfilLink() {
 }
 
 // Admin-Link
-export function AdminLink() {
-  const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
-  const { autherizedUser, adminAcc } = useAuth();
+function AdminLink({ searchParams }) {
+  const queryString = Object.keys(searchParams).length ? `?${new URLSearchParams(searchParams).toString()}` : "";
 
-  if (!autherizedUser || !adminAcc) return null;
-  return <Link href={`/admin${queryString}`}>Admin</Link>;
+  return (
+    <Button>
+      <Link href={`/Admin${queryString}`}>Admin</Link>
+    </Button>
+  );
 }
-
 // Logout-Link
 export function LogoutLink() {
   const { autherizedUser } = useAuth();
@@ -75,41 +74,45 @@ export function LogoutLink() {
 }
 
 // FreeTier-Link
-export function FreeTierLink() {
-  const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+export default function FreeTierLink({ searchParams }) {
+  const queryString = Object.keys(searchParams).length ? `?${new URLSearchParams(searchParams).toString()}` : "";
 
-  return <Link href={`/ErstelleRestaurantAccount/FreeTier${queryString}`}>Jetzt starten</Link>;
+  return (
+    <Button asChild>
+      <Link href={`/ErstelleRestaurantAccount/FreeTier${queryString}`}>Abo abschließen</Link>
+    </Button>
+  );
 }
 
 // Professional-Link
-export function ProfessionalLink() {
-  const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+export function ProfessionalTierLink({ searchParams }) {
+  const queryString = Object.keys(searchParams).length ? `?${new URLSearchParams(searchParams).toString()}` : "";
 
-  return <Link href={`/ErstelleRestaurantAccount/Professional${queryString}`}>Jetzt starten</Link>;
+return (
+  <Button className="bg-yellow-400 hover:bg-green-600 text-black" asChild>
+    <Link href={`/ErstelleRestaurantAccount/Professional${queryString}`}>
+      Abo abschließen
+    </Link>
+  </Button>
+);
 }
 
 // Enterprise-Link
-export function EnterpriseLink() {
+export function EnterpriseTierLink() {
   const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
 
-  return <Link href={`/ErstelleRestaurantAccount/Individuell${queryString}`}>Jetzt prüfen</Link>;
+  return (
+    <Button asChild>
+      <Link href={`/ErstelleRestaurantAccount/Individuell${queryString}`}>Jetzt prüfen</Link>
+    </Button>
+  );
 }
 
 // Unsere Partner-Link
 export function UnserePartnerLink() {
   const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
 
   return <Link href={`/UnserePartner${queryString}`}>Unsere Partner</Link>;
 }
@@ -117,9 +120,7 @@ export function UnserePartnerLink() {
 // Demo-Link
 export function DemoLink() {
   const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
 
   return <Link href={`/demo${queryString}`}>Demo buchen</Link>;
 }
@@ -127,13 +128,11 @@ export function DemoLink() {
 // Jetzt kostenlos starten / Registrierung-Link
 export function RegisterLink() {
   const query = useQueryObject();
-  const queryString = Object.keys(query).length
-    ? `?${new URLSearchParams(query).toString()}`
-    : "";
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
 
   return <Link href={`/register${queryString}`}>Kostenlos registrieren</Link>;
 }
 
-
-
 // Alle dynamischen Links nach und nach ersetzen damit die Seite statisch geladen und gecached werden können
+
+export { AdminLink, FreeTierLink };

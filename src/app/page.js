@@ -1,9 +1,7 @@
-"use client"
+"use client";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-
-// export const revalidate = 60
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -17,13 +15,14 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
-//import PermControleLocation from "./components/LocasionPermission";
+import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
-import RenderUserID from "./components/renderUserID"
+import RenderUserID from "./components/renderUserID";
 
-import BeispielKarte from "./components/img/Beispiel-Karte.png"
-import BeispielKarte2 from "./components/img/Beispiel-Karte2.png"
+import BeispielKarte from "./components/img/Beispiel-Karte.png";
+import BeispielKarte2 from "./components/img/Beispiel-Karte2.png";
+import { AdminLink, FreeTierLink, ProfessionalTierLink, EnterpriseTierLink, UnserePartnerLink } from "./components/renderDynamicLinks";
 
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,7 +40,6 @@ function HomeContent() {
   // const autherizedUser = userID && (role === "Owner" || role === "Admin") && status === "authenticated";
   const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
-
 
   useEffect(() => {
     if (adminAcc) {
@@ -72,8 +70,8 @@ function HomeContent() {
     }
   };
   const memoizedQuery = useMemo(() => {
-  return { ...router.queryString };
-}, [router.queryString]);
+    return { ...router.queryString };
+  }, [router.queryString]);
 
   return (
     <div>
@@ -139,14 +137,7 @@ function HomeContent() {
                     <NavigationMenuItem>
                       {status === "authenticated" && adminAcc ? (
                         <Button variant="ghost" asChild>
-                          <Link
-                            href={{
-                              pathname: "/Admin",
-                              query: { ...router.queryString },
-                            }}
-                          >
-                            Admin Konsole
-                          </Link>
+                          <AdminLink searchParams={userID} />
                         </Button>
                       ) : (
                         <></>
@@ -154,14 +145,7 @@ function HomeContent() {
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button variant="ghost" asChild>
-                        <Link
-                          href={{
-                            pathname: "/UnserePartner",
-                            query: { ...router.queryString },
-                          }}
-                        >
-                          Unsere Partner
-                        </Link>
+                        <UnserePartnerLink />
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
@@ -338,17 +322,9 @@ function HomeContent() {
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für deine erste digitale Speisekarte?</h2>
               <p className="text-xl mb-8 text-indigo-100">Schließe dich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300">
-                  <a href="/register">Kostenlos registrieren</a>
-                </Button>
-                <Button variant="outline" asChild className="border-white text-white hover:bg-white hover:text-indigo-600">
-                  <a href="/demo">Demo buchen</a>
-                </Button>
-              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center"></div>
             </div>
           </section>
-          <section></section>
 
           {/* Pricing Preview */}
           <section id="pricing" className="py-20 bg-gray-50">
@@ -390,14 +366,7 @@ function HomeContent() {
                     {/* Button nach unten drücken */}
                     <div className="mt-auto">
                       <Button asChild className="w-full">
-                        <Link
-                          href={{
-                            pathname: "./ErstelleRestaurantAccount/FreeTier",
-                            query: { ...router.queryString },
-                          }}
-                        >
-                          Jetzt starten
-                        </Link>
+                        <FreeTierLink searchParams={userID} />
                       </Button>
                     </div>
                   </CardContent>
@@ -437,19 +406,14 @@ function HomeContent() {
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300">
-                      <Link
-                        href={{
-                          pathname: "./ErstelleRestaurantAccount/Professional",
-                          query: memoizedQuery,
-                        }}
-                      >
-                        Jetzt starten
-                      </Link>
+                      <Button asChild className="w-full">
+                        <ProfessionalTierLink searchParams={userID} />
+                      </Button>
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="flex flex-col h-full">
+                <Card>
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
@@ -474,14 +438,7 @@ function HomeContent() {
                     {/* Button nach unten */}
                     <div className="mt-auto">
                       <Button asChild className="w-full">
-                        <Link
-                          href={{
-                            pathname: "./ErstelleRestaurantAccount/Individuell",
-                            query: { ...router.queryString },
-                          }}
-                        >
-                          Jetzt prüfen
-                        </Link>
+                        <EnterpriseTierLink />
                       </Button>
                     </div>
                   </CardContent>
