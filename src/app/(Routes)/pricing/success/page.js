@@ -14,7 +14,6 @@ export default function SuccessClient({ searchParams }) {
   const sessionId = searchParams?.session_id;
   const tier = session?.user?.subscription ?? "FreeTier";
 
-  // 🔹 useEffect wird immer aufgerufen
   useEffect(() => {
     if (status === "loading") return; // nur Logging überspringen
 
@@ -40,18 +39,12 @@ export default function SuccessClient({ searchParams }) {
       <div className="max-w-md mx-auto px-4">
         <Card className="shadow-2xl border-green-200">
           <div className="p-8 text-center">
-            <h1 className="text-3xl font-bold">
-              Zahlung erfolgreich!
-            </h1>
+            <h1 className="text-3xl font-bold">Zahlung erfolgreich!</h1>
 
-            <p className="mt-4 text-gray-600">
-              Dein {tier} Abonnement ist aktiv
-            </p>
+            <p className="mt-4 text-gray-600">Ihr Abonnement ist aktiv!</p>
+            <p className="mt-4 text-green-600">Bitte melden sie sich neu an um unseren Service nutzen zu können</p>
 
-            <Button
-              className="mt-6 w-full"
-              onClick={() => router.push("/")}
-            >
+            <Button className="mt-6 w-full" onClick={() => router.push("/")}>
               Zurück
             </Button>
           </div>
