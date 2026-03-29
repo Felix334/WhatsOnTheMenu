@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
@@ -9,24 +9,25 @@ import { Button } from "@/components/ui/button";
 
 export default function SuccessClient({ searchParams }) {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
-  const [loading, setLoading] = useState(true);
+  const sessionId = searchParams?.session_id;
+  const tier = session?.user?.subscription ?? "FreeTier";
 
-  const sessionId = searchParams?.session_id
-    const tier = session?.user?.subscription || "Premium";
-
+  // 🔹 useEffect wird immer aufgerufen
   useEffect(() => {
+    if (status === "loading") return; // nur Logging überspringen
+
     if (sessionId) {
       console.log("Stripe session ID:", sessionId);
-      console.log(`Der Nutzer hat ein ${tier}-Abo abgeschlossen`)
     }
 
-    setLoading(false);
-  }, [sessionId, tier]);
+    console.log("SESSION:", session);
+    console.log("TIER:", tier);
+  }, [sessionId, session, tier, status]);
 
-
-  if (loading) {
+  // 🔹 Früher Return nur für UI
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Verifiziere Zahlung...</div>
@@ -39,10 +40,12 @@ export default function SuccessClient({ searchParams }) {
       <div className="max-w-md mx-auto px-4">
         <Card className="shadow-2xl border-green-200">
           <div className="p-8 text-center">
-            <h1 className="text-3xl font-bold">Zahlung erfolgreich!</h1>
+            <h1 className="text-3xl font-bold">
+              Zahlung erfolgreich!
+            </h1>
 
             <p className="mt-4 text-gray-600">
-              Dein {tier} Abonnement ist aktiv_
+              Dein {tier} Abonnement ist aktiv
             </p>
 
             <Button
