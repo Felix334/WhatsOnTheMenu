@@ -14,14 +14,16 @@ export default function SuccessClient({ searchParams }) {
   const [loading, setLoading] = useState(true);
 
   const sessionId = searchParams?.session_id
+    const tier = session?.user?.subscription || "Premium";
 
   useEffect(() => {
     if (sessionId) {
       console.log("Stripe session ID:", sessionId);
+      console.log(`Der Nutzer hat ein ${tier}-Abo abgeschlossen`)
     }
 
     setLoading(false);
-  }, [sessionId]);
+  }, [sessionId, tier]);
 
 
   if (loading) {
@@ -32,8 +34,6 @@ export default function SuccessClient({ searchParams }) {
     );
   }
 
-  const tier = session?.user?.subscription || "Premium";
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-20">
       <div className="max-w-md mx-auto px-4">
@@ -42,7 +42,7 @@ export default function SuccessClient({ searchParams }) {
             <h1 className="text-3xl font-bold">Zahlung erfolgreich!</h1>
 
             <p className="mt-4 text-gray-600">
-              Dein {tier} Abonnement ist aktiv
+              Dein {tier} Abonnement ist aktiv_
             </p>
 
             <Button

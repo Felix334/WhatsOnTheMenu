@@ -61,8 +61,8 @@ function AdminLink({ searchParams }) {
   const queryString = Object.keys(searchParams).length ? `?${new URLSearchParams(searchParams).toString()}` : "";
 
   return (
-    <Button>
-      <Link href={`/Admin${queryString}`}>Admin</Link>
+    <Button asChild>
+      <Link href={`/Admin${queryString}`}>Admin Konsole</Link>
     </Button>
   );
 }
