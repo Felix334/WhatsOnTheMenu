@@ -63,33 +63,38 @@ export default function PageBuilder() {
 
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-    if (status === "authenticated" && !autherized && session.user.role === "Owner") {
-      console.log("Signed in as:", session.user.id);
-      console.log("User Data:", session.user);
-      console.log("User Subscription:", session.user.subscription);
-      setUserID(session.user.id);
-      switch (session.user.subscription) {
-        case "Basic":
-          setLimit(TierSystem.FreeTier);
-          console.log("Show-Limit:", Limit);
-          break;
-        case "Premium":
-          setLimit(TierSystem.PremiumTier);
-          setAllowPremiumColor(true);
-          console.log("Show-Limit:", Limit);
-          break;
-        case "Advantst":
-          setLimit(TierSystem.Advantst);
-          console.log("Show-Limit:", Limit);
-          break;
-        default:
-          break;
-      }
+useEffect(() => {
+  if (status !== "authenticated" || !session?.user || autherized) return;
 
-      setIsAutherizedUser(true);
+  if (session.user.role === "Owner") {
+    console.log("Signed in as:", session.user.id);
+    console.log("User Data:", session.user);
+    console.log("User Subscription:", session.user.subscription);
+
+    setUserID(session.user.id);
+
+    switch (session.user.subscription) {
+      case "Basic":
+        setLimit(TierSystem.FreeTier);
+        console.log("Free Tier Limit freigeschalten:", TierSystem.FreeTier);
+        break;
+      case "Professional":
+        setLimit(TierSystem.PremiumTier);
+        setAllowPremiumColor(true);
+        console.log("Premium Tier Limit freigeschalten:", TierSystem.PremiumTier);
+        break;
+      case "Advantst":
+        setLimit(TierSystem.Advantst);
+        console.log("Advantst Tier Limit freigeschalten:", TierSystem.Advantst);
+        break;
+      default:
+        console.log("Kein bekanntes Abo:", session.user.subscription);
+        break;
     }
-  }, [status, autherized, session, Limit]);
+
+    setIsAutherizedUser(true);
+  }
+}, [status, autherized, session]);
 
   const calculateLimit = useCallback(() => {
     if (!serverData) return;
@@ -393,7 +398,7 @@ export default function PageBuilder() {
                         name={`items.${index}.name`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Gerichtname:</FormLabel>
+                            <FormLabel className="pt-3">Gerichtname:</FormLabel>
                             <FormControl>
                               <Input placeholder="z.B. Spaghetti" {...field} />
                             </FormControl>
@@ -406,9 +411,11 @@ export default function PageBuilder() {
                         name={`items.${index}.description`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Beschreibung</FormLabel>
+                            <FormLabel className="pt-3">Beschreibung:</FormLabel>
                             <FormControl>
-                              <Input placeholder="z.B. Mit Sahnesauce" {...field} />
+                              <div className="pt-0.5">
+                                <Input placeholder="z.B. Mit Sahnesauce" {...field} />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -419,9 +426,12 @@ export default function PageBuilder() {
                         name={`items.${index}.price`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Preis</FormLabel>
+                            <FormLabel className="pt-3">Preis:</FormLabel>
                             <FormControl>
-                              <Input placeholder="z.B. 9.50" type="text" inputMode="decimal" {...field} />
+                              <div className="flex items-center gap-2 pt-0.5">
+                                <Input placeholder="z.B. 9.50" type="text" inputMode="decimal" {...field} className="w-24" />
+                                <span className="text-gray-600">€</span>
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -433,7 +443,7 @@ export default function PageBuilder() {
                         name={`items.${index}.image`}
                         render={() => (
                           <FormItem>
-                            <FormLabel>Bild</FormLabel>
+                            <FormLabel className="pt-3">Bild</FormLabel>
                             <FormControl>
                               <input
                                 type="file"

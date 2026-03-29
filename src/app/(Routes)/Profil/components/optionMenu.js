@@ -27,6 +27,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
   const authorizedUser = userID && role === "Owner";
 
   useEffect(() => {
+    console.log("optionMenu-Daten:", allowPremiumColor)
     setServerData_(serverData || null);
   }, [serverData]);
 
