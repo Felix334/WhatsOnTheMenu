@@ -4,13 +4,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 
 // Force dynamic rendering - this route should never be statically generated
-export const dynamic = 'force-dynamic';
-
-
+export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
-  console.log("Session-Objekt",session)
+  console.log("Session-Objekt", session);
   if (!session || session.user.role !== "Owner") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -58,12 +56,17 @@ async function main(userId) {
                 font: true,
                 createdAt: true,
                 updatedAt: true,
-                categories: {
+                categoryGroup: {
                   include: {
-                    dishes: {
+                    categories: {
+
                       include: {
-                        ingredients: true,
-                        reviews: true,
+                        dishes: {
+                          include: {
+                            ingredients: true,
+                            reviews: true,
+                          },
+                        },
                       },
                     },
                   },

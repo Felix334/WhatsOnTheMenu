@@ -97,10 +97,10 @@ export default function PageBuilder() {
   }, [status, autherized, session]);
 
   const calculateLimit = useCallback(() => {
+    console.log("Caclulate Data")
     if (!serverData) return;
-    const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories || []).length || 0) + (components.length || 0);
-
-    const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
+    const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroups?.reduce((total, cg) => total + (cg.categorys?.length || 0), 0) || 0) + (components.length || 0);
+    const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroups?.flatMap((cg) => cg.categorys?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
     console.log("Limit:", Limit);
     console.log("TierSystem:", TierSystem);
     console.log("Calc Limit", catCount, dishCount);
@@ -110,13 +110,17 @@ export default function PageBuilder() {
   }, [serverData, components, Limit, exeedCatLimit, exeedDishLimit]);
 
   useEffect(() => {
+    if (serverData?.userData?.restaurant?.menu?.[0]) {
+      const count = serverData.userData.restaurant.menu[0].categoryGroups.reduce((total, cg) => total + (cg.categorys?.length || 0), 0);
+      setPositionNum(count);
+    }
     calculateLimit();
-  }, [components, serverData, Limit, calculateLimit]);
+  }, [serverData, components, Limit, calculateLimit]);
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
     defaultValues: {
-      menu_col: "",
+      menu_group: "",
       menu_name: "",
       items: [{ name: "", price: 0, description: "", image: "" }],
     },
@@ -157,14 +161,11 @@ export default function PageBuilder() {
         setRestaurantID(freshData.userData.restaurant.id);
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
         // Fix das
-        setFontNew(freshData.userData.restaurant.menu.font);
+        setFontNew(freshData.userData.restaurant.menu?.[0]?.font || "");
         if (fontNew) {
           console.log("FontNew:(Unfertig?)", fontNew);
         }
-        console.log("Freshdata:", freshData.userData.restaurant.menu.categoryGroup)
-        const count = freshData.userData.restaurant.menu.categoryGroup.categories.reduce((total, menu) => total + menu.categories.length, 0);
-        console.log(count);
-        setPositionNum(count);
+        // positionNum calculated in useEffect after data loads
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error("Fetch failed:", error);
@@ -192,7 +193,7 @@ export default function PageBuilder() {
   };
 
   const onSubmit = async (data) => {
-    // Upload selected images and update data with filePaths
+    console.log("Execute Submit Data:", data)
     const updatedItems = await Promise.all(
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
@@ -231,28 +232,74 @@ export default function PageBuilder() {
     const updatedData = { ...data, items: updatedItems };
     submitToServer(updatedData);
     setOpenEditor(false);
-    setSelectedFiles({}); // Clear selected files after adding section
+    setSelectedFiles({});
   };
 
   const submitData = async () => {
+    console.log("🖱️ Speichern button clicked!");
+    console.log("📊 serverData:", !!serverData);
+    console.log("🏪 restaurant:", !!serverData?.userData?.restaurant);
+    console.log("🍽️  menu:", !!serverData?.userData?.restaurant?.menu?.[0]);
+    console.log("📱 components:", components.length);
+    console.log("🗑️  deletedDishes:", deletedDishes.length);
+    console.log("🗑️  deletedCategories:", deletedCategories.length);
+    if (!serverData || !serverData.userData?.restaurant) {
+      alert("Lade Daten zuerst...");
+      return;
+    }
+
     const restaurantID = serverData.userData.restaurant.id;
-    const api_key = process.env.NEXT_PUBLIC_API_KEY;
-    console.log("API-KEY Abfrage:", api_key);
-    console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
-    console.log("Deleted Dishes:", deletedDishes);
-    console.log("Deleted Categories:", deletedCategories);
+    const menu = serverData.userData.restaurant.menu[0];
 
-    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
+    if (!menu) {
+      alert("Kein Menü gefunden. Erstelle zuerst ein Menü.");
+      return;
+    }
 
-    console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
-    console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
-    console.log("!Encrypted Data vor dem Senden:", enc_data);
+    const api_key = process.env.NEXT_PUBLIC_API_KEY || "";
+
+    // Convert server menu data to API format
+    const menuData = menu.categoryGroups.map((cg) => ({
+      categoryGroupName: cg.name,
+      categoryGroupColor: cg.color,
+      categorys: cg.categorys.map((cat) => ({
+        categoryName: cat.name,
+        dishes: cat.dishes.map((dish) => ({
+          name: dish.name,
+          description: dish.description,
+          price: dish.price,
+          imageUrl: dish.imageUrl || dish.image || "",
+        })),
+      })),
+    }));
+
+    // Add local components
+    components.forEach((section) => {
+      menuData.push({
+        categoryGroupName: "Neue Gruppe",
+        categoryGroupColor: "#ffffff",
+        categorys: [
+          {
+            categoryName: section.section.title,
+            dishes: section.section.items.map((item) => ({
+              name: item.name,
+              description: item.description,
+              price: parseFloat(item.price) || 0,
+              imageUrl: item.image || "",
+            })),
+          },
+        ],
+      });
+    });
+
+    console.log("📤 Sending menuData:", menuData);
 
     setIsLoading(true);
 
     try {
-      // First, save the data
-      const response = await fetch("/api/user/profil/setData", {
+      const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, menuData, restaurantID, api_key);
+
+      const saveResponse = await fetch("/api/user/profil/setData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -263,52 +310,52 @@ export default function PageBuilder() {
         }),
       });
 
-      // JSON parsen, um die Fehlernachricht zu erhalten
-      const resData = await response.json();
+      const saveResult = await saveResponse.json();
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
+      if (!saveResponse.ok) {
+        throw new Error(saveResult.message || `HTTP ${saveResponse.status}`);
       }
-      // Then, handle deletions if any
+
+      console.log("✅ Save successful:", saveResult);
+
+      // Handle deletions separately
       if (deletedDishes.length > 0 || deletedCategories.length > 0) {
-        console.log("Processing deletions...");
-        const deleteData = {
+        const deletePayload = {
           dishes: deletedDishes,
           categories: deletedCategories,
+          files: [],
         };
-        console.log(`Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`);
-        const { enc_data: enc_delete_data, encrypted_restaurant_id: enc_rest_id, encrypted_api_key: enc_api_key, encrypted_user_id: enc_user_id } = await encrypt_data(userID, deleteData, restaurantID, api_key);
-        console.log(`Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`);
+
+        const { enc_data: del_enc, encrypted_restaurant_id: del_rest, encrypted_api_key: del_key, encrypted_user_id: del_user } = await encrypt_data(userID, deletePayload, restaurantID, api_key);
+
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            encrypted_user_id: enc_user_id,
-            encrypted_restaurant_id: enc_rest_id,
-            encrypted_data: enc_delete_data,
-            encrypted_api_key: enc_api_key,
+            encrypted_user_id: del_user,
+            encrypted_restaurant_id: del_rest,
+            encrypted_data: del_enc,
+            encrypted_api_key: del_key,
           }),
         });
 
-        const deleteResData = await deleteResponse.json();
+        const deleteResult = await deleteResponse.json();
+        console.log("🗑️ Delete result:", deleteResult);
 
         if (!deleteResponse.ok) {
-          throw new Error(`Delete error! status: ${deleteResponse.status}, Message: ${deleteResData.message || "N/A"}, Error: ${deleteResData.error || "N/A"}`);
+          console.warn("Delete failed but save succeeded:", deleteResult);
         }
-
-        // Clear the deleted lists after successful deletion
-        setDeletedDishes([]);
-        setDeletedCategories([]);
-      } else {
-        console.log("No deletions to process");
-        location.reload();
       }
 
-      alert("Data saved and deletions processed successfully!");
-      setSelectedFiles({}); // Clear selected files after successful save
-    } catch (err) {
-      console.error("Failed to save data:", err);
-      alert(`Failed to save data: ${err.message}`);
+      // Reset state
+      setComponents([]);
+      setDeletedDishes([]);
+      setDeletedCategories([]);
+
+      alert("✅ Menu gespeichert!");
+    } catch (error) {
+      console.error("💥 Save error:", error);
+      alert(`Fehler: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -342,10 +389,6 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  // Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
-  // Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
-  // Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola)
-
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <div></div>
@@ -360,10 +403,10 @@ export default function PageBuilder() {
         <ScrollArea className="h-[70vh]">
           <div className="p-4">
             <Form {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(submitData)} className="space-y-4">
                 <FormField
                   control={control}
-                  name="menu_col"
+                  name="menu_group"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Kategorie</FormLabel>
@@ -374,7 +417,6 @@ export default function PageBuilder() {
                     </FormItem>
                   )}
                 />
-                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets und schließt sie</h1>
                 <FormField
                   control={control}
                   name="menu_name"
@@ -480,7 +522,9 @@ export default function PageBuilder() {
                 </div>
 
                 <div className="flex justify-between pt-4">
-                  <Button type="submit">Speichern</Button>
+                  <Button type="submit" onClick={() => {
+                    submitData(onSubmit)
+                  }}>Speichern</Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -505,7 +549,7 @@ export default function PageBuilder() {
               type="button"
               variant="outline"
               onClick={() => {
-                append({ name: "", price: 0, description: "", image: "" });
+                append({ name: "", price: 0, description: "", image: "" }),
                 calculateLimit();
               }}
             >
@@ -597,7 +641,7 @@ export default function PageBuilder() {
     }
 
     return (
-      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden j">
         <div className="relative flex items-center justify-center py-6 px-4 border-b bg-gray-50">
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
@@ -664,14 +708,13 @@ export default function PageBuilder() {
                         </Button>
                       </div>
                     </TableCell>
-
                     <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
                       <div className="flex flex-col">
                         <span className="font-serif truncate">{item.name}</span>
                         {item.description && <span className="text-sm text-gray-500 break-words">{item.description}</span>}
                       </div>
                     </TableCell>
-                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
+                    {parseFloat(item.price || 0).toFixed(2)}€
                   </TableRow>
 
                   {expandedIndex === index && (
@@ -759,7 +802,7 @@ export default function PageBuilder() {
               <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
             </header>
             <main className="w-full">
-              <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
+              {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroups?.flatMap((cg) => cg.categorys?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />)) || [] || <div>Keine Daten vorhanden</div>}
 
               <p className="mt-4" style={{ fontFamily: fontNew }}>
                 Gesamtpreis: 0€
@@ -772,7 +815,9 @@ export default function PageBuilder() {
             </main>
           </div>
           <div className="fixed bottom-6 left-6 z-20">
-            <Button onClick={() => submitData()}>Speichern (Server)</Button>
+            <Button onClick={submitData} disabled={isLoading} className={isLoading ? "animate-pulse" : ""}>
+              {isLoading ? "💾 Speichere..." : "💾 Speichern (Server)"}
+            </Button>
           </div>
         </div>
       </div>

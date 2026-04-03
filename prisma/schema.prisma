@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,31 +7,31 @@ datasource db {
 }
 
 model User {
-  id                   String            @id @default(cuid())
+  id                   String           @id @default(cuid())
   name                 String
-  email                String            @unique
+  email                String           @unique
   emailVerified        DateTime?
   password             String?
-  role                 Role              @default(User)
-  subscription         Subscription      @default(FreeTier)
-  session              Session[]
-  restaurant           Restaurant?
-  accounts             Account[]
-  company              Company?          @relation("CompanyOwner")
-  employeeOf           Company?          @relation("CompanyEmployees", fields: [companyId], references: [id])
+  role                 Role             @default(User)
+  subscription         Subscription     @default(FreeTier)
   companyId            String?
-  dashboard            Dashboard?
-  payments             Payment[]
-  reports              Report[]
-  restaurantQueues     RestaurantQueue[]
-  emails               EmailInbox[]
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
   image                String
-  stripeCustomerId     String?           @unique
+  stripeCustomerId     String?          @unique
   stripeSubscriptionId String?
   stripePriceId        String?
   subscriptionStatus   String?
+  accounts             Account[]
+  company              Company?         @relation("CompanyOwner")
+  dashboard            Dashboard?
+  emails               EmailInbox[]
+  payments             Payment[]
+  reports              Report[]
+  restaurant           Restaurant?
+  restaurantQueues     RestaurantQueue?
+  session              Session[]
+  employeeOf           Company?         @relation("CompanyEmployees", fields: [companyId], references: [id])
 
   @@index([companyId])
 }
@@ -55,8 +49,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -79,32 +72,18 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-enum Role {
-  User
-  Admin
-  Owner
-  Manager
-  Executive
-}
-
-enum Subscription {
-  FreeTier
-  Professional
-  Individuell
-}
-
 model Restaurant {
   id            String     @id @default(cuid())
   name          String
   parentCompany String
   ownerId       String     @unique
   ownerName     String
-  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  menu          Menu[]
-  locations     Location[]
   category      String     @default("NONE")
   createdAt     DateTime   @default(now())
   calendar      Calendar[]
+  locations     Location[]
+  menu          Menu[]
+  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
@@ -139,37 +118,37 @@ model Reservation {
   id          String   @id @default(cuid())
   locationId  String   @unique
   phoneNumber String
-  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
+  location    Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 }
 
 model Menu {
-  id           String     @id @default(cuid())
-  name         String
-  description  String?
-  restaurantId String // A menu belongs to one restaurant
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  categories   Category[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  bgColor      String
-  font         String
-  dishes       Dish[]
+  id            String          @id @default(cuid())
+  name          String
+  description   String?
+  restaurantId  String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  bgColor       String
+  font          String
+  categoryGroup CategoryGroup[]
+  restaurant    Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
   @@index([restaurantId])
 }
 
 model Category {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  position    Int?
-  bgColor     String?
-  font        String?
-  fontColor   String?
-  menuId      String?
-  menu        Menu?   @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  dishes      Dish[]
+  id              String        @id @default(cuid())
+  name            String
+  description     String?
+  position        Int?
+  bgColor         String?
+  font            String?
+  fontColor       String?
+  menuId          String?
+  categroyGroupID String
+  categoryGroup   CategoryGroup @relation(fields: [categroyGroupID], references: [id], onDelete: Cascade)
+  dishes          Dish[]
 
   @@index([menuId])
 }
@@ -179,19 +158,16 @@ model Dish {
   name        String
   description String?
   price       Decimal      @db.Decimal(10, 2)
-  imageUrl    String
+  imageUrl    String?
   categoryId  String?
-  menuId      String
-  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  menu        Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  ingredients Ingredient[] @relation("DishIngredients")
-  reviews     Review[]     @relation("DishReviews")
-  reports     Report[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  reports     Report[]
+  reviews     Review[]     @relation("DishReviews")
+  ingredients Ingredient[] @relation("DishIngredients")
 
   @@index([categoryId])
-  @@index([menuId])
 }
 
 model Ingredient {
@@ -218,8 +194,7 @@ model RestaurantQueue {
   name           String
   description    String?
   ownerId        String       @unique
-  owner          User         @relation(fields: [ownerId], references: [id])
-  status         String       @default("pending") // pending, approved, rejected
+  status         String       @default("pending")
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   restaurantName String
@@ -232,57 +207,50 @@ model RestaurantQueue {
   postalCode     String
   country        String
   subscription   Subscription
+  owner          User         @relation(fields: [ownerId], references: [id])
 
   @@index([ownerId])
 }
 
 model Company {
-  id   String @id @default(cuid())
-  name String
-
+  id              String   @id @default(cuid())
+  name            String
   stripeAccountId String?
-
-  ownerId   String @unique
-  owner     User   @relation("CompanyOwner", fields: [ownerId], references: [id])
-  employees User[] @relation("CompanyEmployees")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  ownerId         String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  owner           User     @relation("CompanyOwner", fields: [ownerId], references: [id])
+  employees       User[]   @relation("CompanyEmployees")
 }
 
 model Dashboard {
   id        String   @id @default(cuid())
   userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  data      Json? // Store dashboard data as JSON
+  data      Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Payment {
-  id     String @id @default(cuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  // Stripe
-  stripePaymentId String  @unique // payment_intent.id
+  id              String   @id @default(cuid())
+  userId          String
+  stripePaymentId String   @unique
   stripeInvoiceId String?
   stripeSessionId String?
-
-  amount   Int // IMMER in Cent! (999 = 9.99€)
-  currency String @default("eur")
-
-  status      String // pending, succeeded, failed, refunded
-  description String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  amount          Int
+  currency        String   @default("eur")
+  status          String
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model StripeEvent {
-  id        String   @id // evt_xxx von Stripe
+  id        String   @id
   type      String
   createdAt DateTime @default(now())
 }
@@ -290,14 +258,14 @@ model StripeEvent {
 model Report {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   dishId    String?
-  dish      Dish?    @relation(fields: [dishId], references: [id])
   reason    String
   details   String?
-  status    String   @default("open") // open, resolved
+  status    String   @default("open")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  dish      Dish?    @relation(fields: [dishId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([dishId])
   @@index([userId])
@@ -306,12 +274,36 @@ model Report {
 model EmailInbox {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   subject   String
   body      String
   from      String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model CategoryGroup {
+  id         String     @id @default(cuid())
+  name       String
+  position   Int
+  color      String
+  menuID     String
+  categories Category[]
+  Menu       Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  User
+  Admin
+  Owner
+  Manager
+  Executive
+}
+
+enum Subscription {
+  FreeTier
+  Professional
+  Individuell
 }

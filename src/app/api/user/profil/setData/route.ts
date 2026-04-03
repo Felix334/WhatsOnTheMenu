@@ -3,13 +3,12 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
-import { supabase } from "src/lib/supabase.js"
-import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory } from "@prisma/client";
+import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup } from "@prisma/client";
 
-type MenuWithRelations = PrismaMenu & { categories: PrismaCategory[] };
+type CategoryGroupWithRelations = PrismaCategoryGroup & { categories: PrismaCategory[] };
+type MenuWithRelations = PrismaMenu & { categoryGroup: CategoryGroupWithRelations[] };
 
 export const dynamic = "force-dynamic";
-
 
 interface EncryptedData {
   encrypted_user_id: string;
@@ -26,30 +25,7 @@ type SuccessResponse = {
   apiKey: string;
 };
 
-type Menu = {
-  id: string;
-  name: string;
-  description: string | null;
-  restaurantId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  bgColor: string;
-  font: string;
-};
-
-type Category = {
-  id: string;
-  name: string;
-  description: string | null;
-  position: number | null;
-  bgColor: string | null;
-  font: string | null;
-  fontColor: string | null;
-  menuId: string | null;
-};
-
 type ErrorResponse = { error: string; status: number };
-
 type DecryptResult = SuccessResponse | ErrorResponse | null;
 
 function isSuccess(r: DecryptResult): r is SuccessResponse {
@@ -60,7 +36,6 @@ function isError(r: DecryptResult): r is ErrorResponse {
   return !!r && "error" in r;
 }
 
-// Utility: sichere DB-Abfrage mit Logging
 async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T> {
   try {
     return await callback();
@@ -75,6 +50,7 @@ export async function POST(req: NextRequest) {
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   try {
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
 
@@ -82,7 +58,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Keine Daten empfangen" }, { status: 400 });
     }
 
-    // decrypt
     const decryptResult = await decryption(encryptedData);
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
@@ -93,7 +68,6 @@ export async function POST(req: NextRequest) {
 
     const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
 
-    // server-only API key
     const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
     if (!expectedApiKey) {
       console.error("Server API_KEY env var missing");
@@ -102,7 +76,7 @@ export async function POST(req: NextRequest) {
     if (apiKey !== expectedApiKey) {
       return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
     }
-    // parse JSON
+
     let parsedData: any;
     try {
       parsedData = JSON.parse(decryptedDataString);
@@ -115,13 +89,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
     }
 
-    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique") as User | null;
+    const user = await safeDb(
+      () => prisma.user.findUnique({ where: { id: userID } }),
+      "user.findUnique"
+    ) as User | null;
+
     const restaurant = await safeDb(
-      () =>
-        prisma.restaurant.findUnique({
-          where: { id: restaurantId },
-          include: { menu: { include: { categories: true } } },
-        }),
+      () => prisma.restaurant.findUnique({
+        where: { id: restaurantId },
+        include: {
+          menu: {
+            include: {
+              categoryGroup: {
+                include: {
+                  categories: true,
+                },
+              },
+            },
+          },
+        },
+      }),
       "restaurant.findUnique"
     ) as (Restaurant & { menu: MenuWithRelations[] }) | null;
 
@@ -133,37 +120,69 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Benutzer ist nicht der Besitzer des Restaurants" }, { status: 403 });
     }
 
-    // Pick first menu or create
-    let menu: (Menu & { categories: Category[] }) | null = restaurant.menu.length > 0 ? (restaurant.menu[0] as Menu & { categories: Category[] }) : null;
+    // Erstes Menü nehmen oder neu erstellen
+    let menu: MenuWithRelations | null = restaurant.menu.length > 0 ? restaurant.menu[0] : null;
 
     if (!menu) {
       const createdMenu = await safeDb(
-        () =>
-          prisma.menu.create({
-            data: {
-              name: `Menü für ${restaurant.name}`,
-              description: null,
-              restaurantId: restaurantId,
-              bgColor: "#ffffff",
-              font: "Arial",
-            },
-          }),
+        () => prisma.menu.create({
+          data: {
+            name: `Menü für ${restaurant.name}`,
+            description: null,
+            restaurantId: restaurantId,
+            bgColor: "#ffffff",
+            font: "Arial",
+          },
+        }),
         "menu.create"
-      ) as PrismaMenu;
+      );
 
-      menu = (await safeDb(
-        () =>
-          prisma.menu.findUnique({
-            where: { id: createdMenu.id },
-            include: { categories: true },
-          }),
+      menu = await safeDb(
+        () => prisma.menu.findUnique({
+          where: { id: createdMenu.id },
+          include: {
+            categoryGroup: {
+              include: {
+                categories: true,
+              },
+            },
+          },
+        }),
         "menu.findUnique after create"
-      )) as Menu & { categories: Category[] };
+      ) as MenuWithRelations;
     }
 
     const menuId = menu.id;
 
-    // Process parsed entries
+    // Standard CategoryGroup finden oder erstellen
+    let defaultGroup: CategoryGroupWithRelations | null =
+      menu.categoryGroup.length > 0 ? menu.categoryGroup[0] : null;
+
+    if (!defaultGroup) {
+      const createdGroup = await safeDb(
+        () => prisma.categoryGroup.create({
+          data: {
+            name: "Standard",
+            position: 0,
+            color: "#ffffff",
+            menuID: menuId,
+          },
+        }),
+        "categoryGroup.create"
+      );
+
+      defaultGroup = await safeDb(
+        () => prisma.categoryGroup.findUnique({
+          where: { id: createdGroup.id },
+          include: { categories: true },
+        }),
+        "categoryGroup.findUnique after create"
+      ) as CategoryGroupWithRelations;
+    }
+
+    const groupId = defaultGroup.id;
+
+    // Einträge verarbeiten
     for (const entry of parsedData) {
       if (!entry || entry.type !== "menuSection") continue;
 
@@ -173,55 +192,69 @@ export async function POST(req: NextRequest) {
 
       const items: any[] = Array.isArray(section.items) ? section.items : [];
 
-      // find or create category
-      let category = await safeDb(() => prisma.category.findFirst({ where: { menuId, name: title } }), "category.findFirst") as PrismaCategory | null;
+      // Kategorie in der CategoryGroup suchen oder erstellen
+      let category = await safeDb(
+        () => prisma.category.findFirst({
+          where: { categroyGroupID: groupId, name: title },
+        }),
+        "category.findFirst"
+      ) as PrismaCategory | null;
 
       if (!category) {
         category = await safeDb(
-          () =>
-            prisma.category.create({
-              data: { name: title, description: null, position: null, menuId },
-            }),
+          () => prisma.category.create({
+            data: {
+              name: title,
+              description: null,
+              position: null,
+              categroyGroupID: groupId,
+            },
+          }),
           "category.create"
         ) as PrismaCategory;
       }
 
-      // create dishes
+      // Gerichte erstellen
       for (const item of items) {
         if (!item || !item.name) continue;
 
         let price = 0;
-        if (typeof item.price === "number") price = item.price;
-        else if (typeof item.price === "string") {
+        if (typeof item.price === "number") {
+          price = item.price;
+        } else if (typeof item.price === "string") {
           const p = parseFloat(item.price.replace(",", ".").replace(/[^\d.-]/g, ""));
           price = Number.isFinite(p) ? p : 0;
         }
 
         await safeDb(
-          () =>
-            prisma.dish.create({
-              data: {
-                name: item.name,
-                description: item.description ?? null,
-                price,
-                imageUrl: item.image ?? "",
-                categoryId: category!.id,
-                menuId,
-              },
-            }),
+          () => prisma.dish.create({
+            data: {
+              name: item.name,
+              description: item.description ?? null,
+              price,
+              imageUrl: item.image ?? "",
+              categoryId: category!.id,
+            },
+          }),
           `dish.create (${item.name})`
         );
       }
     }
 
-    return NextResponse.json({ message: "Daten erfolgreich verarbeitet", restaurantId, menuId }, { status: 200 });
+    return NextResponse.json(
+      { message: "Daten erfolgreich verarbeitet", restaurantId, menuId },
+      { status: 200 }
+    );
+
   } catch (err: any) {
-    console.error("Serverfehler:", err);
-    return NextResponse.json({ message: "Serverfehler", error: err?.message ?? err }, { status: 500 });
+    console.error("Error in POST handler:", err);
+    return NextResponse.json(
+      { message: "Serverfehler", error: err?.message ?? err },
+      { status: 500 }
+    );
   }
 }
 
-/* Decryption function */
 async function decryption(data: EncryptedData): Promise<DecryptResult> {
   const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
   if (!key) return { error: "Encryption key missing", status: 500 };
