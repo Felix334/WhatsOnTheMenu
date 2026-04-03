@@ -1,20 +1,8 @@
-# Fix Profil Page Errors
-Status: ✅ COMPLETE
+# Fix categoryGroupUpdate type in setData/route.ts
 
 ## Steps:
-- [x] 1. Analyze files & identify ReferenceError cause
-- [x] 2. Create & confirm detailed edit plan  
-- [x] 3. Create this TODO.md ✓
-- [ ] 4. Edit src/app/(Routes)/Profil/page.js:
-  - Move useRestaurantData hook to top
-  - Remove duplicate commented fetch useEffect
-  - Fix require() → static Image import
-  - Add React import for Fragment
-  - Inline calculateLimit with null checks
-  - Fix form.watch() scoping
-  - Clean circular useEffect deps
-- [ ] 5. Test: npm run dev → /Profil page loads without crash
-- [ ] 6. Run npm run lint
-- [ ] 7. attempt_completion
+- [x] 1. Add CategoryGroupUpdateEntry interface to src/app/api/user/profil/setData/route.ts
+- [x] 2. Replace the find((e: any)...) line with typed type guard version
+- [x] 3. Test the API endpoint
 
-**Current Error Fixed**: ReferenceError serverData uninitialized
+Fixed! The 'any' type issue is resolved with proper type guard.

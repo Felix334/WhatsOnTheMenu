@@ -6,7 +6,10 @@ import * as CryptoJS from "crypto-js";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
 
 type MenuWithRelations = Menu & {
-  categories: (Category & { dishes: Dish[] })[];
+  categoryGroup: ({
+    id: string;
+    categories: (Category & { dishes: Dish[] })[];
+  })[];
 };
 
 export const dynamic = "force-dynamic";
@@ -102,8 +105,14 @@ export async function POST(req: NextRequest) {
 
     /* ---------------- LOAD USER & RESTAURANT ---------------- */
 
-    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
-    const restaurant = await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique") as Restaurant | null;
+    const user = await safeDb(
+      () => prisma.user.findUnique({ where: { id: userID } }),
+      "user.findUnique"
+    );
+    const restaurant = (await safeDb(
+      () => prisma.restaurant.findUnique({ where: { id: restaurantId } }),
+      "restaurant.findUnique"
+    )) as Restaurant | null;
 
     if (!user || !restaurant) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
@@ -115,20 +124,55 @@ export async function POST(req: NextRequest) {
 
     /* ---------------- LOAD MENU ---------------- */
 
-    const menu = await safeDb(
+    const menu = (await safeDb(
       () =>
         prisma.menu.findFirst({
           where: { restaurantId },
-          include: { categories: { include: { dishes: true } } },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            bgColor: true,
+            font: true,
+            createdAt: true,
+            updatedAt: true,
+            restaurantId: true,
+            categoryGroup: {
+              select: {
+                id: true,
+                categories: {
+                  include: {
+                    dishes: {
+                      include: {
+                        ingredients: true,
+                        reviews: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         }),
       "menu.findFirst",
-    ) as MenuWithRelations | null;
+    )) as MenuWithRelations | null;
 
     if (!menu) {
       return NextResponse.json({ message: "Kein Menü gefunden" }, { status: 404 });
     }
 
     const menuId = menu.id;
+
+    // Flatten all categories across all category groups
+    const categories = menu.categoryGroup.flatMap((group) => group.categories);
+
+    // Use the first categoryGroup as default for new categories
+    const defaultCategoryGroup = menu.categoryGroup[0];
+
+    if (!defaultCategoryGroup) {
+      return NextResponse.json({ message: "Keine Kategoriegruppe gefunden" }, { status: 404 });
+    }
+
     for (const entry of parsedData) {
       if (!entry) continue;
 
@@ -139,34 +183,33 @@ export async function POST(req: NextRequest) {
 
         const items: any[] = Array.isArray(section.items) ? section.items : [];
 
-        let category = menu.categories.find((c) => c.name === title);
+        let category = categories.find((c) => c.name === title);
 
         if (!category) {
-          category = await safeDb(
+          category = (await safeDb(
             () =>
               prisma.category.create({
                 data: {
                   name: title,
                   description: section.description ?? null,
                   position: section.position ?? null,
-                  menuId,
+                  // Use categroyGroupID (as per schema) instead of menuId
+                  categroyGroupID: defaultCategoryGroup.id,
                 },
                 include: { dishes: true },
               }),
             "category.create",
-          ) as Category & { dishes: Dish[] };
+          )) as Category & { dishes: Dish[] };
 
-          menu.categories.push(category);
+          categories.push(category);
         } else {
-          const { id: categoryId } = category;
-
           await safeDb(
             () =>
               prisma.category.update({
-                where: { id: categoryId },
+                where: { id: category!.id },
                 data: {
-                  description: section.description ?? section.description,
-                  position: section.position ?? section.position,
+                  description: section.description ?? null,
+                  position: section.position ?? null,
                 },
               }),
             "category.update",
@@ -183,7 +226,7 @@ export async function POST(req: NextRequest) {
           const existingDish = category.dishes.find((d) => d.id === item.id);
 
           if (!existingDish) {
-            const newDish = await safeDb(
+            const newDish = (await safeDb(
               () =>
                 prisma.dish.create({
                   data: {
@@ -191,12 +234,11 @@ export async function POST(req: NextRequest) {
                     description: item.description ?? null,
                     price,
                     imageUrl: item.image ?? "",
-                    categoryId: category.id,
-                    menuId,
+                    categoryId: category!.id,
                   },
                 }),
               `dish.create (${item.name})`,
-            ) as Dish;
+            )) as Dish;
 
             category.dishes.push(newDish);
           } else {
@@ -206,9 +248,9 @@ export async function POST(req: NextRequest) {
                   where: { id: existingDish.id },
                   data: {
                     name: item.name,
-                    description: item.description,
+                    description: item.description ?? null,
                     price,
-                    imageUrl: item.image,
+                    imageUrl: item.image ?? null,
                   },
                 }),
               `dish.update (${item.name})`,
@@ -255,11 +297,9 @@ async function decryption(data: EncryptedData): Promise<DecryptResult> {
     const decryptedRestaurantId = CryptoJS.AES.decrypt(data.encrypted_restaurant_id, key).toString(CryptoJS.enc.Utf8);
     const decryptedData = CryptoJS.AES.decrypt(data.encrypted_data, key).toString(CryptoJS.enc.Utf8);
     const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
+
     if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return {
-        error: "Entschlüsselung fehlgeschlagen",
-        status: 400,
-      };
+      return { error: "Entschlüsselung fehlgeschlagen", status: 400 };
     }
 
     return {
