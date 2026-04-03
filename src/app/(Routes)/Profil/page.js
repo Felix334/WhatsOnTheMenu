@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,26 +27,36 @@ import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
+import { useRestaurantData } from "./components/fetchData"
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
 //const schnitzel = require("./img/SchnitzelMitSpätzle.jpg");
-const restaurant_icon = require("./img/restaurantLabelIcon.png");
+// const restaurant_icon = require("./img/restaurantLabelIcon.png");
 //const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 export default function PageBuilder() {
   const router = useRouter();
 
   const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }
-  const [serverData, setServerData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+
   const [edditComponents, setEdditComponents] = useState([]);
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
 
-  const [bgColor, setBgColor] = useState("");
-  const [userID, setUserID] = useState("");
-  const [restaurantID, setRestaurantID] = useState("");
+
+const [userID, setUserID] = useState("");
+
+  const {
+    serverData,
+    isLoading,
+    restaurantID,
+    bgColor,
+    font,
+    positionNum,
+    setIsLoading,
+    setBgColor
+  } = useRestaurantData(userID);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -54,7 +65,7 @@ export default function PageBuilder() {
   const [autherized, setIsAutherizedUser] = useState(false);
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
-  const [positionNum, setPositionNum] = useState(0);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
@@ -62,6 +73,7 @@ export default function PageBuilder() {
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
 
   const { data: session, status } = useSession();
+
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.user || autherized) return;
@@ -96,22 +108,16 @@ export default function PageBuilder() {
     }
   }, [status, autherized, session]);
 
-  const calculateLimit = useCallback(() => {
-    if (!serverData) return;
-    const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories || []).length || 0) + (components.length || 0);
-
-    const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
-    console.log("Limit:", Limit);
-    console.log("TierSystem:", TierSystem);
-    console.log("Calc Limit", catCount, dishCount);
-    console.log(exeedCatLimit, exeedDishLimit);
-    setExeedCatLimit(catCount >= Limit.CategoryLimit);
-    setExeedDishLimit(dishCount >= Limit.DishLimit);
-  }, [serverData, components, Limit, exeedCatLimit, exeedDishLimit]);
+// Moved calculateLimit to useEffect below to fix ReferenceError
 
   useEffect(() => {
-    calculateLimit();
-  }, [components, serverData, Limit, calculateLimit]);
+    if (!serverData || !Limit) return;
+    const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories || []).length || 0) + (components.length || 0);
+    const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
+    setExeedCatLimit(catCount >= Limit.CategoryLimit);
+    setExeedDishLimit(dishCount >= Limit.DishLimit);
+  }, [components, serverData, Limit]);
+
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -127,7 +133,7 @@ export default function PageBuilder() {
 
   // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (!userID) return;
 
     const controller = new AbortController();
@@ -161,8 +167,27 @@ export default function PageBuilder() {
         if (fontNew) {
           console.log("FontNew:(Unfertig?)", fontNew);
         }
-        console.log("Freshdata:", freshData.userData.restaurant.menu.categoryGroup)
-        const count = freshData.userData.restaurant.menu.categoryGroup.categories.reduce((total, menu) => total + menu.categories.length, 0);
+        console.log("Freshdata:", freshData.userData.restaurant.menu.categoryGroup);
+        const menu = freshData?.userData?.restaurant?.menu;
+
+        if (!Array.isArray(menu) || menu.length === 0) {
+          console.log("No menu found");
+          return;
+        }
+
+        const categoryGroup = menu[0]?.categoryGroup;
+        console.log("Kattegorie-Gruppen:", categoryGroup)
+
+        if (!Array.isArray(categoryGroup)) {
+          console.log("No categoryGroup found");
+          return;
+        }
+
+        const count = categoryGroup.reduce((total, group) => {
+          return total + (group?.categories?.length || 0);
+        }, 0);
+
+        setPositionNum(count);
         console.log(count);
         setPositionNum(count);
       } catch (error) {
@@ -177,10 +202,9 @@ export default function PageBuilder() {
       }
     };
 
-    fetchData();
 
     return () => controller.abort();
-  }, [userID, bgColor, fontNew]);
+  }, [userID, bgColor, fontNew]);*/
 
   const submitToServer = (data) => {
     const newSection = {
@@ -190,6 +214,7 @@ export default function PageBuilder() {
 
     setComponents((prev) => [...prev, { type: "menuSection", section: newSection }]);
   };
+  // Duplicate hook removed - using one above
 
   const onSubmit = async (data) => {
     // Upload selected images and update data with filePaths
@@ -506,7 +531,6 @@ export default function PageBuilder() {
               variant="outline"
               onClick={() => {
                 append({ name: "", price: 0, description: "", image: "" });
-                calculateLimit();
               }}
             >
               Gericht hinzufügen
@@ -748,7 +772,6 @@ export default function PageBuilder() {
                     {serverData?.userData?.restaurant?.name && (
                       <>
                         <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{serverData.userData.restaurant.name}</h1>
-                        <Image src={restaurant_icon} width={100} height={100} alt="RestaurantIcon" />
                       </>
                     )}
                   </>
