@@ -1,9 +1,8 @@
-// hooks/useRestaurantData.js
-
 import { useEffect, useState } from "react";
 
 // --- Fetch function ---
 const fetchRestaurantData = async (userID, signal) => {
+  console.log("Frage Daten an")
   const response = await fetch("/api/user/profil/getData", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -22,20 +21,22 @@ const fetchRestaurantData = async (userID, signal) => {
   return await response.json();
 };
 
-// --- Helper to extract data ---
+// --- Helper ---
 const extractMenuData = (freshData) => {
   const restaurant = freshData?.userData?.restaurant;
   const menu = restaurant?.menu;
 
-  if (!Array.isArray(menu) || menu.length === 0) {
-    return { categoryGroup: [], count: 0 };
+  if (!menu) {
+    return {
+      restaurantID: "",
+      bgColor: "",
+      font: "",
+      categoryGroup: [],
+      count: 0,
+    };
   }
 
-  const categoryGroup = menu[0]?.categoryGroup;
-
-  if (!Array.isArray(categoryGroup)) {
-    return { categoryGroup: [], count: 0 };
-  }
+  const categoryGroup = menu?.categoryGroup || [];
 
   const count = categoryGroup.reduce(
     (total, group) => total + (group?.categories?.length || 0),
@@ -43,22 +44,20 @@ const extractMenuData = (freshData) => {
   );
 
   return {
-    restaurantID: restaurant?.id,
-    bgColor: menu[0]?.bgColor || "",
-    font: menu[0]?.font || "",
+    restaurantID: restaurant?.id || "",
+    bgColor: menu?.bgColor || "",
+    font: menu?.font || "",
     categoryGroup,
     count,
   };
 };
 
-// --- Custom Hook ---
+// --- Hook ---
 export const useRestaurantData = (userID) => {
-  const [serverData, setServerData] = useState(null);
+const [serverData, setServerData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [restaurantID, setRestaurantID] = useState("");
-  const [bgColor, setBgColor] = useState("");
-  const [font, setFont] = useState("");
-  const [positionNum, setPositionNum] = useState(0);
+  const [bgColorState, setBgColorState] = useState(""); // Local state for bgColor with setter
+  console.log("Suche restaurant mit ID:", userID)
 
   useEffect(() => {
     if (!userID) return;
@@ -67,31 +66,20 @@ export const useRestaurantData = (userID) => {
 
     const loadData = async () => {
       try {
-        setIsLoading(true)
-        const freshData = await fetchRestaurantData(userID, controller.signal);
+        setIsLoading(true);
+
+        const freshData = await fetchRestaurantData(
+          userID,
+          controller.signal
+        );
 
         console.log("Server Response:", freshData);
-        if(freshData){
-          setServerData(freshData)
-          setIsLoading(false)
-        }
 
-
-        const {
-          restaurantID,
-          bgColor,
-          font,
-          count,
-          categoryGroup,
-        } = extractMenuData(freshData);
-
-        setRestaurantID(restaurantID);
-        setBgColor(bgColor);
-        setFont(font);
-        setPositionNum(count);
-
-        console.log("Kategorien:", categoryGroup);
-        console.log("Count:", count);
+        setServerData(freshData);
+        
+        // Initialize local bgColor state from derived data
+        const derived = extractMenuData(freshData);
+        setBgColorState(derived.bgColor);
       } catch (error) {
         if (error.message === "UNAUTHORIZED") {
           window.alert("Bitte melden Sie sich an");
@@ -108,14 +96,26 @@ export const useRestaurantData = (userID) => {
     return () => controller.abort();
   }, [userID]);
 
+  // 🔥 Derived data (kein extra State mehr nötig)
+  const derived = extractMenuData(serverData);
+  const {
+    restaurantID,
+    bgColor, // derived, read-only
+    font,
+    categoryGroup,
+    count: positionNum,
+  } = derived;
+
   return {
     serverData,
     isLoading,
     restaurantID,
-    bgColor,
+    bgColor: bgColorState, // use mutable state
     font,
+    categoryGroup,
     positionNum,
-    setBgColor,
-    setIsLoading
+    setBgColor: setBgColorState, // provide setter for UI updates
+    setIsLoading,
   };
+
 };

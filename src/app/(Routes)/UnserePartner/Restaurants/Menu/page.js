@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import React from "react";
+
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 const MenuContent = () => {
@@ -37,6 +37,7 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
+        console.log("Server-Daten:", data);
 
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
@@ -49,6 +50,9 @@ const MenuContent = () => {
 
     fetchMenu();
   }, [searchParams]);
+  if (serverData) {
+    console.log("Display data:", serverData.menu);
+  }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
@@ -63,15 +67,12 @@ const MenuContent = () => {
 
     return (
       <div className="bg-white rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all">
-        {/* Category Title */}
         <div className="mb-8 text-center border-b pb-6">
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
         </div>
 
-        {/* Table Wrapper */}
         <div className="overflow-x-auto rounded-xl border">
           <Table className="w-full min-w-[700px] table-fixed">
-            {/* Header */}
             <TableHeader className="bg-gray-100">
               <TableRow>
                 <TableHead className="text-left font-semibold">Speisen</TableHead>
@@ -80,7 +81,6 @@ const MenuContent = () => {
               </TableRow>
             </TableHeader>
 
-            {/* Body */}
             <TableBody>
               {menuItems?.map((item, index) => (
                 <React.Fragment key={item.id || index}>
@@ -93,7 +93,6 @@ const MenuContent = () => {
                     border-b
                   "
                   >
-                    {/* Name + Description */}
                     <TableCell className="align-top py-4">
                       <div className="flex flex-col gap-1">
                         <span className="font-serif text-gray-900 truncate">{item.name}</span>
@@ -102,11 +101,9 @@ const MenuContent = () => {
                       </div>
                     </TableCell>
 
-                    {/* Price */}
                     <TableCell className="text-right font-mono whitespace-nowrap align-top py-4 w-28">{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
                   </TableRow>
 
-                  {/* Image Expand Row */}
                   {expandedIndex === index && item.imageUrl && (
                     <TableRow className="bg-gray-50">
                       <TableCell colSpan={2} className="p-5">
@@ -136,7 +133,7 @@ const MenuContent = () => {
       </header>
 
       <main className="w-full max-w-5xl sm:max-w-6xl md:max-w-7xl mx-auto backdrop-blur-md z-10 px-2 sm:px-4 md:px-0">
-        <div className="space-y-8 sm:space-y-10 md:space-y-12">{serverData.menu?.[0]?.categories?.length > 0 ? serverData.menu[0].categories.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) : <div className="text-center">Keine Kategorien gefunden</div>}</div>
+        <div className="space-y-8 sm:space-y-10 md:space-y-12">{serverData.menu.categoryGroup.categories?.length > 0 ? serverData.menu.categoryGroup.categories.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) : <div className="text-center">Keine Kategorien gefunden</div>}</div>
 
         <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
 

@@ -146,8 +146,8 @@ model Category {
   font            String?
   fontColor       String?
   menuId          String?
-  categroyGroupID String
-  categoryGroup   CategoryGroup @relation(fields: [categroyGroupID], references: [id], onDelete: Cascade)
+  categoryGroupID String
+  categoryGroup   CategoryGroup @relation(fields: [categoryGroupID], references: [id], onDelete: Cascade)
   dishes          Dish[]
 
   @@index([menuId])

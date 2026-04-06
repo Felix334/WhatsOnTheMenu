@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
         let category = (await safeDb(
           () =>
             prisma.category.findFirst({
-              where: { categroyGroupID: groupId, name: title },
+              where: { categoryGroupID: groupId, name: title },
             }),
           "category.findFirst",
         )) as PrismaCategory | null;

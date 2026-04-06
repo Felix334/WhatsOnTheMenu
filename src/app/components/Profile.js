@@ -47,10 +47,17 @@ const Profile = () => {
   }, [openProfil]);
 
   // Logout
-  const logout = async () => {
-    sessionStorage.removeItem("googleProfileImg");
-    await signOut({ callbackUrl: "/" });
-  };
+
+const logout = async () => {
+  // 1️⃣ Optional: eigenes sessionStorage/Cookies aufräumen
+  sessionStorage.removeItem("googleProfileImg");
+
+  // 2️⃣ NextAuth ausloggen
+  await signOut({
+    redirect: true,       // redirect true sorgt für sauberen Logout
+    callbackUrl: "/",     // wohin nach Logout
+  });
+};
 
   // Query bauen
   const userID = session?.user?.id;

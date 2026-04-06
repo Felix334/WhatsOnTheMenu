@@ -27,7 +27,7 @@ import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
-import { useRestaurantData } from "./components/fetchData"
+import { useRestaurantData } from "./components/fetchData";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -44,19 +44,9 @@ export default function PageBuilder() {
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
 
+  const [userID, setUserID] = useState("");
 
-const [userID, setUserID] = useState("");
-
-  const {
-    serverData,
-    isLoading,
-    restaurantID,
-    bgColor,
-    font,
-    positionNum,
-    setIsLoading,
-    setBgColor
-  } = useRestaurantData(userID);
+  const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading, setBgColor } = useRestaurantData(userID);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -73,7 +63,6 @@ const [userID, setUserID] = useState("");
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
 
   const { data: session, status } = useSession();
-
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.user || autherized) return;
@@ -108,7 +97,7 @@ const [userID, setUserID] = useState("");
     }
   }, [status, autherized, session]);
 
-// Moved calculateLimit to useEffect below to fix ReferenceError
+  // Moved calculateLimit to useEffect below to fix ReferenceError
 
   useEffect(() => {
     if (!serverData || !Limit) return;
@@ -117,7 +106,6 @@ const [userID, setUserID] = useState("");
     setExeedCatLimit(catCount >= Limit.CategoryLimit);
     setExeedDishLimit(dishCount >= Limit.DishLimit);
   }, [components, serverData, Limit]);
-
 
   const form = useForm({
     resolver: zodResolver(menuSchema),
@@ -217,7 +205,6 @@ const [userID, setUserID] = useState("");
   // Duplicate hook removed - using one above
 
   const onSubmit = async (data) => {
-    // Upload selected images and update data with filePaths
     const updatedItems = await Promise.all(
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
@@ -326,7 +313,6 @@ const [userID, setUserID] = useState("");
         setDeletedCategories([]);
       } else {
         console.log("No deletions to process");
-        location.reload();
       }
 
       alert("Data saved and deletions processed successfully!");
@@ -399,7 +385,7 @@ const [userID, setUserID] = useState("");
                     </FormItem>
                   )}
                 />
-                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets und schließt sie</h1>
+                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets</h1>
                 <FormField
                   control={control}
                   name="menu_name"
@@ -765,13 +751,13 @@ const [userID, setUserID] = useState("");
             </div>
           </div>
           <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
-            <header className="mb-12 text-center w-full sm:grid sm:grid-col1">
+            <header className="mb-32 text-center w-full sm:grid sm:grid-col1">
               <div className="flex items-center justify-center gap-3">
                 {!edditName ? (
                   <>
                     {serverData?.userData?.restaurant?.name && (
                       <>
-                        <h1 className="text-5xl font-serif font-semibold italic tracking-wide">{serverData.userData.restaurant.name}</h1>
+                        <h1 className="text-5xl absolute  font-serif font-semibold italic tracking-wide">{serverData.userData.restaurant.name}</h1>
                       </>
                     )}
                   </>
@@ -782,7 +768,16 @@ const [userID, setUserID] = useState("");
               <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
             </header>
             <main className="w-full">
-              <div className="max-w-7xl mx-auto grid gap-4">{serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup[0]?.categories?.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} />) || <div>Keine Daten vorhanden</div>}</div>
+              <div className="max-w-7xl mx-auto grid gap-4">
+                {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.map((group) => (
+                  <div key={group.id}>
+                    <h2>{group.name}</h2>
+                    {group.categories?.map((category) => (
+                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} />
+                    ))}
+                  </div>
+                )) || <div>Keine Daten vorhanden</div>}
+              </div>
 
               <p className="mt-4" style={{ fontFamily: fontNew }}>
                 Gesamtpreis: 0€

@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Cache configuration - cache for 5 minutes at CDN level, revalidate after 10 minutes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-const CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
-
+const CACHE_CONTROL = "public, s-maxage=300, stale-while-revalidate=600";
 
 export async function POST(req, { params }) {
   try {
@@ -15,52 +13,69 @@ export async function POST(req, { params }) {
     if (!restaurantID) {
       return NextResponse.json({ message: "Restaurant ID is required" }, { status: 400 });
     }
-
     const restaurant = await prisma.restaurant.findUnique({
-      where: { id: restaurantID },
+      where: {
+        id: restaurantID,
+      },
       include: {
-        owner: { select: { name: true, email: true, role: true } },
+        owner: {
+          select: { name: true, email: true, role: true },
+        },
         menu: {
           include: {
-            categories: {
+            categoryGroup: {
               include: {
-                dishes: {
+                categories: {
                   include: {
-                    ingredients: true,
-                    reviews: { select: { id: true, rating: true, comment: true, createdAt: true } },
+                    dishes: {
+                      include: {
+                        ingredients: true,
+                        reviews: true,
+                      },
+                    },
                   },
                 },
               },
             },
           },
         },
-        locations: { include: { reservation: true } },
+        locations: {
+          include: { reservation: true },
+        },
       },
     });
 
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
     }
+    if(restaurant){
+      console.log("Restaurant gefunden:", restaurant)
+    }
 
-    // Prüfen ob menu existiert, sonst fallback
+    // 🔥 FIX: richtige Struktur beachten
     const menuWithRatings = restaurant.menu
       ? {
           ...restaurant.menu,
-          categories:
-            restaurant.menu.categories?.map((category) => ({
-              ...category,
-              dishes:
-                category.dishes?.map((dish) => {
-                  const avgRating = dish.reviews && dish.reviews.length > 0 ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length : 0;
-                  return {
-                    ...dish,
-                    averageRating: parseFloat(avgRating.toFixed(1)),
-                    reviewCount: dish.reviews?.length || 0,
-                  };
-                }) || [],
+          categoryGroup:
+            restaurant.menu.categoryGroup?.map((group) => ({
+              ...group,
+              categories:
+                group.categories?.map((category) => ({
+                  ...category,
+                  dishes:
+                    category.dishes?.map((dish) => {
+                      const avgRating = dish.reviews?.length > 0 ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length : 0;
+
+                      return {
+                        ...dish,
+                        averageRating: Number(avgRating.toFixed(1)),
+                        reviewCount: dish.reviews?.length || 0,
+                      };
+                    }) || [],
+                })) || [],
             })) || [],
         }
-      : { categories: [] };
+      : { categoryGroup: [] };
 
     const response = {
       id: restaurant.id,
@@ -71,15 +86,22 @@ export async function POST(req, { params }) {
       locations: restaurant.locations,
       createdAt: restaurant.createdAt,
     };
+    console.log("Server-Response:", response)
 
-    // Return with cache headers
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': CACHE_CONTROL,
+        "Cache-Control": CACHE_CONTROL,
       },
     });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
-    return NextResponse.json({ message: "Internal server error", error: error.message }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        message: "Internal server error",
+        error: error.message,
+      },
+      { status: 500 },
+    );
   }
 }

@@ -27,6 +27,9 @@ export async function POST(req) {
     }
 
     const userData = await main(id);
+    if(userData){
+      console.log("Restaurant gefunden(user/profil/getData):", userData)
+    }
 
     if (!userData) {
       return NextResponse.json({ status: 404, error: "User not found" });

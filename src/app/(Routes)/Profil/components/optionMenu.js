@@ -29,7 +29,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
   useEffect(() => {
     console.log("optionMenu-Daten:", allowPremiumColor)
     setServerData_(serverData || null);
-  }, [serverData]);
+  }, [serverData, allowPremiumColor]);
 
   useEffect(() => {
     if (!authorizedUser || !restaurantID) return;

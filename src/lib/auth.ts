@@ -1,20 +1,19 @@
-import NextAuth, { type NextAuthOptions } from "next-auth";
-//import GithubProvider from "next-auth/providers/github";
-import EmailProvider from "next-auth/providers/email";
-import GoogleProvider from "next-auth/providers/google";
-import FacebookProvider from "next-auth/providers/facebook";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import bcrypt from "bcryptjs";
-import { prisma } from "src/lib/prisma";
-import { Subscription } from "@prisma/client";
+import NextAuth, { type NextAuthOptions } from 'next-auth';
+import EmailProvider from 'next-auth/providers/email';
+import GoogleProvider from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import bcrypt from 'bcryptjs';
+import { prisma } from 'src/lib/prisma';
+import { Subscription } from '@prisma/client';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
 
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
 
   providers: [
@@ -37,8 +36,13 @@ export const authOptions: NextAuthOptions = {
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
           GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            authorization: {
+              params: { 
+                prompt: 'select_account consent' 
+              },
+            },
           }),
         ]
       : []),
@@ -53,10 +57,10 @@ export const authOptions: NextAuthOptions = {
       : []),
 
     CredentialsProvider({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
 
       async authorize(credentials) {
@@ -83,7 +87,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-          subscription: user.subscription
+          subscription: user.subscription,
         };
       },
     }),
@@ -94,7 +98,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
-        token.subscription = user.subscription
+        token.subscription = user.subscription;
       }
       return token;
     },
@@ -107,10 +111,15 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+
+    async signIn({ account }) {
+      // Allow Google login always
+      return true;
+    },
   },
 
   pages: {
-    signIn: "/login",
+    signIn: '/login',
   },
 };
 
