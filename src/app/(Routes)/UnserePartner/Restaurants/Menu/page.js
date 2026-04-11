@@ -3,18 +3,68 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+
+const MenuSection = ({ title, menuItems }) => {
+  const [expandedIndex, setExpandedIndex] = useState(null);
+
+  const toggleExpand = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all">
+      <div className="mb-8 text-center border-b pb-6">
+        <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border">
+        <Table className="w-full min-w-[700px] table-fixed">
+          <TableHeader className="bg-gray-100">
+            <TableRow>
+              <TableHead className="text-left font-semibold">Speisen</TableHead>
+              <TableHead className="text-right font-semibold w-28">Preis</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {menuItems?.map((item, index) => (
+              <React.Fragment key={item.id || index}>
+                <TableRow onClick={() => toggleExpand(index)} className="cursor-pointer transition-all duration-200 hover:bg-yellow-50 border-b">
+                  <TableCell className="align-top py-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="font-serif text-gray-900 truncate">{item.name}</span>
+                      {item.description && <span className="text-sm text-gray-500 break-words leading-relaxed">{item.description}</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right font-mono whitespace-nowrap align-top py-4 w-28">{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                </TableRow>
+
+                {expandedIndex === index && item.imageUrl && (
+                  <TableRow className="bg-gray-50">
+                    <TableCell colSpan={2} className="p-5">
+                      <div className="shadow-sm overflow-hidden">
+                        <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </React.Fragment>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+};
 
 const MenuContent = () => {
   const searchParams = useSearchParams();
-  const [serverData, setServerData] = useState({});
+  const [serverData, setServerData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [name, setName] = useState("");
-  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     const restaurantID = searchParams.get("restaurantID");
@@ -28,7 +78,7 @@ const MenuContent = () => {
     const fetchMenu = async () => {
       try {
         const resp = await fetch(`/api/restaurant/${restaurantID}/menu`, {
-          method: "POST",
+          method: "GET",
           next: { revalidate: 300 },
         });
 
@@ -39,8 +89,6 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
-        console.log("Server-Daten:", data);
-
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
       } catch (err) {
@@ -52,99 +100,39 @@ const MenuContent = () => {
 
     fetchMenu();
   }, [searchParams]);
-  if (serverData) {
-    console.log("Display data:", serverData.menu);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center">Es ist ein Fehler aufgetreten: {error}</div>;
+  }
 
-  if (error) return <div className="min-h-screen flex items-center justify-center">Es ist ein Fehler aufgetreten: {error}</div>;
+  const menuEntry = serverData?.menu?.[0];
+  const bgColor = menuEntry?.bgColor;
 
-  const MenuSection = ({ title, menuItems }) => {
-    const [expandedIndex, setExpandedIndex] = useState(null);
+  const categoryGroups = menuEntry?.categoryGroup ?? [];
+  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
+  //const font = serverData.menu[0].font
+  const font = "Oswald"
+  console.log("Font:",font)
 
-    const toggleExpand = (index) => {
-      setExpandedIndex(expandedIndex === index ? null : index);
-    };
-
-    return (
-      <div className="bg-white rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all">
-        <div className="mb-8 text-center border-b pb-6">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
-        </div>
-
-        <div className="overflow-x-auto rounded-xl border">
-          <Table className="w-full min-w-[700px] table-fixed">
-            <TableHeader className="bg-gray-100">
-              <TableRow>
-                <TableHead className="text-left font-semibold">Speisen</TableHead>
-
-                <TableHead className="text-right font-semibold w-28">Preis</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {menuItems?.map((item, index) => (
-                <React.Fragment key={item.id || index}>
-                  <TableRow
-                    onClick={() => toggleExpand(index)}
-                    className="
-                    cursor-pointer
-                    transition-all duration-200
-                    hover:bg-yellow-50
-                    border-b
-                  "
-                  >
-                    <TableCell className="align-top py-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-serif text-gray-900 truncate">{item.name}</span>
-
-                        {item.description && <span className="text-sm text-gray-500 break-words leading-relaxed">{item.description}</span>}
-                      </div>
-                    </TableCell>
-
-                    <TableCell className="text-right font-mono whitespace-nowrap align-top py-4 w-28">{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
-                  </TableRow>
-
-                  {expandedIndex === index && item.imageUrl && (
-                    <TableRow className="bg-gray-50">
-                      <TableCell colSpan={2} className="p-5">
-                        <div className=" shadow-sm overflow-hidden">
-                          <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover" />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-    );
-  };
+  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
 
   return (
     <div
       className={`min-h-screen flex flex-col items-center text-gray-900 font-sans p-4 sm:p-6 md:p-8
-      ${serverData?.menu?.[0]?.bgColor ? "" : "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`}
-      style={serverData?.menu?.[0]?.bgColor ? { backgroundColor: serverData?.menu?.[0]?.bgColor } : undefined}
+        ${bgColor ? "" : "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`}
+      style={bgColor ? { backgroundColor: bgColor } : undefined}
     >
       <header className="mb-8 sm:mb-10 md:mb-12 text-center w-full px-4 sm:px-0">
-        <div>
-          <div>
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem></NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-        </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
+        {menuEntry?.name && <p className="mt-2 text-gray-500 text-lg" style={font ? {fontFamily: font}: undefined}>{menuEntry.name}</p>}
       </header>
 
-      <main className="w-full max-w-5xl sm:max-w-6xl md:max-w-7xl mx-auto backdrop-blur-md z-10 px-2 sm:px-4 md:px-0">
-        <div className="space-y-8 sm:space-y-10 md:space-y-12">{serverData.menu.categoryGroup.categories?.length > 0 ? serverData.menu.categoryGroup.categories.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} />) : <div className="text-center">Keine Kategorien gefunden</div>}</div>
+      <main className="w-full max-w-5xl sm:max-w-6xl md:max-w-7xl mx-auto z-10 px-2 sm:px-4 md:px-0">
+        <div className="space-y-8 sm:space-y-10 md:space-y-12">{allCategories.length > 0 ? allCategories.map((category) => <MenuSection key={category.id} title={category.name} menuItems={category.dishes} font={font} />) : <div className="text-center">Keine Kategorien gefunden</div>}</div>
 
         <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
 

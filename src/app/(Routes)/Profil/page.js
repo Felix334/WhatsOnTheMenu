@@ -119,6 +119,16 @@ export default function PageBuilder() {
   const { control, handleSubmit, reset, watch, setValue } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
+    const menuEntry = serverData?.menu?.[0];
+
+  const categoryGroups = menuEntry?.categoryGroup ?? [];
+  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
+  //const font = serverData.menu[0].font
+  console.log("Font:", font);
+
+  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
+
+
   // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
 
   /*useEffect(() => {
@@ -605,6 +615,11 @@ export default function PageBuilder() {
     if (changedItems) {
       console.log("Changes", changedItems);
     }
+    const menuEntry = serverData?.menu?.[0];
+
+    const categoryGroups = menuEntry?.categoryGroup ?? [];
+    const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
+    const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
 
     return (
       <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
@@ -719,6 +734,8 @@ export default function PageBuilder() {
       </div>
     );
   };
+
+
   return (
     <div className="min-h-screen" style={{ fontFamily: fontNew }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
@@ -788,14 +805,12 @@ export default function PageBuilder() {
                 )}
               </div>
 
-              <p className="mt-4" style={{ fontFamily: fontNew }}>
-                Gesamtpreis: 0€
-              </p>
-
               <details className="absolute right-1">
+               
                 <summary>Debug Data</summary>
                 <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
               </details>
+               <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
             </main>
           </div>
           <div className="fixed bottom-6 left-6 z-20">

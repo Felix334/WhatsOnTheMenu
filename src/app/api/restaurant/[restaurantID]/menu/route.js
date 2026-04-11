@@ -1,22 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
-const CACHE_CONTROL = "public, s-maxage=300, stale-while-revalidate=600";
-
-export async function POST(req, { params }) {
+// ✅ force-dynamic entfernt – next: { revalidate: 300 } im Frontend übernimmt das Caching
+export async function GET(req, { params }) {
   try {
-    console.log("Ping");
     const { restaurantID } = await params;
-    console.log("Restaurant ID from URL:", restaurantID);
+
     if (!restaurantID) {
       return NextResponse.json({ message: "Restaurant ID is required" }, { status: 400 });
     }
+
     const restaurant = await prisma.restaurant.findUnique({
-      where: {
-        id: restaurantID,
-      },
+      where: { id: restaurantID },
       include: {
         owner: {
           select: { name: true, email: true, role: true },
@@ -48,11 +43,7 @@ export async function POST(req, { params }) {
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
     }
-    if(restaurant){
-      console.log("Restaurant gefunden:", restaurant)
-    }
 
-    // 🔥 FIX: richtige Struktur beachten
     const menuWithRatings = restaurant.menu
       ? {
           ...restaurant.menu,
@@ -64,8 +55,10 @@ export async function POST(req, { params }) {
                   ...category,
                   dishes:
                     category.dishes?.map((dish) => {
-                      const avgRating = dish.reviews?.length > 0 ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length : 0;
-
+                      const avgRating =
+                        dish.reviews?.length > 0
+                          ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length
+                          : 0;
                       return {
                         ...dish,
                         averageRating: Number(avgRating.toFixed(1)),
@@ -86,22 +79,18 @@ export async function POST(req, { params }) {
       locations: restaurant.locations,
       createdAt: restaurant.createdAt,
     };
-    console.log("Server-Response:", response)
 
     return NextResponse.json(response, {
       headers: {
-        "Cache-Control": CACHE_CONTROL,
+        // ✅ Cache-Control Header bleibt für CDN/Proxy-Caching
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
       },
     });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
-
     return NextResponse.json(
-      {
-        message: "Internal server error",
-        error: error.message,
-      },
-      { status: 500 },
+      { message: "Internal server error", error: error.message },
+      { status: 500 }
     );
   }
 }
