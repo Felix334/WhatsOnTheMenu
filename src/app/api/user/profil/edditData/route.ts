@@ -194,7 +194,7 @@ export async function POST(req: NextRequest) {
                   description: section.description ?? null,
                   position: section.position ?? null,
                   // Use categroyGroupID (as per schema) instead of menuId
-                  categroyGroupID: defaultCategoryGroup.id,
+                  categoryGroupID: defaultCategoryGroup.id,
                 },
                 include: { dishes: true },
               }),
