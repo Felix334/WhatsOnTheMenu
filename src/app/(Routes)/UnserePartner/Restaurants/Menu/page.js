@@ -3,8 +3,10 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 
 const MenuContent = () => {
   const searchParams = useSearchParams();
@@ -129,6 +131,15 @@ const MenuContent = () => {
       style={serverData?.menu?.[0]?.bgColor ? { backgroundColor: serverData?.menu?.[0]?.bgColor } : undefined}
     >
       <header className="mb-8 sm:mb-10 md:mb-12 text-center w-full px-4 sm:px-0">
+        <div>
+          <div>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem></NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
+        </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold italic tracking-wide">{name}</h1>
       </header>
 

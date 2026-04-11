@@ -83,6 +83,7 @@ PROXMOX => als alternative zu Docker
 
 => In the AGBs schreiben dass wir keine Verantwortung für Griefing oder Datenmissbrauch übernehmen
 
+=> Schutz gegen erneute Datenkorruption => Anmeldung mit HauptGmail nicht möglich => Wenn login bei felixmayer02@gmail.com probieren wurde ich statdessen bei fm.trashmail@gmail.com angemeldet
 
 => Stripe Webhook-URL ändern wenn ich eine richtige URL habe
 => Vercel ENVs ändern (Stripe, URL, Public-Keys)

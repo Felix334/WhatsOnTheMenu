@@ -768,15 +768,24 @@ export default function PageBuilder() {
               <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
             </header>
             <main className="w-full">
-              <div className="max-w-7xl mx-auto grid gap-4">
-                {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.map((group) => (
-                  <div key={group.id}>
-                    <h2>{group.name}</h2>
-                    {group.categories?.map((category) => (
-                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} />
-                    ))}
-                  </div>
-                )) || <div>Keine Daten vorhanden</div>}
+              <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+                {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
+                  serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
+                    <div key={group.id} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                      {/* GROUP TITLE */}
+                      <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
+
+                      {/* CATEGORIES */}
+                      <div className="space-y-8">
+                        {group.categories?.map((category) => (
+                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} />
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-10">Keine Daten vorhanden</div>
+                )}
               </div>
 
               <p className="mt-4" style={{ fontFamily: fontNew }}>

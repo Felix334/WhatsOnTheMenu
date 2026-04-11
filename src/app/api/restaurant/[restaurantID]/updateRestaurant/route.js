@@ -68,10 +68,12 @@ export async function POST(req, context) {
       );
     }
 
-    const restaurantID = context.params.restaurantID;
+    //const restaurantID = context.params.restaurantID;
 
     const body = await req.json();
     const { restaurant, locations } = body;
+    console.log(restaurant, locations)
+    const restaurantID = restaurant.id
 
     if (!restaurant) {
       return NextResponse.json(
