@@ -75,7 +75,10 @@ export async function POST(req) {
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant data is required" }, { status: 400 });
     }
-    const owner = await prisma.restaurant.findUnique({ where: })
+    const checkOwner = await prisma.restaurant.findUnique({ where: restaurant.id });
+    if (userID !== checkOwner.ownerId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     await prisma.restaurant.update({
       where: { id: restaurantID },
