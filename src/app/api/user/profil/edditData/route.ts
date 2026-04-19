@@ -6,10 +6,10 @@ import * as CryptoJS from "crypto-js";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
 
 type MenuWithRelations = Menu & {
-  categoryGroup: ({
+  categoryGroup: {
     id: string;
     categories: (Category & { dishes: Dish[] })[];
-  })[];
+  }[];
 };
 
 export const dynamic = "force-dynamic";
@@ -69,8 +69,10 @@ export async function POST(req: NextRequest) {
     }
 
     const decryptResult = await decryption(encryptedData);
+    console.log("/edditData:", decryptResult);
 
     if (isError(decryptResult)) {
+      console.log("Keine Daten vorhanden");
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
     }
 
@@ -80,6 +82,7 @@ export async function POST(req: NextRequest) {
 
     const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
     const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
+    console.log(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${decryptResult}, API-KEY ${apiKey}`);
 
     if (!expectedApiKey) {
       return NextResponse.json({ message: "Serverkonfiguration fehlt (API_KEY)" }, { status: 500 });
@@ -105,14 +108,8 @@ export async function POST(req: NextRequest) {
 
     /* ---------------- LOAD USER & RESTAURANT ---------------- */
 
-    const user = await safeDb(
-      () => prisma.user.findUnique({ where: { id: userID } }),
-      "user.findUnique"
-    );
-    const restaurant = (await safeDb(
-      () => prisma.restaurant.findUnique({ where: { id: restaurantId } }),
-      "restaurant.findUnique"
-    )) as Restaurant | null;
+    const user = await safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique");
+    const restaurant = (await safeDb(() => prisma.restaurant.findUnique({ where: { id: restaurantId } }), "restaurant.findUnique")) as Restaurant | null;
 
     if (!user || !restaurant) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
@@ -176,7 +173,7 @@ export async function POST(req: NextRequest) {
     for (const entry of parsedData) {
       if (!entry) continue;
 
-      if (entry.type === "menuSection") {
+      if (entry.type === "edditMenu") {
         const section = entry.section || {};
         const title = String(section.title ?? "").trim();
         if (!title) continue;
@@ -275,6 +272,32 @@ export async function POST(req: NextRequest) {
             }),
           `category.update (${cat.name})`,
         );
+      }
+      if (entry.type === "switchPos") {
+        const cat1 = entry.category.switch.cat1.id;
+        const posCat1 = entry.category.switch.cat1.pos;
+        const cat2 = entry.category.switch.cat2.id;
+        const posCat2 = entry.category.switch.cat2.pos;
+        if (cat1 && cat2) {
+          await safeDb(
+            () =>
+              prisma.$transaction([
+                prisma.category.update({
+                  where: { id: cat1 },
+                  data: {
+                    position: posCat1,
+                  },
+                }),
+                prisma.category.update({
+                  where: { id: cat2 },
+                  data: {
+                    position: posCat2,
+                  },
+                }),
+              ]), // ✅ Komma hier
+            `category.update (${cat1}, ${cat2})`,
+          );
+        }
       }
     }
 

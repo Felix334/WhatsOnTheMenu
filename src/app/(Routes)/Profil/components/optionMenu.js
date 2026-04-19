@@ -55,6 +55,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
       body: JSON.stringify({
         bgColor: editedBgColor,
         font: editedFont,
+        restaurantID
       }),
       credentials: "include",
     });
@@ -336,12 +337,13 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
       return;
     }
 
-    const response = await fetch(`/api/restaurant/${restaurantID}/updateRestaurant`, {
+    const response = await fetch(`/api/user/profil/updateRestaurant`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         restaurant: editedRestaurant,
         locations: editedLocations,
+        userID
       }),
     });
 

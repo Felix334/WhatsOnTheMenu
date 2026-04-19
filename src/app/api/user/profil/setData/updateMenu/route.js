@@ -34,15 +34,14 @@ export async function GET(req, { params }) {
   }
 }
 
-export async function POST(req, { params }) {
+export async function POST(req) {
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (!token || token.role !== "Owner") {
+    const session = await getServerSession(authOptions);
+    if (!token || token.role !== "Owner" || !session) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
-
-    const { restaurantID } = await params;
-    const { bgColor, font } = await req.json();
+    const { bgColor, font, restaurantID } = await req.json();
 
     if (!restaurantID) {
       return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });

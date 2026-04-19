@@ -111,7 +111,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       // Format data as menu section for editData API
       const menuSectionData = [
         {
-          type: "menuSection",
+          type: "edditMenu",
           section: {
             title: category,
             items: [finalUpdatedItem],

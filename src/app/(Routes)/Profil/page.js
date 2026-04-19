@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,6 +43,10 @@ export default function PageBuilder() {
   const [edditComponents, setEdditComponents] = useState([]);
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
+  const [deleteCategoryGroup, setDeleteCategoryGroup] = useState([]);
+
+  const deletedDishesRef = useRef([]);
+  const deletedCategoriesRef = useRef([]);
 
   const [userID, setUserID] = useState("");
 
@@ -119,7 +123,7 @@ export default function PageBuilder() {
   const { control, handleSubmit, reset, watch, setValue } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
-    const menuEntry = serverData?.menu?.[0];
+  const menuEntry = serverData?.menu?.[0];
 
   const categoryGroups = menuEntry?.categoryGroup ?? [];
   const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
@@ -128,88 +132,28 @@ export default function PageBuilder() {
 
   const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
 
+  const updateDeletedDishes = (id) => {
+    setDeletedDishes((prev) => {
+      const updated = [...prev, id];
+      deletedDishesRef.current = updated;
+      return updated;
+    });
+  };
 
-  // Checken ob mehrere Standorte/restaurants vorliegen und wenn ja beim öffnen der Seite ein Popup erstellen und dann oben ein Select
-
-  /*useEffect(() => {
-    if (!userID) return;
-
-    const controller = new AbortController();
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch("/api/user/profil/getData", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userID }),
-          signal: controller.signal,
-        });
-
-        if (response.status === 401) {
-          window.alert("Bitte melden Sie sich an");
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const freshData = await response.json();
-        console.log("Server Response:", freshData);
-
-        setServerData(freshData);
-        setRestaurantID(freshData.userData.restaurant.id);
-        setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
-        // Fix das
-        setFontNew(freshData.userData.restaurant.menu.font);
-        if (fontNew) {
-          console.log("FontNew:(Unfertig?)", fontNew);
-        }
-        console.log("Freshdata:", freshData.userData.restaurant.menu.categoryGroup);
-        const menu = freshData?.userData?.restaurant?.menu;
-
-        if (!Array.isArray(menu) || menu.length === 0) {
-          console.log("No menu found");
-          return;
-        }
-
-        const categoryGroup = menu[0]?.categoryGroup;
-        console.log("Kattegorie-Gruppen:", categoryGroup)
-
-        if (!Array.isArray(categoryGroup)) {
-          console.log("No categoryGroup found");
-          return;
-        }
-
-        const count = categoryGroup.reduce((total, group) => {
-          return total + (group?.categories?.length || 0);
-        }, 0);
-
-        setPositionNum(count);
-        console.log(count);
-        setPositionNum(count);
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error("Fetch failed:", error);
-        }
-      } finally {
-        setIsLoading(false);
-        if (!bgColor) {
-          console.log("Kein Hintergrund verfügbar");
-        }
-      }
-    };
-
-
-    return () => controller.abort();
-  }, [userID, bgColor, fontNew]);*/
+  const updateDeletedCategories = (id) => {
+    setDeletedCategories((prev) => {
+      const updated = [...prev, id];
+      deletedCategoriesRef.current = updated;
+      return updated;
+    });
+  };
 
   const submitToServer = (data) => {
     const newSection = {
+      categoryGroup: data.menu_col, // ← hinzufügen
       title: data.menu_name,
       items: data.items,
     };
-
     setComponents((prev) => [...prev, { type: "menuSection", section: newSection }]);
   };
   // Duplicate hook removed - using one above
@@ -292,12 +236,13 @@ export default function PageBuilder() {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
       }
       // Then, handle deletions if any
-      if (deletedDishes.length > 0 || deletedCategories.length > 0) {
-        console.log("Processing deletions...");
+      console.log(`Gerichte löschen ${deletedDishes}, Kategorien löschen: ${deletedCategories}, Gruppen löschen: ${deleteCategoryGroup}`);
+      if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0) {
         const deleteData = {
-          dishes: deletedDishes,
-          categories: deletedCategories,
+          dishes: deletedDishesRef.current,
+          categories: deletedCategoriesRef.current,
         };
+
         console.log(`Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`);
         const { enc_data: enc_delete_data, encrypted_restaurant_id: enc_rest_id, encrypted_api_key: enc_api_key, encrypted_user_id: enc_user_id } = await encrypt_data(userID, deleteData, restaurantID, api_key);
         console.log(`Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`);
@@ -595,20 +540,14 @@ export default function PageBuilder() {
     };
 
     const deleteDish = (dishId) => {
-      console.log("Deleting dish:", dishId);
-      if (window.confirm("Sind Sie sicher, dass Sie dieses Gericht löschen möchten?")) {
-        setDeletedDishes((prev) => {
-          const newList = [...prev, dishId];
-          console.log("Updated deletedDishes:", newList);
-          return newList;
-        });
-        // Keep in UI but mark as deleted (will be styled red)
+      if (window.confirm("...")) {
+        updateDeletedDishes(dishId);
       }
     };
 
     const deleteCategory = () => {
-      if (window.confirm("Sind Sie sicher, dass Sie diese gesamte Kategorie löschen möchten?")) {
-        setDeletedCategories((prev) => [...prev, categoryId]);
+      if (window.confirm("...")) {
+        updateDeletedCategories(categoryId);
       }
     };
 
@@ -735,7 +674,6 @@ export default function PageBuilder() {
     );
   };
 
-
   return (
     <div className="min-h-screen" style={{ fontFamily: fontNew }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
@@ -806,11 +744,10 @@ export default function PageBuilder() {
               </div>
 
               <details className="absolute right-1">
-               
                 <summary>Debug Data</summary>
                 <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
               </details>
-               <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
+              <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
             </main>
           </div>
           <div className="fixed bottom-6 left-6 z-20">

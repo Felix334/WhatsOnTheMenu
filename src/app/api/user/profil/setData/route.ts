@@ -23,26 +23,6 @@ interface EncryptedData {
   encrypted_api_key: string;
 }
 
-interface CategoryGroupUpdateEntry {
-  type: "categoryGroupUpdate";
-  categoryGroup: {
-    id?: string;
-    name?: string;
-    position?: number;
-    color?: string;
-  };
-}
-
-interface CategoryUpdateEntry {
-  type: "categoryUpdate";
-  category: {
-    id: string;
-    name?: string;
-    position?: number;
-    color?: string;
-  };
-}
-
 interface MenuSectionItem {
   id?: string;
   name: string;
@@ -54,14 +34,13 @@ interface MenuSectionItem {
 interface MenuSectionEntry {
   type: "menuSection";
   section: {
-    title: string;
+    categoryGroup: string;   // z.B. "Frühstück"
+    title: string;           // z.B. "Müsli"
     description?: string;
     position?: number;
     items?: MenuSectionItem[];
   };
 }
-
-type ParsedEntry = CategoryGroupUpdateEntry | CategoryUpdateEntry | MenuSectionEntry;
 
 type SuccessResponse = {
   status: number;
@@ -111,14 +90,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
-
     if (!encryptedData) {
       return NextResponse.json({ message: "Keine Daten empfangen" }, { status: 400 });
     }
 
-
     const decryptResult = await decryption(encryptedData);
-
     if (isError(decryptResult)) {
       return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
     }
@@ -127,57 +103,36 @@ export async function POST(req: NextRequest) {
     }
 
     const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
+    console.log("Data-Check1:", decryptedDataString);
 
-    // ── API-Key prüfen ─────────────────────────────────────────────────────
-    // FIX: NEXT_PUBLIC_ entfernt – dieser Key darf NICHT im Client-Bundle landen.
-
+    // ── API-Key prüfen ────────────────────────────────────────────────────
     const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
     if (!expectedApiKey) {
-      console.error("Server API_KEY env var missing");
       return NextResponse.json({ message: "Serverkonfiguration fehlt (API_KEY)" }, { status: 500 });
     }
     if (apiKey !== expectedApiKey) {
       return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
     }
 
-    // ── JSON parsen ────────────────────────────────────────────────────────
-
-    let parsedData: ParsedEntry[];
+    // ── JSON parsen ───────────────────────────────────────────────────────
+    let parsedData: MenuSectionEntry[];
     try {
       const raw = JSON.parse(decryptedDataString);
       if (!Array.isArray(raw)) {
         return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
       }
-      parsedData = raw as ParsedEntry[];
-      parsedData.forEach((entry) => {
-        if (entry.type === "menuSection" && entry.section?.items) {
-          entry.section.items.forEach((data) => {
-
-
-
-
-
-// Ist falsch => Eigentlich Suche nach den categoryGroup 
-
-
-
-
-
-
-
-
-
-
-            console.log("Daten-Map:", data);
-          });
-        }
-      });
+      // Nur menuSection-Einträge durchlassen
+      parsedData = (raw as any[]).filter((e) => e?.type === "menuSection") as MenuSectionEntry[];
+      console.log("Datenblock-Check2:", parsedData);
     } catch {
       return NextResponse.json({ message: "Ungültiges JSON im entschlüsselten Feld" }, { status: 400 });
     }
 
-    // ── Benutzer & Restaurant laden ────────────────────────────────────────
+    if (parsedData.length === 0) {
+      return NextResponse.json({ message: "Keine menuSection-Einträge gefunden" }, { status: 400 });
+    }
 
+    // ── Benutzer & Restaurant laden ───────────────────────────────────────
     const [user, restaurant] = await Promise.all([
       safeDb(() => prisma.user.findUnique({ where: { id: userID } }), "user.findUnique") as Promise<User | null>,
       safeDb(
@@ -200,19 +155,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Ungültiger Benutzer oder Restaurant" }, { status: 404 });
     }
 
-    // FIX: Autorisierung – nur der Besitzer darf Daten schreiben.
     if (restaurant.ownerId !== userID) {
       return NextResponse.json({ message: "Benutzer ist nicht der Besitzer des Restaurants" }, { status: 403 });
     }
 
-    // ── Menü finden oder erstellen (upsert-ähnlich, kein doppelter Query) ─
-
+    // ── Menü finden oder erstellen ────────────────────────────────────────
     let menu: MenuWithRelations;
 
     if (restaurant.menu.length > 0) {
       menu = restaurant.menu[0];
     } else {
-      // FIX: include direkt im create → kein zweiter findUnique nötig.
       menu = (await safeDb(
         () =>
           prisma.menu.create({
@@ -233,191 +185,127 @@ export async function POST(req: NextRequest) {
 
     const menuId = menu.id;
 
-    // ── CategoryGroup bestimmen ────────────────────────────────────────────
-    // FIX: Die groupUpdate-Logik läuft NUR einmal hier – nicht doppelt in der Loop.
-
-    const groupUpdateEntry = parsedData.find((e): e is CategoryGroupUpdateEntry => e.type === "categoryGroupUpdate");
-    const groupName = groupUpdateEntry?.categoryGroup?.name ?? "Standard";
-
-    let defaultGroup = menu.categoryGroup.find((g) => g.name === groupName) ?? null;
-
-    if (!defaultGroup) {
-      defaultGroup = (await safeDb(
-        () =>
-          prisma.categoryGroup.create({
-            data: {
-              name: groupName,
-              position: groupUpdateEntry?.categoryGroup?.position ?? 0,
-              color: groupUpdateEntry?.categoryGroup?.color ?? "#ffffff",
-              menuID: menuId,
-            },
-            include: { categories: true },
-          }),
-        "categoryGroup.create",
-      )) as CategoryGroupWithRelations;
-    } else if (groupUpdateEntry?.categoryGroup?.id === defaultGroup.id) {
-      // Nur updaten wenn die ID explizit übereinstimmt, um fremde Gruppen zu schützen.
-      defaultGroup = (await safeDb(
-        () =>
-          prisma.categoryGroup.update({
-            where: { id: defaultGroup!.id },
-            data: {
-              name: groupUpdateEntry.categoryGroup.name,
-              position: groupUpdateEntry.categoryGroup.position,
-              color: groupUpdateEntry.categoryGroup.color,
-            },
-            include: { categories: true },
-          }),
-        "categoryGroup.update",
-      )) as CategoryGroupWithRelations;
-    }
-
-    const groupId = defaultGroup.id;
-
-    // ── Einträge verarbeiten ───────────────────────────────────────────────
-
+    // ── Einträge verarbeiten ──────────────────────────────────────────────
     for (const entry of parsedData) {
-      if (!entry) continue;
+      const section = entry.section;
+      const title = (section.title ?? "").toString().trim();
+      const groupName = (section.categoryGroup ?? "Standard").toString().trim();
+      const items: MenuSectionItem[] = Array.isArray(section.items) ? section.items : [];
 
-      // ── menuSection ──────────────────────────────────────────────────────
-      if (entry.type === "menuSection") {
-        const section = entry.section ?? {};
-        const title = (section.title ?? "").toString().trim();
-        if (!title) continue;
+      if (!title || !groupName) continue;
 
-        const items: MenuSectionItem[] = Array.isArray(section.items) ? section.items : [];
+      // ── CategoryGroup finden oder erstellen ───────────────────────────
+      let group = menu.categoryGroup.find((g) => g.name === groupName) ?? null;
 
-        // Kategorie upsert (find-or-create + update in einem Schritt)
-        let category = (await safeDb(
+      if (!group) {
+        group = (await safeDb(
           () =>
-            prisma.category.findFirst({
-              where: { categoryGroupID: groupId, name: title },
+            prisma.categoryGroup.create({
+              data: {
+                name: groupName,
+                position: 0,
+                color: "#ffffff",
+                menuID: menuId,
+              },
+              include: { categories: true },
             }),
-          "category.findFirst",
-        )) as PrismaCategory | null;
+          "categoryGroup.create",
+        )) as CategoryGroupWithRelations;
 
-        if (!category) {
-          category = (await safeDb(
-            () =>
-              prisma.category.create({
-                data: {
-                  name: title,
-                  description: section.description ?? null,
-                  // FIX: position darf nicht null sein wenn das Schema Int erwartet.
-                  position: section.position ?? 0,
-                  categoryGroupID: groupId,
-                },
-              }),
-            "category.create",
-          )) as PrismaCategory;
-        } else {
-          category = (await safeDb(
-            () =>
-              prisma.category.update({
-                where: { id: category!.id },
-                data: {
-                  description: section.description ?? null,
-                  position: section.position ?? 0,
-                },
-              }),
-            "category.update",
-          )) as PrismaCategory;
-        }
-
-        for (const item of items) {
-          if (!item?.name) continue;
-
-          const price = parsePrice(item.price);
-
-          // FIX: Beim Update prüfen, ob das Dish wirklich zur aktuellen
-          //      Kategorie gehört – verhindert das Überschreiben fremder Daten.
-          if (item.id) {
-            const existingDish = await safeDb(
-              () =>
-                prisma.dish.findUnique({
-                  where: { id: item.id },
-                  select: { id: true, categoryId: true },
-                }),
-              `dish.findUnique (${item.name})`,
-            );
-
-            if (existingDish) {
-              if (existingDish.categoryId !== category.id) {
-                console.warn(`⚠️  Dish ${item.id} gehört nicht zur Kategorie ${category.id} – übersprungen.`);
-                continue;
-              }
-
-              await safeDb(
-                () =>
-                  prisma.dish.update({
-                    where: { id: item.id },
-                    data: {
-                      name: item.name,
-                      description: item.description ?? null,
-                      price,
-                      imageUrl: item.image ?? null,
-                    },
-                  }),
-                `dish.update (${item.name})`,
-              );
-              continue;
-            }
-          }
-
-          await safeDb(
-            () =>
-              prisma.dish.create({
-                data: {
-                  name: item.name,
-                  description: item.description ?? null,
-                  price,
-                  imageUrl: item.image ?? "",
-                  categoryId: category!.id,
-                },
-              }),
-            `dish.create (${item.name})`,
-          );
-        }
+        // Lokalen Cache aktualisieren → verhindert doppelte Gruppen
+        menu.categoryGroup.push(group);
       }
 
-      // ── categoryUpdate ───────────────────────────────────────────────────
-      // FIX: Sicherstellen, dass die Kategorie wirklich zur aktuellen Gruppe gehört.
-      if (entry.type === "categoryUpdate") {
-        const cat = entry.category ?? {};
-        if (!cat.id) continue;
+      const groupId = group.id;
 
-        const existingCat = await safeDb(
+      // ── Category finden oder erstellen ────────────────────────────────
+      let category = (await safeDb(
+        () =>
+          prisma.category.findFirst({
+            where: { categoryGroupID: groupId, name: title },
+          }),
+        "category.findFirst",
+      )) as PrismaCategory | null;
+
+      if (!category) {
+        category = (await safeDb(
           () =>
-            prisma.category.findUnique({
-              where: { id: cat.id },
-              select: { id: true, categoryGroupID: true },
+            prisma.category.create({
+              data: {
+                name: title,
+                description: section.description ?? null,
+                position: section.position ?? 0,
+                categoryGroupID: groupId,
+              },
             }),
-          `category.findUnique for update (${cat.id})`,
-        );
+          "category.create",
+        )) as PrismaCategory;
+      } else {
+        category = (await safeDb(
+          () =>
+            prisma.category.update({
+              where: { id: category!.id },
+              data: {
+                description: section.description ?? null,
+                position: section.position ?? 0,
+              },
+            }),
+          "category.update",
+        )) as PrismaCategory;
+      }
 
-        if (!existingCat || existingCat.categoryGroupID !== groupId) {
-          console.warn(`⚠️  Kategorie ${cat.id} gehört nicht zur Gruppe ${groupId} – übersprungen.`);
-          continue;
+      // ── Dishes verarbeiten ────────────────────────────────────────────
+      for (const item of items) {
+        if (!item?.name) continue;
+
+        const price = parsePrice(item.price);
+
+        if (item.id) {
+          const existingDish = await safeDb(
+            () =>
+              prisma.dish.findUnique({
+                where: { id: item.id },
+                select: { id: true, categoryId: true },
+              }),
+            `dish.findUnique (${item.name})`,
+          );
+
+          if (existingDish) {
+            if (existingDish.categoryId !== category.id) {
+              console.warn(`⚠️ Dish ${item.id} gehört nicht zur Kategorie ${category.id} – übersprungen.`);
+              continue;
+            }
+
+            await safeDb(
+              () =>
+                prisma.dish.update({
+                  where: { id: item.id },
+                  data: {
+                    name: item.name,
+                    description: item.description ?? null,
+                    price,
+                    imageUrl: item.image ?? null,
+                  },
+                }),
+              `dish.update (${item.name})`,
+            );
+            continue;
+          }
         }
 
         await safeDb(
           () =>
-            prisma.category.update({
-              where: { id: cat.id },
+            prisma.dish.create({
               data: {
-                name: cat.name,
-                position: cat.position ?? 0,
-                bgColor: cat.color,
+                name: item.name,
+                description: item.description ?? null,
+                price,
+                imageUrl: item.image ?? "",
+                categoryId: category!.id,
               },
             }),
-          `category.update (${cat.id})`,
+          `dish.create (${item.name})`,
         );
-      }
-
-      // ── categoryGroupUpdate ──────────────────────────────────────────────
-      // FIX: Wird oben bereits korrekt behandelt, hier nur noch überspringen.
-      if (entry.type === "categoryGroupUpdate") {
-        continue; // bereits vor der Loop verarbeitet
       }
     }
 
@@ -431,7 +319,6 @@ export async function POST(req: NextRequest) {
 // ─── Decrypt ─────────────────────────────────────────────────────────────────
 
 async function decryption(data: EncryptedData): Promise<DecryptResult> {
-  // FIX: NEXT_PUBLIC_ entfernt – der Key darf NICHT im Browser verfügbar sein.
   const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
   if (!key) return { error: "Encryption key missing", status: 500 };
 
@@ -442,10 +329,7 @@ async function decryption(data: EncryptedData): Promise<DecryptResult> {
     const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
 
     if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return {
-        error: "Entschlüsselung fehlgeschlagen (leere Werte)",
-        status: 400,
-      };
+      return { error: "Entschlüsselung fehlgeschlagen (leere Werte)", status: 400 };
     }
 
     return {
