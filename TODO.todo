@@ -23,8 +23,6 @@
 => In der kostenlosen Version ist Bestellung über Webseite mit dabei => Um Nutzer anzukurbeln (Aber Kommision enthalten)
 => Erst Bestellungs-Anfrage(Kann vom Restaurant abgeleht oder bestätigt werden)
 
-=> Essen kann gelich über die Webseite im Restaurant bestellt/bezahlt werden => QR scannen => Essen wählen => 
-
 => Login ändern => Zu Supabase Auth => Spart DB RW und funktioniert mit 
 
 
@@ -89,3 +87,5 @@ PROXMOX => als alternative zu Docker
 => Vercel ENVs ändern (Stripe, URL, Public-Keys)
 
 => Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt
+
+=> Essen kann gelich über die Webseite im Restaurant bestellt/bezahlt werden => QR scannen => Essen wählen => 

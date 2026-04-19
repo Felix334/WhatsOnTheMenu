@@ -27,7 +27,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
   const authorizedUser = userID && role === "Owner";
 
   useEffect(() => {
-    console.log("optionMenu-Daten:", allowPremiumColor)
+    console.log("optionMenu-Daten:", allowPremiumColor);
     setServerData_(serverData || null);
   }, [serverData, allowPremiumColor]);
 
@@ -55,7 +55,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
       body: JSON.stringify({
         bgColor: editedBgColor,
         font: editedFont,
-        restaurantID
+        restaurantID,
       }),
       credentials: "include",
     });
@@ -65,6 +65,20 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
       setMenuData(updated.data);
       setBgColor(editedBgColor);
       setIsEditingMenu(false);
+    }
+  };
+
+  const deleteRestaurant = async () => {
+    const answ = window.confirm("Möchten sie ihren Account wirklich löschen?\nGelöschte Daten können nicht wieder hergestellt werden!");
+    if (answ === true) {
+      const resp = await fetch(`/api/deleteAccount/${userID}`, {
+        method: "DELETE",
+      });
+      if (!resp.ok) {
+        window.alert("Account erfolgreich gelöscht!");
+      }
+    }else{
+      console.log("Löschvorgang abgebrochen")
     }
   };
 
@@ -311,6 +325,22 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
     });
   };
 
+    const deleteRestaurant = async () => {
+      console.log("Löschen")
+    const answ = window.confirm("Möchten sie ihren Account wirklich löschen?\nGelöschte Daten können nicht wieder hergestellt werden!");
+    if (answ === true) {
+      console.log("Lösche Daten")
+      const resp = await fetch(`/api/deleteAccount/${userID}`, {
+        method: "DELETE",
+      });
+      if (!resp.ok) {
+        window.alert("Account erfolgreich gelöscht!");
+      }
+    }else{
+      console.log("Löschvorgang abgebrochen")
+    }
+  };
+
   const handleSave = async () => {
     console.log("Post to API");
     const fieldErrors = {};
@@ -343,7 +373,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
       body: JSON.stringify({
         restaurant: editedRestaurant,
         locations: editedLocations,
-        userID
+        userID,
       }),
     });
 
@@ -448,6 +478,9 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
           QR-Code erstellen
         </Link>
       </Button>
+      <div>
+        <Button variant="destructive" onClick={() => deleteRestaurant()}>Account löschen</Button>
+      </div>
     </div>
   );
 };

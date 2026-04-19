@@ -404,6 +404,9 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants
                       </li>
+                      <li className="flex items-center">
+                        <span className="text-green-300 mr-2">✓</span>Verfügbarkeits-Anzeige(1-Min Cache)
+                      </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300">
                       <Button asChild className="w-full">
