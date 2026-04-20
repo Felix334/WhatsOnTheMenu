@@ -6,6 +6,7 @@ import { stripe } from "@/lib/stripe";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
+  console.log("/api/payment/approveRequest Check")
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -23,6 +24,7 @@ export async function POST(request) {
     if (stripeSession.payment_status !== 'paid') {
       return new Response("Payment not completed", { status: 400 });
     }
+    console.log("Stripe Session:", stripeSession)
 
     const tier = stripeSession.metadata.tier || 'Pro';
     const subscriptionId = stripeSession.subscription;
@@ -40,7 +42,7 @@ export async function POST(request) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const priceId = subscription.items.data[0]?.price.id;
 
-    // Update user profile
+    console.log("Update User:", userID)
     await prisma.user.update({
       where: { id: userID },
       data: {
@@ -82,7 +84,7 @@ export async function POST(request) {
           },
         },
       },
-    });
+    }).then(() => {console.log("Restaurant erstellt")})
 
     // Delete queue entry (approved)
     await prisma.restaurantQueue.delete({
