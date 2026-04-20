@@ -15,9 +15,10 @@ export async function POST(request) {
   const body = await request.json();
   console.log("Checkout data:", body);
 
-  const { tier = "Premium", restaurant } = body;
+  const { tier, restaurant } = body;
 
   const priceId = getPriceId(tier);
+  console.log("Erstelle Kunden mit Price ID:", priceId)
 
   if (!priceId) {
     console.error("Invalid tier:", tier);
