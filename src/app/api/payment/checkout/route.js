@@ -15,7 +15,7 @@ export async function POST(request) {
   const body = await request.json();
   console.log("Checkout data:", body);
 
-  const { tier = "pro", restaurant } = body;
+  const { tier = "Premium", restaurant } = body;
 
   const priceId = getPriceId(tier);
 
