@@ -30,9 +30,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 1. Stripe: Abo kündigen + Customer löschen
     if (user.stripeCustomerId) {
-      // Alle aktiven Abos des Kunden holen und kündigen
       const subscriptions = await stripe.subscriptions.list({
         customer: user.stripeCustomerId,
         status: "active",
