@@ -20,7 +20,7 @@ export async function GET(req, context) {
       );
     }
 
-    const restaurantID = context.params.restaurantID;
+    const restaurantID = await context.params.restaurantID;
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
@@ -52,7 +52,7 @@ export async function GET(req, context) {
   }
 }
 
-export async function POST(req, context) {
+export async function POST(req) {
   try {
     console.log("Ping");
 

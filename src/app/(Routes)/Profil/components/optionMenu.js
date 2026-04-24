@@ -68,20 +68,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
     }
   };
 
-  const deleteRestaurant = async () => {
-    const answ = window.confirm("Möchten sie ihren Account wirklich löschen?\nGelöschte Daten können nicht wieder hergestellt werden!");
-    if (answ === true) {
-      const resp = await fetch(`/api/deleteAccount/${userID}`, {
-        method: "DELETE",
-      });
-      if (!resp.ok) {
-        window.alert("Account erfolgreich gelöscht!");
-      }
-    }else{
-      console.log("Löschvorgang abgebrochen")
-    }
-  };
-
   const handleCancelMenu = () => {
     setEditedBgColor(menuData?.bgColor || bgColor);
     setEditedFont(menuData?.font || "Arial");
@@ -291,12 +277,16 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
   const [isEditing, setIsEditing] = useState(false);
   const [editedRestaurant, setEditedRestaurant] = useState(null);
   const [editedLocations, setEditedLocations] = useState([]);
+  const [originalRestaurant, setOriginalRestaurant] = useState(null);
+  const [originalLocations, setOriginalLocations] = useState([]);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (isEditing && restaurant) {
       setEditedRestaurant(restaurant);
       setEditedLocations(restaurant.locations ?? []);
+      setOriginalRestaurant(restaurant);
+      setOriginalLocations(restaurant.locations ?? []);
     }
   }, [isEditing, restaurant]);
 
@@ -325,24 +315,23 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
     });
   };
 
-    const deleteRestaurant = async () => {
-      console.log("Löschen")
+  const deleteRestaurant = async () => {
+    console.log("Löschen");
     const answ = window.confirm("Möchten sie ihren Account wirklich löschen?\nGelöschte Daten können nicht wieder hergestellt werden!");
     if (answ === true) {
-      console.log("Lösche Daten")
+      console.log("Lösche Daten");
       const resp = await fetch(`/api/deleteAccount/${userID}`, {
         method: "DELETE",
       });
       if (!resp.ok) {
         window.alert("Account erfolgreich gelöscht!");
       }
-    }else{
-      console.log("Löschvorgang abgebrochen")
+    } else {
+      console.log("Löschvorgang abgebrochen");
     }
   };
 
   const handleSave = async () => {
-    console.log("Post to API");
     const fieldErrors = {};
 
     editedLocations.forEach((loc, index) => {
@@ -353,9 +342,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         postalCode: loc.postalCode,
         country: loc.country,
       });
-
       if (!result.success) {
-        console.log("Fehler in reslut:", result);
         result.error.issues.forEach((i) => {
           fieldErrors[`${index}.${i.path[0]}`] = i.message;
         });
@@ -367,12 +354,32 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
       return;
     }
 
+    const changedRestaurantFields = Object.fromEntries(Object.entries(editedRestaurant).filter(([key, value]) => value !== originalRestaurant?.[key]));
+
+    const changedLocations = editedLocations
+      .map((loc, index) => {
+        const original = originalLocations[index];
+
+        if (!original) return loc;
+
+        const changedFields = Object.fromEntries(Object.entries(loc).filter(([key, value]) => value !== original[key]));
+
+        if (Object.keys(changedFields).length === 0) return null;
+        return { id: loc.id, ...changedFields };
+      })
+      .filter(Boolean);
+
+    if (Object.keys(changedRestaurantFields).length === 0 && changedLocations.length === 0) {
+      setIsEditing(false);
+      return;
+    }
+
     const response = await fetch(`/api/user/profil/updateRestaurant`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        restaurant: editedRestaurant,
-        locations: editedLocations,
+        restaurant: { id: editedRestaurant.id, ...changedRestaurantFields },
+        locations: changedLocations,
         userID,
       }),
     });
@@ -479,7 +486,9 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         </Link>
       </Button>
       <div>
-        <Button variant="destructive" onClick={() => deleteRestaurant()}>Account löschen</Button>
+        <Button variant="destructive" onClick={() => deleteRestaurant()}>
+          Account löschen
+        </Button>
       </div>
     </div>
   );
