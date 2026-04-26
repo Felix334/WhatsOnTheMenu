@@ -308,23 +308,20 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  // Eine Möglichkeit vorhandene Kategorien (Nachtisch, Vorspeise...) zu sehen und zuzuordnen
-  // Kategorien in einem Speraten Fenster erstellen => Menüs dann zuordnen
-  // Menüs => Kattegorie(Getränk/Nachisch/Vorspeise) => Menü(Pasta/Kuchen/Alkoholische Getränke/ Getränke) => Essen(Schnitzel, Cola)
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <div></div>
       <SheetTrigger asChild>
-        <Button variant="outline">Kategorie erstellen</Button>
+        <Button variant="outline">Hinzufügen</Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full max-w-3xl">
         <SheetHeader>
           <SheetTitle>Menü-Dashboard</SheetTitle>
-          <SheetDescription>Hier können Sie ganz einfach ein neues Menü erstellen</SheetDescription>
+          <SheetDescription>Hier können Sie ganz einfach eine neue Kategoriegruppe erstellen oder etwas zu einer bestehenden Gruppe/Kategorie hinzufügen</SheetDescription>
         </SheetHeader>
         <ScrollArea className="h-[70vh]">
-          <div className="p-4">
+          <div className="pl-2 pt-1">
             <Form {...form}>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
@@ -332,7 +329,7 @@ export default function PageBuilder() {
                   name="menu_col"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kategorie</FormLabel>
+                      <FormLabel>Kategorie-Gruppe</FormLabel>
                       <FormControl>
                         <Input placeholder="z.B. Mittag" {...field} />
                       </FormControl>
@@ -346,7 +343,7 @@ export default function PageBuilder() {
                   name="menu_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Menüname</FormLabel>
+                      <FormLabel>Kategorie</FormLabel>
                       <FormControl>
                         <Input placeholder="z.B. Pasta Menü" {...field} />
                       </FormControl>
@@ -560,9 +557,13 @@ export default function PageBuilder() {
     const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
     const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
 
+    const newBG = menuEntry?.cate
+    //const newBG = ""
+    const old = "bg-gray-50"
+
     return (
-      <div className="bg-white rounded-xl shadow-lg max-w-6xl w-full overflow-hidden">
-        <div className="relative flex items-center justify-center py-6 px-4 border-b bg-gray-50">
+      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${newBG ? newBG : "bg-white"}`}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${newBG ? newBG : "bg-grey-200"}`}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -584,7 +585,7 @@ export default function PageBuilder() {
               <col className="w-24" />
             </colgroup>
             <TableHeader>
-              <TableRow className="bg-gray-100 hover:bg-gray-100 w-full">
+              <TableRow className={`hover:bg-gray-100 w-full ${newBG ? newBG : "bg-gray-100"}`}>
                 <TableHead className="text-left">Aktionen</TableHead>
                 <TableHead className="text-left" style={{ fontFamily: fontNew }}>
                   Speisen

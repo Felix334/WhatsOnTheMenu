@@ -103,7 +103,6 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
 
       const result = await response.json();
       console.log("Category updated:", result);
-
       // Update parent state
       setChangedCategory((prev) => [...prev, categoryData]);
 

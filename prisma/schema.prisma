@@ -166,8 +166,13 @@ model Dish {
   reports     Report[]
   reviews     Review[]     @relation("DishReviews")
   ingredients Ingredient[] @relation("DishIngredients")
-
+  stock       DishAvailable?
   @@index([categoryId])
+}
+
+enum DishAvailable {
+  isAvailable
+  outOfStock
 }
 
 model Ingredient {
