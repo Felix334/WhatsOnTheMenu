@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 import { FaPen, FaTrash, FaInfo } from "react-icons/fa";
 
@@ -125,12 +126,8 @@ export default function PageBuilder() {
 
   const menuEntry = serverData?.menu?.[0];
 
-  const categoryGroups = menuEntry?.categoryGroup ?? [];
-  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
   //const font = serverData.menu[0].font
   console.log("Font:", font);
-
-  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
 
   const updateDeletedDishes = (id) => {
     setDeletedDishes((prev) => {
@@ -308,6 +305,15 @@ export default function PageBuilder() {
     router.push("../");
   };
 
+  const categoryGroups = menuEntry?.categoryGroup ?? [];
+  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
+  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
+  // 🛡️ FIX 2: IMMER Array + Fallbacks
+  const categoryGroupNames = [...(menuEntry?.categoryGroup?.map((group) => group.name) ?? []), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"].filter((name) => name && name.trim()); // Duplikate bleiben (Browser filtert)
+
+  // Kategorien-Namen (korrigiert)
+  const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
+  console.log("CategorieNames",categoryNames)
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -330,27 +336,43 @@ export default function PageBuilder() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Kategorie-Gruppe</FormLabel>
-                      <FormControl>
-                        <Input placeholder="z.B. Mittag" {...field} />
-                      </FormControl>
+                      <>
+                        <FormControl>
+                          <Input list="categoryGroup" minLength={1} autoComplete="off" autoCorrect="off" spellCheck="false" placeholder="z.B. Mittagessen" {...field} className="w-[90%]" />
+                        </FormControl>
+                        <datalist id="categoryGroup">
+                          {categoryGroupNames.map((name) => (
+                            <option key={name} value={name} />
+                          ))}
+                        </datalist>
+                      </>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets</h1>
+
                 <FormField
                   control={control}
                   name="menu_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Kategorie</FormLabel>
-                      <FormControl>
-                        <Input placeholder="z.B. Pasta Menü" {...field} />
-                      </FormControl>
+                      <>
+                        <FormControl>
+                          <Input list="categoryNames" autoComplete="off" autoCorrect="off" spellCheck="false" placeholder="z.B. Pasta Menü" {...field} className="w-[90%]" />
+                        </FormControl>
+                        <datalist id="categoryNames">
+                          {categoryNames.map((name) => (
+                            <option key={name} value={name} />
+                          ))}
+                        </datalist>
+                      </>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets</h1>
+
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold">Gerichte:</h3>
                   {fields.map((item, index) => (
@@ -553,17 +575,11 @@ export default function PageBuilder() {
     }
     const menuEntry = serverData?.menu?.[0];
 
-    const categoryGroups = menuEntry?.categoryGroup ?? [];
-    const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
-    const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
-
-    const newBG = menuEntry?.cate
-    //const newBG = ""
-    const old = "bg-gray-50"
+    const newBG = "bg-red-600"
 
     return (
-      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${newBG ? newBG : "bg-white"}`}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${newBG ? newBG : "bg-grey-200"}`}>
+      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${newBG ? newBG : "bg-red-600"}`}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${newBG ? newBG : "bg-blue-400"}`}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -636,7 +652,7 @@ export default function PageBuilder() {
                         {item.description && <span className="text-sm text-gray-500 break-words">{item.description}</span>}
                       </div>
                     </TableCell>
-                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{item.price}0€</TableCell>
+                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{Number(item.price).toFixed(2)}€</TableCell>
                   </TableRow>
 
                   {expandedIndex === index && (
@@ -690,7 +706,7 @@ export default function PageBuilder() {
 
                 <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
 
-                {!exeedCatLimit && <MenuEditor />}
+                {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
               </div>
               <div>
                 <Button asChild>
