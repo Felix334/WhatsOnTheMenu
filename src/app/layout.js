@@ -20,12 +20,12 @@ export const metadata = {
   title: "Online Speisekarte erstellen | QR Menü Generator",
   description: "Erstelle digitale Speisekarten für dein Restaurant in Sekunden. Einfach, schnell und mobil per QR-Code nutzbar.",
 
-  metadataBase: new URL("www.whatisonmymenu.com"),
+  metadataBase: new URL("https://www.whatisonmymenu.com/"),
 
   openGraph: {
     title: "Online Speisekarte erstellen",
     description: "Erstelle digitale Speisekarten für dein Restaurant in Sekunden.",
-    url: "www.whatisonmymenu.com",
+    url: "https://www.whatisonmymenu.com/",
     siteName: "What's On The Menu",
     images: [
       {
@@ -43,8 +43,6 @@ export const metadata = {
     description: "Digitale Menüs für Restaurants - einfach per QR-Code.",
     images: ["/og-image.png"],
   },
-
-  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
   },
