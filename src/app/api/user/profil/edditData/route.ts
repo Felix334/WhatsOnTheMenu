@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
+import { webhookSecret } from "src/lib/stripe";
 
 type MenuWithRelations = Menu & {
   categoryGroup: {
@@ -299,7 +300,83 @@ export async function POST(req: NextRequest) {
           );
         }
       }
+      if (entry.type === "updateCategoryGroupPos") {
+        const catGroupID1 = entry.categoryGroup1.id;
+        const catGroupID2 = entry.categoryGroup2.id;
+        console.log("Update Positionen von categoriegruppen:", catGroupID1, catGroupID2);
+        const oldPos = entry.categoryGroup.pos;
+        const newPos = entry.categoryGroup2.pos;
+        if (catGroupID1 && catGroupID2 && oldPos && newPos) {
+          await safeDb(
+            () =>
+              prisma.$transaction([
+                prisma.categoryGroup.update({
+                  where: { id: catGroupID1 },
+                  data: {
+                    position: newPos,
+                  },
+                }),
+                prisma.categoryGroup.update({
+                  where: { id: catGroupID2 },
+                  data: {
+                    position: newPos,
+                  },
+                }),
+              ]),
+            `categoryGroup.update(${catGroupID1}, ${catGroupID2})`,
+          );
+        }
+      }
+      if (entry.type === "categoryGroupUpdate") {
+        const catGroupID = entry.categoryGroup.id;
+        const newName = entry.categoryGroup?.newName;
+        if (catGroupID && newName) {
+          await safeDb(
+            () =>
+              prisma.categoryGroup.update({
+                where: { id: catGroupID },
+                data: {
+                  name: newName,
+                },
+              }),
+            `categoryGroup.update(${catGroupID})`,
+          );
+        }
+      }
     }
+
+    /* => Einbauen und testen
+    async function applyPositionUpdates(
+  updates: { itemId: string; oldPos: number; newPos: number }[],
+  userId: string
+) {
+  // Validierung: oldPos stimmt wirklich mit DB überein?
+  const ids = updates.map(u => u.itemId)
+  const current = await prisma.item.findMany({
+    where: { id: { in: ids }, userId }, // userId = Sicherheit!
+    select: { id: true, position: true },
+  })
+
+  const invalid = updates.filter(u => {
+    const dbItem = current.find(c => c.id === u.itemId)
+    return !dbItem || dbItem.position !== u.oldPos
+  })
+
+  if (invalid.length > 0) {
+    throw new Error('Position conflict – bitte Seite neu laden')
+  }
+
+  // Schreiben
+  await prisma.$transaction(
+    updates.map(({ itemId, newPos }) =>
+      prisma.item.update({
+        where: { id: itemId },
+        data: { position: newPos },
+      })
+    )
+  )
+}
+  */
 
     return NextResponse.json({ message: "Daten erfolgreich bearbeitet", restaurantId, menuId }, { status: 200 });
   } catch (err: any) {

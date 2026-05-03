@@ -29,6 +29,7 @@ import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
 import { useRestaurantData } from "./components/fetchData";
+import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -66,6 +67,7 @@ export default function PageBuilder() {
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
+  const [renderCatGroupMenu, setRenderCatGroupMenu] = useState(null);
 
   const { data: session, status } = useSession();
 
@@ -128,6 +130,10 @@ export default function PageBuilder() {
 
   //const font = serverData.menu[0].font
   console.log("Font:", font);
+
+  const renderCategoryGroupEdit = (id) => {
+    setRenderCatGroupMenu((prev) => (prev === id ? null : id));
+  };
 
   const updateDeletedDishes = (id) => {
     setDeletedDishes((prev) => {
@@ -313,7 +319,7 @@ export default function PageBuilder() {
 
   // Kategorien-Namen (korrigiert)
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
-  console.log("CategorieNames",categoryNames)
+  console.log("CategorieNames", categoryNames);
 
   const MenuEditor = () => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -513,7 +519,7 @@ export default function PageBuilder() {
     );
   }
 
-  const MenuSection = ({ title, menuItems, categoryId }) => {
+  const MenuSection = ({ title, menuItems, categoryId, bgColor }) => {
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -573,13 +579,17 @@ export default function PageBuilder() {
     if (changedItems) {
       console.log("Changes", changedItems);
     }
+    console.log("Color-Check:", menuItems)
+    console.log("BG-Color-Check:", bgColor)
     const menuEntry = serverData?.menu?.[0];
-
-    const newBG = "bg-red-600"
+    var newBG = bgColor
+    if(newBG){
+      var bgCol = newBG
+    }
 
     return (
-      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${newBG ? newBG : "bg-red-600"}`}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${newBG ? newBG : "bg-blue-400"}`}>
+      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgCol}`}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgCol}`}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -743,14 +753,17 @@ export default function PageBuilder() {
               <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
                 {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
                   serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
-                    <div key={group.id} className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-                      {/* GROUP TITLE */}
+                    <div key={group.id} className={`bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 ${group.color}`}>
+                      <div>
+                        <Button onClick={() => renderCategoryGroupEdit(group.id)}>
+                          <FaPen />
+                        </Button>
+                      </div>
+                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} />}
                       <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
-
-                      {/* CATEGORIES */}
                       <div className="space-y-8">
                         {group.categories?.map((category) => (
-                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} />
+                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor}/>
                         ))}
                       </div>
                     </div>
@@ -759,7 +772,6 @@ export default function PageBuilder() {
                   <div className="text-center text-gray-500 py-10">Keine Daten vorhanden</div>
                 )}
               </div>
-
               <details className="absolute right-1">
                 <summary>Debug Data</summary>
                 <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>

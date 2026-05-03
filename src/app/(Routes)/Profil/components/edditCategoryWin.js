@@ -7,9 +7,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
 import { colors } from "./colorPalet";
-
 import { AddNewItems } from "./addNewItem";
 
 //import { menuSchema, itemSchema } from "./menuSchema";
@@ -19,7 +17,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const [edditPos, setEdditPos] = useState(0);
   const [edditColor, setEdditColor] = useState("");
   const [edditBorder, setEdditBorder] = useState("");
-  const [ID, setID] = useState("")
+  const [ID, setID] = useState("");
   const [addItem, setAddItem] = useState([
     {
       name: "",
@@ -57,7 +55,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       setEdditPos(selectedCategory.position || 0);
       setEdditColor(selectedCategory.color || "");
       setEdditBorder(selectedCategory.border || "");
-      setID(selectedCategory.id)
+      setID(selectedCategory.id);
       formRef.current.setValue("name", selectedCategory.name || "");
       formRef.current.setValue("position", selectedCategory.position || 0);
       formRef.current.setValue("color", selectedCategory.color || "");
@@ -69,7 +67,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
 
   const onSubmit = async (data) => {
     const api_key = process.env.NEXT_PUBLIC_API_KEY;
-    console.log("Überprüfe Kattegorie ID vor dem senden:", category.id)
+    console.log("Überprüfe Kattegorie ID vor dem senden:", category.id);
     const categoryData = [
       {
         type: "categoryUpdate",
@@ -153,11 +151,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
-                  <ScrollArea className="h-[100px] w-full rounded-md border p-2">
-                    {Array.isArray(position) && position.map((num, index) => (
-                      <div key={index}>{num}</div>
-                    ))}
-                  </ScrollArea>
+                  <ScrollArea className="h-[100px] w-full rounded-md border p-2">{Array.isArray(position) && position.map((num, index) => <div key={index}>{num}</div>)}</ScrollArea>
                   <FormMessage />
                 </FormItem>
               )}
