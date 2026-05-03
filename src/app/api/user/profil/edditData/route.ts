@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (session.user.role !== "Owner") {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
-
+    console.log("reciver-check:", await req.json())
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
 
     if (!encryptedData) {
@@ -260,18 +260,17 @@ export async function POST(req: NextRequest) {
       if (entry.type === "categoryUpdate") {
         const cat = entry.category || {};
         if (!cat.id) continue;
-
         await safeDb(
           () =>
             prisma.category.update({
               where: { id: cat.id },
               data: {
-                name: cat.name,
-                position: cat.position,
-                bgColor: cat.color,
+                ...(cat.name && { name: cat.name }),
+                ...(cat.position !== undefined && { position: cat.position }),
+                ...(cat.color && { bgColor: cat.color }),
               },
             }),
-          `category.update (${cat.name})`,
+          `category.update (${cat.name || cat.id})`,
         );
       }
       if (entry.type === "switchPos") {
@@ -330,13 +329,16 @@ export async function POST(req: NextRequest) {
       if (entry.type === "categoryGroupUpdate") {
         const catGroupID = entry.categoryGroup.id;
         const newName = entry.categoryGroup?.newName;
-        if (catGroupID && newName) {
+        const newBG = entry.categoryGroup?.newBgColor;
+
+        if (catGroupID) {
           await safeDb(
             () =>
               prisma.categoryGroup.update({
                 where: { id: catGroupID },
                 data: {
-                  name: newName,
+                  ...(newName && { name: newName }),
+                  ...(newBG && { bgColor: newBG }),
                 },
               }),
             `categoryGroup.update(${catGroupID})`,

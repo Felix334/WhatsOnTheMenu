@@ -84,7 +84,7 @@ const colors = [
   { label: "Fuchsia", value: "bg-fuchsia-500" },
   { label: "Grün", value: "bg-green-500" },
   { label: "Limette", value: "bg-lime-500" },
-  { label: "Oliv", value: "bg-olive-700" },
+  { label: "Olivengrün", value: "bg-olive-700" },
   { label: "Gelb", value: "bg-yellow-500" },
   { label: "Marineblau", value: "bg-[#001F3F]" },
   { label: "Blau", value: "bg-blue-500" },

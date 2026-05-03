@@ -32,8 +32,17 @@ model User {
   restaurantQueues     RestaurantQueue?
   session              Session[]
   employeeOf           Company?         @relation("CompanyEmployees", fields: [companyId], references: [id])
+  favoriteRestaurants  SaveFavorites[]
 
   @@index([companyId])
+}
+
+model SaveFavorites {
+  id           String @id @default(uuid())
+  name         String
+  restaurantID String
+  userID       String
+  user         User   @relation(fields: [userID], references: [id])
 }
 
 model Account {
@@ -154,19 +163,20 @@ model Category {
 }
 
 model Dish {
-  id          String       @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
   description String?
-  price       Decimal      @db.Decimal(10, 2)
+  price       Decimal        @db.Decimal(10, 2)
   imageUrl    String?
   categoryId  String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  category    Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   reports     Report[]
-  reviews     Review[]     @relation("DishReviews")
-  ingredients Ingredient[] @relation("DishIngredients")
+  reviews     Review[]       @relation("DishReviews")
+  ingredients Ingredient[]   @relation("DishIngredients")
   stock       DishAvailable?
+
   @@index([categoryId])
 }
 
