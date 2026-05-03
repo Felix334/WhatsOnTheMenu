@@ -3,14 +3,16 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
-
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  if (pathname.startsWith("/Admin")) {
+  if (pathname.startsWith("/Admin") || pathname.startsWith("/api/Admin")) {
     if (!token || token.role !== "Admin") {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/", req.url));
     }
   }
@@ -27,6 +29,7 @@ export async function middleware(req) {
 export const config = {
   matcher: [
     "/Admin/:path*",
+    "/api/Admin/:path*",
     "/Profil/:path*",
   ],
 };
