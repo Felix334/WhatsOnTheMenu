@@ -13,19 +13,24 @@ export async function GET(req, { params }) {
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
       include: {
+        // ✅ Äußeres include!
         owner: {
           select: { name: true, email: true, role: true },
         },
         menu: {
           include: {
+            // ✅ Inneres include!
             categoryGroup: {
+              // ✅ Dein Name!
               include: {
                 categories: {
                   include: {
                     dishes: {
-                      include: {
-                        ingredients: true,
-                        reviews: true,
+                      select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        price: true,
                       },
                     },
                   },
@@ -35,11 +40,13 @@ export async function GET(req, { params }) {
           },
         },
         locations: {
-          include: { reservation: true },
+          // ✅ Dein Name!
+          include: {
+            reservation: true, // ✅ Dein Name!
+          },
         },
       },
     });
-
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
     }
@@ -55,10 +62,7 @@ export async function GET(req, { params }) {
                   ...category,
                   dishes:
                     category.dishes?.map((dish) => {
-                      const avgRating =
-                        dish.reviews?.length > 0
-                          ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length
-                          : 0;
+                      const avgRating = dish.reviews?.length > 0 ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length : 0;
                       return {
                         ...dish,
                         averageRating: Number(avgRating.toFixed(1)),
@@ -88,9 +92,6 @@ export async function GET(req, { params }) {
     });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
-    return NextResponse.json(
-      { message: "Internal server error", error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: error.message }, { status: 500 });
   }
 }
