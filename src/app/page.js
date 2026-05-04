@@ -76,7 +76,7 @@ function HomeContent() {
   return (
     <div>
       <Head>
-        <title>MenuMaker - Digitale Speisekarten mit Bildern einfach erstellen</title>
+        <title>WhatIsOnMyMenu - Digitale Speisekarten mit Bildern einfach erstellen</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta charSet="UTF-8" />
         <style jsx>{`
@@ -129,7 +129,7 @@ function HomeContent() {
                 )}
               </div>
               <div className="flex items-center justify-center md:justify-start">
-                <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatsOnMyMenu</div>
+                <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatIsOnMyMenu.com</div>
               </div>
               <div className="hidden right-0 md:block">
                 <NavigationMenu>
