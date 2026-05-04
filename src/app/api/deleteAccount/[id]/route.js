@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 
 export async function DELETE(request, { params }) {
-  const id = params.i;
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
