@@ -760,7 +760,7 @@ export default function PageBuilder() {
                         </Button>
                       </div>
                       {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} />}
-                      <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
+                      <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                       <div className="space-y-8">
                         {group.categories?.map((category) => (
                           <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor}/>
