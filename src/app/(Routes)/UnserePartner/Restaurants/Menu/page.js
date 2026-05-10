@@ -85,7 +85,7 @@ const InfoPage = ({ restaurantData }) => {
 };
 
 // ─── Menu Section ──────────────────────────────────────────────────────────────
-const MenuSection = ({ id, title, menuItems }) => {
+const MenuSection = ({ id, title, menuItems, bgColor }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   const toggleExpand = (index) => {
@@ -93,14 +93,14 @@ const MenuSection = ({ id, title, menuItems }) => {
   };
 
   return (
-    <div id={id} className="bg-white rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24">
+    <div id={id} className={`${bgColor} rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
       <div className="mb-8 text-center border-b pb-6">
-        <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
+        <h3 className="text-5xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
       </div>
 
       <div className="overflow-x-auto rounded-xl border">
         <Table className="w-full min-w-[700px] table-fixed">
-          <TableHeader className="bg-gray-100">
+          <TableHeader className="">
             <TableRow>
               <TableHead className="text-left font-semibold">Speisen</TableHead>
               <TableHead className="text-right font-semibold w-28">Preis</TableHead>
@@ -254,42 +254,34 @@ const MenuContent = () => {
   const menuEntry = serverData?.menu?.[0];
   const bgColor = menuEntry?.bgColor;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
-  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
   const font = "Oswald";
 
-  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
-
   return (
-    <div
-      className={`min-h-screen flex flex-col text-gray-900 font-sans
-        ${bgColor ? "" : "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`}
-      style={bgColor ? { backgroundColor: bgColor } : undefined}
-    >
-      {/* Sticky Header mit Tab-Nav */}
+    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`} style={bgColor ? { backgroundColor: bgColor } : undefined}>
       <Header name={name} activePage={activePage} setActivePage={setActivePage} />
+      {activePage === "menu" && categoryGroups.length > 0 && <CategoryNav categories={categoryGroups.flatMap((g) => g.categories ?? [])} activeId={activeId} />}
 
-      {/* Kategorie-Nav nur auf Speisekarte */}
-      {activePage === "menu" && allCategories.length > 0 && <CategoryNav categories={allCategories} activeId={activeId} />}
-
-      {/* Page Content */}
       {activePage === "info" ? (
         <InfoPage restaurantData={serverData} />
       ) : (
-        <main className="w-full max-w-5xl sm:max-w-6xl md:max-w-7xl mx-auto z-10 px-2 sm:px-4 md:px-0 py-8">
-          {menuEntry?.name && (
-            <p className="mb-6 text-center text-gray-500 text-lg" style={font ? { fontFamily: font } : undefined}>
-              {menuEntry.name}
-            </p>
+        <main className="w-full max-w-7xl mx-auto px-4 py-8">
+
+          {categoryGroups.length > 0 ? (
+            <div className="space-y-12">
+              {categoryGroups.map((group) => (
+                <div key={group.id} className={`bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 ${group.color}`}>
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
+                  <div className="space-y-8">
+                    {group.categories?.map((category) => (
+                      <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor}/>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-10">Keine Kategorien gefunden</div>
           )}
-
-          <div className="space-y-8 sm:space-y-10 md:space-y-12">{allCategories.length > 0 ? allCategories.map((category) => <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} />) : <div className="text-center">Keine Kategorien gefunden</div>}</div>
-
-          <p className="mt-8 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
-
-          <details className="mt-8">
-            <summary className="cursor-pointer font-medium">Debug Data</summary>
-            <pre className="mt-4 p-4 bg-gray-100 rounded-lg overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
-          </details>
         </main>
       )}
     </div>
