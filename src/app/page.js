@@ -73,6 +73,11 @@ function HomeContent() {
     return { ...router.queryString };
   }, [router.queryString]);
 
+  const goToExamplePage = () => {
+    const url = window.location.origin;
+    console.log("URL", url);
+  };
+
   return (
     <div>
       <Head>
@@ -159,9 +164,17 @@ function HomeContent() {
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <Button variant="ghost" onClick={() => scrollToSection("#examples")}>
-                        Beispiele
-                      </Button>
+                                       <Link
+                    href={{
+                      pathname: "/UnserePartner/Restaurants/Menu",
+                      query: {
+                        ...(userID ? { userID } : {}),
+                        restaurantID: "cmo7fzgh3000004kzaov2ldwp"
+                      },
+                    }}
+                  >
+                    Beispiel
+                  </Link>
                     </NavigationMenuItem>
 
                     {!userID && (
@@ -306,12 +319,6 @@ function HomeContent() {
                       Premium für 14 Tage kostenlos testen
                     </div>
                   </div>
-                </div>
-                <div id="examples" className="bg-white rounded-lg p-2 mb-4 overflow-hidden">
-                  <Image src={BeispielKarte} alt="Beispiel Speisekarte" width={400} height={600} className="rounded-lg object-cover w-full h-auto" priority />
-                </div>
-                <div className="bg-white rounded-lg p-2 mb-4 overflow-hidden">
-                  <Image src={BeispielKarte2} alt="Beispiel Speisekarte" width={400} height={600} className="rounded-lg object-cover w-full h-auto" priority />
                 </div>
               </div>
             </div>

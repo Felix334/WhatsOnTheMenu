@@ -90,4 +90,4 @@ PROXMOX => als alternative zu Docker
 
 => Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt
 
-=> Essen kann gelich über die Webseite im Restaurant bestellt/bezahlt werden => QR scannen => Essen wählen => 
+=> Session validierung noch nicht sicher genug
