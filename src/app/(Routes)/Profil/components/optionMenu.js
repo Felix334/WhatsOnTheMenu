@@ -49,13 +49,14 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
   }, [restaurantID, authorizedUser, bgColor]);
 
   const handleSaveMenu = async () => {
-    const response = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, {
+    const response = await fetch(`/api/user/profil/updateMenu`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         bgColor: editedBgColor,
         font: editedFont,
         restaurantID,
+        userID
       }),
       credentials: "include",
     });

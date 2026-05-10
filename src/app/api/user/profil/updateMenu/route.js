@@ -13,17 +13,85 @@ async function authorize(req) {
   return token;
 }
 
-export async function POST(req){
-    try{
-        if (!await authorize(req)) {
-            return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
-        }
-        var data = await req.body();
-        if(!data){
-            return NextResponse.json({status: 404})
-        }
-        const {restaurantID, userID, font, bgColor, }
-    }catch(err){
-        console.log(err)
+export async function POST(req) {
+  try {
+    if (!(await authorize(req))) {
+      return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
+
+    const body = await req.json();
+    const { restaurantID, userID, font, bgColor } = body ?? {};
+
+    if (!restaurantID || !userID || (!font && !bgColor)) {
+      return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+    }
+
+    // owner check like in updateRestaurant
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantID },
+      select: { ownerId: true },
+    });
+    console.log("Serach Restaurant:", restaurant)
+
+    if (!restaurant) {
+      return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
+    }
+
+    if (restaurant.ownerId !== userID) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const updatedMenu = await prisma.$transaction(async (tx) => {
+      const menu = await tx.menu.findFirst({
+        where: { restaurantId: restaurantID },
+        select: { id: true, bgColor: true, font: true },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (!menu) {
+        // if no menu exists, create one with defaults
+        return tx.menu.create({
+          data: {
+            name: "Default Menü",
+            description: "Default Menü",
+            restaurantId: restaurantID,
+            bgColor: bgColor ?? "#FFFFFF",
+            font: font ?? "Arial",
+            categoryGroup: {
+            },
+          },
+        });
+      }
+
+      const dataToUpdate = {
+        ...(font ? { font } : null),
+        ...(bgColor ? { bgColor } : null),
+      };
+
+      const cleaned = Object.fromEntries(
+        Object.entries(dataToUpdate).filter(([, v]) => v !== null)
+      );
+
+      return tx.menu.update({
+        where: { id: menu.id },
+        data: cleaned,
+      });
+    });
+
+    return NextResponse.json({
+      message: "Menu updated successfully",
+      data: {
+        bgColor: updatedMenu.bgColor,
+        font: updatedMenu.font,
+        menu: updatedMenu,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
+
