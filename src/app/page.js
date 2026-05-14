@@ -69,6 +69,7 @@ function HomeContent() {
       setRenderLogin(false);
     }
   };
+
   const memoizedQuery = useMemo(() => {
     return { ...router.queryString };
   }, [router.queryString]);
@@ -164,30 +165,23 @@ function HomeContent() {
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                                       <Link
-                    href={{
-                      pathname: "/UnserePartner/Restaurants/Menu",
-                      query: {
-                        ...(userID ? { userID } : {}),
-                        restaurantID: "cmo7fzgh3000004kzaov2ldwp"
-                      },
-                    }}
-                  >
-                    Beispiel
-                  </Link>
+                      <Link
+                        href={{
+                          pathname: "/UnserePartner/Restaurants/Menu",
+                          query: {
+                            ...(userID ? { userID } : {}),
+                            restaurantID: "cmo7fzgh3000004kzaov2ldwp",
+                          },
+                        }}
+                      >
+                        Beispiel
+                      </Link>
                     </NavigationMenuItem>
 
                     {!userID && (
                       <NavigationMenuItem>
                         <Button variant="" onClick={renderLoginW}>
                           Anmelden
-                        </Button>
-                      </NavigationMenuItem>
-                    )}
-                    {!userID && (
-                      <NavigationMenuItem>
-                        <Button asChild>
-                          <a href="/register">Kostenlos starten</a>
                         </Button>
                       </NavigationMenuItem>
                     )}
@@ -298,7 +292,7 @@ function HomeContent() {
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                     Digitale Speisekarten in <span className="text-yellow-700">wenigen Minuten</span> erstellen
                   </h1>
-                  <p className="text-xl mb-8 text-gray-400">Erstelle professionelle, interaktive Speisekarten für dein Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-gray-400">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
                       <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300">
@@ -306,13 +300,23 @@ function HomeContent() {
                       </Button>
                     )}
                     <Button variant="outline" onClick={() => scrollToSection("#demo")} className="border-white text-yellow hover:bg-white hover:text-gray-900">
-                      Live Demo ansehen
+                      <Link
+                        href={{
+                          pathname: "/UnserePartner/Restaurants/Menu",
+                          query: {
+                            ...(userID ? { userID } : {}),
+                            restaurantID: "cmo7fzgh3000004kzaov2ldwp",
+                          },
+                        }}
+                      >
+                        Live Demo
+                      </Link>
                     </Button>
                   </div>
                   <div className="mt-8 flex items-center space-x-6 text-sm">
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
-                      Kostenlose Standartversion verfügbar
+                      Kostenlose Standardversion verfügbar
                     </div>
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
@@ -327,8 +331,8 @@ function HomeContent() {
           {/* CTA Section */}
           <section className="py-20 bg-red-800 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für deine erste digitale Speisekarte?</h2>
-              <p className="text-xl mb-8 text-indigo-100">Schließe dich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für ihre erste digitale Speisekarte?</h2>
+              <p className="text-xl mb-8 text-indigo-100">Schließe sie sich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center"></div>
             </div>
           </section>
@@ -338,7 +342,7 @@ function HomeContent() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Transparente Preise</h2>
-                <p className="text-xl text-gray-600">Wähle den Plan, der zu deinem Restaurant passt</p>
+                <p className="text-xl text-gray-600">Wähle den Plan, der zu Ihrem Restaurant passt</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">

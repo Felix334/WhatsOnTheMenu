@@ -1,54 +1,93 @@
-'use client'; // Nur für App Router nötig
-
-import { useEffect, useState } from 'react';
+'use client'
+import { useEffect, useState } from 'react'
 
 export default function CookieBanner() {
-  const [showBanner, setShowBanner] = useState(false);
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
+    // Cookie prüfen
     const consent = document.cookie
       .split('; ')
-      .find(row => row.startsWith('cookieConsent='));
+      .find(row => row.startsWith('cookieConsent='))
+    
     if (!consent) {
-      setShowBanner(true);
+      setShow(true)
     }
-  }, []);
+  }, [])
 
   const acceptCookies = () => {
-    const expiry = new Date();
-    expiry.setFullYear(expiry.getFullYear() + 1); // 1 Jahr gültig
-    document.cookie = `cookieConsent=accepted; expires=${expiry.toUTCString()}; path=/`;
-    setShowBanner(false);
-  };
+    // 1 Jahr Cookie setzen
+    const expiry = new Date()
+    expiry.setFullYear(expiry.getFullYear() + 1)
+    document.cookie = `cookieConsent=accepted; expires=${expiry.toUTCString()}; path=/; SameSite=Strict`
+    setShow(false)
+  }
 
-  const declineCookies = () => {
-    const expiry = new Date();
-    expiry.setFullYear(expiry.getFullYear() + 1);
-    document.cookie = `cookieConsent=declined; expires=${expiry.toUTCString()}; path=/`;
-    setShowBanner(false);
-  };
-
-  if (!showBanner) return null;
+  if (!show) return null
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 bg-white shadow-xl border rounded-xl p-4 max-w-md z-50">
-      <p className="text-sm text-gray-800 mb-2">
-        Diese Website verwendet Cookies, um dein Erlebnis zu verbessern. Mit deiner Zustimmung speichern wir Cookies auf deinem Gerät.
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '20px',
+      right: '20px',
+      maxWidth: '450px',
+      margin: '0 auto',
+      background: 'rgba(255,255,255,0.95)',
+      backdropFilter: 'blur(10px)',
+      padding: '24px',
+      borderRadius: '16px',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+      border: '1px solid #e5e7eb',
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      zIndex: 9999
+    }}>
+      <h3 style={{
+        margin: '0 0 12px 0',
+        fontSize: '18px',
+        fontWeight: '600',
+        color: '#111827'
+      }}>
+        🍪 Cookies
+      </h3>
+      
+      <p style={{
+        margin: '0 0 16px 0',
+        fontSize: '14px',
+        color: '#6b7280',
+        lineHeight: '1.5'
+      }}>
+        Wir nutzen <strong>technische Cookies</strong> für Sicherheit (Cloudflare) 
+        und Zahlungen (Stripe).
       </p>
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={declineCookies}
-          className="text-sm px-4 py-1 border border-gray-400 rounded hover:bg-gray-100"
-        >
-          Ablehnen
-        </button>
-        <button
-          onClick={acceptCookies}
-          className="text-sm px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Akzeptieren
-        </button>
-      </div>
+      
+      <p style={{
+        margin: '0 0 20px 0',
+        fontSize: '13px',
+        color: '#9ca3af'
+      }}>
+        <a href="/legal/datenschutz" style={{
+          color: '#3b82f6',
+          textDecoration: 'none',
+          fontWeight: '500'
+        }}>
+          Datenschutzerklärung →
+        </a>
+      </p>
+      
+      <button onClick={acceptCookies} style={{
+        padding: '12px 24px',
+        background: '#3b82f6',
+        color: 'white',
+        border: 'none',
+        borderRadius: '10px',
+        cursor: 'pointer',
+        fontSize: '14px',
+        fontWeight: '500',
+        boxShadow: '0 4px 12px rgba(59,130,246,0.4)'
+      }}>
+        Akzeptieren
+      </button>
     </div>
-  );
+  )
 }

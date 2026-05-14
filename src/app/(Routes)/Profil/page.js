@@ -41,7 +41,6 @@ export default function PageBuilder() {
   const router = useRouter();
 
   const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }
-
   const [edditComponents, setEdditComponents] = useState([]);
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
@@ -53,6 +52,8 @@ export default function PageBuilder() {
   const [userID, setUserID] = useState("");
 
   const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading, setBgColor } = useRestaurantData(userID);
+  console.log("New BG:", bgColor);
+  console.log("New Font:", font);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -579,17 +580,10 @@ export default function PageBuilder() {
     if (changedItems) {
       console.log("Changes", changedItems);
     }
-    console.log("Color-Check:", menuItems)
-    console.log("BG-Color-Check:", bgColor)
-    const menuEntry = serverData?.menu?.[0];
-    var newBG = bgColor
-    if(newBG){
-      var bgCol = newBG
-    }
 
     return (
-      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgCol}`}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgCol}`}>
+      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgColor}`}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColor}`}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -605,13 +599,12 @@ export default function PageBuilder() {
         <div className="overflow-x-auto">
           <Table className="w-full min-w-[700px] table-fixed">
             <colgroup>
-              <col className="sm:w-20 md:w-full md:absolute" />
-              <col className="w-1/4" />
-              <col className="w-1/2" />
+              <col className="w-24" />
+              <col className="w-full" />
               <col className="w-24" />
             </colgroup>
             <TableHeader>
-              <TableRow className={`hover:bg-gray-100 w-full ${newBG ? newBG : "bg-gray-100"}`}>
+              <TableRow className={`hover:bg-gray-100 w-full ${bgColor ? bgColor : "bg-gray-100"}`}>
                 <TableHead className="text-left">Aktionen</TableHead>
                 <TableHead className="text-left" style={{ fontFamily: fontNew }}>
                   Speisen
@@ -763,7 +756,7 @@ export default function PageBuilder() {
                       <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
                       <div className="space-y-8">
                         {group.categories?.map((category) => (
-                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor}/>
+                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} />
                         ))}
                       </div>
                     </div>

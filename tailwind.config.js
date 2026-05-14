@@ -4,6 +4,9 @@ const config = {
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
+    safelist: [
+    { pattern: /bg-.+/ },
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -24,3 +27,8 @@ const config = {
 }
 
 export default config
+
+
+
+
+// Farben Config Ist falsch
