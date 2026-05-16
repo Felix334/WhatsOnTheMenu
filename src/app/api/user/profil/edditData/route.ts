@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (session.user.role !== "Owner") {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
-    console.log("reciver-check:", await req.json())
+    console.log("reciver-check(/profil/edditData):", await req.json())
     const encryptedData: EncryptedData | null = await req.json().catch(() => null);
 
     if (!encryptedData) {

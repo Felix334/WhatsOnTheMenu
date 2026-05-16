@@ -36,25 +36,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
         },
       }),
     });
-
-
-
-
-
-
-
 // API-KEY Abfrgae fürs erste entfernen => Erst dann funktioniert der code wieder
-
-
-
-
-
-
-
-
-
-
-
 
     if (!resp.ok) window.alert("Ein Fehler ist aufgetreten: " + resp.status);
     setRenderCatGroupMenu(null);

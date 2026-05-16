@@ -95,12 +95,33 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
   return (
     <div id={id} className={`${bgColor} rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
       <div className="mb-8 text-center border-b pb-6">
-        <h3 className="text-5xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
+        <h3 className="text-3xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border">
-        <Table className="w-full min-w-[700px] table-fixed">
-          <TableHeader className="">
+      {/* Mobile: Card-Layout */}
+      <div className="block sm:hidden space-y-3">
+        {menuItems?.map((item, index) => (
+          <React.Fragment key={item.id || index}>
+            <div onClick={() => toggleExpand(index)} className="flex justify-between items-start py-3 border-b cursor-pointer hover:bg-yellow-50 transition-colors">
+              <div className="flex-1 pr-4">
+                <p className="font-serif text-gray-900">{item.name}</p>
+                {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
+              </div>
+              <span className="font-mono whitespace-nowrap text-sm">{parseFloat(item.price || 0).toFixed(2)}€</span>
+            </div>
+            {expandedIndex === index && item.imageUrl && (
+              <div className="pb-3">
+                <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover rounded-xl shadow-sm" />
+              </div>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* Desktop: Tabelle */}
+      <div className="hidden sm:block rounded-xl border">
+        <Table className="w-full table-auto">
+          <TableHeader>
             <TableRow>
               <TableHead className="text-left font-semibold">Speisen</TableHead>
               <TableHead className="text-right font-semibold w-28">Preis</TableHead>
@@ -113,7 +134,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
                 <TableRow onClick={() => toggleExpand(index)} className="cursor-pointer transition-all duration-200 hover:bg-yellow-50 border-b">
                   <TableCell className="align-top py-4">
                     <div className="flex flex-col gap-1">
-                      <span className="font-serif text-gray-900 truncate">{item.name}</span>
+                      <span className="font-serif text-gray-900">{item.name}</span>
                       {item.description && <span className="text-sm text-gray-500 break-words leading-relaxed">{item.description}</span>}
                     </div>
                   </TableCell>
@@ -138,7 +159,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
   );
 };
 
-// ─── Category Nav (nur auf Speisekarte) ───────────────────────────────────────
+// ─── Category Nav ──────────────────────────────────────────────────────────────
 const CategoryNav = ({ categories, activeId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -211,7 +232,7 @@ const MenuContent = () => {
   const [error, setError] = useState(null);
   const [name, setName] = useState("");
   const [activeId, setActiveId] = useState(null);
-  const [activePage, setActivePage] = useState("menu"); // "menu" | "info"
+  const [activePage, setActivePage] = useState("menu");
 
   useEffect(() => {
     const restaurantID = searchParams.get("restaurantID");
@@ -235,7 +256,6 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
-        console.log("Server Data:", data);
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
       } catch (err) {
@@ -254,7 +274,6 @@ const MenuContent = () => {
   const menuEntry = serverData?.menu?.[0];
   const bgColor = menuEntry?.bgColor;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
-  const font = "Oswald";
 
   return (
     <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200"}`} style={bgColor ? { backgroundColor: bgColor } : undefined}>
@@ -265,7 +284,6 @@ const MenuContent = () => {
         <InfoPage restaurantData={serverData} />
       ) : (
         <main className="w-full max-w-7xl mx-auto px-4 py-8">
-
           {categoryGroups.length > 0 ? (
             <div className="space-y-12">
               {categoryGroups.map((group) => (
@@ -273,7 +291,7 @@ const MenuContent = () => {
                   <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
-                      <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor}/>
+                      <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} />
                     ))}
                   </div>
                 </div>
