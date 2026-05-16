@@ -10,12 +10,9 @@ import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@
 const Header = ({ name, activePage, setActivePage }) => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Restaurant Name / Logo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between sm:h-16 gap-2">
         <span className="text-lg font-serif font-semibold tracking-wide text-gray-900 truncate">{name || "Restaurant"}</span>
-
-        {/* Tab Navigation */}
-        <nav className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+        <nav className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 self-start sm:self-auto">
           <button
             onClick={() => setActivePage("menu")}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
@@ -35,7 +32,6 @@ const Header = ({ name, activePage, setActivePage }) => {
     </header>
   );
 };
-
 // ─── Informationen Page ────────────────────────────────────────────────────────
 const InfoPage = ({ restaurantData }) => {
   // Hier kannst du die Extrainformationen eintragen / aus der API laden
@@ -181,7 +177,7 @@ const CategoryNav = ({ categories, activeId }) => {
   };
 
   return (
-    <nav className="sticky top-16 z-40 w-full bg-white/90 backdrop-blur-sm border-b shadow-sm">
+    <nav className="sticky mt-1 sm:md-23 z-40 w-full bg-white/90 backdrop-blur-sm border-b shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <ul className="hidden sm:flex flex-wrap gap-2 py-3 items-center">
           {categories.map((cat) => (

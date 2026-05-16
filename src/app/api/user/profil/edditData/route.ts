@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import * as CryptoJS from "crypto-js";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
-import { webhookSecret } from "src/lib/stripe";
+//import { webhookSecret } from "src/lib/stripe";
 
 type MenuWithRelations = Menu & {
   categoryGroup: {
@@ -14,31 +14,10 @@ type MenuWithRelations = Menu & {
 };
 
 export const dynamic = "force-dynamic";
-
-interface EncryptedData {
-  encrypted_user_id: string;
-  encrypted_restaurant_id: string;
-  encrypted_data: string;
-  encrypted_api_key: string;
-}
-
-type SuccessResponse = {
-  status: number;
+interface ReceivedData {
   userID: string;
   restaurantId: string;
-  data: string;
-  apiKey: string;
-};
-
-type ErrorResponse = { error: string; status: number };
-type DecryptResult = SuccessResponse | ErrorResponse | null;
-
-function isSuccess(r: DecryptResult): r is SuccessResponse {
-  return !!r && "userID" in r;
-}
-
-function isError(r: DecryptResult): r is ErrorResponse {
-  return !!r && "error" in r;
+  data: object;
 }
 
 async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T> {
@@ -62,48 +41,23 @@ export async function POST(req: NextRequest) {
     if (session.user.role !== "Owner") {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
-    console.log("reciver-check(/profil/edditData):", await req.json())
-    const encryptedData: EncryptedData | null = await req.json().catch(() => null);
+    const recived_data: ReceivedData | null = await req.json().catch(() => null);
+    console.log("reciver-check(/profil/edditData):", recived_data); // erst loggen, dann weiterverarbeiten
 
-    if (!encryptedData) {
-      return NextResponse.json({ message: "Keine Daten vorhanden" }, { status: 400 });
+    if (!recived_data) {
+      return NextResponse.json({ message: "Keine Daten vorhanden(Z49)" }, { status: 400 });
     }
 
-    const decryptResult = await decryption(encryptedData);
-    console.log("/edditData:", decryptResult);
-
-    if (isError(decryptResult)) {
-      console.log("Keine Daten vorhanden");
-      return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
-    }
-
-    if (!isSuccess(decryptResult)) {
-      return NextResponse.json({ message: "Unbekannter Entschlüsselungsfehler" }, { status: 500 });
-    }
-
-    const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
-    const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
-    console.log(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${decryptResult}, API-KEY ${apiKey}`);
-
-    if (!expectedApiKey) {
-      return NextResponse.json({ message: "Serverkonfiguration fehlt (API_KEY)" }, { status: 500 });
-    }
-
-    if (apiKey !== expectedApiKey) {
-      return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
-    }
+    const { userID, restaurantId, data } = recived_data;
+    console.log("/edditData:", data);
+    console.log(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${data},`);
 
     /* ---------------- PARSE JSON ---------------- */
 
-    let parsedData: any;
-
-    try {
-      parsedData = JSON.parse(decryptedDataString);
-    } catch {
-      return NextResponse.json({ message: "Ungültiges JSON Format" }, { status: 400 });
-    }
+    const parsedData = Array.isArray(data) ? data : [data];
 
     if (!Array.isArray(parsedData)) {
+      console.log("Daten sind kein Array");
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
     }
 
@@ -328,8 +282,8 @@ export async function POST(req: NextRequest) {
       }
       if (entry.type === "categoryGroupUpdate") {
         const catGroupID = entry.categoryGroup.id;
-        const newName = entry.categoryGroup?.newName;
-        const newBG = entry.categoryGroup?.newBgColor;
+        const newName = entry.categoryGroup?.name;
+        const newBG = entry.categoryGroup?.bgColor;
 
         if (catGroupID) {
           await safeDb(
@@ -384,34 +338,5 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("❌ Serverfehler:", err);
     return NextResponse.json({ message: "Serverfehler", error: err?.message ?? err }, { status: 500 });
-  }
-}
-
-/* ---------------- DECRYPT FUNCTION ---------------- */
-
-async function decryption(data: EncryptedData): Promise<DecryptResult> {
-  const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-
-  if (!key) return { error: "Encryption key missing", status: 500 };
-
-  try {
-    const decryptedUserId = CryptoJS.AES.decrypt(data.encrypted_user_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedRestaurantId = CryptoJS.AES.decrypt(data.encrypted_restaurant_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedData = CryptoJS.AES.decrypt(data.encrypted_data, key).toString(CryptoJS.enc.Utf8);
-    const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
-
-    if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return { error: "Entschlüsselung fehlgeschlagen", status: 400 };
-    }
-
-    return {
-      userID: decryptedUserId,
-      restaurantId: decryptedRestaurantId,
-      data: decryptedData,
-      apiKey: decryptedApiKey,
-      status: 200,
-    };
-  } catch {
-    return { error: "Decryption failed", status: 400 };
   }
 }

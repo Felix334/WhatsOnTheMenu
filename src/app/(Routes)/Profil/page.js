@@ -752,7 +752,7 @@ export default function PageBuilder() {
                           <FaPen />
                         </Button>
                       </div>
-                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} />}
+                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID}/>}
                       <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                       <div className="space-y-8">
                         {group.categories?.map((category) => (
