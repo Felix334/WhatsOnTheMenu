@@ -22,7 +22,7 @@ import RenderUserID from "./components/renderUserID";
 
 import BeispielKarte from "./components/img/Beispiel-Karte.png";
 import BeispielKarte2 from "./components/img/Beispiel-Karte2.png";
-import { AdminLink, FreeTierLink, ProfessionalTierLink, EnterpriseTierLink, UnserePartnerLink } from "./components/renderDynamicLinks";
+import { AdminLink, FreeTierLink, ProfessionalTierLink, EnterpriseTierLink } from "./components/renderDynamicLinks";
 
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -148,11 +148,6 @@ function HomeContent() {
                       ) : (
                         <></>
                       )}
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <Button variant="ghost" asChild>
-                        <UnserePartnerLink />
-                      </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button variant="ghost" onClick={() => scrollToSection("#features")}>

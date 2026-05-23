@@ -90,7 +90,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
 
   return (
     <div id={id} className={`${bgColor} rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
-      <div className="mb-8 text-center border-b pb-6">
+      <div className="mb-8 text-center pb-6">
         <h3 className="text-3xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
       </div>
 
@@ -252,6 +252,8 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
+        console.log("Server Daten(Sort)",data)
+        data.menu[0].categoryGroup.sort((a, b) => Number(a.position) - Number(b.position));
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
       } catch (err) {
@@ -284,7 +286,7 @@ const MenuContent = () => {
             <div className="space-y-12">
               {categoryGroups.map((group) => (
                 <div key={group.id} className={`bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 ${group.color}`}>
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-2">{group.name}</h2>
+                  <h2 className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
                       <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} />

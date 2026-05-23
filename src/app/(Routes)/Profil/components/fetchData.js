@@ -9,6 +9,9 @@ const fetchRestaurantData = async (userID, signal) => {
   });
   if (response.status === 401) throw new Error("UNAUTHORIZED");
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  
+
+
   return response.json();
 };
 
@@ -17,6 +20,7 @@ const extractMenuData = (data) => {
   console.log("First Check!:", restaurant)
   const menu = restaurant?.menu[0];
   const categoryGroup = menu?.categoryGroup ?? [];
+  categoryGroup.sort((a,b) => Number(a.position) - Number(b.position))
   return {
     restaurantID: restaurant?.id ?? "",
     bgColor: menu?.bgColor ?? "",

@@ -322,7 +322,7 @@ export default function PageBuilder() {
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
   console.log("CategorieNames", categoryNames);
 
-  const MenuEditor = () => (
+  const MenuEditor = ({categoryGroupNames}) => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <div></div>
       <SheetTrigger asChild>
@@ -345,7 +345,7 @@ export default function PageBuilder() {
                       <FormLabel>Kategorie-Gruppe</FormLabel>
                       <>
                         <FormControl>
-                          <Input list="categoryGroup" minLength={1} autoComplete="off" autoCorrect="off" spellCheck="false" placeholder="z.B. Mittagessen" {...field} className="w-[90%]" />
+                          <Input list="categoryGroup" minLength={1} autoComplete="new-password" autoCorrect="off" spellCheck="false" placeholder="Hinzufügen order erstellen" {...field} className="w-[90%]" />
                         </FormControl>
                         <datalist id="categoryGroup">
                           {categoryGroupNames.map((name) => (

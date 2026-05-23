@@ -110,12 +110,6 @@ export function EnterpriseTierLink() {
 }
 
 // Unsere Partner-Link
-export function UnserePartnerLink() {
-  const query = useQueryObject();
-  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
-
-  return <Link href={`/UnserePartner${queryString}`}>Unsere Partner</Link>;
-}
 
 // Demo-Link
 export function DemoLink() {
