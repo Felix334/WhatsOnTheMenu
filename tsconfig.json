@@ -32,7 +32,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "../src/middleware.js", "../src/app/api/user/profil/setData/route.ts", "../src/app/(Routes)/TestScanner/page.jsx", "prisma/prisma.config.ts", "../src/app/api/auth/[...nextauth]/route.js", "../src/app/(Routes)/Profil/components/positionWrapper.js", "src/app/api/restaurant/[restaurantID]/updateMenu/route.js", "src/app/api/restaurant/[restaurantID]/updateRestaurant/route.js", "src/app/api/payment/webhook/route.js", "src/app/api/deleteAccount/[id]/route.js", "src/app/(Routes)/Profil/QRBuilder/page.js", "src/app/api/user/profil/updateRestaurant/route.js", "src/app/components/cookieWin.js"  ],
+, "../src/middleware.js", "../src/app/api/user/profil/setData/route.ts", "../src/app/(Routes)/TestScanner/page.jsx", "prisma/prisma.config.ts", "../src/app/api/auth/[...nextauth]/route.js", "../src/app/(Routes)/Profil/components/positionWrapper.js", "src/app/api/restaurant/[restaurantID]/updateMenu/route.js", "src/app/api/restaurant/[restaurantID]/updateRestaurant/route.js", "src/app/api/payment/webhook/route.js", "src/app/api/deleteAccount/[id]/route.js", "src/app/(Routes)/Profil/QRBuilder/page.js", "src/app/api/user/profil/updateRestaurant/route.js", "src/app/components/cookieWin.js", "src/app/(Routes)/Profil/components/sortMenu.js"  ],
   "exclude": [
     "../node_modules"
   ]

@@ -30,6 +30,7 @@ import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
 import { useRestaurantData } from "./components/fetchData";
 import { EdditCategoryGroup } from "./components/edditCategoryGroup";
+import { SortComponents } from "./components/sortMenu";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -45,7 +46,7 @@ export default function PageBuilder() {
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
   const [deleteCategoryGroup, setDeleteCategoryGroup] = useState([]);
-  const [newBgColor, setNewBgColor] = useState()
+  const [newBgColor, setNewBgColor] = useState();
 
   const deletedDishesRef = useRef([]);
   const deletedCategoriesRef = useRef([]);
@@ -64,13 +65,11 @@ export default function PageBuilder() {
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
 
-
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
   const [renderCatGroupMenu, setRenderCatGroupMenu] = useState(null);
-
 
   const { data: session, status } = useSession();
 
@@ -314,17 +313,23 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  const categoryGroups = menuEntry?.categoryGroup ?? [];
-  const allCategories = categoryGroups.flatMap((group) => group.categories ?? []);
-  const totalPrice = allCategories.flatMap((cat) => cat.dishes ?? []).reduce((sum, dish) => sum + parseFloat(dish.price || 0), 0);
-  // 🛡️ FIX 2: IMMER Array + Fallbacks
-  const categoryGroupNames = [...(menuEntry?.categoryGroup?.map((group) => group.name) ?? []), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"].filter((name) => name && name.trim()); // Duplikate bleiben (Browser filtert)
+  const categoryGroups = serverData?.userData?.restaurant?.menu[0]?.categoryGroup ?? [];
+  console.log("Group-Test z319:", serverData?.userData?.restaurant?.menu[0].categoryGroup);
+  console.log("Groups-Test z320", categoryGroups);
+  const categoryGroupNames = [
+    ...(categoryGroups?.map((group) => group.name) ?? []),
+    "Mittagessen",
+    "Abendessen",
+    "Frühstück",
+    "Snacks",
+    "Getränke",
+  ].filter((name) => name && name.trim());
 
   // Kategorien-Namen (korrigiert)
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
   console.log("CategorieNames", categoryNames);
 
-  const MenuEditor = ({categoryGroupNames}) => (
+  const MenuEditor = ({ categoryGroupNames }) => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <div></div>
       <SheetTrigger asChild>
@@ -712,6 +717,7 @@ export default function PageBuilder() {
                 <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
 
                 {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
+                <SortComponents componentList={categoryGroups} />
               </div>
               <div>
                 <Button asChild>
@@ -754,7 +760,7 @@ export default function PageBuilder() {
                           <FaPen />
                         </Button>
                       </div>
-                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID}/>}
+                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID} />}
                       <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                       <div className="space-y-8">
                         {group.categories?.map((category) => (
@@ -771,7 +777,6 @@ export default function PageBuilder() {
                 <summary>Debug Data</summary>
                 <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
               </details>
-              <p className="mt-6 sm:mt-8 md:mt-10 text-right font-semibold text-lg">Gesamtpreis: {totalPrice.toFixed(2)}€</p>
             </main>
           </div>
           <div className="fixed bottom-6 left-6 z-20">
