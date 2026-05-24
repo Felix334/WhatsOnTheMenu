@@ -14,7 +14,7 @@ import FontSelector from "./fontList";
 
 /* ===================== OPTION MENU ===================== */
 
-const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaurantID, serverData, allowPremiumColor }) => {
+const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, restaurantID, serverData, allowPremiumColor }) => {
   const [serverData_, setServerData_] = useState(null);
   const [menuData, setMenuData] = useState(null);
   const [isEditingMenu, setIsEditingMenu] = useState(false);
@@ -64,8 +64,9 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setBgColor, restaura
     if (response.ok) {
       const updated = await response.json();
       setMenuData(updated.data);
-      setBgColor(editedBgColor);
+      setNewBgColor(editedBgColor);
       setIsEditingMenu(false);
+      location.reload()
     }
   };
 

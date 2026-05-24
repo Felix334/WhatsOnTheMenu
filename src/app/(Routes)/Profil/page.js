@@ -45,13 +45,14 @@ export default function PageBuilder() {
   const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
   const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
   const [deleteCategoryGroup, setDeleteCategoryGroup] = useState([]);
+  const [newBgColor, setNewBgColor] = useState()
 
   const deletedDishesRef = useRef([]);
   const deletedCategoriesRef = useRef([]);
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading, setBgColor } = useRestaurantData(userID);
+  const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading } = useRestaurantData(userID);
   console.log("New BG:", bgColor);
   console.log("New Font:", font);
 
@@ -63,12 +64,13 @@ export default function PageBuilder() {
   const [fontNew, setFontNew] = useState("");
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
   const [renderCatGroupMenu, setRenderCatGroupMenu] = useState(null);
+
 
   const { data: session, status } = useSession();
 
@@ -707,7 +709,7 @@ export default function PageBuilder() {
                   Zurück
                 </Button>
 
-                <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setBgColor={setBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+                <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
 
                 {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
               </div>
