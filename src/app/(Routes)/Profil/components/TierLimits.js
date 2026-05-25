@@ -5,9 +5,13 @@ const TierSystem = {
         allowedFonts: {},
         allowedColorPallet: {},
     },
+    Business : {
+        DishLimit: 100,
+        CategoryLimit: 15
+    },
     PremiumTier: {
         DishLimit: 200,
-        CategoryLimit: 15,
+        CategoryLimit: 25,
         allowedFonts: {},
         allowedColorPallet: {allAllowed: true},
         allowedCalendarLimit: {days: 365}
