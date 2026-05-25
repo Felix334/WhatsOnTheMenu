@@ -323,12 +323,18 @@ function HomeContent() {
             </div>
           </section>
           <section className="bg-white flex items-center justify-center py-12 px-4">
-            <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
-              <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-[4/3]">
-                <Image src={SpeiseKarteLaptop}  className="object-cover" alt="Speisekarte Laptop" />
-              </div>
-              <div className="relative w-full max-w-[280px] sm:max-w-[120px] md:max-w-[250px] aspect-[9/16]">
-                <Image src={SpeiseKarteHandy} className="object-cover" alt="Speisekarte Handy" />
+            <div className="mx-auto max-w-6xl text-center">
+              <header className="mb-10">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">Passt sich einfach Ihren Geräten an</h2>
+                <p className="mt-3 text-gray-500 text-sm sm:text-base">Optimiert für Smartphone, Tablet und Desktop – ohne Kompromisse im Design.</p>
+              </header>
+              <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
+                <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-[4/3]">
+                  <Image src={SpeiseKarteLaptop} className="object-cover" alt="Speisekarte Laptop" />
+                </div>
+                <div className="relative w-full max-w-[280px] sm:max-w-[120px] md:max-w-[250px] aspect-[9/16]">
+                  <Image src={SpeiseKarteHandy} className="object-cover" alt="Speisekarte Handy" />
+                </div>
               </div>
             </div>
           </section>
@@ -432,7 +438,7 @@ function HomeContent() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="relative">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
@@ -456,9 +462,7 @@ function HomeContent() {
 
                     {/* Button nach unten */}
                     <div className="mt-auto">
-                      <Button asChild className="w-full">
-                        <EnterpriseTierLink />
-                      </Button>
+                      <Button asChild className="w-full" disable></Button>
                     </div>
                   </CardContent>
                 </Card>
