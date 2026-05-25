@@ -65,7 +65,6 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <Analytics />
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossorigin="anonymous"></script>
           <Script id="adsbygoogle-init" strategy="afterInteractive">
             {`(adsbygoogle = window.adsbygoogle || []).push({});`}
           </Script>
@@ -76,3 +75,6 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
+
+// Adsense ve
