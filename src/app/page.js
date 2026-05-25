@@ -360,7 +360,7 @@ function HomeContent() {
                 <Card className="flex flex-col h-full">
                   <CardHeader>
                     <CardTitle>Starter</CardTitle>
-                    <div className="text-3xl font-bold text-red-800">Kostenlos</div>
+                    <div className="text-3xl font-bold ">Kostenlos</div>
                   </CardHeader>
 
                   <CardContent className="flex flex-col flex-1">
@@ -397,7 +397,7 @@ function HomeContent() {
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
-                    <div className="text-3xl font-bold text-red-800">
+                    <div className="text-3xl font-bold ">
                       7.99€<span className="text-lg font-normal">/Monat</span>
                     </div>
                   </CardHeader>
@@ -475,7 +475,7 @@ function HomeContent() {
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Enterprise</CardTitle>
-                    <div className="text-3xl font-bold text-red-800">Individuell</div>
+                    <div className="text-3xl font-bold ">Individuell</div>
                   </CardHeader>
 
                   <CardContent className="flex flex-col flex-1">
