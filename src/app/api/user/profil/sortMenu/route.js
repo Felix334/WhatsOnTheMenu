@@ -24,38 +24,34 @@ export async function PATCH(req) {
 
     const { groups, categories } = await req.json();
 
-    // Prüfen: Gehören die CategoryGroups zur Menu-Kette des Restaurants?
     const groupIds = groups.map((g) => g.id);
     const validGroups = await prisma.categoryGroup.findMany({
       where: {
         id: { in: groupIds },
         Menu: {
-          restaurantId: restaurant.id, // Über Menu-Kette
+          restaurantId: restaurant.id,
         },
       },
       select: { id: true },
     });
 
-    // Prüfen: Gehören die Categories zur CategoryGroup-Kette?
     const categoryIds = categories.map((c) => c.id);
     const validCategories = await prisma.category.findMany({
       where: {
         id: { in: categoryIds },
         categoryGroup: {
           Menu: {
-            restaurantId: restaurant.id, // Über CategoryGroup -> Menu -> Restaurant
+            restaurantId: restaurant.id,
           },
         },
       },
       select: { id: true },
     });
 
-    // Wenn keine gültigen Groups/Categories gefunden
     if (validGroups.length === 0 && validCategories.length === 0) {
       return NextResponse.json({ error: "No valid items found" }, { status: 400 });
     }
 
-    // Nur die gültigen Updates ausführen
     const validGroupIds = new Set(validGroups.map((g) => g.id));
     const validCategoryIds = new Set(validCategories.map((c) => c.id));
 

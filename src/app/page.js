@@ -20,8 +20,8 @@ import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
 import RenderUserID from "./components/renderUserID";
 
-import BeispielKarte from "./components/img/Beispiel-Karte.png";
-import BeispielKarte2 from "./components/img/Beispiel-Karte2.png";
+import SpeiseKarteLaptop from "./components/img/ResizedLaptopImage.png";
+import SpeiseKarteHandy from "./components/img/Speisekarte_HandybildschirmNeu.png";
 import { AdminLink, FreeTierLink, ProfessionalTierLink, EnterpriseTierLink } from "./components/renderDynamicLinks";
 
 function HomeContent() {
@@ -319,6 +319,16 @@ function HomeContent() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </section>
+          <section className="bg-white flex items-center justify-center py-12 px-4">
+            <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
+              <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-[4/3]">
+                <Image src={SpeiseKarteLaptop}  className="object-cover" alt="Speisekarte Laptop" />
+              </div>
+              <div className="relative w-full max-w-[280px] sm:max-w-[120px] md:max-w-[250px] aspect-[9/16]">
+                <Image src={SpeiseKarteHandy} className="object-cover" alt="Speisekarte Handy" />
               </div>
             </div>
           </section>

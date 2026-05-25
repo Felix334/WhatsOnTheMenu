@@ -53,19 +53,18 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
         <div className="flex flex-col gap-4 py-2">
           {/* Name */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Name</label>
+            <label className="text-xs font-medium text-muted-foreground tracking-wide">Name</label>
             <Input defaultValue={name} placeholder="z. B. Fixkosten" onChange={(e) => setNewName(e.target.value)} />
           </div>
 
           {/* Position */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Position</label>
-            <Input type="number" defaultValue={position} placeholder="1" onChange={(e) => setNewPos(Number(e.target.value))} />
+            <label className="text-xs font-medium text-muted-foreground tracking-wide ">Position: {position}</label>
           </div>
 
           {/* Farbe */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-muted-foreground tracking-wide uppercase">Farbe</label>
+            <label className="text-xs font-medium text-muted-foreground tracking-wide">Farbe</label>
             <div className="flex flex-wrap gap-2">
               {colors.map((color) => (
                 <button
