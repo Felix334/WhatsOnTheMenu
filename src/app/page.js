@@ -369,7 +369,7 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>Bis zu 7 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 30 Gerichte
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 50 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>

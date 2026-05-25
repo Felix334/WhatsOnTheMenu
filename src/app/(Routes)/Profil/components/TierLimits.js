@@ -1,6 +1,6 @@
 const TierSystem = {
     FreeTier: {
-        DishLimit: 30,
+        DishLimit: 50,
         CategoryLimit: 7,
         allowedFonts: {},
         allowedColorPallet: {},

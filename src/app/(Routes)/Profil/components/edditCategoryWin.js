@@ -144,20 +144,6 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
             />
             <FormField
               control={form.control}
-              name="position"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Position:</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <ScrollArea className="h-[100px] w-full rounded-md border p-2">{Array.isArray(position) && position.map((num, index) => <div key={index}>{num}</div>)}</ScrollArea>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="color"
               render={({ field }) => (
                 <FormItem>
