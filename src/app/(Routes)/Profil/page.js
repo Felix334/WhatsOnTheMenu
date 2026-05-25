@@ -773,10 +773,6 @@ export default function PageBuilder() {
                   <div className="text-center text-gray-500 py-10">Keine Daten vorhanden</div>
                 )}
               </div>
-              <details className="absolute right-1">
-                <summary>Debug Data</summary>
-                <pre className="mt-8 p-4 bg-gray-100 rounded-lg max-w-7xl overflow-auto text-sm">{JSON.stringify(serverData, null, 2)}</pre>
-              </details>
             </main>
           </div>
           <div className="fixed bottom-6 left-6 z-20">

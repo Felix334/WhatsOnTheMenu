@@ -20,7 +20,7 @@ export default function AdminConsole() {
   const [search, setSearch ] = useState("");
   const [filter, setFilter] = useState("all");
   const [userList, setUserList] = useState([]);
-  const [rolesMap, setRolesMap] = useState({});
+
   const [requestList, setRequestList] = useState([]);
   const [activePage, setActivePage] = useState("users");
 
@@ -74,7 +74,6 @@ export default function AdminConsole() {
           map[u.id] = u.role;
         });
 
-        setRolesMap(map);
       } catch (err) {
         console.error(err);
       }
@@ -108,7 +107,6 @@ export default function AdminConsole() {
           map[u.id] = u.role;
         });
 
-        setRolesMap(map);
       } catch (err) {
         console.error(err);
       }
@@ -126,12 +124,6 @@ export default function AdminConsole() {
 
   const filtered = userList.filter((u) => (filter === "all" || u.role === filter) && u.name?.toLowerCase().includes(search.toLowerCase()));
 
-  const handleRoleChange = (id, role) => {
-    setRolesMap((prev) => ({
-      ...prev,
-      [id]: role,
-    }));
-  };
 
   /* ---------------- Render ---------------- */
 
@@ -267,20 +259,7 @@ export default function AdminConsole() {
                     <TableCell>{u.name}</TableCell>
 
                     <TableCell>{u.email}</TableCell>
-
-                    <TableCell>
-                      <Select value={rolesMap[u.id]} onValueChange={(v) => handleRoleChange(u.id, v)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          <SelectItem value="User">User</SelectItem>
-                          <SelectItem value="Admin">Admin</SelectItem>
-                          <SelectItem value="Owner">Owner</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
+                    <TableCell>{u.role}</TableCell>
                     <TableCell>
                       <Badge variant={u.status === "active" ? "default" : u.status === "pending" ? "secondary" : "destructive"}>{u.status}</Badge>
                     </TableCell>
