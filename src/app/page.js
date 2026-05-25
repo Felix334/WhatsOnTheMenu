@@ -393,12 +393,12 @@ function HomeContent() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="relative">
+                <Card className="border-2 relative">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
                     <div className="text-3xl font-bold text-red-800">
-                      9.99€<span className="text-lg font-normal">/Monat</span>
+                      7.99€<span className="text-lg font-normal">/Monat</span>
                     </div>
                   </CardHeader>
 
@@ -462,6 +462,9 @@ function HomeContent() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Verfügbarkeits-Anzeige(1-Min Cache)
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-300 mr-2">✓</span>Update-Alarm
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
