@@ -43,7 +43,10 @@ export const useRestaurantData = (userID) => {
         setIsLoading(true);
         setServerData(await fetchRestaurantData(userID, controller.signal));
       } catch (err) {
-        if (err.message === "UNAUTHORIZED") window.alert("Bitte melden Sie sich an");
+        if (err.message === "UNAUTHORIZED") {
+          const { toast } = await import("sonner");
+          toast.error("Bitte melden Sie sich an");
+        }
         else if (err.name !== "AbortError") console.error("Fetch failed:", err);
       } finally {
         setIsLoading(false);

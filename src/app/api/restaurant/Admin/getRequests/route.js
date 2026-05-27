@@ -8,8 +8,8 @@ export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    
-    if (!session && !token) {
+
+    if (!session || !token || token.role !== "Admin") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -36,14 +36,19 @@ export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    
-    if (!session && !token) {
+
+    if (!session || !token || token.role !== "Admin") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    // Nur erlaubte Filter-Felder übernehmen (kein direktes where: body → Prisma-Injection)
     const body = await req.json();
+    const { status, ownerId } = body ?? {};
     const restaurants = await prisma.restaurantQueue.findMany({
-      where: body,
+      where: {
+        ...(status   && { status }),
+        ...(ownerId  && { ownerId }),
+      },
       include: {
         owner: {
           select: {

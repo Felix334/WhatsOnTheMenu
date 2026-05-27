@@ -13,15 +13,12 @@ export async function GET(req, { params }) {
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
       include: {
-        // ✅ Äußeres include!
         owner: {
-          select: { name: true, email: true, role: true },
+          select: { name: true },
         },
         menu: {
           include: {
-            // ✅ Inneres include!
             categoryGroup: {
-              // ✅ Dein Name!
               include: {
                 categories: {
                   include: {
@@ -31,6 +28,12 @@ export async function GET(req, { params }) {
                         name: true,
                         description: true,
                         price: true,
+                        imageUrl: true,
+                        stock: true,
+                        ingredients: {
+                          where: { isAllergen: true },
+                          select: { id: true, name: true },
+                        },
                       },
                     },
                   },
@@ -40,9 +43,8 @@ export async function GET(req, { params }) {
           },
         },
         locations: {
-          // ✅ Dein Name!
           include: {
-            reservation: true, // ✅ Dein Name!
+            reservation: true,
           },
         },
       },
@@ -81,6 +83,7 @@ export async function GET(req, { params }) {
       owner: restaurant.owner,
       menu: menuWithRatings,
       locations: restaurant.locations,
+      openingHours: restaurant.openingHours ?? null,
       createdAt: restaurant.createdAt,
     };
 

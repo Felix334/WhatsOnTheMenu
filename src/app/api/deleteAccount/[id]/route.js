@@ -18,7 +18,7 @@ export async function DELETE(request, { params }) {
   }
 
   const isSelf = session.user.id === id;
-  const isAdmin = session.user.role === "admin";
+  const isAdmin = session.user.role === "Admin";
 
   if (!isSelf && !isAdmin) {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });

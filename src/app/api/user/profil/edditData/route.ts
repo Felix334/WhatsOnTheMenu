@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
-import * as CryptoJS from "crypto-js";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
 //import { webhookSecret } from "src/lib/stripe";
 
@@ -15,7 +14,6 @@ type MenuWithRelations = Menu & {
 
 export const dynamic = "force-dynamic";
 interface ReceivedData {
-  userID: string;
   restaurantId: string;
   data: object;
 }
@@ -48,7 +46,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Keine Daten vorhanden(Z49)" }, { status: 400 });
     }
 
-    const { userID, restaurantId, data } = recived_data;
+    const { restaurantId, data } = recived_data;
+    const userID = session.user.id;
     console.log("/edditData:", data);
     console.log(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${data},`);
 
@@ -214,17 +213,21 @@ export async function POST(req: NextRequest) {
       if (entry.type === "categoryUpdate") {
         const cat = entry.category || {};
         if (!cat.id) continue;
+        // updateMany allows relation filter → scopes update to this restaurant's menu
         await safeDb(
           () =>
-            prisma.category.update({
-              where: { id: cat.id },
+            prisma.category.updateMany({
+              where: {
+                id: cat.id,
+                categoryGroup: { menuID: menuId },
+              },
               data: {
                 ...(cat.name && { name: cat.name }),
                 ...(cat.position !== undefined && { position: cat.position }),
                 ...(cat.color && { bgColor: cat.color }),
               },
             }),
-          `category.update (${cat.name || cat.id})`,
+          `category.updateMany (${cat.name || cat.id})`,
         );
       }
       if (entry.type === "switchPos") {
@@ -236,20 +239,16 @@ export async function POST(req: NextRequest) {
           await safeDb(
             () =>
               prisma.$transaction([
-                prisma.category.update({
-                  where: { id: cat1 },
-                  data: {
-                    position: posCat1,
-                  },
+                prisma.category.updateMany({
+                  where: { id: cat1, categoryGroup: { menuID: menuId } },
+                  data: { position: posCat1 },
                 }),
-                prisma.category.update({
-                  where: { id: cat2 },
-                  data: {
-                    position: posCat2,
-                  },
+                prisma.category.updateMany({
+                  where: { id: cat2, categoryGroup: { menuID: menuId } },
+                  data: { position: posCat2 },
                 }),
-              ]), // ✅ Komma hier
-            `category.update (${cat1}, ${cat2})`,
+              ]),
+            `category.updateMany (${cat1}, ${cat2})`,
           );
         }
       }
@@ -263,20 +262,17 @@ export async function POST(req: NextRequest) {
           await safeDb(
             () =>
               prisma.$transaction([
-                prisma.categoryGroup.update({
-                  where: { id: catGroupID1 },
-                  data: {
-                    position: newPos,
-                  },
+                // menuID is a direct field on CategoryGroup → safe ownership scope
+                prisma.categoryGroup.updateMany({
+                  where: { id: catGroupID1, menuID: menuId },
+                  data: { position: newPos },
                 }),
-                prisma.categoryGroup.update({
-                  where: { id: catGroupID2 },
-                  data: {
-                    position: newPos,
-                  },
+                prisma.categoryGroup.updateMany({
+                  where: { id: catGroupID2, menuID: menuId },
+                  data: { position: newPos },
                 }),
               ]),
-            `categoryGroup.update(${catGroupID1}, ${catGroupID2})`,
+            `categoryGroup.updateMany(${catGroupID1}, ${catGroupID2})`,
           );
         }
       }
@@ -288,14 +284,14 @@ export async function POST(req: NextRequest) {
         if (catGroupID) {
           await safeDb(
             () =>
-              prisma.categoryGroup.update({
-                where: { id: catGroupID },
+              prisma.categoryGroup.updateMany({
+                where: { id: catGroupID, menuID: menuId },
                 data: {
                   ...(newName && { name: newName }),
                   ...(newBG && { bgColor: newBG }),
                 },
               }),
-            `categoryGroup.update(${catGroupID})`,
+            `categoryGroup.updateMany(${catGroupID})`,
           );
         }
       }

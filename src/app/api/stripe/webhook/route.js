@@ -5,7 +5,6 @@ import { stripe, webhookSecret, getSubscriptionTier } from "@/lib/stripe";
 
 export async function POST(req) {
   const body = await req.text();
-  console.log("Stripe Webhook:", body)
 
   const headerList = await headers();
   const signature = headerList.get("stripe-signature");
@@ -80,6 +79,16 @@ export async function POST(req) {
               where: { id: userId },
               select: { name: true },
             });
+
+            // Idempotency: skip if restaurant already exists for this owner
+            const existingRestaurant = await prisma.restaurant.findUnique({
+              where: { ownerId: userId },
+            });
+
+            if (existingRestaurant) {
+              console.log(`Restaurant already exists for ${userId}, skipping creation`);
+              break;
+            }
 
             await prisma.restaurant.create({
               data: {

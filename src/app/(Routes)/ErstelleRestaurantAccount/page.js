@@ -4,215 +4,199 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Check } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
+const TIERS = [
+  {
+    id: "free",
+    name: "Free",
+    label: "Kostenlos",
+    price: "€0",
+    period: "/Monat",
+    description: "Perfekt zum Ausprobieren",
+    features: ["1 Restaurant", "Digitale Speisekarte", "50 Gerichte Limit", "QR-Code Generator"],
+    href: "/ErstelleRestaurantAccount/FreeTier",
+    cta: "Kostenlos starten",
+    isActive: (sub) => !sub || sub === "FreeTier",
+    color: "gray",
+  },
+  {
+    id: "Professional",
+    name: "Professional",
+    label: "Beliebteste Wahl",
+    price: "€14.99",
+    period: "/Monat",
+    description: "Unbegrenzte Möglichkeiten",
+    features: [
+      "Bis zu 25 Kategorien",
+      "Bis zu 200 Gerichte",
+      "Premium Farben & Fonts",
+      "Mehrere Standorte",
+      "Allergen-Verwaltung",
+    ],
+    href: "/ErstelleRestaurantAccount/Professional",
+    cta: "Pro abonnieren",
+    featured: true,
+    isActive: (sub) => sub === "Professional",
+    color: "amber",
+  },
+  {
+    id: "Business",
+    name: "Premium",
+    label: "Enterprise",
+    price: "€7.99",
+    period: "/Monat",
+    description: "Maximale Features & Support",
+    features: [
+      "Alles aus Pro +",
+      "24/7 Premium Support",
+      "Marketing Tools",
+      "Analytics Dashboard",
+    ],
+    href: "/ErstelleRestaurantAccount/Individuell",
+    cta: "Premium abonnieren",
+    isActive: (sub) => sub === "Individuell",
+    color: "orange",
+  },
+];
+
+function CheckIcon({ color }) {
+  const bg = color === "amber" ? "bg-amber-100 text-amber-600" : color === "orange" ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-500";
+  return (
+    <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${bg}`}>
+      ✓
+    </span>
+  );
+}
 
 function PricingContent() {
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
   const { data: session } = useSession();
-
-  const tier = session?.user?.subscription?.tier ?? "FREE";
-
-  const isFree = tier === "FREE";
-  const isPro = tier === "PRO";
-  const isEnterprise = tier === "ENTERPRISE";
+  const sub = session?.user?.subscription;
 
   return (
-    <section className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-24">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-20">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-20">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-6">
-            Flexible Preise für jedes Restaurant
+        <div className="text-center mb-14">
+          <p className="text-amber-600 uppercase tracking-widest text-xs font-semibold mb-3">Tarife</p>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-gray-900 mb-4">
+            Wähle deinen Tarif
           </h1>
-          <p className="text-lg text-gray-600">
-            Starte kostenlos und skaliere, wenn dein Restaurant wächst.
+          <p className="text-gray-500 max-w-md mx-auto">
+            Starte kostenlos und wechsle jederzeit. Keine versteckten Kosten.
           </p>
         </div>
 
-        {/* Pricing Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        {/* Cards */}
+        <div className="grid md:grid-cols-3 gap-6 items-start">
+          {TIERS.map((tier) => {
+            const active = tier.isActive(sub);
+            return (
+              <Card
+                key={tier.id}
+                className={`flex flex-col transition-all duration-300 ${
+                  tier.featured
+                    ? "border-2 border-amber-500 bg-white shadow-xl scale-105 relative"
+                    : tier.color === "orange"
+                    ? "border border-orange-200 bg-white hover:shadow-lg"
+                    : "border border-gray-200 bg-white hover:shadow-lg"
+                }`}
+              >
+                {tier.featured && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">
+                    ⭐ Empfohlen
+                  </div>
+                )}
 
-          {/* =========================
-              STARTER
-          ========================== */}
-          <Card className="flex flex-col rounded-2xl shadow-sm hover:shadow-md transition-all border border-gray-200">
-            <CardHeader>
-              <CardTitle>Starter</CardTitle>
-              <CardDescription>Kostenloser Einstieg</CardDescription>
-              <div className="text-4xl font-bold mt-4">
-                0€
-                <span className="text-base font-normal text-gray-500">
-                  {" "}
-                  /Monat
-                </span>
-              </div>
-            </CardHeader>
+                <CardHeader className={`pb-2 ${tier.featured ? "pt-7" : ""}`}>
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-widest mb-1 ${
+                      tier.color === "amber"
+                        ? "text-amber-500"
+                        : tier.color === "orange"
+                        ? "text-orange-400"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {tier.label}
+                  </p>
+                  <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
+                  <CardDescription>{tier.description}</CardDescription>
+                </CardHeader>
 
-            <CardContent className="flex flex-col flex-1">
-              <ul className="space-y-4 mb-10">
-                {[
-                  "1 Speisekarte",
-                  "Basis Templates",
-                  "QR-Code",
-                ].map((feature) => (
-                  <li key={feature} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Button
-                  asChild={isFree}
-                  disabled={!isFree}
-                  className="w-full"
-                >
-                  {isFree ? (
-                    <Link
-                      href={`/ErstelleRestaurantAccount/FreeTier?${queryString}`}
+                <CardContent className="flex flex-col flex-1">
+                  <div className="mb-6">
+                    <span
+                      className={`text-5xl font-bold ${
+                        tier.color === "amber" ? "text-amber-600" : "text-gray-900"
+                      }`}
                     >
-                      Kostenlos starten
-                    </Link>
-                  ) : (
-                    <span>Aktiver Plan</span>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                      {tier.price}
+                    </span>
+                    <span className="text-gray-400 ml-1">{tier.period}</span>
+                  </div>
 
-          {/* =========================
-              PROFESSIONAL
-          ========================== */}
-          <Card className="relative flex flex-col rounded-2xl shadow-xl border-2 border-red-700 bg-red-800 text-white scale-105">
-            <Badge className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 px-4 py-1 text-sm font-semibold shadow">
-              Empfohlen
-            </Badge>
+                  <ul className="space-y-3 mb-8 text-sm text-gray-600 flex-1">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2">
+                        <CheckIcon color={tier.color} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
 
-            <CardHeader>
-              <CardTitle>Professional</CardTitle>
-              <CardDescription className="text-red-100">
-                Für wachsende Restaurants
-              </CardDescription>
-              <div className="text-4xl font-bold mt-4">
-                9.99€
-                <span className="text-base font-normal text-red-200">
-                  {" "}
-                  /Monat
-                </span>
-              </div>
-            </CardHeader>
-
-            <CardContent className="flex flex-col flex-1">
-              <ul className="space-y-4 mb-10">
-                {[
-                  "Bis zu 15 Karten",
-                  "Premium Templates",
-                  "Mehrsprachige Menüs",
-                  "QR-Code",
-                  "Event-Planer",
-                ].map((feature) => (
-                  <li key={feature} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-300" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Button
-                  asChild={!isPro}
-                  disabled={isPro}
-                  className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold"
-                >
-                  {isPro ? (
-                    <span>Aktiver Plan</span>
-                  ) : (
-                    <Link
-                      href={`/ErstelleRestaurantAccount/Professional?${queryString}`}
-                    >
-                      Jetzt upgraden
-                    </Link>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex flex-col rounded-2xl shadow-sm hover:shadow-md transition-all border border-gray-200">
-            <CardHeader>
-              <CardTitle>Enterprise</CardTitle>
-              <CardDescription>Individuelle Lösung</CardDescription>
-              <div className="text-4xl font-bold mt-4">
-                Individuell
-              </div>
-            </CardHeader>
-
-            <CardContent className="flex flex-col flex-1">
-              <ul className="space-y-4 mb-10">
-                {[
-                  "Alles aus Professional",
-                  "White-Label Lösung",
-                  "API-Zugang",
-                  "Erweiterte Analytics",
-                  "Priority Support",
-                ].map((feature) => (
-                  <li key={feature} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-auto">
-                <Button
-                  asChild={!isEnterprise}
-                  disabled={isEnterprise}
-                  variant="outline"
-                  className="w-full"
-                >
-                  {isEnterprise ? (
-                    <span>Aktiver Plan</span>
-                  ) : (
-                    <Link
-                      href={`/ErstelleRestaurantAccount/Individuell?${queryString}`}
-                    >
-                      Vertrieb kontaktieren
-                    </Link>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
+                  <div className="mt-auto">
+                    {active ? (
+                      <Button disabled className="w-full">
+                        Aktiver Plan
+                      </Button>
+                    ) : (
+                      <Button
+                        asChild
+                        className={
+                          tier.featured
+                            ? "w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow"
+                            : tier.color === "orange"
+                            ? "w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400"
+                            : "w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"
+                        }
+                        variant={tier.featured ? undefined : "outline"}
+                      >
+                        <Link href={`${tier.href}${queryString ? `?${queryString}` : ""}`}>
+                          {tier.cta}
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
+
+        {session && sub && (
+          <div className="mt-16 text-center">
+            <p className="text-gray-500">
+              Aktueller Tarif:{" "}
+              <span className="font-semibold text-gray-900">{sub}</span>
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 export default function Page() {
-  const { data: session, status } = useSession();
-
-  /* -------------------------
-     Loading & Auth Check
-  -------------------------- */
+  const { status, data: session } = useSession();
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
         Lade...
       </div>
     );
@@ -220,22 +204,20 @@ export default function Page() {
 
   if (!session?.user?.id) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
         Bitte anmelden
       </div>
     );
   }
 
-  /* -------------------------
-     Role & Subscription Logic
-  -------------------------- */
-
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        Lade...
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Lade...
+        </div>
+      }
+    >
       <PricingContent />
     </Suspense>
   );

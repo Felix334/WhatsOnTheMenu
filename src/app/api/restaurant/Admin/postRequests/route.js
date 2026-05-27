@@ -12,7 +12,7 @@ export async function POST(req) {
       secret: process.env.NEXTAUTH_SECRET,
     });
 
-    if (!session && !token) {
+    if (!session || !token || token.role !== "Admin") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

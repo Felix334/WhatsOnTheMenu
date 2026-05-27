@@ -35,17 +35,22 @@ export default function SuccessClient({ searchParams }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 py-20">
       <div className="max-w-md mx-auto px-4">
-        <Card className="shadow-2xl border-green-200">
+        <Card className="shadow-xl border-amber-200">
           <div className="p-8 text-center">
-            <h1 className="text-3xl font-bold">Zahlung erfolgreich!</h1>
-
-            <p className="mt-4 text-gray-600">Ihr Abonnement ist aktiv!</p>
-            <p className="mt-4 text-green-600">Bitte melden sie sich neu an um unseren Service nutzen zu können</p>
-
-            <Button className="mt-6 w-full" onClick={() => router.push("/")}>
-              Zurück
+            <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h1 className="text-3xl font-serif font-bold text-gray-900">Zahlung erfolgreich!</h1>
+            <p className="mt-3 text-gray-500">Dein Abonnement ist jetzt aktiv.</p>
+            <p className="mt-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+              Bitte einmal ab- und neu anmelden, um alle Features freizuschalten.
+            </p>
+            <Button className="mt-6 w-full bg-amber-500 hover:bg-amber-600 text-white" onClick={() => router.push("/")}>
+              Zum Dashboard
             </Button>
           </div>
         </Card>

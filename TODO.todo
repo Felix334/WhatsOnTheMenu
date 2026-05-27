@@ -73,17 +73,15 @@ Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden
 PROXMOX => als alternative zu Docker
 
 => Später Premium Fetaures hinzufügen(user anylytics, keine adds mehr Custom Optionen, Möglichkeit online essen zu bestellen, )
-=> Ein Premium Feature: Statt der Vorgegeben Farbenauswahl => einen "Input type=Color" hinzufügen für 100% Kontrolle
 => Zusätzliche Premium-Funktion => Beim Hintergrund eine from-to Auswahl(Bsp:  bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200)
 
 => NextJS-Feature: serverAction => setzt erlaubte URLs fest
 
-=> Bei Admin-Zugriff die IPs speichern und bei neuer IP eine Email schicken
 
 => In the AGBs schreiben dass wir keine Verantwortung für Griefing oder Datenmissbrauch übernehmen
 
 => Schutz gegen erneute Datenkorruption => Anmeldung mit HauptGmail nicht möglich => Wenn login bei felixmayer02@gmail.com probieren wurde ich statdessen bei fm.trashmail@gmail.com angemeldet
 
-=> Suchfunktion komplett entfernen => Missbrauch stark eingeschränkt
-
 => Session validierung noch nicht sicher genug
+
+=> Doppelter Stripe Webhook

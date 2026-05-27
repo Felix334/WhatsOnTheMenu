@@ -3,15 +3,20 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { prismaQueryInsights } from "@prisma/sqlcommenter-query-insights";
 
-const pool = new Pool({
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient;
+  pgPool: Pool;
+};
+
+// Pool im Singleton halten → verhindert Cold-Connections bei jedem Hot-Reload in Dev
+const pool = globalForPrisma.pgPool ?? new Pool({
   connectionString: process.env.DATABASE_URL!,
+  min: 1,   // Mindestens eine warme Verbindung offen halten
+  max: 5,   // Supabase Free Tier hat begrenzte Connections
+  idleTimeoutMillis: 30_000,
 });
 
-const pgAdapter = new PrismaPg(pool); // ✅ pg_adapter → pgAdapter (Konvention)
-
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient; // ✅ Typ-Fix: "|" entfernt
-};
+const pgAdapter = new PrismaPg(pool);
 
 // 🔥 LOCALHOST-ONLY LOGS!
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -71,6 +76,7 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
+  globalForPrisma.pgPool = pool;
 }
 /*import { PrismaClient } from "@prisma/client";
 

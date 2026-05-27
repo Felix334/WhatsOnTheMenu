@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import {prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import * as CryptoJS from "crypto-js";
 import { setup_logger } from "@/logger";
 import path from "path";
 import { unlink, access } from "fs/promises";
@@ -11,64 +10,78 @@ const logger = setup_logger();
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "Owner") {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
   }
 
   try {
-    const encryptedData = await req.json();
+    const body = await req.json();
     logger.info(`Request received: ${req.method} ${req.url}`);
 
-    if (!encryptedData.encrypted_data) {
-      return NextResponse.json({ error: "Missing encrypted_data field" }, { status: 400 });
+    const { restaurantId, dishes, categories, files } = body;
+
+    if (!restaurantId) {
+      return NextResponse.json({ error: "restaurantId fehlt" }, { status: 400 });
     }
 
-    const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-    if (!key) return NextResponse.json({ error: "Encryption key missing" }, { status: 500 });
+    const userID = session.user.id;
 
-    const decryptedUserId = CryptoJS.AES.decrypt(encryptedData.encrypted_user_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedRestaurantId = CryptoJS.AES.decrypt(encryptedData.encrypted_restaurant_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedData = CryptoJS.AES.decrypt(encryptedData.encrypted_data, key).toString(CryptoJS.enc.Utf8);
-    const decryptedApiKey = CryptoJS.AES.decrypt(encryptedData.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
-
-    if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return NextResponse.json({ error: "Decryption failed" }, { status: 400 });
-    }
-
-    const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
-    if (decryptedApiKey !== expectedApiKey) {
-      return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
-    }
-
-    const data = JSON.parse(decryptedData);
-
-    const user = await prisma.user.findUnique({ where: { id: decryptedUserId } });
-    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    const restaurant = await prisma.restaurant.findUnique({ where: { id: decryptedRestaurantId } });
-    if (!restaurant || restaurant.ownerId !== decryptedUserId) {
+    // Ownership check
+    const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+    if (!restaurant || restaurant.ownerId !== userID) {
       return NextResponse.json({ error: "Unauthorized or restaurant not found" }, { status: 403 });
     }
 
     // -----------------------------
-    // DELETE DB ITEMS
+    // DELETE DB ITEMS  (scoped to the verified restaurant)
     // -----------------------------
-    if (data.dishes && Array.isArray(data.dishes)) {
-      await prisma.dish.deleteMany({ where: { id: { in: data.dishes } } });
+    if (dishes && Array.isArray(dishes)) {
+      await prisma.dish.deleteMany({
+        where: {
+          id: { in: dishes },
+          // Only delete dishes that actually belong to this restaurant
+          category: {
+            categoryGroup: {
+              Menu: { restaurantId },
+            },
+          },
+        },
+      });
     }
 
-    if (data.categories && Array.isArray(data.categories)) {
+    if (categories && Array.isArray(categories)) {
       await prisma.$transaction(async (tx) => {
-        await tx.dish.deleteMany({ where: { categoryId: { in: data.categories } } });
-        await tx.category.deleteMany({ where: { id: { in: data.categories } } });
+        // Delete dishes scoped to the restaurant's categories
+        await tx.dish.deleteMany({
+          where: {
+            category: {
+              id: { in: categories },
+              categoryGroup: {
+                Menu: { restaurantId },
+              },
+            },
+          },
+        });
+        // Delete categories scoped to the restaurant
+        await tx.category.deleteMany({
+          where: {
+            id: { in: categories },
+            categoryGroup: {
+              Menu: { restaurantId },
+            },
+          },
+        });
       });
     }
 
     // -----------------------------
     // DELETE FILES FROM DISK
     // -----------------------------
-    if (data.files && Array.isArray(data.files)) {
-      for (const fileName of data.files) {
+    if (files && Array.isArray(files)) {
+      for (const fileName of files) {
         // security: prevent directory traversal
         if (fileName.includes("..") || fileName.includes("/")) continue;
 
@@ -77,7 +90,7 @@ export async function POST(req) {
           "public",
           "uploads",
           "Restaurant",
-          decryptedRestaurantId,
+          restaurantId,
           fileName
         );
 

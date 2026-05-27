@@ -43,12 +43,13 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    if (!(await authorize(req))) {
+    const token = await authorize(req);
+    if (!token) {
       return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { restaurant, locations, userID } = body;
+    const { restaurant, locations } = body;
 
     if (!restaurant?.id) {
       return NextResponse.json({ message: "Restaurant data is required" }, { status: 400 });
@@ -63,11 +64,14 @@ export async function POST(req) {
       });
 
       if (!existing) throw new Error("NOT_FOUND");
-      if (existing.ownerId !== userID) throw new Error("UNAUTHORIZED");
+      if (existing.ownerId !== token.id) throw new Error("UNAUTHORIZED");
 
       const restaurantData = Object.fromEntries(
-        Object.entries({ name: restaurant.name, parentCompany: restaurant.parentCompany })
-          .filter(([_, v]) => v !== undefined)
+        Object.entries({
+          name: restaurant.name,
+          parentCompany: restaurant.parentCompany,
+          openingHours: restaurant.openingHours,
+        }).filter(([_, v]) => v !== undefined)
       );
 
       const locationOps = (locations ?? []).map((location) => {
@@ -77,7 +81,7 @@ export async function POST(req) {
         );
         if (id) {
           return Object.keys(locationData).length > 0
-            ? tx.location.update({ where: { id }, data: locationData })
+            ? tx.location.update({ where: { id, restaurantId: restaurantID }, data: locationData })
             : null;
         }
         return tx.location.create({ data: { ...locationData, restaurantId: restaurantID } });

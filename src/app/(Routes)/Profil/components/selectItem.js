@@ -1,33 +1,33 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form"; // Removed unused useFieldArray
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
-import { FaCreativeCommonsNcJp, FaPen } from "react-icons/fa";
+import { FaPen } from "react-icons/fa";
 import { FaCircleInfo } from "react-icons/fa6";
 
-import CryptoJS from "crypto-js"; // Add this import for encryption
-
-import { menuSchema, itemSchema } from "./menuSchema";
+import { itemSchema } from "./menuSchema";
+import { ALLERGENS } from "@/lib/allergens";
 
 const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, category, restaurantId }) => {
-  // Add userID as prop (from parent/auth)
-  // State to toggle edit mode for fields (default false)
   const [editName, setEditName] = useState(false);
   const [editDescription, setEditDescription] = useState(false);
   const [editPrice, setEditPrice] = useState(false);
-  const [editImage, setEditImage] = useState(false); // Fixed typo
+  const [editImage, setEditImage] = useState(false);
 
-  // Initialize as object (not string) - sync with selectedItem
-  const [updatedItem, setUpdatedItem] = useState({});
+  // ── Allergen-State ─────────────────────────────────────────────────────────
+  const [selectedAllergens, setSelectedAllergens] = useState([]);
+  const [allergenSaving, setAllergenSaving] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(itemSchema),
@@ -35,80 +35,50 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       name: selectedItem?.name || "",
       description: selectedItem?.description || "",
       price: selectedItem?.price || 0,
-      Bild: "", // Assume string URL for now (not File); see notes below
+      Bild: "",
     },
   });
-  const { control, handleSubmit, reset, watch } = form; // watch for real-time form values
+  const { control, handleSubmit, reset, watch } = form;
 
   useEffect(() => {
     if (selectedItem) {
       reset({
         name: selectedItem.name || "",
         description: selectedItem.description || "",
-        price: selectedItem.price !== null && selectedItem.price !== undefined ? Number(selectedItem.price).toFixed(2) : "0.00",
-
-        Bild: selectedItem.img || "", // Assume img is URL
+        price: selectedItem.price !== null && selectedItem.price !== undefined
+          ? Number(selectedItem.price).toFixed(2)
+          : "0.00",
+        Bild: selectedItem.img || "",
       });
-      setUpdatedItem(selectedItem); // Sync initial state
+
+      // Vorhandene Allergene aus dem Item laden
+      const existing = (selectedItem.ingredients ?? [])
+        .filter((i) => i.isAllergen)
+        .map((i) => i.name);
+      setSelectedAllergens(existing);
     }
-    // Reset edit modes on item change
     setEditName(false);
     setEditDescription(false);
     setEditPrice(false);
     setEditImage(false);
   }, [selectedItem, reset]);
 
-  // Encryption function (fixed: stringify object, add IV, call properly)
-  const encryptObject = useCallback((userID, itemToEncrypt, encryptionKey) => {
-    if (!encryptionKey) throw new Error("Encryption key missing");
-
-    const iv = CryptoJS.lib.WordArray.random(16);
-    const ivBase64 = iv.toString(CryptoJS.enc.Base64);
-
-    // Encrypt userID (assume string)
-    const enc_userID = CryptoJS.AES.encrypt(userID, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-
-    // Encrypt item as JSON string (key fix: stringify the object)
-    const jsonString = JSON.stringify(itemToEncrypt);
-    const enc_data = CryptoJS.AES.encrypt(jsonString, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-
-    // Encrypt API key (insecure client-side; avoid if possible)
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY || "";
-    const enc_api_key = CryptoJS.AES.encrypt(apiKey, CryptoJS.enc.Utf8.parse(encryptionKey), { iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-
-    return {
-      userID: `${ivBase64}:${enc_userID.ciphertext.toString(CryptoJS.enc.Base64)}`,
-      data: `${ivBase64}:${enc_data.ciphertext.toString(CryptoJS.enc.Base64)}`,
-      key: `${ivBase64}:${enc_api_key.ciphertext.toString(CryptoJS.enc.Base64)}`,
-    };
-  }, []);
-
+  // ── Gericht speichern ──────────────────────────────────────────────────────
   const onSubmit = useCallback(
     async (data) => {
       if (!data || !selectedItem) {
-        window.alert("Keine Veränderung oder kein Item ausgewählt");
+        toast.warning("Kein Item ausgewählt oder keine Änderungen");
         return;
       }
 
-      console.log("Data-Ausgabe:", data);
-
-      // Build final updated item directly from form data + selectedItem (avoids state staleness)
       const finalUpdatedItem = {
         id: selectedItem.id,
         name: data.name || selectedItem.name,
         price: data.price != null ? data.price : selectedItem.price,
         description: data.description || selectedItem.description,
-        image: data.Bild || selectedItem.img, // For files: Upload first, set to URL (see notes)
+        image: data.Bild || selectedItem.img,
       };
 
-      // TODO: If Bild is a File, upload it separately before encryption
-      // Example: if (data.Bild && data.Bild instanceof File) {
-      //   const uploadResp = await fetch('/api/upload', { method: 'POST', body: formDataWithFile });
-      //   const { url } = await uploadResp.json();
-      //   finalUpdatedItem.image = url;
-      // }
-
-      // Format data as menu section for editData API
       const menuSectionData = [
         {
           type: "edditMenu",
@@ -119,216 +89,294 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
         },
       ];
 
-      const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || "";
-      if (!encryptionKey || !userID || !restaurantId) {
-        console.error("Missing encryption key, userID, or restaurantId");
-        window.alert("Configuration error - cannot submit");
+      if (!userID || !restaurantId) {
+        toast.error("Konfigurationsfehler – bitte Seite neu laden");
         return;
       }
 
-      // Encrypt the data
-      const enc_data = CryptoJS.AES.encrypt(JSON.stringify(menuSectionData), encryptionKey).toString();
-      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantId, encryptionKey).toString();
-      const encrypted_api_key = CryptoJS.AES.encrypt(process.env.NEXT_PUBLIC_API_KEY || "", encryptionKey).toString();
-      const encrypted_user_id = CryptoJS.AES.encrypt(userID, encryptionKey).toString();
+      // ── Optimistisch: UI sofort aktualisieren & Dialog schließen ──────────
+      setChangedItem(finalUpdatedItem);
+      onOpenChange(false);
+      reset();
+      setEditName(false);
+      setEditDescription(false);
+      setEditPrice(false);
+      setEditImage(false);
 
       try {
         const resp = await fetch("/api/user/profil/edditData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            encrypted_user_id,
-            encrypted_restaurant_id,
-            encrypted_data: enc_data,
-            encrypted_api_key,
-          }),
+          body: JSON.stringify({ restaurantId, data: menuSectionData }),
         });
-        console.log(resp);
 
         if (!resp.ok) {
           const errorData = await resp.json().catch(() => ({}));
           throw new Error(errorData.message || `API Error: ${resp.status}`);
         }
 
-        const result = await resp.json();
-        console.log("Success:", result);
-
-        // Update parent and reset
-        setChangedItem(finalUpdatedItem);
-        reset();
-        setUpdatedItem(finalUpdatedItem);
-        setEditName(false);
-        setEditDescription(false);
-        setEditPrice(false);
-        setEditImage(false);
-
-// Der Preis Speicher ist kaputt =>  12.50 wird zu 12.5, 12.00 => 12, aber 12.05 funktioniert
-// Es liegt an der Datenbank
-
-        console.log("Updated Data:", finalUpdatedItem);
-        window.alert("Erfolgreich aktualisiert!"); // Optional success alert
+        toast.success("Gericht erfolgreich aktualisiert!");
       } catch (error) {
-        console.error("Fetch/Encryption Error:", error);
-        window.alert("Ups etwas ist schief gelaufen! \nBitte versuchen sie es nochmal! \nFehler: " + error.message);
+        console.error("Fehler beim Speichern:", error);
+        // ── Rollback: Original-Item wiederherstellen ───────────────────────
+        setChangedItem(selectedItem);
+        toast.error("Fehler beim Speichern – Änderungen wurden zurückgesetzt: " + error.message);
       }
     },
-    [selectedItem, userID, restaurantId, category, setChangedItem, reset]
+    [selectedItem, userID, restaurantId, category, setChangedItem, reset, onOpenChange]
   );
 
-  const toggleEdit = (field) => {
-    switch (field) {
-      case "name":
-        setEditName((prev) => !prev);
-        break;
-      case "description":
-        setEditDescription((prev) => !prev);
-        break;
-      case "price":
-        setEditPrice((prev) => !prev);
-        break;
-      case "img":
-        setEditImage((prev) => !prev);
-        break;
-      default:
-        break;
+  // ── Allergene speichern ────────────────────────────────────────────────────
+  const saveAllergens = async () => {
+    if (!selectedItem?.id || !restaurantId) return;
+    setAllergenSaving(true);
+    try {
+      const resp = await fetch("/api/user/profil/updateAllergens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dishId: selectedItem.id,
+          restaurantId,
+          allergens: selectedAllergens,
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || "Fehler");
+      }
+
+      toast.success("Allergene gespeichert!");
+    } catch (err) {
+      toast.error("Fehler beim Speichern der Allergene: " + err.message);
+    } finally {
+      setAllergenSaving(false);
     }
   };
 
-  // Watch form values for real-time display (when not editing)
+  const toggleAllergen = (name) => {
+    setSelectedAllergens((prev) =>
+      prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name]
+    );
+  };
+
+  const toggleEdit = (field) => {
+    switch (field) {
+      case "name":        setEditName((p) => !p); break;
+      case "description": setEditDescription((p) => !p); break;
+      case "price":       setEditPrice((p) => !p); break;
+      case "img":         setEditImage((p) => !p); break;
+      default: break;
+    }
+  };
+
   const watchedValues = watch();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Speise bearbeiten:</DialogTitle>
-          <Tooltip>
-            <TooltipTrigger>
-              <FaCircleInfo />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="truncate whitespace-nowrap">Auf das Stift Symbol oder die Bezeichnung klicken um das Element bearbeiten zu können</p>
-            </TooltipContent>
-          </Tooltip>
+          <DialogTitle>Speise bearbeiten</DialogTitle>
+          <DialogDescription className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex items-center gap-1 cursor-help">
+                  <FaCircleInfo className="text-gray-400" />
+                  Auf das Stift-Symbol klicken um ein Feld zu bearbeiten
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                Felder können einzeln bearbeitet werden
+              </TooltipContent>
+            </Tooltip>
+          </DialogDescription>
         </DialogHeader>
-        <div className="mt-4">
+
+        <div className="mt-2">
           {selectedItem ? (
-            <Form {...form}>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("name")}>
-                        <FaPen />
-                        Name:
-                      </FormLabel>
-                      {editName ? (
-                        <FormControl>
-                          <Input type="text" placeholder="Name" {...field} />
-                        </FormControl>
-                      ) : (
-                        <div>{watchedValues.name || selectedItem.name || "-"}</div> // Use watched or fallback
-                      )}
-                      <FormMessage /> {/* Show Zod errors */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("description")}>
-                        <FaPen />
-                        Beschreibung:
-                      </FormLabel>
-                      {editDescription ? (
-                        <FormControl>
-                          <Textarea placeholder="Beschreibung" {...field} />
-                        </FormControl>
-                      ) : (
-                        <div>{watchedValues.description || selectedItem.description || "-"}</div>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("price")}>
-                        <FaPen />
-                        Preis:
-                      </FormLabel>
-                      {editPrice ? <Input type="text" inputMode="decimal" placeholder="z. B. 9.99" {...field} /> : <div>{Number(watchedValues.price ?? selectedItem.price ?? 0).toFixed(2)} €</div>}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={control}
-                  name="Bild"
-                  render={(
-                    { field: { onChange, value, ...field } } // Destructure to handle file
-                  ) => (
-                    <FormItem className="mb-6">
-                      <FormLabel onClick={() => toggleEdit("img")}>
-                        <FaPen />
-                        Bild:
-                      </FormLabel>
-                      {editImage ? (
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={async (e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
+            <>
+              {/* ── Basis-Daten ──────────────────────────────────────────── */}
+              <Form {...form}>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel
+                          onClick={() => toggleEdit("name")}
+                          className="flex items-center gap-1 cursor-pointer select-none"
+                        >
+                          <FaPen className="text-xs" /> Name
+                        </FormLabel>
+                        {editName ? (
+                          <FormControl>
+                            <Input type="text" placeholder="Name" {...field} />
+                          </FormControl>
+                        ) : (
+                          <div className="text-sm px-1">{watchedValues.name || selectedItem.name || "–"}</div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel
+                          onClick={() => toggleEdit("description")}
+                          className="flex items-center gap-1 cursor-pointer select-none"
+                        >
+                          <FaPen className="text-xs" /> Beschreibung
+                        </FormLabel>
+                        {editDescription ? (
+                          <FormControl>
+                            <Textarea placeholder="Beschreibung" {...field} />
+                          </FormControl>
+                        ) : (
+                          <div className="text-sm px-1">{watchedValues.description || selectedItem.description || "–"}</div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel
+                          onClick={() => toggleEdit("price")}
+                          className="flex items-center gap-1 cursor-pointer select-none"
+                        >
+                          <FaPen className="text-xs" /> Preis
+                        </FormLabel>
+                        {editPrice ? (
+                          <Input type="text" inputMode="decimal" placeholder="z. B. 9.99" {...field} />
+                        ) : (
+                          <div className="text-sm px-1">
+                            {Number(watchedValues.price ?? selectedItem.price ?? 0).toFixed(2)} €
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={control}
+                    name="Bild"
+                    render={({ field: { onChange, ...field } }) => (
+                      <FormItem>
+                        <FormLabel
+                          onClick={() => toggleEdit("img")}
+                          className="flex items-center gap-1 cursor-pointer select-none"
+                        >
+                          <FaPen className="text-xs" /> Bild
+                        </FormLabel>
+                        {editImage ? (
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
                                 try {
                                   const formData = new FormData();
                                   formData.append("image", file);
                                   formData.append("restaurantID", restaurantId);
                                   formData.append("userID", userID);
-
                                   const response = await fetch("/api/user/profil/uploadImg", {
                                     method: "POST",
                                     body: formData,
                                   });
-
                                   if (response.ok) {
                                     const result = await response.json();
                                     onChange(result.path);
                                   } else {
-                                    console.error("Upload failed");
-                                    alert("Bild-Upload fehlgeschlagen");
+                                    toast.error("Bild-Upload fehlgeschlagen");
                                   }
                                 } catch (error) {
-                                  console.error("Upload error:", error);
-                                  alert("Fehler beim Hochladen des Bildes");
+                                  toast.error("Fehler beim Hochladen: " + error.message);
                                 }
-                              }
-                            }}
-                            {...field}
-                          />
-                        </FormControl>
-                      ) : (
-                        <div>{selectedItem.img || "-"}</div> // Show URL or placeholder
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Aktualisieren
+                              }}
+                              {...field}
+                            />
+                          </FormControl>
+                        ) : (
+                          <div className="text-sm px-1 text-gray-500">
+                            {selectedItem.imageUrl ? "Bild vorhanden" : "Kein Bild"}
+                          </div>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    Gericht aktualisieren
+                  </Button>
+                </form>
+              </Form>
+
+              {/* ── Allergen-Editor ──────────────────────────────────────── */}
+              <Separator className="my-4" />
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-gray-700">
+                  🌿 Allergene (EU-Kennzeichnungspflicht)
+                </h4>
+
+                {/* Ausgewählte Allergene als Badges anzeigen */}
+                {selectedAllergens.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {selectedAllergens.map((name) => {
+                      const a = ALLERGENS.find((x) => x.name === name);
+                      return (
+                        <Badge key={name} variant="secondary" className="text-xs">
+                          {a ? `(${a.id}) ` : ""}{name}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                  {ALLERGENS.map((allergen) => (
+                    <div key={allergen.id} className="flex items-start gap-2">
+                      <Checkbox
+                        id={`allergen-${allergen.id}`}
+                        checked={selectedAllergens.includes(allergen.name)}
+                        onCheckedChange={() => toggleAllergen(allergen.name)}
+                        className="mt-0.5"
+                      />
+                      <label
+                        htmlFor={`allergen-${allergen.id}`}
+                        className="text-xs cursor-pointer leading-tight"
+                      >
+                        <span className="font-medium">({allergen.id}) {allergen.name}</span>
+                        {allergen.description && (
+                          <span className="block text-gray-400">{allergen.description}</span>
+                        )}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={saveAllergens}
+                  disabled={allergenSaving}
+                  className="w-full"
+                >
+                  {allergenSaving ? "Speichert..." : "Allergene speichern"}
                 </Button>
-              </form>
-            </Form>
+              </div>
+            </>
           ) : (
-            <div>No item selected.</div>
+            <div className="text-gray-500 text-sm">Kein Item ausgewählt.</div>
           )}
         </div>
       </DialogContent>

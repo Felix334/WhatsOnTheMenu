@@ -30,6 +30,7 @@ export const config = {
   matcher: [
     "/Admin/:path*",
     "/api/Admin/:path*",
+    "/api/restaurant/Admin/:path*",   // ← fehlte: Restaurant-Genehmigungs-Routen
     "/Profil/:path*",
   ],
 };

@@ -72,34 +72,46 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-20">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-20">
       <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-center mb-12">Wähle deinen Tarif</h1>
-        
+        {/* Hero */}
+        <div className="text-center mb-14">
+          <p className="text-amber-600 uppercase tracking-widest text-xs font-semibold mb-3">Preise</p>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-gray-900 mb-4">Wähle deinen Tarif</h1>
+          <p className="text-gray-500 max-w-md mx-auto">Starte kostenlos und wechsle jederzeit. Keine versteckten Kosten.</p>
+        </div>
+
         {error && (
-          <div className="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error} 
-            <Button variant="ghost" size="sm" onClick={() => setError('')} className="ml-2">×</Button>
+          <div className="mb-8 p-4 bg-red-100 border border-red-300 text-red-700 rounded-xl flex items-center justify-between">
+            <span>{error}</span>
+            <Button variant="ghost" size="sm" onClick={() => setError('')}>×</Button>
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           {/* Free Tier */}
-          <Card className="border-2 border-gray-200 hover:shadow-xl transition-all">
-            <CardHeader>
-              <CardTitle className="text-2xl">Free</CardTitle>
-              <CardDescription>Perfekt zum Starten</CardDescription>
+          <Card className="border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Kostenlos</p>
+              <CardTitle className="text-2xl font-bold">Free</CardTitle>
+              <CardDescription>Perfekt zum Ausprobieren</CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <div className="text-4xl font-bold text-gray-900 mb-4">€0</div>
-              <ul className="text-left space-y-2 mb-8">
-                <li>✓ 1 Restaurant</li>
-                <li>✓ Basis Features</li>
-                <li>✓ 50 Gerichte Limit</li>
+            <CardContent>
+              <div className="mb-6">
+                <span className="text-5xl font-bold text-gray-900">€0</span>
+                <span className="text-gray-400 ml-1">/Monat</span>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm text-gray-600">
+                {["1 Restaurant", "Digitale Speisekarte", "50 Gerichte Limit", "QR-Code Generator"].map(f => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+                    {f}
+                  </li>
+                ))}
               </ul>
-              <Button 
-                variant="outline" 
-                className="w-full" 
+              <Button
+                variant="outline"
+                className="w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"
                 onClick={() => router.push("/(Routes)/ErstelleRestaurantAccount/FreeTier")}
               >
                 Jetzt starten
@@ -107,28 +119,34 @@ export default function PricingPage() {
             </CardContent>
           </Card>
 
-          {/* Pro Tier */}
-          <Card className="border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 hover:shadow-2xl transition-all relative md:col-span-1">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Empfohlen</div>
-            <CardHeader>
-              <CardTitle className="text-2xl">Pro</CardTitle>
+          {/* Pro Tier — hervorgehoben */}
+          <Card className="border-2 border-amber-500 bg-white hover:shadow-2xl transition-all duration-300 relative scale-105 shadow-xl">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">
+              ⭐ Empfohlen
+            </div>
+            <CardHeader className="pb-2 pt-7">
+              <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 mb-1">Beliebteste Wahl</p>
+              <CardTitle className="text-2xl font-bold">Pro</CardTitle>
               <CardDescription>Unbegrenzte Möglichkeiten</CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-4">
-                €19<small className="text-lg">/Monat</small>
+            <CardContent>
+              <div className="mb-6">
+                <span className="text-5xl font-bold text-amber-600">€19</span>
+                <span className="text-gray-400 ml-1">/Monat</span>
               </div>
-              <ul className="text-left space-y-2 mb-8">
-                <li>✓ Unbegrenzte Gerichte</li>
-                <li>✓ Premium Farben</li>
-                <li>✓ Mehreren Standorte</li>
-                <li>✓ Priorisierter Support</li>
+              <ul className="space-y-3 mb-8 text-sm text-gray-600">
+                {["Unbegrenzte Gerichte", "Premium Farben & Fonts", "Mehrere Standorte", "Allergen-Verwaltung", "Priorisierter Support"].map(f => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+                    {f}
+                  </li>
+                ))}
               </ul>
               <Dialog open={showProForm} onOpenChange={setShowProForm}>
                 <DialogTrigger asChild>
-                  <Button 
-                    size="lg" 
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow"
                   >
                     Jetzt Pro abonnieren
                   </Button>
@@ -214,22 +232,28 @@ export default function PricingPage() {
           </Card>
 
           {/* Premium Tier */}
-          <Card className="border-2 border-purple-500 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-2xl transition-all">
-            <CardHeader>
-              <CardTitle className="text-2xl">Premium</CardTitle>
-              <CardDescription>Maximale Features</CardDescription>
+          <Card className="border border-orange-200 bg-white hover:shadow-lg transition-all duration-300">
+            <CardHeader className="pb-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-orange-400 mb-1">Enterprise</p>
+              <CardTitle className="text-2xl font-bold">Premium</CardTitle>
+              <CardDescription>Maximale Features & Support</CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-4">€14.99<small className="text-lg">/Monat</small></div>
-              <ul className="text-left space-y-2 mb-8">
-                <li>✓ Alles aus Pro +</li>
-                <li>✓ 24/7 Premium Support</li>
-                <li>✓ Marketing Tools</li>
-                <li>✓ Analytics</li>
+            <CardContent>
+              <div className="mb-6">
+                <span className="text-5xl font-bold text-gray-900">€14.99</span>
+                <span className="text-gray-400 ml-1">/Monat</span>
+              </div>
+              <ul className="space-y-3 mb-8 text-sm text-gray-600">
+                {["Alles aus Pro +", "24/7 Premium Support", "Marketing Tools", "Analytics Dashboard"].map(f => (
+                  <li key={f} className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+                    {f}
+                  </li>
+                ))}
               </ul>
               <Dialog open={showPremiumForm} onOpenChange={setShowPremiumForm}>
                 <DialogTrigger asChild>
-                  <Button size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                  <Button size="lg" variant="outline" className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400">
                     Jetzt Premium abonnieren
                   </Button>
                 </DialogTrigger>

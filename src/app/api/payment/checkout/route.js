@@ -63,7 +63,7 @@ export async function POST(request) {
     `${baseUrl}/pricing/success?session_id={CHECKOUT_SESSION_ID}`;
 
   const cancelUrl =
-    `${baseUrl}/pricing/cancel`;
+    `${baseUrl}/pricing/cancel?cancelled=true`;
 
   // ---------------------------
   // Checkout Session erstellen

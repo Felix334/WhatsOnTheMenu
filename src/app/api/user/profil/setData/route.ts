@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
-import * as CryptoJS from "crypto-js";
 import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -16,13 +15,6 @@ type MenuWithRelations = PrismaMenu & {
   categoryGroup: CategoryGroupWithRelations[];
 };
 
-interface EncryptedData {
-  encrypted_user_id: string;
-  encrypted_restaurant_id: string;
-  encrypted_data: string;
-  encrypted_api_key: string;
-}
-
 interface MenuSectionItem {
   id?: string;
   name: string;
@@ -34,30 +26,12 @@ interface MenuSectionItem {
 interface MenuSectionEntry {
   type: "menuSection";
   section: {
-    categoryGroup: string;   // z.B. "Frühstück"
-    title: string;           // z.B. "Müsli"
+    categoryGroup: string;
+    title: string;
     description?: string;
     position?: number;
     items?: MenuSectionItem[];
   };
-}
-
-type SuccessResponse = {
-  status: number;
-  userID: string;
-  restaurantId: string;
-  data: string;
-  apiKey: string;
-};
-
-type ErrorResponse = { error: string; status: number };
-type DecryptResult = SuccessResponse | ErrorResponse | null;
-
-function isSuccess(r: DecryptResult): r is SuccessResponse {
-  return !!r && "userID" in r;
-}
-function isError(r: DecryptResult): r is ErrorResponse {
-  return !!r && "error" in r;
 }
 
 // ─── Hilfsfunktionen ─────────────────────────────────────────────────────────
@@ -84,53 +58,36 @@ function parsePrice(raw: unknown): number {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "Owner") {
+    return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
   }
 
   try {
-    const encryptedData: EncryptedData | null = await req.json().catch(() => null);
-    if (!encryptedData) {
+    const body = await req.json().catch(() => null);
+    if (!body) {
       return NextResponse.json({ message: "Keine Daten empfangen" }, { status: 400 });
     }
 
-    const decryptResult = await decryption(encryptedData);
-    if (isError(decryptResult)) {
-      return NextResponse.json({ message: decryptResult.error }, { status: decryptResult.status });
-    }
-    if (!isSuccess(decryptResult)) {
-      return NextResponse.json({ message: "Unbekannter Entschlüsselungsfehler" }, { status: 500 });
+    const { restaurantId, data: rawData } = body;
+
+    if (!restaurantId) {
+      return NextResponse.json({ message: "restaurantId fehlt" }, { status: 400 });
     }
 
-    const { userID, restaurantId, data: decryptedDataString, apiKey } = decryptResult;
-    console.log("Data-Check1:", decryptedDataString);
-
-    // ── API-Key prüfen ────────────────────────────────────────────────────
-    const expectedApiKey = process.env.NEXT_PUBLIC_API_KEY;
-    if (!expectedApiKey) {
-      return NextResponse.json({ message: "Serverkonfiguration fehlt (API_KEY)" }, { status: 500 });
-    }
-    if (apiKey !== expectedApiKey) {
-      return NextResponse.json({ message: "Ungültiger API-Schlüssel" }, { status: 401 });
-    }
-
-    // ── JSON parsen ───────────────────────────────────────────────────────
-    let parsedData: MenuSectionEntry[];
-    try {
-      const raw = JSON.parse(decryptedDataString);
-      if (!Array.isArray(raw)) {
-        return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
-      }
-      // Nur menuSection-Einträge durchlassen
-      parsedData = (raw as any[]).filter((e) => e?.type === "menuSection") as MenuSectionEntry[];
-      console.log("Datenblock-Check2:", parsedData);
-    } catch {
-      return NextResponse.json({ message: "Ungültiges JSON im entschlüsselten Feld" }, { status: 400 });
-    }
+    // ── Daten normalisieren ───────────────────────────────────────────────
+    const raw = Array.isArray(rawData) ? rawData : [rawData];
+    // Nur menuSection-Einträge durchlassen
+    const parsedData: MenuSectionEntry[] = (raw as any[]).filter((e) => e?.type === "menuSection");
+    console.log("Datenblock-Check:", parsedData);
 
     if (parsedData.length === 0) {
       return NextResponse.json({ message: "Keine menuSection-Einträge gefunden" }, { status: 400 });
     }
+
+    const userID = session.user.id;
 
     // ── Benutzer & Restaurant laden ───────────────────────────────────────
     const [user, restaurant] = await Promise.all([
@@ -313,34 +270,5 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Error in POST handler:", err);
     return NextResponse.json({ message: "Serverfehler", error: err?.message ?? err }, { status: 500 });
-  }
-}
-
-// ─── Decrypt ─────────────────────────────────────────────────────────────────
-
-async function decryption(data: EncryptedData): Promise<DecryptResult> {
-  const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
-  if (!key) return { error: "Encryption key missing", status: 500 };
-
-  try {
-    const decryptedUserId = CryptoJS.AES.decrypt(data.encrypted_user_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedRestaurantId = CryptoJS.AES.decrypt(data.encrypted_restaurant_id, key).toString(CryptoJS.enc.Utf8);
-    const decryptedData = CryptoJS.AES.decrypt(data.encrypted_data, key).toString(CryptoJS.enc.Utf8);
-    const decryptedApiKey = CryptoJS.AES.decrypt(data.encrypted_api_key, key).toString(CryptoJS.enc.Utf8);
-
-    if (!decryptedUserId || !decryptedRestaurantId || !decryptedData || !decryptedApiKey) {
-      return { error: "Entschlüsselung fehlgeschlagen (leere Werte)", status: 400 };
-    }
-
-    return {
-      userID: decryptedUserId,
-      restaurantId: decryptedRestaurantId,
-      data: decryptedData,
-      apiKey: decryptedApiKey,
-      status: 200,
-    };
-  } catch (e) {
-    console.error("Decryption error:", e);
-    return { error: "Decryption failed", status: 400 };
   }
 }

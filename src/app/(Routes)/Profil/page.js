@@ -7,7 +7,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import * as CryptoJS from "crypto-js";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-import { FaPen, FaTrash, FaInfo } from "react-icons/fa";
+import { toast } from "sonner";
+import { FaPen, FaTrash } from "react-icons/fa";
+import { CheckCircle, XCircle } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import { menuSchema, itemSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
@@ -188,7 +190,7 @@ export default function PageBuilder() {
                   image: result.path,
                 };
               } else {
-                alert(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
+                toast.error(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
               }
             } catch (error) {
               console.error(error);
@@ -207,17 +209,9 @@ export default function PageBuilder() {
 
   const submitData = async () => {
     const restaurantID = serverData.userData.restaurant.id;
-    const api_key = process.env.NEXT_PUBLIC_API_KEY;
-    console.log("API-KEY Abfrage:", api_key);
-    console.log(`!Vor dem Verschlüsseln: UserID: ${userID}, Daten: ${components}, RestaurantID: ${restaurantID}, API_KEY: ${api_key}`);
+    console.log(`Vor dem Senden: UserID: ${userID}, RestaurantID: ${restaurantID}`);
     console.log("Deleted Dishes:", deletedDishes);
     console.log("Deleted Categories:", deletedCategories);
-
-    const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, components, restaurantID, api_key);
-
-    console.log("!Vor dem Senden (Encrypted API Key):", encrypted_api_key);
-    console.log("!Vor dem Senden (Encrypted User ID):", encrypted_user_id);
-    console.log("!Encrypted Data vor dem Senden:", enc_data);
 
     setIsLoading(true);
 
@@ -227,38 +221,27 @@ export default function PageBuilder() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          encrypted_user_id,
-          encrypted_restaurant_id,
-          encrypted_data: enc_data,
-          encrypted_api_key,
+          restaurantId: restaurantID,
+          data: components,
         }),
       });
 
-      // JSON parsen, um die Fehlernachricht zu erhalten
       const resData = await response.json();
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
       }
+
       // Then, handle deletions if any
       console.log(`Gerichte löschen ${deletedDishes}, Kategorien löschen: ${deletedCategories}, Gruppen löschen: ${deleteCategoryGroup}`);
       if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0) {
-        const deleteData = {
-          dishes: deletedDishesRef.current,
-          categories: deletedCategoriesRef.current,
-        };
-
-        console.log(`Vor dem Verschlüsseln(Delete-Data): userID:${userID}, Data:${deleteData}, RestaurantID:${restaurantID}, API-KEY:${api_key}`);
-        const { enc_data: enc_delete_data, encrypted_restaurant_id: enc_rest_id, encrypted_api_key: enc_api_key, encrypted_user_id: enc_user_id } = await encrypt_data(userID, deleteData, restaurantID, api_key);
-        console.log(`Nach dem Verschlüsseln: Data: ${enc_delete_data}, RestaurantID: ${enc_rest_id}, User-ID:${enc_user_id}, API-KEY:${enc_api_key}`);
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            encrypted_user_id: enc_user_id,
-            encrypted_restaurant_id: enc_rest_id,
-            encrypted_data: enc_delete_data,
-            encrypted_api_key: enc_api_key,
+            restaurantId: restaurantID,
+            dishes: deletedDishesRef.current,
+            categories: deletedCategoriesRef.current,
           }),
         });
 
@@ -275,37 +258,13 @@ export default function PageBuilder() {
         console.log("No deletions to process");
       }
 
-      alert("Data saved and deletions processed successfully!");
-      setSelectedFiles({}); // Clear selected files after successful save
+      toast.success("Daten erfolgreich gespeichert!");
+      setSelectedFiles({});
     } catch (err) {
       console.error("Failed to save data:", err);
-      alert(`Failed to save data: ${err.message}`);
+      toast.error("Fehler beim Speichern: " + err.message);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const encrypt_data = async (userID, components, restaurantID, api_key) => {
-    console.log("components before stringify (function encrypt_data):", components, typeof components);
-    console.log("Vor dem Verschlüsseln: (userID)", userID);
-    console.log("Vor dem Verschlüsseln: (api_key)", api_key);
-    console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
-    const data = JSON.stringify(components);
-    try {
-      const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
-      return {
-        enc_data,
-        encrypted_restaurant_id,
-        encrypted_api_key,
-        encrypted_user_id,
-      };
-    } catch (error) {
-      console.log(error);
-      throw error;
     }
   };
 
@@ -532,15 +491,55 @@ export default function PageBuilder() {
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
+
+    // Optimistisches Stock-State: { [dishId]: "isAvailable" | "outOfStock" }
+    const [stockMap, setStockMap] = useState(
+      () => Object.fromEntries((menuItems ?? []).map((d) => [d.id, d.stock ?? "isAvailable"]))
+    );
+
+    const toggleAvailability = async (e, dishId) => {
+      e.stopPropagation();
+      const current = stockMap[dishId] ?? "isAvailable";
+      const next = current === "isAvailable" ? "outOfStock" : "isAvailable";
+
+      // Optimistisch aktualisieren
+      setStockMap((prev) => ({ ...prev, [dishId]: next }));
+
+      try {
+        const resp = await fetch("/api/user/profil/updateDishAvailability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dishId,
+            restaurantId: serverData?.userData?.restaurant?.id,
+            stock: next,
+          }),
+        });
+        if (!resp.ok) throw new Error("Fehler");
+        toast.success(next === "isAvailable" ? "Gericht als verfügbar markiert" : "Gericht als nicht verfügbar markiert");
+      } catch {
+        // Zurücksetzen bei Fehler
+        setStockMap((prev) => ({ ...prev, [dishId]: current }));
+        toast.error("Status konnte nicht geändert werden");
+      }
+    };
     const [itemData, setItemData] = useState({
       id: "",
       name: "",
       price: 0,
       description: "",
     });
-    const [changedItems, setChangedItems] = useState([]);
+    // Optimistischer Item-Cache: { [dishId]: updatedItem }
+    const [changedItems, setChangedItems] = useState({});
+    // Merge: lokale Änderungen haben Vorrang vor serverData
+    const displayItems = (menuItems ?? []).map(item =>
+      changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item
+    );
     const [changedCategories, setChangedCategories] = useState([]);
     const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
+    const [pendingDeleteDishId, setPendingDeleteDishId] = useState(null);
+    const [confirmDeleteCategory, setConfirmDeleteCategory] = useState(false);
+
     const [edditCategoryData, setEdditCategoryData] = useState([
       {
         color: "",
@@ -550,20 +549,14 @@ export default function PageBuilder() {
       },
     ]);
 
-    const openMenuItemEddit = (id, name, price, description) => {
-      var newEddit = {
-        id: id,
-        name: name,
-        price: price,
-        description: description,
-      };
-      setSelectedItem(newEddit);
+    const openMenuItemEddit = (item) => {
+      setSelectedItem(item); // vollständiges Item inkl. ingredients für Allergen-Dialog
       setItemData((prev) => ({
         ...prev,
-        id: id,
-        name: name,
-        price: price,
-        description: description,
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        description: item.description,
       }));
       setOpenItem(true);
     };
@@ -573,20 +566,12 @@ export default function PageBuilder() {
     };
 
     const deleteDish = (dishId) => {
-      if (window.confirm("...")) {
-        updateDeletedDishes(dishId);
-      }
+      setPendingDeleteDishId(dishId);
     };
 
     const deleteCategory = () => {
-      if (window.confirm("...")) {
-        updateDeletedCategories(categoryId);
-      }
+      setConfirmDeleteCategory(true);
     };
-
-    if (changedItems) {
-      console.log("Changes", changedItems);
-    }
 
     return (
       <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgColor}`}>
@@ -621,7 +606,7 @@ export default function PageBuilder() {
             </TableHeader>
 
             <TableBody className="">
-              {menuItems?.map((item, index) => (
+              {displayItems.map((item, index) => (
                 <React.Fragment key={index}>
                   <TableRow
                     className={`
@@ -631,13 +616,13 @@ export default function PageBuilder() {
                     onClick={() => toggleExpand(index)}
                   >
                     <TableCell className="align-middle">
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         <Button
                           size="icon"
                           variant="secondary"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openMenuItemEddit(item.id, item.name, item.price, item.description);
+                            openMenuItemEddit(item);
                           }}
                         >
                           <FaPen />
@@ -653,13 +638,29 @@ export default function PageBuilder() {
                         >
                           <FaTrash />
                         </Button>
+
+                        {/* Verfügbarkeits-Toggle */}
+                        <Button
+                          size="icon"
+                          variant="outline"
+                          title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"}
+                          onClick={(e) => toggleAvailability(e, item.id)}
+                          className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}
+                        >
+                          {stockMap[item.id] === "outOfStock"
+                            ? <XCircle className="size-4" />
+                            : <CheckCircle className="size-4" />}
+                        </Button>
                       </div>
                     </TableCell>
 
                     <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
                       <div className="flex flex-col">
-                        <span className="font-serif truncate">{item.name}</span>
-                        {item.description && <span className="text-sm text-gray-500 break-words">{item.description}</span>}
+                        <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
+                        {item.description && <span className="text-sm text-gray-500">{item.description}</span>}
+                        {stockMap[item.id] === "outOfStock" && (
+                          <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{Number(item.price).toFixed(2)}€</TableCell>
@@ -678,7 +679,41 @@ export default function PageBuilder() {
           </Table>
         </div>
 
-        <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={setChangedItems} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
+        <SelectItem
+          open={openItem}
+          onOpenChange={setOpenItem}
+          selectedItem={selectedItem}
+          setChangedItem={(item) => setChangedItems(prev => ({ ...prev, [item.id]: item }))}
+          category={title}
+          restaurantId={serverData?.userData?.restaurant?.id}
+          userID={userID}
+        />
+
+        {/* Bestätigungs-Dialog: Gericht löschen */}
+        <ConfirmDialog
+          open={pendingDeleteDishId !== null}
+          onOpenChange={(open) => !open && setPendingDeleteDishId(null)}
+          title="Gericht löschen?"
+          description="Das Gericht wird beim nächsten Speichern entfernt."
+          confirmLabel="Löschen"
+          onConfirm={() => {
+            updateDeletedDishes(pendingDeleteDishId);
+            setPendingDeleteDishId(null);
+          }}
+        />
+
+        {/* Bestätigungs-Dialog: Kategorie löschen */}
+        <ConfirmDialog
+          open={confirmDeleteCategory}
+          onOpenChange={setConfirmDeleteCategory}
+          title="Kategorie löschen?"
+          description="Die gesamte Kategorie und alle Gerichte darin werden entfernt."
+          confirmLabel="Kategorie löschen"
+          onConfirm={() => {
+            updateDeletedCategories(categoryId);
+            setConfirmDeleteCategory(false);
+          }}
+        />
 
         <EdditCategoryMenu
           open={openCategoryMenu}

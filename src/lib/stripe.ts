@@ -1,8 +1,11 @@
 import Stripe from "stripe";
 
+// In production: use STRIPE_SECRET_KEY (live key, starts with sk_live_)
+// In development: falls back to STRIPE_SECRET_KEY_TEST (starts with sk_test_)
 const secretKey =
-  process.env.STRIPE_SECRET_KEY_TEST ??
-  process.env.STRIPE_SECRET_KEY;
+  process.env.NODE_ENV === "production"
+    ? process.env.STRIPE_SECRET_KEY
+    : (process.env.STRIPE_SECRET_KEY_TEST ?? process.env.STRIPE_SECRET_KEY);
 
 if (!secretKey) {
   throw new Error("Missing Stripe secret key");
@@ -18,7 +21,7 @@ if (!webhookSecret) {
 
 export const PRICE_IDS = {
   pro: process.env.STRIPE_PRICE_PRO,
-  premium: process.env.STRIPE_PREMIUM_PRICE_ID,
+  premium: process.env.STRIPE_PRICE_PREMIUM,
 } as const;
 
 /**
@@ -38,15 +41,19 @@ export function getPriceId(tier: string): string | null {
 }
 
 /**
- * Maps internal tier naming
+ * Maps Stripe tier names (e.g. "pro", "premium") to internal subscription enum values.
+ * IMPORTANT: input is always lowercased before lookup.
  */
 export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" | "Individuell" {
   const normalized = tier.toLowerCase();
 
   const TIER_MAP: Record<string, "FreeTier" | "Professional" | "Individuell"> = {
-    FreeTier: "FreeTier",
-    Professional: "Professional",
-    Individuell: "Individuell",
+    free:         "FreeTier",
+    freetier:     "FreeTier",
+    pro:          "Professional",
+    professional: "Professional",
+    premium:      "Individuell",
+    individuell:  "Individuell",
   };
 
   return TIER_MAP[normalized] ?? "Professional";

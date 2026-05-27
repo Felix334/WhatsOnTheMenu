@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import addressSchema from "./Schema/adressSchema";
 import FontSelector from "./fontList";
+import { OpeningHoursEditor } from "./openingHours";
 
 /* ===================== OPTION MENU ===================== */
 
@@ -66,7 +69,10 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
       setMenuData(updated.data);
       setNewBgColor(editedBgColor);
       setIsEditingMenu(false);
-      location.reload()
+      toast.success("Design gespeichert!");
+      location.reload();
+    } else {
+      toast.error("Fehler beim Speichern des Designs");
     }
   };
 
@@ -282,6 +288,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
   const [originalRestaurant, setOriginalRestaurant] = useState(null);
   const [originalLocations, setOriginalLocations] = useState([]);
   const [errors, setErrors] = useState({});
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   useEffect(() => {
     if (isEditing && restaurant) {
@@ -317,19 +324,17 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
     });
   };
 
-  const deleteRestaurant = async () => {
-    console.log("Löschen");
-    const answ = window.confirm("Möchten sie ihren Account wirklich löschen?\nGelöschte Daten können nicht wieder hergestellt werden!");
-    if (answ === true) {
-      console.log("Lösche Daten");
-      const resp = await fetch(`/api/deleteAccount/${userID}`, {
-        method: "DELETE",
-      });
-      if (!resp.ok) {
-        window.alert("Account erfolgreich gelöscht!");
-      }
+  const deleteRestaurant = () => {
+    setConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setConfirmDeleteOpen(false);
+    const resp = await fetch(`/api/deleteAccount/${userID}`, { method: "DELETE" });
+    if (resp.ok) {
+      toast.success("Account erfolgreich gelöscht!");
     } else {
-      console.log("Löschvorgang abgebrochen");
+      toast.error("Fehler beim Löschen des Accounts");
     }
   };
 
@@ -487,11 +492,27 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
           QR-Code erstellen
         </Link>
       </Button>
+      {/* ── Öffnungszeiten ─────────────────────────────────────────────────── */}
+      <OpeningHoursEditor
+        restaurantId={restaurant?.id}
+        userID={userID}
+        initialHours={restaurant?.openingHours ?? null}
+      />
+
       <div>
-        <Button variant="destructive" onClick={() => deleteRestaurant()}>
+        <Button variant="destructive" onClick={deleteRestaurant}>
           Account löschen
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Account wirklich löschen?"
+        description="Gelöschte Daten können nicht wiederhergestellt werden!"
+        confirmLabel="Endgültig löschen"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
