@@ -446,9 +446,6 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>Bis zu 200 Gerichte
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bild zu jedem Gericht
-                      </li>
-                      <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Premium Templates
                       </li>
                       <li className="flex items-center">

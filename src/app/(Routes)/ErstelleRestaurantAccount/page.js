@@ -34,7 +34,6 @@ const TIERS = [
       "Bis zu 200 Gerichte",
       "Premium Farben & Fonts",
       "Mehrere Standorte",
-      "Allergen-Verwaltung",
     ],
     href: "/ErstelleRestaurantAccount/Professional",
     cta: "Pro abonnieren",
@@ -50,7 +49,8 @@ const TIERS = [
     period: "/Monat",
     description: "Maximale Features & Support",
     features: [
-      "Alles aus Pro +",
+      "Bis zu 15 Kategorien",
+      "Bis zu 100 Gerichte",
       "24/7 Premium Support",
       "Marketing Tools",
       "Analytics Dashboard",

@@ -84,4 +84,7 @@ PROXMOX => als alternative zu Docker
 
 => Session validierung noch nicht sicher genug
 
+=> Wenn der Kunde bereits ein höheres(oder gleichwertiges Abbo hat) wird dieses Abbo als entweder "In Nutzung" oder
+als "Ein höheres Abbo wird bereits genutzt" angezeigt
+
 => Doppelter Stripe Webhook
