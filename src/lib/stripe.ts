@@ -1,7 +1,5 @@
 import Stripe from "stripe";
 
-// In production: use STRIPE_SECRET_KEY (live key, starts with sk_live_)
-// In development: falls back to STRIPE_SECRET_KEY_TEST (starts with sk_test_)
 const secretKey =
   process.env.NODE_ENV === "production"
     ? process.env.STRIPE_SECRET_KEY
@@ -11,6 +9,7 @@ if (!secretKey) {
   throw new Error("Missing Stripe secret key");
 }
 
+export const stripe = new Stripe(secretKey);
 
 export const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
