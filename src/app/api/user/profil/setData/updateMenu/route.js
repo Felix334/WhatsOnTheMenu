@@ -41,14 +41,14 @@ export async function POST(req) {
     if (!token || token.role !== "Owner" || !session) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
-    const { bgColor, font, restaurantID } = await req.json();
+    const { bgColor, font, description, restaurantID } = await req.json();
 
     if (!restaurantID) {
       return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
     }
 
-    if (!bgColor || !font) {
-      return NextResponse.json({ message: "bgColor and font are required" }, { status: 400 });
+    if (!bgColor && !font && description === undefined) {
+      return NextResponse.json({ message: "At least one field (bgColor, font, description) is required" }, { status: 400 });
     }
 
     const restaurant = await prisma.restaurant.findUnique({
@@ -64,9 +64,13 @@ export async function POST(req) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
 
+    const updateData = Object.fromEntries(
+      Object.entries({ bgColor, font, description }).filter(([_, v]) => v !== undefined)
+    );
+
     const updatedMenu = await prisma.menu.updateMany({
       where: { restaurantId: restaurantID },
-      data: { bgColor, font },
+      data: updateData,
     });
 
     if (updatedMenu.count === 0) {

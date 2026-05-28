@@ -6,6 +6,19 @@ import Image from "next/image";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
+// ─── Hero-Farben ──────────────────────────────────────────────────────────────
+const HERO_COLOR_PRESETS = [
+  { key: "amber",  gradient: "from-amber-700 via-orange-600 to-amber-600" },
+  { key: "green",  gradient: "from-emerald-700 via-green-600 to-teal-600" },
+  { key: "blue",   gradient: "from-blue-700 via-indigo-600 to-blue-600" },
+  { key: "red",    gradient: "from-red-700 via-rose-600 to-red-500" },
+  { key: "purple", gradient: "from-purple-700 via-violet-600 to-purple-500" },
+  { key: "dark",   gradient: "from-gray-900 via-gray-800 to-gray-700" },
+];
+const HERO_GRADIENT_MAP = Object.fromEntries(
+  HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient])
+);
+
 // ─── Öffnungsstatus berechnen ──────────────────────────────────────────────────
 const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
@@ -27,11 +40,16 @@ const HeroSection = ({ restaurantData }) => {
   const { isOpen, todayHours } = getOpenStatus(restaurantData?.openingHours);
 
   return (
-    <div className="w-full bg-gradient-to-r from-amber-700 via-orange-600 to-amber-600 text-white py-10 px-4 text-center">
+    <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[restaurantData?.menu?.[0]?.heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center`}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
       <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">
         {restaurantData?.name || "Restaurant"}
       </h1>
+      {restaurantData?.menu?.[0]?.description && (
+        <p className="mt-3 text-amber-100 text-sm max-w-md mx-auto italic">
+          {restaurantData.menu[0].description}
+        </p>
+      )}
       {loc && (
         <p className="mt-3 text-amber-100 text-sm">
           {loc.street} {loc.houseNumber}, {loc.postalCode} {loc.city}

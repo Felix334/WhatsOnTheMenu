@@ -27,8 +27,8 @@ export async function POST(req) {
     }
 
     const userData = await main(id);
-    if(userData){
-      console.log("Restaurant gefunden(user/profil/getData):", userData)
+    if (userData) {
+      console.log("Restaurant gefunden(user/profil/getData):", userData);
     }
 
     if (!userData) {
@@ -57,12 +57,12 @@ async function main(userId) {
                 description: true,
                 bgColor: true,
                 font: true,
+                heroColor: true,
                 createdAt: true,
                 updatedAt: true,
                 categoryGroup: {
                   include: {
                     categories: {
-
                       include: {
                         dishes: {
                           include: {
@@ -80,8 +80,9 @@ async function main(userId) {
         },
       },
     });
-
-    console.log("User data found: ", userData);
+    if (process.env.NODE_ENV !== "production") {
+      console.log("User data found: ", userData);
+    }
     return userData;
   } catch (error) {
     console.error("Error fetching user data: ", error);

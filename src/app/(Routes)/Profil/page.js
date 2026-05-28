@@ -40,6 +40,19 @@ import { SortComponents } from "./components/sortMenu";
 // const restaurant_icon = require("./img/restaurantLabelIcon.png");
 //const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
+const HERO_COLOR_PRESETS = [
+  { key: "amber",  label: "Amber",   gradient: "from-amber-700 via-orange-600 to-amber-600" },
+  { key: "green",  label: "Grün",    gradient: "from-emerald-700 via-green-600 to-teal-600" },
+  { key: "blue",   label: "Blau",    gradient: "from-blue-700 via-indigo-600 to-blue-600" },
+  { key: "red",    label: "Rot",     gradient: "from-red-700 via-rose-600 to-red-500" },
+  { key: "purple", label: "Lila",    gradient: "from-purple-700 via-violet-600 to-purple-500" },
+  { key: "dark",   label: "Dunkel",  gradient: "from-gray-900 via-gray-800 to-gray-700" },
+];
+
+const HERO_GRADIENT_MAP = Object.fromEntries(
+  HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient])
+);
+
 export default function PageBuilder() {
   const router = useRouter();
 
@@ -62,9 +75,15 @@ export default function PageBuilder() {
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
-  const [edditName, setEdditName] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
   const [fontNew, setFontNew] = useState("");
+
+  // Hero editing
+  const [isEditingHero, setIsEditingHero] = useState(false);
+  const [heroName, setHeroName] = useState("");
+  const [heroDescription, setHeroDescription] = useState("");
+  const [heroColor, setHeroColor] = useState(null);
+  const [savingHero, setSavingHero] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
 
   const [Limit, setLimit] = useState({});
@@ -107,6 +126,32 @@ export default function PageBuilder() {
       setIsAutherizedUser(true);
     }
   }, [status, autherized, session]);
+
+  useEffect(() => {
+    if (!serverData) return;
+    setHeroName(serverData?.userData?.restaurant?.name || "");
+    setHeroDescription(serverData?.userData?.restaurant?.menu?.[0]?.description || "");
+    setHeroColor(serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null);
+  }, [serverData]);
+
+  const saveHero = async () => {
+    setSavingHero(true);
+    try {
+      const restaurantId = serverData?.userData?.restaurant?.id;
+      const res = await fetch("/api/user/profil/updateHero", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restaurantId, name: heroName, description: heroDescription, heroColor }),
+      });
+      if (!res.ok) throw new Error("Fehler beim Speichern");
+      toast.success("Header gespeichert!");
+      setIsEditingHero(false);
+    } catch (err) {
+      toast.error("Fehler: " + err.message);
+    } finally {
+      setSavingHero(false);
+    }
+  };
 
   // Moved calculateLimit to useEffect below to fix ReferenceError
 
@@ -739,81 +784,138 @@ export default function PageBuilder() {
   return (
     <div className="min-h-screen" style={{ fontFamily: fontNew }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
-      <div>
-        <div className="">
-          <div className="sticky top-0 z-50 w-full bg-white shadow-md border-b">
-            <div className="max-w-[1280px] mx-auto flex items-center justify-between py-3 ">
-              {/* Linke Seite */}
-              <div className="flex gap-3">
-                <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
-                  Zurück
-                </Button>
 
-                <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+      <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between h-12 gap-2">
+          <div className="flex gap-3">
+            <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
+              Zurück
+            </Button>
 
-                {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
-                <SortComponents componentList={categoryGroups} />
-              </div>
-              <div>
-                <Button asChild>
-                  <Link
-                    href={{
-                      pathname: "/UnserePartner/Restaurants/Menu",
-                      query: { userID, restaurantID },
-                    }}
-                  >
-                    User-Ansicht
-                  </Link>
-                </Button>
-              </div>
-            </div>
+            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+
+            {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
+            <SortComponents componentList={categoryGroups} />
           </div>
-          <div className={`min-h-screen flex flex-col items-center justify-center text-gray-900 font-sans p-8 ${!bgColor ? "bg-gradient-to-r from-yellow-50 via-yellow-100 to-yellow-200" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
-            <header className="mb-32 text-center w-full sm:grid sm:grid-col1">
-              <div className="flex items-center justify-center gap-3">
-                {!edditName ? (
-                  <>
-                    {serverData?.userData?.restaurant?.name && (
-                      <>
-                        <h1 className="text-5xl absolute  font-serif font-semibold italic tracking-wide">{serverData.userData.restaurant.name}</h1>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <Input type="text" className="text-center text-5xl" placeholder={serverData?.userData?.restaurant?.name || "Bitte einen Namen für die Überschrift wählen"} />
-                )}
-              </div>
-              <p className="mt-2 text-gray-600 italic max-w-md mx-auto text-2xl" />
-            </header>
-            <main className="w-full">
-              <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-                {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
-                  serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
-                    <div key={group.id} className={`bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 ${group.color}`}>
-                      <div>
-                        <Button onClick={() => renderCategoryGroupEdit(group.id)}>
-                          <FaPen />
-                        </Button>
-                      </div>
-                      {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID} />}
-                      <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
-                      <div className="space-y-8">
-                        {group.categories?.map((category) => (
-                          <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} />
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-500 py-10">Keine Daten vorhanden</div>
-                )}
-              </div>
-            </main>
-          </div>
-          <div className="fixed bottom-6 left-6 z-20">
-            <Button onClick={() => submitData()}>Speichern (Server)</Button>
+          <div>
+            <Button asChild>
+              <Link
+                href={{
+                  pathname: "/UnserePartner/Restaurants/Menu",
+                  query: { userID, restaurantID },
+                }}
+              >
+                User-Ansicht
+              </Link>
+            </Button>
           </div>
         </div>
+      </header>
+
+      <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center relative`}>
+        <p className="text-white/60 uppercase tracking-widest text-xs font-semibold mb-2">Mein Restaurant</p>
+
+        {isEditingHero ? (
+          <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
+            <input
+              value={heroName}
+              onChange={(e) => setHeroName(e.target.value)}
+              className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60"
+              placeholder="Restaurant Name"
+            />
+            <input
+              value={heroDescription}
+              onChange={(e) => setHeroDescription(e.target.value)}
+              className="text-sm text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60"
+              placeholder="Kurze Beschreibung (z.B. Authentische italienische Küche)"
+            />
+
+            {/* Farbpalette */}
+            <div className="flex flex-wrap justify-center gap-2 mt-1">
+              {HERO_COLOR_PRESETS.map(({ key, label, gradient }) => (
+                <button
+                  key={key}
+                  title={label}
+                  onClick={() => setHeroColor(key)}
+                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${
+                    (heroColor ?? "amber") === key
+                      ? "border-white scale-110 shadow-lg"
+                      : "border-white/30 hover:border-white/70"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <div className="flex gap-2 mt-1">
+              <Button size="sm" onClick={saveHero} disabled={savingHero} className="bg-white text-gray-800 hover:bg-white/90 font-semibold">
+                {savingHero ? "Speichern..." : "Speichern"}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setIsEditingHero(false);
+                  setHeroName(serverData?.userData?.restaurant?.name || "");
+                  setHeroDescription(serverData?.userData?.restaurant?.menu?.[0]?.description || "");
+                  setHeroColor(serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null);
+                }}
+                className="text-white border border-white/40 hover:bg-white/10"
+              >
+                Abbrechen
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">
+              {heroName || serverData?.userData?.restaurant?.name || "Restaurant"}
+            </h1>
+            {heroDescription && (
+              <p className="mt-3 text-white/80 text-sm max-w-md mx-auto">{heroDescription}</p>
+            )}
+          </>
+        )}
+
+        {!isEditingHero && (
+          <button
+            onClick={() => setIsEditingHero(true)}
+            className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all"
+            title="Header bearbeiten"
+          >
+            <FaPen className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      <div className={`text-gray-900 font-sans ${!bgColor ? "bg-amber-50" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
+        <main className="w-full">
+          <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+            {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
+              serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
+                <div key={group.id} className={`bg-white rounded-2xl shadow-sm p-6 border border-amber-100 ${group.color}`}>
+                  <div>
+                    <Button onClick={() => renderCategoryGroupEdit(group.id)}>
+                      <FaPen />
+                    </Button>
+                  </div>
+                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID} />}
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
+                  <div className="space-y-8">
+                    {group.categories?.map((category) => (
+                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} />
+                    ))}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-500 py-10">Keine Daten vorhanden</div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      <div className="fixed bottom-6 left-6 z-20">
+        <Button onClick={() => submitData()}>Speichern (Server)</Button>
       </div>
     </div>
   );

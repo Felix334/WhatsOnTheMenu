@@ -1,13 +1,10 @@
 import Stripe from "stripe";
 
-/*const secretKey =
-  process.env.NODE_ENV === "production"
-    ? process.env.STRIPE_SECRET_KEY
-    : (process.env.STRIPE_SECRET_KEY_TEST ?? process.env.STRIPE_SECRET_KEY_TEST);*/
-    const secretKey = process.env.STRIPE_SECRET_KEY_TEST
+//const secretKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_SECRET_KEY : (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_SECRET_KEY_TEST);
+const secretKey = process.env.STRIPE_SECRET_KEY_TEST;
 
 if (!secretKey) {
-  throw new Error("Missing Stripe secret key");
+  throw new Error("Missing Stripe secret key:");
 }
 
 export const stripe = new Stripe(secretKey);
@@ -47,12 +44,12 @@ export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" |
   const normalized = tier.toLowerCase();
 
   const TIER_MAP: Record<string, "FreeTier" | "Professional" | "Individuell"> = {
-    free:         "FreeTier",
-    freetier:     "FreeTier",
-    pro:          "Professional",
+    free: "FreeTier",
+    freetier: "FreeTier",
+    pro: "Professional",
     professional: "Professional",
-    premium:      "Individuell",
-    individuell:  "Individuell",
+    premium: "Individuell",
+    individuell: "Individuell",
   };
 
   return TIER_MAP[normalized] ?? "Professional";

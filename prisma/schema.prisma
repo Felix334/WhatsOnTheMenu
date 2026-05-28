@@ -141,6 +141,7 @@ model Menu {
   updatedAt     DateTime        @updatedAt
   bgColor       String
   font          String
+  heroColor     String?
   categoryGroup CategoryGroup[]
   restaurant    Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 

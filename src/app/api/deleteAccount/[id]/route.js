@@ -40,7 +40,6 @@ export async function DELETE(request, { params }) {
         await stripe.subscriptions.cancel(sub.id);
       }
 
-      // Customer komplett löschen (entfernt auch Zahlungsmethoden)
       await stripe.customers.del(user.stripeCustomerId);
     }
 

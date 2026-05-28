@@ -78,7 +78,6 @@ function HomeContent() {
     const url = window.location.origin;
     console.log("URL", url);
   };
-
   return (
     <div>
       <Head>
