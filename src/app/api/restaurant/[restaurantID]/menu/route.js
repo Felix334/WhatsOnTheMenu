@@ -12,19 +12,41 @@ export async function GET(req, { params }) {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        parentCompany: true,
+        openingHours: true,
+        createdAt: true,
         owner: {
           select: { name: true },
         },
         menu: {
-          include: {
+          select: {
+            name: true,
+            description: true,
+            bgColor: true,
+            font: true,
+            heroColor: true,
+            createdAt: true,
+            updatedAt: true,
             categoryGroup: {
-              include: {
+              select: {
+                id: true, // benötigt als React key
+                name: true,
+                position: true,
+                color: true,
                 categories: {
-                  include: {
+                  select: {
+                    id: true, // benötigt für Scroll-Anker im Frontend
+                    name: true,
+                    description: true,
+                    position: true,
+                    bgColor: true,
+                    font: true,
+                    fontColor: true,
                     dishes: {
                       select: {
-                        id: true,
                         name: true,
                         description: true,
                         price: true,
@@ -32,7 +54,7 @@ export async function GET(req, { params }) {
                         stock: true,
                         ingredients: {
                           where: { isAllergen: true },
-                          select: { id: true, name: true },
+                          select: { name: true },
                         },
                       },
                     },
@@ -43,8 +65,15 @@ export async function GET(req, { params }) {
           },
         },
         locations: {
-          include: {
-            reservation: true,
+          select: {
+            street: true,
+            houseNumber: true,
+            city: true,
+            postalCode: true,
+            country: true,
+            reservation: {
+              select: { phoneNumber: true },
+            },
           },
         },
       },

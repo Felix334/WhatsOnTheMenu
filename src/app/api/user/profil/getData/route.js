@@ -81,7 +81,7 @@ async function main(userId) {
       },
     });
     if (process.env.NODE_ENV !== "production") {
-      console.log("User data found: ", userData);
+      console.log("User data found(/profil/getData): ", userData);
     }
     return userData;
   } catch (error) {
