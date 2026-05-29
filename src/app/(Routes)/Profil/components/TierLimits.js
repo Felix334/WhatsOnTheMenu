@@ -7,7 +7,7 @@ const TierSystem = {
     },
     Business : {
         DishLimit: 100,
-        CategoryLimit: 15,
+        CategoryLimit: 16,
         allowedColorPallet: {allAllowed: true},
     },
     PremiumTier: {

@@ -12,76 +12,15 @@ const FooterPart = () => {
           <div>
             <h4 className="font-semibold mb-4">Produkt</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>
-                <a href="/features" className="hover:text-white transition-colors">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="/pricing" className="hover:text-white transition-colors">
-                  Preise
-                </a>
-              </li>
-              <li>
-                <a href="/templates" className="hover:text-white transition-colors">
-                  Vorlagen
-                </a>
-              </li>
-              <li>
-                <a href="/integrations" className="hover:text-white transition-colors">
-                  Integrationen
-                </a>
-              </li>
+              
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>
-                <a href="/help" className="hover:text-white transition-colors">
-                  Hilfe Center
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-white transition-colors">
-                  Kontakt
-                </a>
-              </li>
-              <li>
-                <a href="/tutorials" className="hover:text-white transition-colors">
-                  Tutorials
-                </a>
-              </li>
-              <li>
-                <a href="/api-docs" className="hover:text-white transition-colors">
-                  API Docs
-                </a>
-              </li>
-            </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Unternehmen</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>
-                <a href="/about" className="hover:text-white transition-colors">
-                  Über uns
-                </a>
-              </li>
-              <li>
-                <a href="/blog" className="hover:text-white transition-colors">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="/careers" className="hover:text-white transition-colors">
-                  Karriere
-                </a>
-              </li>
-              <li>
-                <a href="/press" className="hover:text-white transition-colors">
-                  Presse
-                </a>
-              </li>
             </ul>
           </div>
         </div>

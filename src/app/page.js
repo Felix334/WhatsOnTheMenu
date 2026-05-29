@@ -155,7 +155,7 @@ function HomeContent() {
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                       <Button variant="ghost" onClick={() => scrollToSection("#pricing")}>
-                        Preise
+                        Angebote
                       </Button>
                     </NavigationMenuItem>
 
@@ -223,7 +223,7 @@ function HomeContent() {
                           setMobileMenuOpen(false);
                         }}
                       >
-                        Preise
+                        Angebote
                       </Button>
                       <Button
                         variant="ghost"
@@ -379,7 +379,7 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 15 Kategorien
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 16 Kategorien
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Bis zu 100 Gerichte
@@ -394,7 +394,7 @@ function HomeContent() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
-                        Perfekt für Veranstaltungen und kleine Restaurants
+                        Perfekt für kleine Restaurants
                       </li>
                     </ul>
 
