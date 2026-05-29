@@ -276,7 +276,7 @@ function HomeContent() {
                   <p className="text-xl mb-8 text-gray-400">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
-                      <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300">
+                      <Button asChild className="bg-white text-gray-900 hover:bg-yellow-300">
                         <a href="/editor">Jetzt kostenlos starten</a>
                       </Button>
                     )}
