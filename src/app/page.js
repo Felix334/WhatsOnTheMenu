@@ -158,19 +158,6 @@ function HomeContent() {
                         Preise
                       </Button>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <Link
-                        href={{
-                          pathname: "/UnserePartner/Restaurants/Menu",
-                          query: {
-                            ...(userID ? { userID } : {}),
-                            restaurantID: "cmo7fzgh3000004kzaov2ldwp",
-                          },
-                        }}
-                      >
-                        Beispiel
-                      </Link>
-                    </NavigationMenuItem>
 
                     {!userID && (
                       <NavigationMenuItem>
@@ -293,26 +280,14 @@ function HomeContent() {
                         <a href="/editor">Jetzt kostenlos starten</a>
                       </Button>
                     )}
-                    <Button variant="outline" onClick={() => scrollToSection("#demo")} className="border-white text-yellow hover:bg-white hover:text-gray-900">
-                      <Link
-                        href={{
-                          pathname: "/UnserePartner/Restaurants/Menu",
-                          query: {
-                            ...(userID ? { userID } : {}),
-                            restaurantID: "cmo7fzgh3000004kzaov2ldwp",
-                          },
-                        }}
-                      >
-                        Live Demo
-                      </Link>
-                    </Button>
+
                   </div>
-                  <div className="mt-8 flex items-center space-x-6 text-sm">
+                  <div className="mt-8 flex items-center space-x-6 text-sm text-yellow-500">
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
                       Kostenlose Standardversion verfügbar
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center text-yellow-500">
                       <span className="text-green-300 mr-2">✓</span>
                       Premium für 14 Tage kostenlos testen
                     </div>
@@ -434,6 +409,7 @@ function HomeContent() {
                     <div className="text-3xl font-bold">
                       14.99€<span className="text-lg font-normal">/Monat</span>
                     </div>
+                    
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3 mb-8">

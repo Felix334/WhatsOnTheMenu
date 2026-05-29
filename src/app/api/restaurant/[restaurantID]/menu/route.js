@@ -32,13 +32,13 @@ export async function GET(req, { params }) {
             updatedAt: true,
             categoryGroup: {
               select: {
-                id: true, // benötigt als React key
+                id: true,
                 name: true,
                 position: true,
                 color: true,
                 categories: {
                   select: {
-                    id: true, // benötigt für Scroll-Anker im Frontend
+                    id: true,
                     name: true,
                     description: true,
                     position: true,
