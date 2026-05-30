@@ -25,6 +25,7 @@ const restaurantSchema = z.object({
 });
 
 export default function RestaurantForm() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
     restaurantName: "",
@@ -50,8 +51,11 @@ export default function RestaurantForm() {
   if (status === "loading") {
     return <div>Seite wird geladen</div>;
   } else {
-    restaurant.ownerID = session.user.id;
-    console.log(session.user.id);
+    if (status === "authenticated") {
+      restaurant.ownerID = session?.user?.id;
+      console.log(session.user.id);
+      setIsAuthenticated(true);
+    }
   }
 
   const handleChange = (e) => {
@@ -314,30 +318,37 @@ export default function RestaurantForm() {
         {success && <p className="text-green-600 font-medium">Restaurant erfolgreich registriert!</p>}
 
         <div className="space-y-3">
-          {success ? (
-            <></>
+          {isAuthenticated ? (
+            success ? (
+              <></>
+            ) : (
+              <>
+                <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
+                  FreeTier registrieren
+                </button>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const res = await fetch("/api/payment/checkout", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ tier: "pro" }),
+                      });
+                      const { url } = await res.json();
+                      if (url) window.location.href = url;
+                    }}
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700"
+                  >
+                    💳 Zu Pro upgrade (€19/Monat)
+                  </button>
+                </div>
+              </>
+            )
           ) : (
-            <>
-              <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
-                FreeTier registrieren
-              </button>
-            </>
+            <div>Bitte Anmelden</div>
           )}
-          <button
-            type="button"
-            onClick={async () => {
-              const res = await fetch("/api/payment/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tier: "pro" }),
-              });
-              const { url } = await res.json();
-              if (url) window.location.href = url;
-            }}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700"
-          >
-            💳 Zu Pro upgrade (€19/Monat)
-          </button>
         </div>
       </form>
     </div>
