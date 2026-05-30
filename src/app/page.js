@@ -15,14 +15,13 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
 import Profile from "./components/Profile";
-import PermControleLocation from "./components/LocasionPermission";
 import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
 import RenderUserID from "./components/renderUserID";
 
 import SpeiseKarteLaptop from "./components/img/ResizedLaptopImage.png";
 import SpeiseKarteHandy from "./components/img/Speisekarte_HandybildschirmNeu.png";
-import { AdminLink, FreeTierLink, ProfessionalTierLink, EnterpriseTierLink } from "./components/renderDynamicLinks";
+import { AdminLink, FreeTierLink } from "./components/renderDynamicLinks";
 
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

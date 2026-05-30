@@ -51,7 +51,6 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
           <div className="flex items-center justify-center md:justify-start">
             <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatsOnMyMenu</div>
           </div>
-          <!-- Desktop Nav -->
           <div className="hidden right-0 md:block">
             <NavigationMenu>
               <NavigationMenuList>
@@ -93,7 +92,6 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-          <!-- Mobile Menu -->
           <div className="absolute left-0 flex flex-col md:hidden">
             <Sheet open={mobileMenuOpen} onOpenChange={toggleMobileMenu}>
               <SheetTrigger asChild>
