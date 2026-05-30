@@ -279,7 +279,6 @@ function HomeContent() {
                         <a href="/editor">Jetzt kostenlos starten</a>
                       </Button>
                     )}
-
                   </div>
                   <div className="mt-8 flex items-center space-x-6 text-sm text-yellow-500">
                     <div className="flex items-center">
@@ -378,7 +377,7 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 16 Kategorien
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 15 Kategorien
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Bis zu 100 Gerichte
@@ -408,7 +407,6 @@ function HomeContent() {
                     <div className="text-3xl font-bold">
                       14.99€<span className="text-lg font-normal">/Monat</span>
                     </div>
-                    
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-3 mb-8">
@@ -426,16 +424,16 @@ function HomeContent() {
                         <span className="text-green-300 mr-2">✓</span>QR-Code
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Event-Kalender
-                      </li>
-                      <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Verfügbarkeits-Anzeige(1-Min Cache)
-                      </li>
-                      <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Update-Alarm
+                      </li>
+                      <li>
+                        <span className="text-green-300 mr-2">✓</span>Management-System
+                      </li>
+                      <li>
+                        <span className="text-green-300 mr-2">✓</span>Verfügbarkeitsanzeige
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
