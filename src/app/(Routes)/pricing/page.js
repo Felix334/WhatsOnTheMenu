@@ -131,11 +131,11 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-amber-600">€19</span>
+                <span className="text-5xl font-bold text-amber-600">€14.99</span>
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Unbegrenzte Gerichte", "Premium Farben & Fonts", "Mehrere Standorte", "Allergen-Verwaltung", "Priorisierter Support"].map(f => (
+                {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Mehrere Standorte"].map(f => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -153,7 +153,7 @@ export default function PricingPage() {
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl h-[80vh]">
                   <DialogHeader>
-                    <DialogTitle>Restaurant Details für Pro (€19/Monat)</DialogTitle>
+                    <DialogTitle>Restaurant Details für Pro (€14.99/Monat)</DialogTitle>
                     <DialogDescription>Nach Zahlung wird dein Restaurant automatisch erstellt.</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleProSubmit} className="space-y-4 overflow-y-auto">
@@ -240,11 +240,11 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-gray-900">€14.99</span>
+                <span className="text-5xl font-bold text-gray-900">€7.99</span>
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Alles aus Pro +", "24/7 Premium Support", "Marketing Tools", "Analytics Dashboard"].map(f => (
+                {["Bis zu 15 Kategorien", "Bis zu 100 Gerichte", "24/7 Premium Support", "Marketing Tools", "Analytics Dashboard"].map(f => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -259,7 +259,7 @@ export default function PricingPage() {
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl h-[80vh]">
                   <DialogHeader>
-                    <DialogTitle>Restaurant Details für Premium (€14.99/Monat)</DialogTitle>
+                    <DialogTitle>Restaurant Details für Premium (€7.99/Monat)</DialogTitle>
                     <DialogDescription>Nach Zahlung wird dein Restaurant automatisch erstellt.</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handlePremiumSubmit} className="space-y-4 overflow-y-auto">

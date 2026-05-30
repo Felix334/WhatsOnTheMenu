@@ -71,6 +71,7 @@ export async function POST(req) {
           name: restaurant.name,
           parentCompany: restaurant.parentCompany,
           openingHours: restaurant.openingHours,
+          socialLinks: restaurant.socialLinks,
         }).filter(([_, v]) => v !== undefined)
       );
 

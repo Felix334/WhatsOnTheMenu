@@ -342,7 +342,7 @@ export default function RestaurantForm() {
             className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
     ${isFormValid() ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
           >
-            💳 Pro Abo aktivieren (€19/Monat)
+            💳 Professional Abo aktivieren (€14.99/Monat)
           </Button>
         </div>
       </form>

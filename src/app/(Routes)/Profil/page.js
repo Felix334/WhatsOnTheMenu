@@ -89,6 +89,8 @@ export default function PageBuilder() {
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
+  const [catCount, setCatCount] = useState(0);
+  const [dishCount, setDishCount] = useState(0);
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
   const [renderCatGroupMenu, setRenderCatGroupMenu] = useState(null);
 
@@ -97,34 +99,30 @@ export default function PageBuilder() {
   useEffect(() => {
     if (status !== "authenticated" || !session?.user || autherized) return;
 
-    if (session.user.role === "Owner") {
-      console.log("Signed in as:", session.user.id);
-      console.log("User Data:", session.user);
-      console.log("User Subscription:", session.user.subscription);
+    if (session.user.role !== "Owner") return;
 
-      setUserID(session.user.id);
+    setUserID(session.user.id);
 
-      switch (session.user.subscription) {
-        case "Basic":
-          setLimit(TierSystem.FreeTier);
-          console.log("Free Tier Limit freigeschalten:", TierSystem.FreeTier);
-          break;
-        case "Professional":
-          setLimit(TierSystem.PremiumTier);
-          setAllowPremiumColor(true);
-          console.log("Premium Tier Limit freigeschalten:", TierSystem.PremiumTier);
-          break;
-        case "Advantst":
-          setLimit(TierSystem.Advantst);
-          console.log("Advantst Tier Limit freigeschalten:", TierSystem.Advantst);
-          break;
-        default:
-          console.log("Kein bekanntes Abo:", session.user.subscription);
-          break;
-      }
+    const sub = session.user.subscription;
 
-      setIsAutherizedUser(true);
+    switch (sub) {
+      case "FreeTier":
+        setLimit(TierSystem.FreeTier);
+        break;
+      case "Professional":
+        setLimit(TierSystem.Professional);
+        setAllowPremiumColor(true);
+        break;
+      case "Individuell":
+        setLimit(TierSystem.Individuell);
+        setAllowPremiumColor(true);
+        break;
+      default:
+        setLimit(TierSystem.FreeTier);
+        break;
     }
+
+    setIsAutherizedUser(true);
   }, [status, autherized, session]);
 
   useEffect(() => {
@@ -157,10 +155,12 @@ export default function PageBuilder() {
 
   useEffect(() => {
     if (!serverData || !Limit) return;
-    const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories || []).length || 0) + (components.length || 0);
-    const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
-    setExeedCatLimit(catCount >= Limit.CategoryLimit);
-    setExeedDishLimit(dishCount >= Limit.DishLimit);
+    const cats = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories || []).length || 0) + (components.length || 0);
+    const dishes = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
+    setCatCount(cats);
+    setDishCount(dishes);
+    setExeedCatLimit(cats >= Limit.CategoryLimit);
+    setExeedDishLimit(dishes >= Limit.DishLimit);
   }, [components, serverData, Limit]);
 
   const form = useForm({
@@ -502,7 +502,12 @@ export default function PageBuilder() {
 
         <SheetFooter>
           {exeedDishLimit ? (
-            <div>Gericht-Limit erreicht</div>
+            <div className="flex items-center gap-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 w-full">
+              <span>Gericht-Limit ({Limit.DishLimit}) erreicht.</span>
+              <Link href="/pricing" className="ml-auto font-semibold underline text-amber-600 hover:text-amber-700 whitespace-nowrap">
+                ↑ Upgrade
+              </Link>
+            </div>
           ) : (
             <Button
               type="button"
@@ -787,16 +792,51 @@ export default function PageBuilder() {
 
       <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between h-12 gap-2">
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
               Zurück
             </Button>
 
             <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
 
-            {!exeedCatLimit && <MenuEditor categoryGroupNames={categoryGroupNames} />}
+            {exeedCatLimit ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button variant="outline" disabled>Hinzufügen</Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  Kategorie-Limit ({Limit.CategoryLimit}) erreicht —{" "}
+                  <Link href="/pricing" className="underline font-medium">Upgrade</Link>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <MenuEditor categoryGroupNames={categoryGroupNames} />
+            )}
             <SortComponents componentList={categoryGroups} />
           </div>
+
+          {/* Abo-Badge mit Live-Zähler */}
+          <div className="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
+            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Individuell" ? "text-orange-500" : "text-gray-500"}`}>
+              {session?.user?.subscription ?? "FreeTier"}
+            </span>
+            <span className="text-gray-300">|</span>
+            <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
+              {catCount}/{Limit.CategoryLimit ?? "?"} Kat.
+            </span>
+            <span className="text-gray-300">|</span>
+            <span className={dishCount >= Limit.DishLimit ? "text-red-500 font-medium" : "text-gray-500"}>
+              {dishCount}/{Limit.DishLimit ?? "?"} Gerichte
+            </span>
+            {(exeedCatLimit || exeedDishLimit) && (
+              <Link href="/pricing" className="ml-1 text-amber-600 hover:text-amber-700 font-semibold hover:underline">
+                ↑ Upgrade
+              </Link>
+            )}
+          </div>
+
           <div>
             <Button asChild>
               <Link

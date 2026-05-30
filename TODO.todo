@@ -2,7 +2,7 @@
 
 => API-Routen sind komplett durcheinander
 
-=> Es ist möglich auch ein leeres Datenpacket an den Server zu schicken => Kontrolle einfügeb
+=> Es ist möglich auch ein leeres Datenpacket an den Server zu schicken => Kontrolle einfügen
 
 
 => Console Logs am ende entfernen => aber nicht die console.errors => wird alles auf vercel angezeigt
@@ -78,5 +78,7 @@ PROXMOX => als alternative zu Docker
 
 => Wenn der Kunde bereits ein höheres(oder gleichwertiges Abbo hat) wird dieses Abbo als entweder "In Nutzung" oder
 als "Ein höheres Abbo wird bereits genutzt" angezeigt
+
+=> Packetupgrades einfügen
 
 => Doppelter Stripe Webhook

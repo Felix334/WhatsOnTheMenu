@@ -268,7 +268,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
             )}
           </div>
 
-          {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
+              {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
         </ScrollArea>
       </SheetContent>
     </Sheet>
@@ -276,6 +276,99 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
 };
 
 export { OptionMenu };
+
+/* ===================== SOCIAL LINKS EDITOR ===================== */
+
+const SOCIAL_PLATFORMS = [
+  { key: "instagram", label: "Instagram",  placeholder: "https://instagram.com/deinrestaurant" },
+  { key: "facebook",  label: "Facebook",   placeholder: "https://facebook.com/deinrestaurant" },
+  { key: "tiktok",    label: "TikTok",     placeholder: "https://tiktok.com/@deinrestaurant" },
+  { key: "twitter",   label: "X / Twitter",placeholder: "https://x.com/deinrestaurant" },
+  { key: "whatsapp",  label: "WhatsApp",   placeholder: "https://wa.me/49123456789" },
+  { key: "website",   label: "Website",    placeholder: "https://www.deinrestaurant.de" },
+];
+
+const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
+  const [links, setLinks] = useState(initialLinks ?? {});
+  const [isEditing, setIsEditing] = useState(false);
+  const [saved, setSaved] = useState(links);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/user/profil/updateRestaurant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          restaurant: { id: restaurantId, socialLinks: links },
+          locations: [],
+          userID,
+        }),
+      });
+      if (!res.ok) throw new Error("Fehler");
+      setSaved(links);
+      setIsEditing(false);
+      toast.success("Social-Media-Links gespeichert!");
+    } catch {
+      toast.error("Fehler beim Speichern");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setLinks(saved);
+    setIsEditing(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="text-xl font-semibold">Social Media</h2>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {SOCIAL_PLATFORMS.map(({ key, label, placeholder }) => (
+          <div key={key}>
+            <Label className="text-sm text-gray-600">{label}</Label>
+            {isEditing ? (
+              <Input
+                value={links[key] ?? ""}
+                placeholder={placeholder}
+                onChange={(e) => setLinks((prev) => ({ ...prev, [key]: e.target.value }))}
+              />
+            ) : (
+              <p className="text-sm truncate">
+                {saved[key] ? (
+                  <a href={saved[key]} target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">
+                    {saved[key]}
+                  </a>
+                ) : (
+                  <span className="text-gray-400 italic">Nicht angegeben</span>
+                )}
+              </p>
+            )}
+          </div>
+        ))}
+
+        <div className="flex gap-3 pt-2">
+          {isEditing ? (
+            <>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "Speichern..." : "Speichern"}
+              </Button>
+              <Button variant="outline" onClick={handleCancel}>Abbrechen</Button>
+            </>
+          ) : (
+            <Button onClick={() => setIsEditing(true)}>Bearbeiten</Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export { SocialLinksEditor };
 
 /* ===================== RESTAURANT DATA ===================== */
 
@@ -497,6 +590,13 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         restaurantId={restaurant?.id}
         userID={userID}
         initialHours={restaurant?.openingHours ?? null}
+      />
+
+      {/* ── Social Media Links ──────────────────────────────────────────────── */}
+      <SocialLinksEditor
+        restaurantId={restaurant?.id}
+        userID={userID}
+        initialLinks={restaurant?.socialLinks ?? {}}
       />
 
       <div>

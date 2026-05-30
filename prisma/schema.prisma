@@ -89,6 +89,7 @@ model Restaurant {
   ownerName     String
   category      String     @default("NONE")
   openingHours  Json?
+  socialLinks   Json?
   createdAt     DateTime   @default(now())
   calendar      Calendar[]
   locations     Location[]

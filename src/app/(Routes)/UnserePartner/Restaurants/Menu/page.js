@@ -34,6 +34,16 @@ function getOpenStatus(openingHours) {
   return { isOpen, todayHours: `${day.open} – ${day.close} Uhr` };
 }
 
+// ─── Social Icons ─────────────────────────────────────────────────────────────
+const SOCIAL_ICONS = [
+  { key: "instagram", label: "Instagram", icon: "📸" },
+  { key: "facebook",  label: "Facebook",  icon: "📘" },
+  { key: "tiktok",    label: "TikTok",    icon: "🎵" },
+  { key: "twitter",   label: "X",         icon: "𝕏" },
+  { key: "whatsapp",  label: "WhatsApp",  icon: "💬" },
+  { key: "website",   label: "Website",   icon: "🌐" },
+];
+
 // ─── Hero-Banner ───────────────────────────────────────────────────────────────
 const HeroSection = ({ restaurantData }) => {
   const loc = restaurantData?.locations?.[0];
@@ -68,6 +78,24 @@ const HeroSection = ({ restaurantData }) => {
           <span className="text-amber-100">{todayHours}</span>
         )}
       </div>
+
+      {/* Social Media Links */}
+      {restaurantData?.socialLinks && Object.values(restaurantData.socialLinks).some(Boolean) && (
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {SOCIAL_ICONS.filter(({ key }) => restaurantData.socialLinks[key]).map(({ key, label, icon }) => (
+            <a
+              key={key}
+              href={restaurantData.socialLinks[key]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-all"
+            >
+              <span>{icon}</span>
+              <span>{label}</span>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
