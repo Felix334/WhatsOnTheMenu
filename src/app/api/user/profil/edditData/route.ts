@@ -279,7 +279,7 @@ export async function POST(req: NextRequest) {
       if (entry.type === "categoryGroupUpdate") {
         const catGroupID = entry.categoryGroup.id;
         const newName = entry.categoryGroup?.name;
-        const newBG = entry.categoryGroup?.bgColor;
+        const newColor = entry.categoryGroup?.color;
 
         if (catGroupID) {
           await safeDb(
@@ -288,7 +288,7 @@ export async function POST(req: NextRequest) {
                 where: { id: catGroupID, menuID: menuId },
                 data: {
                   ...(newName && { name: newName }),
-                  ...(newBG && { bgColor: newBG }),
+                  ...(newColor && { color: newColor }),
                 },
               }),
             `categoryGroup.updateMany(${catGroupID})`,

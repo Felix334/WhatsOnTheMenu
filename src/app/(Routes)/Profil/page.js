@@ -33,6 +33,7 @@ import { TierSystem } from "./components/TierLimits";
 import { useRestaurantData } from "./components/fetchData";
 import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
+import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 
 // Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
 
@@ -624,8 +625,8 @@ export default function PageBuilder() {
     };
 
     return (
-      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgColor}`}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColor}`}>
+      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgColorClass(bgColor)}`} style={bgColorStyle(bgColor)}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(bgColor)}`} style={bgColorStyle(bgColor)}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -781,6 +782,7 @@ export default function PageBuilder() {
           userID={userID}
           categoryId={categoryId}
           position={positionNum}
+          allowPremiumColor={allowPremiumColor}
         />
       </div>
     );
@@ -932,13 +934,13 @@ export default function PageBuilder() {
           <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
             {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
               serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
-                <div key={group.id} className={`bg-white rounded-2xl shadow-sm p-6 border border-amber-100 ${group.color}`}>
+                <div key={group.id} className={`rounded-2xl shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
                   <div>
                     <Button onClick={() => renderCategoryGroupEdit(group.id)}>
                       <FaPen />
                     </Button>
                   </div>
-                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.bgColor} restaurantID={restaurantID} />}
+                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.color} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} />}
                   <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
