@@ -94,11 +94,20 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
         token.subscription = user.subscription;
+      }
+      // Refresh staff memberships on login or session update
+      if (user || trigger === 'update') {
+        const userId = (user?.id ?? token.id) as string;
+        const memberships = await prisma.restaurantStaff.findMany({
+          where: { userId, approved: true },
+          select: { restaurantId: true, role: true },
+        });
+        token.staffMemberships = memberships;
       }
       return token;
     },
@@ -108,12 +117,19 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.subscription = token.subscription as Subscription;
+        session.user.staffMemberships = (token.staffMemberships ?? []) as any;
       }
       return session;
     },
 
-    async signIn({ account }) {
-      // Allow Google login always
+    async signIn({ user }) {
+      // Wenn E-Mail einem offenen Staff-Eintrag entspricht → automatisch verknüpfen
+      if (user?.email) {
+        await prisma.restaurantStaff.updateMany({
+          where: { email: user.email, userId: null },
+          data: { userId: user.id },
+        });
+      }
       return true;
     },
   },

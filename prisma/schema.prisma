@@ -32,6 +32,7 @@ model User {
   restaurant           Restaurant?
   restaurantQueues     RestaurantQueue?
   session              Session[]
+  staffMemberships     RestaurantStaff[]
   employeeOf           Company?         @relation("CompanyEmployees", fields: [companyId], references: [id])
   favoriteRestaurants  SaveFavorites[]
 
@@ -97,6 +98,7 @@ model Restaurant {
   locations     Location[]
   menu          Menu[]
   orders        Order[]
+  staff         RestaurantStaff[]
   owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
@@ -347,4 +349,26 @@ enum Subscription {
   FreeTier
   Professional
   Individuell
+}
+
+enum StaffRole {
+  manager
+  waiter
+  kitchen
+}
+
+model RestaurantStaff {
+  id           String     @id @default(cuid())
+  email        String
+  userId       String?
+  restaurantId String
+  role         StaffRole
+  approved     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  user         User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([email, restaurantId])
+  @@index([restaurantId])
+  @@index([userId])
 }

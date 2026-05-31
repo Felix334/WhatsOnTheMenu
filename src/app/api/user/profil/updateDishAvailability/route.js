@@ -1,23 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getStaffAccess, can } from "@/lib/staffAuth";
 
 export const dynamic = "force-dynamic";
 
-/**
- * POST /api/user/profil/updateDishAvailability
- * Body: { dishId: string, restaurantId: string, stock: "isAvailable" | "outOfStock" }
- *
- * Setzt den Verfügbarkeitsstatus eines Gerichts.
- * Nur der Besitzer des zugehörigen Restaurants darf ändern.
- */
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "Owner") {
-    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
-  }
-
   try {
     const body = await req.json();
     const { dishId, restaurantId, stock } = body;
@@ -36,18 +23,18 @@ export async function POST(req) {
       );
     }
 
-    // Prüfen ob das Gericht zum Restaurant des eingeloggten Users gehört
+    const access = await getStaffAccess(req, restaurantId);
+    if (!access || !can(access, "availability")) {
+      return NextResponse.json({ error: "Nicht autorisiert" }, { status: 401 });
+    }
+
+    // Prüfen ob das Gericht zum Restaurant gehört
     const dish = await prisma.dish.findFirst({
       where: {
         id: dishId,
         category: {
           categoryGroup: {
-            Menu: {
-              restaurant: {
-                id: restaurantId,
-                ownerId: session.user.id,
-              },
-            },
+            Menu: { restaurantId },
           },
         },
       },

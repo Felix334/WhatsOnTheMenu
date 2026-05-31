@@ -626,6 +626,9 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         initialLinks={restaurant?.socialLinks ?? {}}
       />
 
+      {/* ── Mitarbeiter ─────────────────────────────────────────────────────── */}
+      <StaffManager restaurantId={restaurant?.id} />
+
       <div>
         <Button variant="destructive" onClick={deleteRestaurant}>
           Account löschen
@@ -641,5 +644,150 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         onConfirm={handleConfirmDelete}
       />
     </div>
+  );
+};
+
+/* ===================== STAFF MANAGER ===================== */
+
+const ROLE_LABELS = { manager: "Manager", waiter: "Kellner", kitchen: "Küchenleitung" };
+const ROLE_COLORS = {
+  manager: "bg-purple-100 text-purple-800",
+  waiter: "bg-blue-100 text-blue-800",
+  kitchen: "bg-orange-100 text-orange-800",
+};
+
+const StaffManager = ({ restaurantId }) => {
+  const [staff, setStaff] = useState([]);
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("waiter");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!restaurantId) return;
+    fetch("/api/restaurant/staff")
+      .then((r) => r.json())
+      .then((d) => setStaff(d.staff ?? []));
+  }, [restaurantId]);
+
+  const handleAdd = async () => {
+    if (!email.trim()) return;
+    setLoading(true);
+    const res = await fetch("/api/restaurant/staff", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim(), role }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setStaff((prev) => [data.staff, ...prev]);
+      setEmail("");
+      toast.success("Mitarbeiter hinzugefügt");
+    } else {
+      toast.error(data.message ?? "Fehler");
+    }
+    setLoading(false);
+  };
+
+  const handleApprove = async (id) => {
+    const res = await fetch(`/api/restaurant/staff/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approved: true }),
+    });
+    if (res.ok) {
+      setStaff((prev) => prev.map((s) => (s.id === id ? { ...s, approved: true } : s)));
+      toast.success("Genehmigt");
+    }
+  };
+
+  const handleRemove = async (id) => {
+    const res = await fetch(`/api/restaurant/staff/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setStaff((prev) => prev.filter((s) => s.id !== id));
+      toast.success("Entfernt");
+    }
+  };
+
+  const pending = staff.filter((s) => !s.approved);
+  const approved = staff.filter((s) => s.approved);
+
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="text-xl font-semibold">Mitarbeiter</h2>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Neuen Mitarbeiter hinzufügen */}
+        <div className="space-y-2">
+          <Label>E-Mail-Adresse</Label>
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="mitarbeiter@beispiel.de"
+          />
+          <Label>Rolle</Label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border rounded-md px-3 py-2 text-sm"
+          >
+            <option value="waiter">Kellner</option>
+            <option value="kitchen">Küchenleitung</option>
+            <option value="manager">Manager</option>
+          </select>
+          <Button onClick={handleAdd} disabled={loading || !email.trim()}>
+            {loading ? "Wird hinzugefügt..." : "Hinzufügen"}
+          </Button>
+        </div>
+
+        {/* Ausstehende Genehmigungen */}
+        {pending.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-amber-700">Ausstehend ({pending.length})</p>
+            {pending.map((s) => (
+              <div key={s.id} className="flex items-center justify-between border rounded-xl px-3 py-2 bg-amber-50">
+                <div>
+                  <p className="text-sm font-medium">{s.user?.name ?? s.email}</p>
+                  <p className="text-xs text-gray-500">{s.email}</p>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[s.role]}`}>
+                    {ROLE_LABELS[s.role]}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  {s.userId && (
+                    <Button size="sm" onClick={() => handleApprove(s.id)}>Genehmigen</Button>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => handleRemove(s.id)}>Entfernen</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Aktive Mitarbeiter */}
+        {approved.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-gray-600">Aktiv ({approved.length})</p>
+            {approved.map((s) => (
+              <div key={s.id} className="flex items-center justify-between border rounded-xl px-3 py-2">
+                <div>
+                  <p className="text-sm font-medium">{s.user?.name ?? s.email}</p>
+                  <p className="text-xs text-gray-500">{s.email}</p>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[s.role]}`}>
+                    {ROLE_LABELS[s.role]}
+                  </span>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => handleRemove(s.id)}>Entfernen</Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {staff.length === 0 && (
+          <p className="text-sm text-gray-400 text-center py-4">Noch keine Mitarbeiter hinzugefügt</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };

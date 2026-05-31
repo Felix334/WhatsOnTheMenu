@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getStaffAccess, can } from "@/lib/staffAuth";
 
 export async function PATCH(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== "Owner") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
     const { orderID } = await params;
     const { status } = await req.json();
 
@@ -19,10 +13,13 @@ export async function PATCH(req, { params }) {
 
     const order = await prisma.order.findUnique({
       where: { id: orderID },
-      include: { restaurant: { select: { ownerId: true } } },
+      select: { restaurantId: true },
     });
 
-    if (!order || order.restaurant.ownerId !== session.user.id) {
+    if (!order) return NextResponse.json({ message: "Nicht gefunden" }, { status: 404 });
+
+    const access = await getStaffAccess(req, order.restaurantId);
+    if (!access || !can(access, "orders")) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
