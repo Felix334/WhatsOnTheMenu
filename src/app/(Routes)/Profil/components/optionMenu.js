@@ -249,11 +249,13 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
               </>
             )}
 
-            {isEditingMenu && (
-              <>
-                <Label>Schriftart</Label>
-                <FontSelector onFontChange={setEditedFont} />
-              </>
+            <Label>Schriftart</Label>
+            {isEditingMenu ? (
+              <FontSelector onFontChange={setEditedFont} value={editedFont} />
+            ) : (
+              <p className="text-sm text-gray-600 py-1" style={{ fontFamily: editedFont || "inherit" }}>
+                {editedFont || "Standard"}
+              </p>
             )}
 
             {isEditingMenu ? (
@@ -502,6 +504,14 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
             <>
               <Label>Name</Label>
               <Input value={editedRestaurant?.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} />
+              <Label>Beschreibung</Label>
+              <textarea
+                value={editedRestaurant?.description || ""}
+                onChange={(e) => updateRestaurantField("description", e.target.value)}
+                rows={3}
+                placeholder="Kurze Beschreibung des Restaurants..."
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+              />
               <Label>Muttergesellschaft</Label>
               <Input value={editedRestaurant?.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} />
             </>
@@ -510,6 +520,11 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
               <p>
                 <strong>Name:</strong> {restaurant?.name}
               </p>
+              {restaurant?.description && (
+                <p>
+                  <strong>Beschreibung:</strong> {restaurant.description}
+                </p>
+              )}
               <p>
                 <strong>Muttergesellschaft:</strong> {restaurant?.parentCompany}
               </p>

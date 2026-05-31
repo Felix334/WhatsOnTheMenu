@@ -69,6 +69,7 @@ export async function POST(req) {
       const restaurantData = Object.fromEntries(
         Object.entries({
           name: restaurant.name,
+          description: restaurant.description,
           parentCompany: restaurant.parentCompany,
           openingHours: restaurant.openingHours,
           socialLinks: restaurant.socialLinks,

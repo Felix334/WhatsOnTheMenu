@@ -15,6 +15,7 @@ export async function GET(req, { params }) {
       select: {
         id: true,
         name: true,
+        description: true,
         parentCompany: true,
         openingHours: true,
         createdAt: true,
@@ -108,6 +109,7 @@ export async function GET(req, { params }) {
     const response = {
       id: restaurant.id,
       name: restaurant.name,
+      description: restaurant.description ?? null,
       parentCompany: restaurant.parentCompany,
       owner: restaurant.owner,
       menu: menuWithRatings,

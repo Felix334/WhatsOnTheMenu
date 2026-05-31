@@ -85,6 +85,7 @@ model VerificationToken {
 model Restaurant {
   id            String     @id @default(cuid())
   name          String
+  description   String?
   parentCompany String
   ownerId       String     @unique
   ownerName     String

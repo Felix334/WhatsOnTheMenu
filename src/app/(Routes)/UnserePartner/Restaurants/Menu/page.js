@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { bgColorClass, bgColorStyle } from "./components/colorPicker";
+import { GOOGLE_FONTS_URL } from "@/app/(Routes)/Profil/components/fontList";
 
 // ─── Hero-Farben ──────────────────────────────────────────────────────────────
 const HERO_COLOR_PRESETS = [
@@ -44,15 +45,16 @@ const SOCIAL_ICONS = [
 ];
 
 // ─── Hero-Banner ───────────────────────────────────────────────────────────────
-const HeroSection = ({ restaurantData }) => {
+const HeroSection = ({ restaurantData, menuFont }) => {
   const loc = restaurantData?.locations?.[0];
   const { isOpen, todayHours } = getOpenStatus(restaurantData?.openingHours);
 
   return (
     <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[restaurantData?.menu?.[0]?.heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center`}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">{restaurantData?.name || "Restaurant"}</h1>
-      {restaurantData?.menu?.[0]?.description && <p className="mt-3 text-amber-100 text-sm max-w-md mx-auto italic">{restaurantData.menu[0].description}</p>}
+      <h1 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">{restaurantData?.name || "Restaurant"}</h1>
+      {restaurantData?.description && <p className="mt-3 text-white/80 text-base max-w-lg mx-auto">{restaurantData.description}</p>}
+      {restaurantData?.menu?.[0]?.description && <p className="mt-1 text-amber-100 text-sm max-w-md mx-auto italic">{restaurantData.menu[0].description}</p>}
       {loc && (
         <p className="mt-3 text-amber-100 text-sm">
           {loc.street} {loc.houseNumber}, {loc.postalCode} {loc.city}
@@ -249,8 +251,9 @@ const AllergenBadges = ({ ingredients }) => {
 };
 
 // ─── Menu Section ──────────────────────────────────────────────────────────────
-const MenuSection = ({ id, title, menuItems, bgColor }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -259,7 +262,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
   return (
     <div id={id} className={`${bgColor} rounded-2xl shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
       <div className="mb-8 text-center pb-6">
-        <h3 className="text-3xl sm:text-3xl md:text-4xl font-serif font-semibold tracking-wide">{title}</h3>
+        <h3 style={fontStyle} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">{title}</h3>
       </div>
 
       {/* Mobile: Card-Layout */}
@@ -271,7 +274,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
               <div onClick={() => !unavailable && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-yellow-50"}`}>
                 <div className="flex-1 pr-4">
                   <div className="flex items-center gap-2">
-                    <p className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</p>
+                    <p style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>{item.name}</p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
                   </div>
                   {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
@@ -308,7 +311,7 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
                     <TableCell className="align-top py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</span>
+                          <span style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>{item.name}</span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
                         </div>
                         {item.description && <span className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
@@ -453,12 +456,16 @@ const MenuContent = () => {
 
   const menuEntry = serverData?.menu?.[0];
   const bgColor = menuEntry?.bgColor;
+  const menuFont = menuEntry?.font || null;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
 
   return (
-    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-amber-50"}`} style={bgColor ? { backgroundColor: bgColor } : undefined}>
+    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-amber-50"}`} style={{ backgroundColor: bgColor || undefined, fontFamily: menuFont || undefined }}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      {menuFont && <link href={GOOGLE_FONTS_URL} rel="stylesheet" />}
       <Header name={name} activePage={activePage} setActivePage={setActivePage} />
-      <HeroSection restaurantData={serverData} />
+      <HeroSection restaurantData={serverData} menuFont={menuFont} />
       {activePage === "menu" && categoryGroups.length > 0 && <CategoryNav categories={categoryGroups.flatMap((g) => g.categories ?? [])} activeId={activeId} />}
 
       {activePage === "info" ? (
@@ -470,10 +477,10 @@ const MenuContent = () => {
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
                   <div key={group.id} className={`rounded-2xl shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
+                    <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} />
                       ))}
                     </div>
                   </div>

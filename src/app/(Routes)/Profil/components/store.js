@@ -160,11 +160,7 @@ export default function PageBuilder() {
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
         setBgColor(freshData.userData.restaurant.menu[0]?.bgColor || "");
-        // Fix das
         setFontNew(freshData.userData.restaurant.menu?.[0]?.font || "");
-        if (fontNew) {
-          console.log("FontNew:(Unfertig?)", fontNew);
-        }
         // positionNum calculated in useEffect after data loads
       } catch (error) {
         if (error.name !== "AbortError") {
@@ -172,16 +168,13 @@ export default function PageBuilder() {
         }
       } finally {
         setIsLoading(false);
-        if (!bgColor) {
-          console.log("Kein Hintergrund verfügbar");
-        }
       }
     };
 
     fetchData();
 
     return () => controller.abort();
-  }, [userID, bgColor, fontNew]);
+  }, [userID]);
 
   const submitToServer = (data) => {
     const newSection = {
