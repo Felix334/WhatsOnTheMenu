@@ -42,17 +42,15 @@ import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 //const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 const HERO_COLOR_PRESETS = [
-  { key: "amber",  label: "Amber",   gradient: "from-amber-700 via-orange-600 to-amber-600" },
-  { key: "green",  label: "Grün",    gradient: "from-emerald-700 via-green-600 to-teal-600" },
-  { key: "blue",   label: "Blau",    gradient: "from-blue-700 via-indigo-600 to-blue-600" },
-  { key: "red",    label: "Rot",     gradient: "from-red-700 via-rose-600 to-red-500" },
-  { key: "purple", label: "Lila",    gradient: "from-purple-700 via-violet-600 to-purple-500" },
-  { key: "dark",   label: "Dunkel",  gradient: "from-gray-900 via-gray-800 to-gray-700" },
+  { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
+  { key: "green", label: "Grün", gradient: "from-emerald-700 via-green-600 to-teal-600" },
+  { key: "blue", label: "Blau", gradient: "from-blue-700 via-indigo-600 to-blue-600" },
+  { key: "red", label: "Rot", gradient: "from-red-700 via-rose-600 to-red-500" },
+  { key: "purple", label: "Lila", gradient: "from-purple-700 via-violet-600 to-purple-500" },
+  { key: "dark", label: "Dunkel", gradient: "from-gray-900 via-gray-800 to-gray-700" },
 ];
 
-const HERO_GRADIENT_MAP = Object.fromEntries(
-  HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient])
-);
+const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient]));
 
 export default function PageBuilder() {
   const router = useRouter();
@@ -318,17 +316,40 @@ export default function PageBuilder() {
     router.push("../");
   };
 
+  const ALLERGEN_LETTER = {
+    Gluten: "A",
+    Krebstiere: "B",
+    Eier: "C",
+    Fisch: "D",
+    Erdnüsse: "E",
+    Soja: "F",
+    Milch: "G",
+    Schalenfrüchte: "H",
+    Sellerie: "I",
+    Senf: "J",
+    Sesam: "K",
+    Sulfite: "L",
+    Lupinen: "M",
+    Weichtiere: "N",
+  };
+
+  const AllergenBadges = ({ ingredients }) => {
+    if (!ingredients || ingredients.length === 0) return null;
+    return (
+      <div className="flex flex-warp gap-1 mt-1">
+        {ingredients.map((ing) => (
+          <span key={ing.id ?? ing.name} title={ing.name} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
+            {ALLERGEN_LETTER[ing.name] ?? "?"}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   const categoryGroups = serverData?.userData?.restaurant?.menu[0]?.categoryGroup ?? [];
   console.log("Group-Test z319:", serverData?.userData?.restaurant?.menu[0].categoryGroup);
   console.log("Groups-Test z320", categoryGroups);
-  const categoryGroupNames = [
-    ...(categoryGroups?.map((group) => group.name) ?? []),
-    "Mittagessen",
-    "Abendessen",
-    "Frühstück",
-    "Snacks",
-    "Getränke",
-  ].filter((name) => name && name.trim());
+  const categoryGroupNames = [...(categoryGroups?.map((group) => group.name) ?? []), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"].filter((name) => name && name.trim());
 
   // Kategorien-Namen (korrigiert)
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
@@ -544,9 +565,7 @@ export default function PageBuilder() {
     const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
 
     // Optimistisches Stock-State: { [dishId]: "isAvailable" | "outOfStock" }
-    const [stockMap, setStockMap] = useState(
-      () => Object.fromEntries((menuItems ?? []).map((d) => [d.id, d.stock ?? "isAvailable"]))
-    );
+    const [stockMap, setStockMap] = useState(() => Object.fromEntries((menuItems ?? []).map((d) => [d.id, d.stock ?? "isAvailable"])));
 
     const toggleAvailability = async (e, dishId) => {
       e.stopPropagation();
@@ -583,9 +602,7 @@ export default function PageBuilder() {
     // Optimistischer Item-Cache: { [dishId]: updatedItem }
     const [changedItems, setChangedItems] = useState({});
     // Merge: lokale Änderungen haben Vorrang vor serverData
-    const displayItems = (menuItems ?? []).map(item =>
-      changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item
-    );
+    const displayItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
     const [changedCategories, setChangedCategories] = useState([]);
     const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
     const [pendingDeleteDishId, setPendingDeleteDishId] = useState(null);
@@ -647,7 +664,7 @@ export default function PageBuilder() {
               <col className="w-24" />
             </colgroup>
             <TableHeader>
-              <TableRow className={`hover:bg-gray-100 w-full ${bgColor ? bgColor : "bg-gray-100"}`}>
+              <TableRow className={`hover:bg-gray-100 w-full ${bgColor}`}>
                 <TableHead className="text-left">Aktionen</TableHead>
                 <TableHead className="text-left" style={{ fontFamily: fontNew }}>
                   Speisen
@@ -691,16 +708,8 @@ export default function PageBuilder() {
                         </Button>
 
                         {/* Verfügbarkeits-Toggle */}
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"}
-                          onClick={(e) => toggleAvailability(e, item.id)}
-                          className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}
-                        >
-                          {stockMap[item.id] === "outOfStock"
-                            ? <XCircle className="size-4" />
-                            : <CheckCircle className="size-4" />}
+                        <Button size="icon" variant="outline" title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"} onClick={(e) => toggleAvailability(e, item.id)} className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}>
+                          {stockMap[item.id] === "outOfStock" ? <XCircle className="size-4" /> : <CheckCircle className="size-4" />}
                         </Button>
                       </div>
                     </TableCell>
@@ -709,9 +718,8 @@ export default function PageBuilder() {
                       <div className="flex flex-col">
                         <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
                         {item.description && <span className="text-sm text-gray-500">{item.description}</span>}
-                        {stockMap[item.id] === "outOfStock" && (
-                          <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>
-                        )}
+                        {stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
+                        <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
                     <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{Number(item.price).toFixed(2)}€</TableCell>
@@ -730,15 +738,7 @@ export default function PageBuilder() {
           </Table>
         </div>
 
-        <SelectItem
-          open={openItem}
-          onOpenChange={setOpenItem}
-          selectedItem={selectedItem}
-          setChangedItem={(item) => setChangedItems(prev => ({ ...prev, [item.id]: item }))}
-          category={title}
-          restaurantId={serverData?.userData?.restaurant?.id}
-          userID={userID}
-        />
+        <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={(item) => setChangedItems((prev) => ({ ...prev, [item.id]: item }))} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
 
         {/* Bestätigungs-Dialog: Gericht löschen */}
         <ConfirmDialog
@@ -805,12 +805,16 @@ export default function PageBuilder() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span>
-                    <Button variant="outline" disabled>Hinzufügen</Button>
+                    <Button variant="outline" disabled>
+                      Hinzufügen
+                    </Button>
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                   Kategorie-Limit ({Limit.CategoryLimit}) erreicht —{" "}
-                  <Link href="/pricing" className="underline font-medium">Upgrade</Link>
+                  <Link href="/pricing" className="underline font-medium">
+                    Upgrade
+                  </Link>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -821,9 +825,7 @@ export default function PageBuilder() {
 
           {/* Abo-Badge mit Live-Zähler */}
           <div className="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Individuell" ? "text-orange-500" : "text-gray-500"}`}>
-              {session?.user?.subscription ?? "FreeTier"}
-            </span>
+            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Individuell" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription ?? "FreeTier"}</span>
             <span className="text-gray-300">|</span>
             <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
               {catCount}/{Limit.CategoryLimit ?? "?"} Kat.
@@ -859,32 +861,13 @@ export default function PageBuilder() {
 
         {isEditingHero ? (
           <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
-            <input
-              value={heroName}
-              onChange={(e) => setHeroName(e.target.value)}
-              className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60"
-              placeholder="Restaurant Name"
-            />
-            <input
-              value={heroDescription}
-              onChange={(e) => setHeroDescription(e.target.value)}
-              className="text-sm text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60"
-              placeholder="Kurze Beschreibung (z.B. Authentische italienische Küche)"
-            />
+            <input value={heroName} onChange={(e) => setHeroName(e.target.value)} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Restaurant Name" />
+            <input value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} className="text-sm text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Kurze Beschreibung (z.B. Authentische italienische Küche)" />
 
             {/* Farbpalette */}
             <div className="flex flex-wrap justify-center gap-2 mt-1">
               {HERO_COLOR_PRESETS.map(({ key, label, gradient }) => (
-                <button
-                  key={key}
-                  title={label}
-                  onClick={() => setHeroColor(key)}
-                  className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${
-                    (heroColor ?? "amber") === key
-                      ? "border-white scale-110 shadow-lg"
-                      : "border-white/30 hover:border-white/70"
-                  }`}
-                />
+                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${(heroColor ?? "amber") === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
               ))}
             </div>
 
@@ -909,21 +892,13 @@ export default function PageBuilder() {
           </div>
         ) : (
           <>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">
-              {heroName || serverData?.userData?.restaurant?.name || "Restaurant"}
-            </h1>
-            {heroDescription && (
-              <p className="mt-3 text-white/80 text-sm max-w-md mx-auto">{heroDescription}</p>
-            )}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">{heroName || serverData?.userData?.restaurant?.name || "Restaurant"}</h1>
+            {heroDescription && <p className="mt-3 text-white/80 text-sm max-w-md mx-auto">{heroDescription}</p>}
           </>
         )}
 
         {!isEditingHero && (
-          <button
-            onClick={() => setIsEditingHero(true)}
-            className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all"
-            title="Header bearbeiten"
-          >
+          <button onClick={() => setIsEditingHero(true)} className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all" title="Header bearbeiten">
             <FaPen className="w-3.5 h-3.5" />
           </button>
         )}

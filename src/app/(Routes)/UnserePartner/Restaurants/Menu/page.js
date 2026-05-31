@@ -5,19 +5,18 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 
 // ─── Hero-Farben ──────────────────────────────────────────────────────────────
 const HERO_COLOR_PRESETS = [
-  { key: "amber",  gradient: "from-amber-700 via-orange-600 to-amber-600" },
-  { key: "green",  gradient: "from-emerald-700 via-green-600 to-teal-600" },
-  { key: "blue",   gradient: "from-blue-700 via-indigo-600 to-blue-600" },
-  { key: "red",    gradient: "from-red-700 via-rose-600 to-red-500" },
+  { key: "amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
+  { key: "green", gradient: "from-emerald-700 via-green-600 to-teal-600" },
+  { key: "blue", gradient: "from-blue-700 via-indigo-600 to-blue-600" },
+  { key: "red", gradient: "from-red-700 via-rose-600 to-red-500" },
   { key: "purple", gradient: "from-purple-700 via-violet-600 to-purple-500" },
-  { key: "dark",   gradient: "from-gray-900 via-gray-800 to-gray-700" },
+  { key: "dark", gradient: "from-gray-900 via-gray-800 to-gray-700" },
 ];
-const HERO_GRADIENT_MAP = Object.fromEntries(
-  HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient])
-);
+const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient]));
 
 // ─── Öffnungsstatus berechnen ──────────────────────────────────────────────────
 const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
@@ -37,11 +36,11 @@ function getOpenStatus(openingHours) {
 // ─── Social Icons ─────────────────────────────────────────────────────────────
 const SOCIAL_ICONS = [
   { key: "instagram", label: "Instagram", icon: "📸" },
-  { key: "facebook",  label: "Facebook",  icon: "📘" },
-  { key: "tiktok",    label: "TikTok",    icon: "🎵" },
-  { key: "twitter",   label: "X",         icon: "𝕏" },
-  { key: "whatsapp",  label: "WhatsApp",  icon: "💬" },
-  { key: "website",   label: "Website",   icon: "🌐" },
+  { key: "facebook", label: "Facebook", icon: "📘" },
+  { key: "tiktok", label: "TikTok", icon: "🎵" },
+  { key: "twitter", label: "X", icon: "𝕏" },
+  { key: "whatsapp", label: "WhatsApp", icon: "💬" },
+  { key: "website", label: "Website", icon: "🌐" },
 ];
 
 // ─── Hero-Banner ───────────────────────────────────────────────────────────────
@@ -52,44 +51,26 @@ const HeroSection = ({ restaurantData }) => {
   return (
     <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[restaurantData?.menu?.[0]?.heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center`}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
-      <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">
-        {restaurantData?.name || "Restaurant"}
-      </h1>
-      {restaurantData?.menu?.[0]?.description && (
-        <p className="mt-3 text-amber-100 text-sm max-w-md mx-auto italic">
-          {restaurantData.menu[0].description}
-        </p>
-      )}
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">{restaurantData?.name || "Restaurant"}</h1>
+      {restaurantData?.menu?.[0]?.description && <p className="mt-3 text-amber-100 text-sm max-w-md mx-auto italic">{restaurantData.menu[0].description}</p>}
       {loc && (
         <p className="mt-3 text-amber-100 text-sm">
           {loc.street} {loc.houseNumber}, {loc.postalCode} {loc.city}
         </p>
       )}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm">
-        <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold ${
-          isOpen
-            ? "bg-green-500/80 text-white"
-            : "bg-black/30 text-amber-200"
-        }`}>
+        <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold ${isOpen ? "bg-green-500/80 text-white" : "bg-black/30 text-amber-200"}`}>
           <span className={`inline-block w-2 h-2 rounded-full ${isOpen ? "bg-white animate-pulse" : "bg-amber-400"}`} />
           {isOpen ? "Jetzt geöffnet" : "Derzeit geschlossen"}
         </span>
-        {todayHours && (
-          <span className="text-amber-100">{todayHours}</span>
-        )}
+        {todayHours && <span className="text-amber-100">{todayHours}</span>}
       </div>
 
       {/* Social Media Links */}
       {restaurantData?.socialLinks && Object.values(restaurantData.socialLinks).some(Boolean) && (
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {SOCIAL_ICONS.filter(({ key }) => restaurantData.socialLinks[key]).map(({ key, label, icon }) => (
-            <a
-              key={key}
-              href={restaurantData.socialLinks[key]}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-all"
-            >
+            <a key={key} href={restaurantData.socialLinks[key]} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition-all">
               <span>{icon}</span>
               <span>{label}</span>
             </a>
@@ -128,13 +109,13 @@ const Header = ({ name, activePage, setActivePage }) => {
 };
 // ─── Öffnungszeiten-Anzeige ────────────────────────────────────────────────────
 const DAYS_DE = [
-  { key: "monday",    label: "Montag" },
-  { key: "tuesday",   label: "Dienstag" },
+  { key: "monday", label: "Montag" },
+  { key: "tuesday", label: "Dienstag" },
   { key: "wednesday", label: "Mittwoch" },
-  { key: "thursday",  label: "Donnerstag" },
-  { key: "friday",    label: "Freitag" },
-  { key: "saturday",  label: "Samstag" },
-  { key: "sunday",    label: "Sonntag" },
+  { key: "thursday", label: "Donnerstag" },
+  { key: "friday", label: "Freitag" },
+  { key: "saturday", label: "Samstag" },
+  { key: "sunday", label: "Sonntag" },
 ];
 
 const OpeningHoursDisplay = ({ hours }) => {
@@ -147,9 +128,13 @@ const OpeningHoursDisplay = ({ hours }) => {
         return (
           <div key={key} className="flex gap-3">
             <span className="w-28 text-gray-500 font-medium">{label}</span>
-            {day.closed
-              ? <span className="text-gray-400">Geschlossen</span>
-              : <span>{day.open} – {day.close} Uhr</span>}
+            {day.closed ? (
+              <span className="text-gray-400">Geschlossen</span>
+            ) : (
+              <span>
+                {day.open} – {day.close} Uhr
+              </span>
+            )}
           </div>
         );
       })}
@@ -163,7 +148,6 @@ const InfoPage = ({ restaurantData }) => {
   return (
     <div className="w-full max-w-3xl mx-auto py-10 px-4 space-y-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-
         {/* Adresse */}
         <div>
           <h2 className="text-2xl font-serif font-semibold mb-4 border-b pb-3">Informationen</h2>
@@ -194,23 +178,27 @@ const InfoPage = ({ restaurantData }) => {
 
 // ─── Allergen-Legende ──────────────────────────────────────────────────────────
 const ALLERGEN_LIST = [
-  { letter: "A", name: "Gluten" },       { letter: "B", name: "Krebstiere" },
-  { letter: "C", name: "Eier" },         { letter: "D", name: "Fisch" },
-  { letter: "E", name: "Erdnüsse" },     { letter: "F", name: "Soja" },
-  { letter: "G", name: "Milch" },        { letter: "H", name: "Schalenfrüchte" },
-  { letter: "I", name: "Sellerie" },     { letter: "J", name: "Senf" },
-  { letter: "K", name: "Sesam" },        { letter: "L", name: "Sulfite" },
-  { letter: "M", name: "Lupinen" },      { letter: "N", name: "Weichtiere" },
+  { letter: "A", name: "Gluten" },
+  { letter: "B", name: "Krebstiere" },
+  { letter: "C", name: "Eier" },
+  { letter: "D", name: "Fisch" },
+  { letter: "E", name: "Erdnüsse" },
+  { letter: "F", name: "Soja" },
+  { letter: "G", name: "Milch" },
+  { letter: "H", name: "Schalenfrüchte" },
+  { letter: "I", name: "Sellerie" },
+  { letter: "J", name: "Senf" },
+  { letter: "K", name: "Sesam" },
+  { letter: "L", name: "Sulfite" },
+  { letter: "M", name: "Lupinen" },
+  { letter: "N", name: "Weichtiere" },
 ];
 
 const AllergenLegend = () => {
   const [open, setOpen] = useState(false);
   return (
     <div className="max-w-7xl mx-auto px-4 pt-4 pb-10">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
-      >
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors">
         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold border border-amber-300">A</span>
         Allergen-Legende
         <span className={`text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
@@ -219,9 +207,7 @@ const AllergenLegend = () => {
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-x-6 gap-y-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
           {ALLERGEN_LIST.map(({ letter, name }) => (
             <div key={letter} className="flex items-center gap-2 text-sm text-gray-700">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">
-                {letter}
-              </span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">{letter}</span>
               {name}
             </div>
           ))}
@@ -233,10 +219,20 @@ const AllergenLegend = () => {
 
 // ─── Allergen Badges ───────────────────────────────────────────────────────────
 const ALLERGEN_LETTER = {
-  "Gluten": "A", "Krebstiere": "B", "Eier": "C", "Fisch": "D",
-  "Erdnüsse": "E", "Soja": "F", "Milch": "G", "Schalenfrüchte": "H",
-  "Sellerie": "I", "Senf": "J", "Sesam": "K", "Sulfite": "L",
-  "Lupinen": "M", "Weichtiere": "N",
+  Gluten: "A",
+  Krebstiere: "B",
+  Eier: "C",
+  Fisch: "D",
+  Erdnüsse: "E",
+  Soja: "F",
+  Milch: "G",
+  Schalenfrüchte: "H",
+  Sellerie: "I",
+  Senf: "J",
+  Sesam: "K",
+  Sulfite: "L",
+  Lupinen: "M",
+  Weichtiere: "N",
 };
 
 const AllergenBadges = ({ ingredients }) => {
@@ -244,11 +240,7 @@ const AllergenBadges = ({ ingredients }) => {
   return (
     <div className="flex flex-wrap gap-1 mt-1">
       {ingredients.map((ing) => (
-        <span
-          key={ing.id}
-          title={ing.name}
-          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300"
-        >
+        <span key={ing.id ?? ing.name} title={ing.name} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
           {ALLERGEN_LETTER[ing.name] ?? "?"}
         </span>
       ))}
@@ -275,25 +267,25 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
         {menuItems?.map((item, index) => {
           const unavailable = item.stock === "outOfStock";
           return (
-          <React.Fragment key={item.id || index}>
-            <div onClick={() => !unavailable && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-yellow-50"}`}>
-              <div className="flex-1 pr-4">
-                <div className="flex items-center gap-2">
-                  <p className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</p>
-                  {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
+            <React.Fragment key={item.id || index}>
+              <div onClick={() => !unavailable && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-yellow-50"}`}>
+                <div className="flex-1 pr-4">
+                  <div className="flex items-center gap-2">
+                    <p className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</p>
+                    {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
+                  </div>
+                  {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
+                  <AllergenBadges ingredients={item.ingredients} />
                 </div>
-                {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
-                <AllergenBadges ingredients={item.ingredients} />
+                <span className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
               </div>
-              <span className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
-            </div>
-            {expandedIndex === index && item.imageUrl && (
-              <div className="pb-3">
-                <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover rounded-xl shadow-sm" />
-              </div>
-            )}
-          </React.Fragment>
-        );
+              {expandedIndex === index && item.imageUrl && (
+                <div className="pb-3">
+                  <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover rounded-xl shadow-sm" />
+                </div>
+              )}
+            </React.Fragment>
+          );
         })}
       </div>
 
@@ -311,40 +303,31 @@ const MenuSection = ({ id, title, menuItems, bgColor }) => {
             {menuItems?.map((item, index) => {
               const unavailable = item.stock === "outOfStock";
               return (
-              <React.Fragment key={item.id || index}>
-                <TableRow
-                  onClick={() => !unavailable && toggleExpand(index)}
-                  className={`transition-all duration-200 border-b ${unavailable ? "opacity-50 cursor-not-allowed bg-gray-50" : "cursor-pointer hover:bg-yellow-50"}`}
-                >
-                  <TableCell className="align-top py-4">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</span>
-                        {unavailable && (
-                          <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">
-                            Nicht verfügbar
-                          </span>
-                        )}
-                      </div>
-                      {item.description && <span className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
-                      <AllergenBadges ingredients={item.ingredients} />
-                    </div>
-                  </TableCell>
-                  <TableCell className={`text-right font-mono whitespace-nowrap align-top py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>
-                    {parseFloat(item.price || 0).toFixed(2)}€
-                  </TableCell>
-                </TableRow>
-
-                {expandedIndex === index && item.imageUrl && (
-                  <TableRow className="bg-gray-50">
-                    <TableCell colSpan={2} className="p-5">
-                      <div className="shadow-sm overflow-hidden">
-                        <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover" />
+                <React.Fragment key={item.id || index}>
+                  <TableRow onClick={() => !unavailable && toggleExpand(index)} className={`transition-all duration-200 border-b ${unavailable ? "opacity-50 cursor-not-allowed bg-gray-50" : "cursor-pointer hover:bg-yellow-50"}`}>
+                    <TableCell className="align-top py-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-serif ${unavailable ? "text-gray-400 line-through" : "text-gray-900"}`}>{item.name}</span>
+                          {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
+                        </div>
+                        {item.description && <span className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
+                        <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
+                    <TableCell className={`text-right font-mono whitespace-nowrap align-top py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
                   </TableRow>
-                )}
-              </React.Fragment>
+
+                  {expandedIndex === index && item.imageUrl && (
+                    <TableRow className="bg-gray-50">
+                      <TableCell colSpan={2} className="p-5">
+                        <div className="shadow-sm overflow-hidden">
+                          <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               );
             })}
           </TableBody>
@@ -451,7 +434,7 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
-        console.log("Server Daten(Sort)",data)
+        console.log("Server Daten(Sort)", data);
         data.menu[0].categoryGroup.sort((a, b) => Number(a.position) - Number(b.position));
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");
@@ -486,7 +469,7 @@ const MenuContent = () => {
             {categoryGroups.length > 0 ? (
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
-                  <div key={group.id} className={`bg-white rounded-2xl shadow-sm p-6 border border-amber-100 ${group.color}`}>
+                  <div key={group.id} className={`rounded-2xl shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
                     <h2 className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
