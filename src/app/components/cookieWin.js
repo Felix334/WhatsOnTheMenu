@@ -20,11 +20,10 @@ export default function CookieBanner() {
     }
   }, []);
 
-  const acceptCookies = () => {
-    // 1 Jahr Cookie setzen
+  const dismissBanner = () => {
     const expiry = new Date();
     expiry.setFullYear(expiry.getFullYear() + 1);
-    document.cookie = `cookieConsent=accepted; expires=${expiry.toUTCString()}; path=/; SameSite=Strict`;
+    document.cookie = `cookieConsent=acknowledged; expires=${expiry.toUTCString()}; path=/; SameSite=Strict`;
     setShow(false);
   };
 
@@ -89,7 +88,7 @@ export default function CookieBanner() {
       </p>
 
       <button
-        onClick={acceptCookies}
+        onClick={dismissBanner}
         style={{
           padding: "12px 24px",
           background: "#3b82f6",
@@ -102,7 +101,7 @@ export default function CookieBanner() {
           boxShadow: "0 4px 12px rgba(59,130,246,0.4)",
         }}
       >
-        Akzeptieren
+        Verstanden
       </button>
     </div>
   );

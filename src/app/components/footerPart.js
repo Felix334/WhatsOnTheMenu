@@ -30,7 +30,7 @@ const FooterPart = () => {
             <a href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
               Datenschutz
             </a>
-            <a href="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <a href="/AGBs" className="text-gray-400 hover:text-white text-sm transition-colors">
               AGB
             </a>
             <a href="/imprint" className="text-gray-400 hover:text-white text-sm transition-colors">
