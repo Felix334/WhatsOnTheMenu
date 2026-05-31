@@ -96,6 +96,7 @@ model Restaurant {
   calendar      Calendar[]
   locations     Location[]
   menu          Menu[]
+  orders        Order[]
   owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
@@ -188,6 +189,26 @@ model Dish {
 enum DishAvailable {
   isAvailable
   outOfStock
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  restaurantId String
+  tableNumber  String
+  items        Json
+  note         String?
+  status       OrderStatus @default(pending)
+  createdAt    DateTime    @default(now())
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  done
 }
 
 model Ingredient {

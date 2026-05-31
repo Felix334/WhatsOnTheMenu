@@ -587,19 +587,31 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
           <Button onClick={() => setIsEditing(true)}>Bearbeiten</Button>
         )}
       </div>
-      <Button asChild>
-        <Link
-          href={{
-            pathname: "/Profil/QRBuilder/",
-            query: {
-              ...(userID && { userID }),
-              ...(restaurantID && { restaurantID }),
-            },
-          }}
-        >
-          QR-Code erstellen
-        </Link>
-      </Button>
+      <div className="flex gap-3 flex-wrap">
+        <Button asChild>
+          <Link
+            href={{
+              pathname: "/Profil/QRBuilder/",
+              query: {
+                ...(userID && { userID }),
+                ...(restaurantID && { restaurantID }),
+              },
+            }}
+          >
+            QR-Code erstellen
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link
+            href={{
+              pathname: "/Profil/Bestellungen",
+              query: { ...(restaurantID && { restaurantID }) },
+            }}
+          >
+            🍽️ Bestellungen
+          </Link>
+        </Button>
+      </div>
       {/* ── Öffnungszeiten ─────────────────────────────────────────────────── */}
       <OpeningHoursEditor
         restaurantId={restaurant?.id}

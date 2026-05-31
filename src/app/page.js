@@ -435,6 +435,9 @@ function HomeContent() {
                       <li>
                         <span className="text-green-300 mr-2">✓</span>Verfügbarkeitsanzeige
                       </li>
+                      <li>
+                        <span className="text-green-300 mr-2">✓</span>Bestellfunktion
+                      </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
                   </CardContent>

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { Suspense, useEffect, useState, useRef } from "react";
+import React, { Suspense, useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { bgColorClass, bgColorStyle } from "./components/colorPicker";
@@ -251,12 +252,27 @@ const AllergenBadges = ({ ingredients }) => {
 };
 
 // ─── Menu Section ──────────────────────────────────────────────────────────────
-const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  const CartControls = ({ item }) => {
+    const qty = cart[item.id]?.quantity ?? 0;
+    return (
+      <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+        {qty > 0 && (
+          <>
+            <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center transition-colors">−</button>
+            <span className="w-5 text-center text-sm font-semibold">{qty}</span>
+          </>
+        )}
+        <button onClick={() => addToCart(item)} className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-700 text-white font-bold text-sm flex items-center justify-center transition-colors">+</button>
+      </div>
+    );
   };
 
   return (
@@ -271,8 +287,8 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
           const unavailable = item.stock === "outOfStock";
           return (
             <React.Fragment key={item.id || index}>
-              <div onClick={() => !unavailable && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-yellow-50"}`}>
-                <div className="flex-1 pr-4">
+              <div onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
+                <div className="flex-1 pr-2">
                   <div className="flex items-center gap-2">
                     <p style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>{item.name}</p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
@@ -280,7 +296,10 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
                   {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
                   <AllergenBadges ingredients={item.ingredients} />
                 </div>
-                <span className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
+                  {orderMode && !unavailable && <CartControls item={item} />}
+                </div>
               </div>
               {expandedIndex === index && item.imageUrl && (
                 <div className="pb-3">
@@ -299,6 +318,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
             <TableRow>
               <TableHead className="text-left font-semibold">Speisen</TableHead>
               <TableHead className="text-right font-semibold w-28">Preis</TableHead>
+              {orderMode && <TableHead className="w-32" />}
             </TableRow>
           </TableHeader>
 
@@ -307,7 +327,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
               const unavailable = item.stock === "outOfStock";
               return (
                 <React.Fragment key={item.id || index}>
-                  <TableRow onClick={() => !unavailable && toggleExpand(index)} className={`transition-all duration-200 border-b ${unavailable ? "opacity-50 cursor-not-allowed bg-gray-50" : "cursor-pointer hover:bg-yellow-50"}`}>
+                  <TableRow onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`transition-all duration-200 border-b ${unavailable ? "opacity-50 cursor-not-allowed bg-gray-50" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
                     <TableCell className="align-top py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
@@ -318,12 +338,13 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont }) => {
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
-                    <TableCell className={`text-right font-mono whitespace-nowrap align-top py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                    <TableCell className={`text-right font-mono whitespace-nowrap align-middle py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                    {orderMode && <TableCell className="align-middle py-4 w-32"><div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div></TableCell>}
                   </TableRow>
 
                   {expandedIndex === index && item.imageUrl && (
                     <TableRow className="bg-gray-50">
-                      <TableCell colSpan={2} className="p-5">
+                      <TableCell colSpan={orderMode ? 3 : 2} className="p-5">
                         <div className="shadow-sm overflow-hidden">
                           <Image src={item.imageUrl} alt={item.name} width={900} height={600} className="w-full h-auto object-cover" />
                         </div>
@@ -405,6 +426,117 @@ const CategoryNav = ({ categories, activeId }) => {
   );
 };
 
+// ─── Cart Bar ─────────────────────────────────────────────────────────────────
+const CartBar = ({ cart, onOrder }) => {
+  const items = Object.values(cart);
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  if (items.length === 0) return null;
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-xl px-4 py-3 flex items-center justify-between gap-4">
+      <div className="text-sm text-gray-700">
+        <span className="font-semibold">{items.reduce((s, i) => s + i.quantity, 0)} Artikel</span>
+        <span className="mx-2 text-gray-300">|</span>
+        <span className="font-mono">{total.toFixed(2)} €</span>
+      </div>
+      <button onClick={onOrder} className="bg-gray-900 text-white text-sm font-semibold px-5 py-2 rounded-xl hover:bg-gray-700 transition-colors">
+        Bestellen →
+      </button>
+    </div>
+  );
+};
+
+// ─── Order Modal ───────────────────────────────────────────────────────────────
+const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => {
+  const [note, setNote] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const items = Object.values(cart);
+  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          restaurantId,
+          tableNumber,
+          items: items.map((i) => ({ dishId: i.dishId, name: i.name, price: i.price, quantity: i.quantity })),
+          note: note || null,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) onSuccess(data.orderId);
+      else alert("Fehler beim Bestellen");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+        <h2 className="text-lg font-semibold">Bestellung bestätigen</h2>
+        <p className="text-sm text-gray-500">Tisch {tableNumber}</p>
+
+        <ul className="space-y-1 text-sm border rounded-xl p-3 bg-gray-50">
+          {items.map((i) => (
+            <li key={i.dishId} className="flex justify-between">
+              <span>{i.quantity}× {i.name}</span>
+              <span className="font-mono text-gray-600">{(i.price * i.quantity).toFixed(2)} €</span>
+            </li>
+          ))}
+          <li className="flex justify-between font-semibold pt-2 border-t mt-2">
+            <span>Gesamt</span>
+            <span className="font-mono">{total.toFixed(2)} €</span>
+          </li>
+        </ul>
+
+        <div>
+          <label className="text-sm font-medium text-gray-700">Anmerkung (optional)</label>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            placeholder="z.B. ohne Zwiebeln..."
+            className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-400"
+          />
+        </div>
+
+        <div className="flex gap-3 pt-1">
+          <button onClick={onClose} className="flex-1 border border-gray-200 rounded-xl py-2 text-sm font-medium hover:bg-gray-50 transition-colors">
+            Abbrechen
+          </button>
+          <button onClick={handleSubmit} disabled={loading} className="flex-1 bg-gray-900 text-white rounded-xl py-2 text-sm font-semibold hover:bg-gray-700 transition-colors disabled:opacity-50">
+            {loading ? "Wird gesendet..." : "Jetzt bestellen"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── QR Modal ─────────────────────────────────────────────────────────────────
+const QRModal = ({ orderId, tableNumber, onClose }) => {
+  const url = typeof window !== "undefined" ? `${window.location.origin}/orders/${orderId}` : `/orders/${orderId}`;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-sm p-6 space-y-4 shadow-2xl text-center">
+        <h2 className="text-lg font-semibold">Bestellung aufgegeben!</h2>
+        <p className="text-sm text-gray-500">Tisch {tableNumber} · Zeige diesen QR-Code der Bedienung</p>
+        <div className="flex justify-center p-4 bg-gray-50 rounded-xl">
+          <QRCodeSVG value={url} size={180} />
+        </div>
+        <p className="text-xs text-gray-400">Die Bedienung scannt den Code um deine Bestellung zu sehen</p>
+        <button onClick={onClose} className="w-full bg-gray-900 text-white rounded-xl py-2 text-sm font-semibold hover:bg-gray-700 transition-colors">
+          Schließen
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // ─── Main Content ──────────────────────────────────────────────────────────────
 const MenuContent = () => {
   const searchParams = useSearchParams();
@@ -414,6 +546,29 @@ const MenuContent = () => {
   const [name, setName] = useState("");
   const [activeId, setActiveId] = useState(null);
   const [activePage, setActivePage] = useState("menu");
+
+  const tableNumber = searchParams.get("tableNumber");
+  const [cart, setCart] = useState({});
+  const [orderStep, setOrderStep] = useState(null); // null | "confirm" | "qr"
+  const [orderId, setOrderId] = useState(null);
+
+  const addToCart = useCallback((dish) => {
+    setCart((prev) => {
+      const existing = prev[dish.id];
+      return { ...prev, [dish.id]: { dishId: dish.id, name: dish.name, price: parseFloat(dish.price), quantity: (existing?.quantity ?? 0) + 1 } };
+    });
+  }, []);
+
+  const removeFromCart = useCallback((dishId) => {
+    setCart((prev) => {
+      const existing = prev[dishId];
+      if (!existing || existing.quantity <= 1) {
+        const { [dishId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [dishId]: { ...existing, quantity: existing.quantity - 1 } };
+    });
+  }, []);
 
   useEffect(() => {
     const restaurantID = searchParams.get("restaurantID");
@@ -459,6 +614,8 @@ const MenuContent = () => {
   const menuFont = menuEntry?.font || null;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
 
+  const restaurantId = serverData?.id;
+
   return (
     <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-amber-50"}`} style={{ backgroundColor: bgColor || undefined, fontFamily: menuFont || undefined }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -472,7 +629,13 @@ const MenuContent = () => {
         <InfoPage restaurantData={serverData} />
       ) : (
         <>
-          <main className="w-full max-w-7xl mx-auto px-4 py-8">
+          <main className={`w-full max-w-7xl mx-auto px-4 py-8 ${tableNumber ? "pb-28" : ""}`}>
+            {tableNumber && (
+              <div className="mb-6 flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 w-fit shadow-sm">
+                <span>🪑</span>
+                <span>Tisch <strong className="text-gray-900">{tableNumber}</strong> · Wähle deine Gerichte aus</span>
+              </div>
+            )}
             {categoryGroups.length > 0 ? (
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
@@ -480,7 +643,7 @@ const MenuContent = () => {
                     <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} />
                       ))}
                     </div>
                   </div>
@@ -492,6 +655,22 @@ const MenuContent = () => {
           </main>
           <AllergenLegend />
         </>
+      )}
+
+      {tableNumber && <CartBar cart={cart} onOrder={() => setOrderStep("confirm")} />}
+
+      {orderStep === "confirm" && (
+        <OrderModal
+          cart={cart}
+          tableNumber={tableNumber}
+          restaurantId={restaurantId}
+          onSuccess={(id) => { setOrderId(id); setOrderStep("qr"); setCart({}); }}
+          onClose={() => setOrderStep(null)}
+        />
+      )}
+
+      {orderStep === "qr" && (
+        <QRModal orderId={orderId} tableNumber={tableNumber} onClose={() => setOrderStep(null)} />
       )}
     </div>
   );
