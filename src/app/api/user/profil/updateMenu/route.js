@@ -15,29 +15,28 @@ async function authorize(req) {
 
 export async function POST(req) {
   try {
-    if (!(await authorize(req))) {
+    const token = await authorize(req);
+    if (!token) {
       return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { restaurantID, userID, font, bgColor } = body ?? {};
+    const { restaurantID, font, bgColor } = body ?? {};
 
-    if (!restaurantID || !userID || (!font && !bgColor)) {
+    if (!restaurantID || (!font && !bgColor)) {
       return NextResponse.json({ message: "Bad Request" }, { status: 400 });
     }
 
-    // owner check like in updateRestaurant
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
       select: { ownerId: true },
     });
-    console.log("Serach Restaurant:", restaurant)
 
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
     }
 
-    if (restaurant.ownerId !== userID) {
+    if (restaurant.ownerId !== token.id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
