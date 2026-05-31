@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
+import { bgColorClass, bgColorStyle } from "./components/colorPicker";
 
 // ─── Hero-Farben ──────────────────────────────────────────────────────────────
 const HERO_COLOR_PRESETS = [
