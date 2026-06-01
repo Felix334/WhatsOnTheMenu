@@ -1,37 +1,39 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { permission } from "process";
+
+const ALL_PERMISSIONS = ["orders", "availability", "staff_view", "settings"];
 
 const ROLE_PERMISSIONS = {
-  manager: ["orders", "availability", "staff_view"],
+  manager: ALL_PERMISSIONS,
   waiter:  ["orders"],
-  kitchen: ["availability"],
+  kitchen: ["availability", "orders"],
 };
 
 /**
  * Gibt die Staff-Rolle des eingeloggten Users für ein Restaurant zurück.
- * Gibt null zurück wenn kein Zugriff.
+ * Gibt null zurück wenn kein Zugriff oder Owner kein Professional-Abo hat.
  */
-export async function getStaffAccess(req, restaurantId) {
+export async function getStaffAccess(_req, restaurantId) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
-  // Owner hat immer vollen Zugriff
-  if (session.user.role === "Owner") {
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { id: restaurantId },
-      select: { ownerId: true },
-    });
-    if (restaurant?.ownerId === session.user.id) {
-      return { role: "owner", permissions: ["orders", "availability", "staff_view", "settings"] };
-    }
-  }
-  if(session.user.restaurantStaff === "kitchen" || session.user.staffMemberships === "waiter" || session.user.staffMemberships === "manager"){
-    return {permission : ["order"]}
-  }
-  if(session.user.restaurantStaff === "manager"){
-    return {role: session.user.restaurantStaff ,permissions: ["orders", "availability", "staff_view", "settings"]}
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    select: {
+      ownerId: true,
+      owner: { select: { subscription: true } },
+    },
+  });
+
+  if (!restaurant) return null;
+
+  // Nur Professional-Restaurants dürfen das Staff-System nutzen
+  if (restaurant.owner.subscription !== "Professional") return null;
+
+  // Owner hat immer vollen Zugriff auf sein eigenes Restaurant
+  if (session.user.role === "Owner" && restaurant.ownerId === session.user.id) {
+    return { role: "owner", permissions: ["orders", "availability", "staff_view", "settings"] };
   }
 
   const membership = await prisma.restaurantStaff.findFirst({
