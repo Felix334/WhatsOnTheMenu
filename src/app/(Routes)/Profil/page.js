@@ -841,7 +841,12 @@ export default function PageBuilder() {
             )}
           </div>
 
-          <div>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>
+                🍽️ Bestellungen
+              </Link>
+            </Button>
             <Button asChild>
               <Link
                 href={{
@@ -857,8 +862,6 @@ export default function PageBuilder() {
       </header>
 
       <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center relative`}>
-        <p className="text-white/60 uppercase tracking-widest text-xs font-semibold mb-2">Mein Restaurant</p>
-
         {isEditingHero ? (
           <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
             <input value={heroName} onChange={(e) => setHeroName(e.target.value)} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Restaurant Name" />

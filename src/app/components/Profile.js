@@ -17,6 +17,8 @@ const Profile = () => {
   const { data: session } = useSession();
 
   const role = session?.user?.role;
+  const staffMembershipsRole = session?.user?.staffMemberships.role;
+  console.log("Staffmembership", staffMembershipsRole);
   const googleImg = window.sessionStorage.getItem("googleProfileImg");
   if (!googleImg) {
     const setGoogleImg = session.user?.image;
@@ -48,16 +50,16 @@ const Profile = () => {
 
   // Logout
 
-const logout = async () => {
-  // 1️⃣ Optional: eigenes sessionStorage/Cookies aufräumen
-  sessionStorage.removeItem("googleProfileImg");
+  const logout = async () => {
+    // 1️⃣ Optional: eigenes sessionStorage/Cookies aufräumen
+    sessionStorage.removeItem("googleProfileImg");
 
-  // 2️⃣ NextAuth ausloggen
-  await signOut({
-    redirect: true,       // redirect true sorgt für sauberen Logout
-    callbackUrl: "/",     // wohin nach Logout
-  });
-};
+    // 2️⃣ NextAuth ausloggen
+    await signOut({
+      redirect: true, // redirect true sorgt für sauberen Logout
+      callbackUrl: "/", // wohin nach Logout
+    });
+  };
 
   // Query bauen
   const userID = session?.user?.id;
@@ -100,6 +102,8 @@ const logout = async () => {
               {role === "Admin" && <p className="text-red-600 font-bold">Admin</p>}
 
               {role === "Owner" && <p className="text-blue-600 font-bold">Owner</p>}
+
+              {role === "Staff" && <p className="text-green-500 font-bold">{session.user.role}</p>}
             </div>
 
             {/* Buttons */}
@@ -117,12 +121,13 @@ const logout = async () => {
                   <Button className="w-full">Unser Partnerprogramm</Button>
                 </Link>
               )}
-
-              <Link href={`/settings?${queryString}`} onClick={() => setOpenProfil(false)}>
-                <Button variant="outline" className="w-full">
-                  Einstellungen
-                </Button>
-              </Link>
+              {(role === "Owner" || role === "Staff" || staffMembershipsRole === "manager" || staffMembershipsRole === "waiter" || staffMembershipsRole === "kitchen") && (
+                <Link href={`/staff?${queryString}`} onClick={() => setOpenProfil(false)}>
+                  <Button variant="outline" className="w-full">
+                    Einstellungen
+                  </Button>
+                </Link>
+              )}
 
               <Button variant="destructive" className="w-full" onClick={logout}>
                 Abmelden

@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { permission } from "process";
 
 const ROLE_PERMISSIONS = {
   manager: ["orders", "availability", "staff_view"],
@@ -25,6 +26,12 @@ export async function getStaffAccess(req, restaurantId) {
     if (restaurant?.ownerId === session.user.id) {
       return { role: "owner", permissions: ["orders", "availability", "staff_view", "settings"] };
     }
+  }
+  if(session.user.restaurantStaff === "kitchen" || session.user.staffMemberships === "waiter" || session.user.staffMemberships === "manager"){
+    return {permission : ["order"]}
+  }
+  if(session.user.restaurantStaff === "manager"){
+    return {role: session.user.restaurantStaff ,permissions: ["orders", "availability", "staff_view", "settings"]}
   }
 
   const membership = await prisma.restaurantStaff.findFirst({

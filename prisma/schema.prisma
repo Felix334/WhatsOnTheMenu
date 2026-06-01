@@ -339,6 +339,7 @@ model CategoryGroup {
 
 enum Role {
   User
+  Staff
   Admin
   Owner
   Manager

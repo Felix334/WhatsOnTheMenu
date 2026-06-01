@@ -23,6 +23,20 @@ export async function middleware(req) {
     }
   }
 
+  // /staff/* — nur Staff und Owner
+  if (pathname.startsWith("/staff")) {
+    if (!token || (token.role !== "Staff" && token.role !== "Owner")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
+  // /settings — Owner und Staff
+  if (pathname.startsWith("/settings")) {
+    if (!token || (token.role !== "Owner" && token.role !== "Staff")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -30,7 +44,11 @@ export const config = {
   matcher: [
     "/Admin/:path*",
     "/api/Admin/:path*",
-    "/api/restaurant/Admin/:path*",   // ← fehlte: Restaurant-Genehmigungs-Routen
+    "/api/restaurant/Admin/:path*",
     "/Profil/:path*",
+    "/staff/:path*",
+    "/staff",
+    "/settings/:path*",
+    "/settings",
   ],
 };

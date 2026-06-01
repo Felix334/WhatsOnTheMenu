@@ -32,8 +32,16 @@ export async function PATCH(req, { params }) {
       ...(approved !== undefined && { approved }),
       ...(role && ["manager", "waiter", "kitchen"].includes(role) && { role }),
     },
-    include: { user: { select: { name: true, email: true } } },
+    include: { user: { select: { id: true, name: true, email: true } } },
   });
+
+  // Wenn genehmigt → User.role auf "Staff" setzen
+  if (approved === true && updated.userId) {
+    await prisma.user.update({
+      where: { id: updated.userId },
+      data: { role: "Staff" },
+    });
+  }
 
   return NextResponse.json({ staff: updated });
 }
@@ -46,6 +54,19 @@ export async function DELETE(req, { params }) {
   if (!entry) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   await prisma.restaurantStaff.delete({ where: { id: staffID } });
+
+  // Wenn der User keine weiteren Staff-Einträge hat → Rolle zurücksetzen
+  if (entry.userId) {
+    const remaining = await prisma.restaurantStaff.count({
+      where: { userId: entry.userId, approved: true },
+    });
+    if (remaining === 0) {
+      await prisma.user.update({
+        where: { id: entry.userId },
+        data: { role: "User" },
+      });
+    }
+  }
 
   return NextResponse.json({ message: "Entfernt" });
 }
