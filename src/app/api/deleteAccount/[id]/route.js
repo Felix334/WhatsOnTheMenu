@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+import { getServerSession, signOut } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
@@ -61,5 +61,11 @@ export async function DELETE(request, { params }) {
       { error: "Failed to delete account" },
       { status: 500 }
     );
+  }finally{
+    var findUser = await prisma.user.findUnique({ where: { id }}).then(() => {
+      if(!findUser){
+        console.log("Kein Benutzer gefunden!\nNutzer erfolgreich gelöscht")
+      }
+    })
   }
 }

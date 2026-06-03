@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -384,6 +385,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
   const [originalLocations, setOriginalLocations] = useState([]);
   const [errors, setErrors] = useState({});
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     if (isEditing && restaurant) {
@@ -428,6 +430,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
     const resp = await fetch(`/api/deleteAccount/${userID}`, { method: "DELETE" });
     if (resp.ok) {
       toast.success("Account erfolgreich gelöscht!");
+      await signOut().then(() => {router.push("./")})
     } else {
       toast.error("Fehler beim Löschen des Accounts");
     }
