@@ -29,10 +29,7 @@ export type Tier = keyof typeof PRICE_IDS;
  * Get Stripe Price ID safely
  */
 export function getPriceId(tier: string): string | null {
-  const normalized = tier.toLowerCase() as Tier;
-
-  const priceId = PRICE_IDS[normalized];
-
+  const priceId = PRICE_IDS[tier as Tier];
   return priceId ?? null;
 }
 
