@@ -52,5 +52,5 @@ export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" |
     individuell: "Individuell",
   };
 
-  return TIER_MAP[normalized] ?? "Professional";
+  return TIER_MAP[normalized] ?? "FreeTier";
 }

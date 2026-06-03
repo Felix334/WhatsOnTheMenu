@@ -103,12 +103,12 @@ const Profile = () => {
 
               {role === "Owner" && <p className="text-blue-600 font-bold">Owner</p>}
 
-              {role === "Staff" && <p className="text-green-500 font-bold">{session.user.role}</p>}
+              {role === "Staff" && <p className="text-green-500 font-bold">Angestellter</p>}
             </div>
 
             {/* Buttons */}
             <div className="space-y-2 grid">
-              {(role === "Owner" || role === "Admin") && (
+              {(role === "Owner" || role === "Admin" || role === "Staff") && (
                 <Link href={`/Profil?${queryString}`} onClick={() => setOpenProfil(false)}>
                   <Button variant="outline" className="w-full">
                     Profil
@@ -116,7 +116,7 @@ const Profile = () => {
                 </Link>
               )}
 
-              {role !== "Owner" && role !== "Admin" && (
+              {role !== "Owner" && role !== "Admin" && role !== "Staff" && (
                 <Link href={`/ErstelleRestaurantAccount?${queryString}`} onClick={() => setOpenProfil(false)}>
                   <Button className="w-full">Unser Partnerprogramm</Button>
                 </Link>

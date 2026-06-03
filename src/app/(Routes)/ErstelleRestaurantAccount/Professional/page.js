@@ -41,7 +41,7 @@ export default function RestaurantForm() {
     category: "",
     description: "",
     ownerID: "",
-    subscription: "Premium",
+    subscription: "Professional",
   });
 
   const [errors, setErrors] = useState({});
@@ -145,7 +145,7 @@ export default function RestaurantForm() {
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: "Premium", restaurant }),
+        body: JSON.stringify({ tier: "Professional", restaurant }),
       });
       const { url } = await res.json();
       if (url) window.location.href = url;

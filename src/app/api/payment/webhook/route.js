@@ -19,7 +19,6 @@ export async function POST(req) {
   }
   
   let event;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
