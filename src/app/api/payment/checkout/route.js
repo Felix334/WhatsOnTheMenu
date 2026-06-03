@@ -28,7 +28,17 @@ export async function POST(request) {
   // ---------------------------
   // Stripe Customer holen / erstellen
   // ---------------------------
-  let customerId = session.user.stripeCustomerId;
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { stripeCustomerId: true, stripeSubscriptionId: true, subscriptionStatus: true },
+  });
+
+  // Bereits aktives Abo → kein zweites erstellen
+  if (dbUser?.stripeSubscriptionId && dbUser?.subscriptionStatus === "active") {
+    return new Response("Already subscribed", { status: 409 });
+  }
+
+  let customerId = dbUser?.stripeCustomerId;
 
   if (!customerId) {
     try {

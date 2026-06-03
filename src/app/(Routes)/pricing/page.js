@@ -142,6 +142,11 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
+              {session?.user?.role === "Owner" ? (
+                <div className="w-full text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                  Du hast bereits ein aktives Abonnement.
+                </div>
+              ) : (
               <Dialog open={showProForm} onOpenChange={setShowProForm}>
                 <DialogTrigger asChild>
                   <Button
@@ -228,6 +233,7 @@ export default function PricingPage() {
                   </form>
                 </DialogContent>
               </Dialog>
+              )}
             </CardContent>
           </Card>
 
@@ -251,6 +257,11 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
+              {session?.user?.role === "Owner" ? (
+                <div className="w-full text-center text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                  Du hast bereits ein aktives Abonnement.
+                </div>
+              ) : (
               <Dialog open={showPremiumForm} onOpenChange={setShowPremiumForm}>
                 <DialogTrigger asChild>
                   <Button size="lg" variant="outline" className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400">
@@ -322,6 +333,7 @@ export default function PricingPage() {
                   </form>
                 </DialogContent>
               </Dialog>
+              )}
             </CardContent>
           </Card>
         </div>

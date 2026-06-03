@@ -7,9 +7,7 @@ import { getServerSession } from "next-auth";
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
-    const token = getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
-    if (!token || !session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
     if(session.user.role === "Owner"){
@@ -17,7 +15,8 @@ export async function POST(req) {
     }
     const body = await req.json();
 
-    const { ownerName, restaurantName, email, postalCode, city, street, houseNumber, phone, category, description, ownerID } = body;
+    const { ownerName, restaurantName, email, postalCode, city, street, houseNumber, phone, category, description } = body;
+    const ownerID = session.user.id;
 
     console.log(`OwnerName:${ownerName}, RestaurantName:${restaurantName}, Email:${email}, PLZ:${postalCode}, Stadt:${city}, Straße: ${street}`);
     console.log(`Hausnummer:${houseNumber}, Nummer:${phone}, Kattegory:${category}, Beschreibung:${description}, OwnerID:${ownerID}`);
@@ -80,7 +79,7 @@ export async function POST(req) {
         city: city,
         postalCode: postalCode,
         country: "Deutschland",
-        subscription: "Basic",
+        subscription: "FreeTier",
         owner: { connect: { id: ownerID } },
       },
     });
