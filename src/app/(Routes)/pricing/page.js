@@ -112,7 +112,7 @@ export default function PricingPage() {
               <Button
                 variant="outline"
                 className="w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"
-                onClick={() => router.push("/(Routes)/ErstelleRestaurantAccount/FreeTier")}
+                onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")}
               >
                 Jetzt starten
               </Button>

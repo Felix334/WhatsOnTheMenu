@@ -17,36 +17,33 @@ if (!webhookSecret) {
 
 export const PRICE_IDS = {
   Professional: process.env.STRIPE_PROFESSIONAL_PRICE_ID,
-  Business: process.env.STRIPE_BUSINESS_PRICE_ID,
+  Business: process.env.STRIPE_PREMIUM_PRICE_ID,
 } as const;
 
-/**
- * Tier-safe typing
- */
 export type Tier = keyof typeof PRICE_IDS;
 
-/**
- * Get Stripe Price ID safely
- */
+const TIER_ALIAS: Record<string, Tier> = {
+  pro: "Professional",
+  professional: "Professional",
+  business: "Business",
+  premium: "Business",
+};
+
 export function getPriceId(tier: string): string | null {
-  const priceId = PRICE_IDS[tier as Tier];
-  return priceId ?? null;
+  const key = TIER_ALIAS[tier.toLowerCase()];
+  if (!key) return null;
+  return PRICE_IDS[key] ?? null;
 }
 
-/**
- * Maps Stripe tier names (e.g. "pro", "premium") to internal subscription enum values.
- * IMPORTANT: input is always lowercased before lookup.
- */
 export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" | "Business" {
-  const normalized = tier.toLowerCase();
-
   const TIER_MAP: Record<string, "FreeTier" | "Professional" | "Business"> = {
     free: "FreeTier",
     freetier: "FreeTier",
     pro: "Professional",
     professional: "Professional",
-    business: "Business"
+    business: "Business",
+    premium: "Business",
   };
 
-  return TIER_MAP[normalized] ?? "FreeTier";
+  return TIER_MAP[tier.toLowerCase()] ?? "FreeTier";
 }
