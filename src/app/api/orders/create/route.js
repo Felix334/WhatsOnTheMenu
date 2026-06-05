@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getStaffAccess, can } from "@/lib/staffAuth";
 
 export async function POST(req) {
   try {
     const { restaurantId, tableNumber, items, note } = await req.json();
+
+    const access = await getStaffAccess(req, restaurantId);
+    if (!access || !can(access, "orders")) {
+      return NextResponse.json({ message: "Nicht autorisiert" }, { status: 401 });
+    }
 
     if (!restaurantId || !tableNumber || !items?.length) {
       return NextResponse.json({ message: "Fehlende Felder" }, { status: 400 });
