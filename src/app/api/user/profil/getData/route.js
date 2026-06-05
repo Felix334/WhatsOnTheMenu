@@ -17,19 +17,16 @@ export async function POST(req) {
     if (!data) {
       return NextResponse.json({ status: 400, error: "No data provided" });
     }
-
-    console.log("Empfangene Daten", data);
     const id = data.userID;
-    console.log("UserID suchen:", id);
 
     if (!id) {
       return NextResponse.json({ status: 400, error: "userID is required" });
     }
+    if(id !== session.user.id){
+      return NextResponse.json({status: 401, message: "Unautherized"})
+    }
 
     const userData = await main(id);
-    if (userData) {
-      console.log("Restaurant gefunden(user/profil/getData):", userData);
-    }
 
     if (!userData) {
       return NextResponse.json({ status: 404, error: "User not found" });

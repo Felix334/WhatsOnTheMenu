@@ -249,8 +249,6 @@ export default function PageBuilder() {
       return;
     }
 
-    const api_key = process.env.NEXT_PUBLIC_API_KEY || "";
-
     // Convert server menu data to API format
     const menuData = menu.categoryGroups.map((cg) => ({
       categoryGroupName: cg.name,
@@ -290,7 +288,7 @@ export default function PageBuilder() {
     setIsLoading(true);
 
     try {
-      const { enc_data, encrypted_restaurant_id, encrypted_api_key, encrypted_user_id } = await encrypt_data(userID, menuData, restaurantID, api_key);
+      const { enc_data, encrypted_restaurant_id, encrypted_user_id } = await encrypt_data(userID, menuData, restaurantID);
 
       const saveResponse = await fetch("/api/user/profil/setData", {
         method: "POST",
@@ -299,7 +297,6 @@ export default function PageBuilder() {
           encrypted_user_id,
           encrypted_restaurant_id,
           encrypted_data: enc_data,
-          encrypted_api_key,
         }),
       });
 
@@ -319,7 +316,7 @@ export default function PageBuilder() {
           files: [],
         };
 
-        const { enc_data: del_enc, encrypted_restaurant_id: del_rest, encrypted_api_key: del_key, encrypted_user_id: del_user } = await encrypt_data(userID, deletePayload, restaurantID, api_key);
+        const { enc_data: del_enc, encrypted_restaurant_id: del_rest, encrypted_user_id: del_user } = await encrypt_data(userID, deletePayload, restaurantID);
 
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
@@ -328,7 +325,6 @@ export default function PageBuilder() {
             encrypted_user_id: del_user,
             encrypted_restaurant_id: del_rest,
             encrypted_data: del_enc,
-            encrypted_api_key: del_key,
           }),
         });
 
@@ -354,22 +350,15 @@ export default function PageBuilder() {
     }
   };
 
-  const encrypt_data = async (userID, components, restaurantID, api_key) => {
-    console.log("components before stringify (function encrypt_data):", components, typeof components);
-    console.log("Vor dem Verschlüsseln: (userID)", userID);
-    console.log("Vor dem Verschlüsseln: (api_key)", api_key);
-    console.log("Vor dem Verschlüsseln: (restaurantID)", restaurantID);
+  const encrypt_data = async (userID, components, restaurantID) => {
     const data = JSON.stringify(components);
     try {
       const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
       const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_api_key = CryptoJS.AES.encrypt(api_key, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
       const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      console.log("Daten nach encryption (function encrypt_data):", enc_data, encrypted_api_key, encrypted_restaurant_id);
       return {
         enc_data,
         encrypted_restaurant_id,
-        encrypted_api_key,
         encrypted_user_id,
       };
     } catch (error) {

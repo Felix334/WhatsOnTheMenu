@@ -56,7 +56,7 @@ export default function AdminConsole() {
 
     const fetchUsers = async () => {
       try {
-        const resp = await fetch("/api/user/userList", {
+        const resp = await fetch("/api/Admin/getData/getUserList", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ search }),
@@ -81,38 +81,6 @@ export default function AdminConsole() {
 
     fetchUsers();
   }, [status, search, authorizedUser]);
-
-  useEffect(() => {
-    const fetchRestaurantRequests = async () => {
-      const key = process.env.API_KEY;
-      try {
-        const resp = await fetch("/api/Admin/getData/getRequests", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            api_key: key,
-          }),
-        });
-
-        if (!resp.ok) throw new Error("Fetch failed");
-
-        const json = await resp.json();
-        console.log("Requests:", json);
-
-        setRequestList(json || []);
-
-        const map = {};
-
-        (json.data || []).forEach((u) => {
-          map[u.id] = u.role;
-        });
-
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchRestaurantRequests();
-  }, []);
 
   /* ---------------- Guards ---------------- */
 
@@ -140,11 +108,6 @@ export default function AdminConsole() {
             <Users className="w-4 h-4" /> Users
           </Button>
 
-          <Button variant="ghost" className="justify-start gap-2 flex flex-row items-center" onClick={() => setActivePage("requests")}>
-            <UserPlus className="w-4 h-4" />
-            <span>Restaurant-Anfragen</span>
-            <span>({requestList.length})</span>
-          </Button>
           <Button variant="ghost" className="justify-start gap-2 flex flex-row items-center" onClick={() => setActivePage("abboRequests")}>
             <HandCoinsIcon className="w-4 h-4" />
             <span>Abbo-Upgrades</span>
@@ -172,7 +135,6 @@ export default function AdminConsole() {
       <main className="col-span-12 md:col-span-10 p-4">
         {activePage === "users" && renderUsers()}
         {activePage === "settings" && renderSettings()}
-        {activePage === "requests" && renderRequests(requestList)}
         {activePage === "abboRequests" && renderAbboRequests()}
         {activePage === "messages" && renderMessages()}
         {activePage === "finances" && renderFinances()}

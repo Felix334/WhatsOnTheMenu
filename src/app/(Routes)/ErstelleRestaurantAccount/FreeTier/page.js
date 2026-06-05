@@ -45,6 +45,7 @@ export default function RestaurantForm() {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
 
   const { data: session, status } = useSession();
 
@@ -317,19 +318,37 @@ export default function RestaurantForm() {
 
         {success && <p className="text-green-600 font-medium">Restaurant erfolgreich registriert!</p>}
 
+        {/* Unternehmer-Bestätigung */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isBusinessConfirmed}
+            onChange={(e) => setIsBusinessConfirmed(e.target.checked)}
+            className="mt-1 w-4 h-4 accent-emerald-600 shrink-0"
+          />
+          <span className="text-sm text-gray-600">
+            Ich bestätige, dass ich als <strong>Unternehmer / Gewerbetreibender</strong> handle und diese Plattform ausschließlich im geschäftlichen Rahmen nutze. <span className="text-red-500">*</span>
+          </span>
+        </label>
+
         <div className="space-y-3">
           {isAuthenticated ? (
             success ? (
               <></>
             ) : (
               <>
-                <button type="submit" className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg hover:bg-emerald-700">
+                <button
+                  type="submit"
+                  disabled={!isBusinessConfirmed}
+                  className={`w-full font-semibold py-3 rounded-lg transition-all ${isBusinessConfirmed ? "bg-emerald-600 text-white hover:bg-emerald-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                >
                   FreeTier registrieren
                 </button>
 
                 <div>
                   <button
                     type="button"
+                    disabled={!isBusinessConfirmed}
                     onClick={async () => {
                       const res = await fetch("/api/payment/checkout", {
                         method: "POST",
@@ -339,7 +358,7 @@ export default function RestaurantForm() {
                       const { url } = await res.json();
                       if (url) window.location.href = url;
                     }}
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700"
+                    className={`w-full font-semibold py-3 rounded-lg transition-all ${isBusinessConfirmed ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
                   >
                     💳 Zu Pro upgrade (€19/Monat)
                   </button>
