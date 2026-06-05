@@ -40,6 +40,21 @@ export async function POST(request) {
 
   let customerId = dbUser?.stripeCustomerId;
 
+  // Verify existing customer still exists in this Stripe environment (test vs. live mismatch)
+  if (customerId) {
+    try {
+      await stripe.customers.retrieve(customerId);
+    } catch (err) {
+      if (err?.code === "resource_missing") {
+        console.warn("Stripe customer not found in this environment, creating new one:", customerId);
+        customerId = null;
+      } else {
+        console.error("Customer retrieval failed:", err);
+        return new Response("Customer error", { status: 500 });
+      }
+    }
+  }
+
   if (!customerId) {
     try {
       const customer = await stripe.customers.create({
