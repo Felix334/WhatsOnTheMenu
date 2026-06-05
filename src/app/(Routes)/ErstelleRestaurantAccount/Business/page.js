@@ -112,7 +112,7 @@ export default function RestaurantForm() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dein Restaurant registrieren</h1>
       <p className="text-gray-600 text-center mb-8">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
 
-      <form onSubmit={handleBusinessCheckout} className="space-y-6">
+      <form className="space-y-6">
         {/* Owner Name */}
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="ownerName">
@@ -290,6 +290,7 @@ export default function RestaurantForm() {
           <Button
             type="submit"
             disabled={!isFormValid()}
+            onClick={handleBusinessCheckout}
             className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
     ${isFormValid() ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
           >
