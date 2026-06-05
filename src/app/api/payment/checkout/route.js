@@ -50,7 +50,7 @@ export async function POST(request) {
         customerId = null;
       } else {
         console.error("Customer retrieval failed:", err);
-        return new Response("Customer error", { status: 500 });
+        return new Response(`Customer error: ${err}`, { status: 500 });
       }
     }
   }
@@ -74,7 +74,7 @@ export async function POST(request) {
       console.log("Created customer:", customerId);
     } catch (err) {
       console.error("Customer creation failed:", err);
-      return new Response("Customer error", { status: 500 });
+      return new Response(`Customer error: ${err}`, { status: 500 });
     }
   }
 
@@ -124,6 +124,6 @@ export async function POST(request) {
     );
   } catch (err) {
     console.error("Checkout creation failed:", err);
-    return new Response("Checkout error", { status: 500 });
+    return new Response(`Checkout error:${err}`, { status: 500 });
   }
 }
