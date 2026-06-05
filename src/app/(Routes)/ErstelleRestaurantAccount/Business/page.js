@@ -145,7 +145,7 @@ export default function RestaurantForm() {
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: "Bussiness", restaurant }),
+        body: JSON.stringify({ tier: "Business", restaurant }),
       });
       const { url } = await res.json();
       if (url) window.location.href = url;
