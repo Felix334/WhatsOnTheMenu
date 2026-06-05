@@ -112,7 +112,16 @@ export async function POST(request) {
       metadata: {
         userId: session.user.id,
         tier,
-        restaurantDetails: JSON.stringify(restaurant || {}),
+        // Stripe metadata values are limited to 500 chars — only include fields used in the webhook
+        restaurantDetails: JSON.stringify({
+          restaurantName: restaurant?.restaurantName || "",
+          category: restaurant?.category || "",
+          street: restaurant?.street || "",
+          houseNumber: restaurant?.houseNumber || "",
+          postalCode: restaurant?.postalCode || "",
+          city: restaurant?.city || "",
+          country: restaurant?.country || "DE",
+        }),
       },
     });
 

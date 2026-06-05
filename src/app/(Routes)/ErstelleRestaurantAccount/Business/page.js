@@ -92,18 +92,26 @@ export default function RestaurantForm() {
   };
 
   const handleBusinessCheckout = async () => {
+    setSubmitError(null);
     try {
-      console.log("Sende Daten:", restaurant);
+      const { ownerName, restaurantName, category, street, houseNumber, postalCode, city } = restaurant;
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier: "Business", restaurant }),
+        body: JSON.stringify({
+          tier: "Business",
+          restaurant: { ownerName, restaurantName, category, street, houseNumber, postalCode, city },
+        }),
       });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Fehler beim Checkout");
+      }
       const { url } = await res.json();
       if (url) window.location.href = url;
     } catch (err) {
       console.error("Checkout error:", err);
-      setSubmitError("Fehler beim Starten des Checkout.");
+      setSubmitError(err.message || "Fehler beim Starten des Checkout.");
     }
   };
 
@@ -288,7 +296,7 @@ export default function RestaurantForm() {
         {/* Buttons */}
         <div className="pt-4">
           <Button
-            type="submit"
+            type="button"
             onClick={handleBusinessCheckout}
             disabled={!isFormValid()}
             className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
