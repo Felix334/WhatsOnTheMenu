@@ -100,7 +100,6 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.subscription = user.subscription;
       }
-      // Refresh staff memberships on login or session update
       if (user || trigger === 'update') {
         const userId = (user?.id ?? token.id) as string;
         const memberships = await prisma.restaurantStaff.findMany({
