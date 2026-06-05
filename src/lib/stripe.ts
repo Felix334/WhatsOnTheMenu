@@ -17,7 +17,7 @@ if (!webhookSecret) {
 
 export const PRICE_IDS = {
   Professional: process.env.STRIPE_PROFESSIONAL_PRICE_ID,
-  Business: process.env.STRIPE_PREMIUM_PRICE_ID,
+  Business: process.env.STRIPE_BUSINESS_PRICE_ID,
 } as const;
 
 export type Tier = keyof typeof PRICE_IDS;
