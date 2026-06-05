@@ -5,6 +5,7 @@ import { stripe, webhookSecret, getSubscriptionTier } from "@/lib/stripe";
 
 export async function POST(req) {
   const body = await req.text();
+  console.log("Webhook Called: ", body)
 
   const headerList = await headers();
   const signature = headerList.get("stripe-signature");

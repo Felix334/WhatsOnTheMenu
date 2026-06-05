@@ -349,7 +349,7 @@ enum Role {
 enum Subscription {
   FreeTier
   Professional
-  Individuell
+  Business
 }
 
 enum StaffRole {
