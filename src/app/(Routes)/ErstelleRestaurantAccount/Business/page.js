@@ -41,7 +41,7 @@ export default function RestaurantForm() {
     category: "",
     description: "",
     ownerID: "",
-    subscription: "Professional",
+    subscription: "Business",
   });
 
   const [errors, setErrors] = useState({});
@@ -139,7 +139,7 @@ export default function RestaurantForm() {
     }
   };
 
-  const handleProCheckout = async () => {
+  const handleBusinessCheckout = async () => {
     try {
       console.log("Sende Daten:", restaurant);
       const res = await fetch("/api/payment/checkout", {
@@ -337,7 +337,7 @@ export default function RestaurantForm() {
         <div className="pt-4">
           <Button
             type="button"
-            onClick={handleProCheckout}
+            onClick={handleBusinessCheckout}
             disabled={!isFormValid()}
             className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
     ${isFormValid() ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
