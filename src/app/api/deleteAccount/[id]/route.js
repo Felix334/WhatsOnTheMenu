@@ -3,6 +3,7 @@ import { getServerSession, signOut } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { devLog } from "@/lib/logger";
 
 export async function DELETE(request, { params }) {
   const id = params.id;
@@ -64,7 +65,7 @@ export async function DELETE(request, { params }) {
   }finally{
     var findUser = await prisma.user.findUnique({ where: { id }}).then(() => {
       if(!findUser){
-        console.log("Kein Benutzer gefunden!\nNutzer erfolgreich gelöscht")
+        devLog("Kein Benutzer gefunden!\nNutzer erfolgreich gelöscht")
       }
     })
   }

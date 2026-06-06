@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
+import { devLog } from "src/lib/logger";
 
 // Force dynamic rendering - this route should never be statically generated
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
-  console.log("Session-Objekt", session);
   if (!session || session.user.role !== "Owner") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -77,9 +77,7 @@ async function main(userId) {
         },
       },
     });
-    if (process.env.NODE_ENV !== "production") {
-      console.log("User data found(/profil/getData): ", userData);
-    }
+    devLog("User data found(/profil/getData): ", userData);
     return userData;
   } catch (error) {
     console.error("Error fetching user data: ", error);

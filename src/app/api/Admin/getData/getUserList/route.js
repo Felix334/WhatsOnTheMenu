@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { devLog } from "@/lib/logger";
 
 
 export async function POST(req) {
@@ -15,13 +16,13 @@ export async function POST(req) {
 
     const userID = session.user.id;
     const role = session.user.role;
-    console.log("Check1", role, userID);
+    devLog("Check1", role, userID);
 
     const data = await req.json();
     let searchData = data?.search || null;
 
     const userData = await handleUserRequest(role, searchData);
-    console.log("User Data:", userData);
+    devLog("User Data:", userData);
 
     if (!userData || userData.length === 0) {
       return NextResponse.json({ status: 404, message: "No data found" });
@@ -35,7 +36,7 @@ export async function POST(req) {
 }
 
 async function handleUserRequest(role, searchData) {
-  console.log("Check2", role);
+  devLog("Check2", role);
 
   if (role === "Admin") {
     if (!searchData) {
@@ -49,7 +50,7 @@ async function handleUserRequest(role, searchData) {
           role: true,
         },
       });
-      console.log("User List:", userList);
+      devLog("User List:", userList);
       return userList;
     } 
     /*

@@ -2,10 +2,10 @@ import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe, webhookSecret, getSubscriptionTier } from "@/lib/stripe";
+import { devLog, devWarn } from "@/lib/logger";
 
 export async function POST(req) {
   const body = await req.text();
-  console.log("Webhook Called: ", body)
 
   const headerList = await headers();
   const signature = headerList.get("stripe-signature");
@@ -33,7 +33,7 @@ export async function POST(req) {
         const restaurantDetailsStr = session.metadata?.restaurantDetails;
 
         if (!userId || !subscriptionId) {
-          console.warn("Missing userId or subscriptionId in metadata");
+          devWarn("Missing userId or subscriptionId in metadata");
           break;
         }
 
@@ -53,7 +53,13 @@ export async function POST(req) {
         });
 
         if (restaurantDetailsStr) {
-          const restaurantDetails = JSON.parse(restaurantDetailsStr);
+          let restaurantDetails;
+          try {
+            restaurantDetails = JSON.parse(restaurantDetailsStr);
+          } catch {
+            console.error("Failed to parse restaurantDetails metadata");
+            break;
+          }
 
           const existingRestaurant = await prisma.restaurant.findUnique({
             where: { ownerId: userId },
@@ -91,7 +97,7 @@ export async function POST(req) {
                 },
               },
             });
-            console.log(`Restaurant created for ${userId}`);
+            devLog(`Restaurant created for ${userId}`);
           }
         }
         break;
@@ -131,7 +137,7 @@ export async function POST(req) {
       }
 
       default:
-        console.log(`Unhandled event: ${event.type}`);
+        devLog(`Unhandled event: ${event.type}`);
     }
   } catch (err) {
     console.error("Webhook handler error:", err);

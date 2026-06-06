@@ -3,6 +3,7 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup } from "@prisma/client";
+import { devLog, devWarn } from "src/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
     const raw = Array.isArray(rawData) ? rawData : [rawData];
     // Nur menuSection-Einträge durchlassen
     const parsedData: MenuSectionEntry[] = (raw as any[]).filter((e) => e?.type === "menuSection");
-    console.log("Datenblock-Check:", parsedData);
+    devLog("Datenblock-Check:", parsedData);
 
     if (parsedData.length === 0) {
       return NextResponse.json({ message: "Keine menuSection-Einträge gefunden" }, { status: 400 });
@@ -229,7 +230,7 @@ export async function POST(req: NextRequest) {
 
           if (existingDish) {
             if (existingDish.categoryId !== category.id) {
-              console.warn(`⚠️ Dish ${item.id} gehört nicht zur Kategorie ${category.id} – übersprungen.`);
+              devWarn(`⚠️ Dish ${item.id} gehört nicht zur Kategorie ${category.id} – übersprungen.`);
               continue;
             }
 

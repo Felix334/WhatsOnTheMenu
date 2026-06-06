@@ -2,23 +2,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe, getPriceId } from "@/lib/stripe";
+import { devLog, devWarn } from "@/lib/logger";
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-
-  console.log("API checkout called");
 
   if (!session?.user?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   const body = await request.json();
-  console.log("Checkout data:", body);
 
   const { tier, restaurant } = body;
 
   const priceId = getPriceId(tier);
-  console.log("Erstelle Kunden mit Price ID:", priceId)
 
   if (!priceId) {
     console.error("Invalid tier:", tier);
@@ -45,16 +42,16 @@ export async function POST(request) {
     try {
       const existing = await stripe.customers.retrieve(customerId);
       if (existing.deleted) {
-        console.warn("Stripe customer was deleted, creating new one:", customerId);
+        devWarn("Stripe customer was deleted, creating new one:", customerId);
         customerId = null;
       }
     } catch (err) {
       if (err?.code === "resource_missing" || err?.statusCode === 404) {
-        console.warn("Stripe customer not found, creating new one:", customerId);
+        devWarn("Stripe customer not found, creating new one:", customerId);
         customerId = null;
       } else {
         console.error("Customer retrieval failed:", err);
-        return new Response(`Customer error: ${err}`, { status: 500 });
+        return new Response("Customer error", { status: 500 });
       }
     }
   }
@@ -75,10 +72,10 @@ export async function POST(request) {
         data: { stripeCustomerId: customerId },
       });
 
-      console.log("Created customer:", customerId);
+      devLog("Created customer:", customerId);
     } catch (err) {
       console.error("Customer creation failed:", err);
-      return new Response(`Customer error: ${err}`, { status: 500 });
+      return new Response("Customer error", { status: 500 });
     }
   }
 
@@ -125,8 +122,6 @@ export async function POST(request) {
       },
     });
 
-    console.log("Checkout session:", checkoutSession.id);
-
     return new Response(
       JSON.stringify({ url: checkoutSession.url }),
       {
@@ -137,6 +132,6 @@ export async function POST(request) {
     );
   } catch (err) {
     console.error("Checkout creation failed:", err);
-    return new Response(`Checkout error:${err}`, { status: 500 });
+    return new Response("Checkout error", { status: 500 });
   }
 }

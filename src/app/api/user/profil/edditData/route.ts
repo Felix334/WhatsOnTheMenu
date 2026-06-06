@@ -3,6 +3,7 @@ import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
+import { devLog } from "src/lib/logger";
 //import { webhookSecret } from "src/lib/stripe";
 
 type MenuWithRelations = Menu & {
@@ -30,7 +31,7 @@ async function safeDb<T>(callback: () => Promise<T>, context: string): Promise<T
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    console.log("ServerSession2:", session);
+    devLog("ServerSession2:", session);
 
     if (!session || !session.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Nur Restaurant-Besitzer erlaubt" }, { status: 403 });
     }
     const recived_data: ReceivedData | null = await req.json().catch(() => null);
-    console.log("reciver-check(/profil/edditData):", recived_data); // erst loggen, dann weiterverarbeiten
+    devLog("reciver-check(/profil/edditData):", recived_data);
 
     if (!recived_data) {
       return NextResponse.json({ message: "Keine Daten vorhanden(Z49)" }, { status: 400 });
@@ -48,15 +49,15 @@ export async function POST(req: NextRequest) {
 
     const { restaurantId, data } = recived_data;
     const userID = session.user.id;
-    console.log("/edditData:", data);
-    console.log(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${data},`);
+    devLog("/edditData:", data);
+    devLog(`List-Check: ${userID}, Restaurant-ID: ${restaurantId}, Daten: ${data},`);
 
     /* ---------------- PARSE JSON ---------------- */
 
     const parsedData = Array.isArray(data) ? data : [data];
 
     if (!Array.isArray(parsedData)) {
-      console.log("Daten sind kein Array");
+      devLog("Daten sind kein Array");
       return NextResponse.json({ message: "Daten müssen ein Array sein" }, { status: 400 });
     }
 
@@ -255,7 +256,7 @@ export async function POST(req: NextRequest) {
       if (entry.type === "updateCategoryGroupPos") {
         const catGroupID1 = entry.categoryGroup1.id;
         const catGroupID2 = entry.categoryGroup2.id;
-        console.log("Update Positionen von categoriegruppen:", catGroupID1, catGroupID2);
+        devLog("Update Positionen von categoriegruppen:", catGroupID1, catGroupID2);
         const oldPos = entry.categoryGroup.pos;
         const newPos = entry.categoryGroup2.pos;
         if (catGroupID1 && catGroupID2 && oldPos && newPos) {
