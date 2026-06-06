@@ -62,11 +62,11 @@ function StaffDashboardContent() {
                 <span className="text-sm font-semibold px-3 py-1 rounded-full border bg-green-100 text-green-800 border-green-200">Owner</span>
               </div>
               <div className="space-y-2">
-                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: restaurantId } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>Bestellungen</span>
                 </Link>
-                <Link href={{ pathname: "/staff/availability", query: { restaurantID: restaurantId, ...userID } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                <Link href={{ pathname: "/staff/availability", query: { restaurantID: restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🧑‍🍳</span>
                   <span>Verfügbarkeit</span>
                 </Link>
@@ -81,12 +81,12 @@ function StaffDashboardContent() {
                 <span className={`text-sm font-semibold px-3 py-1 rounded-full border ${ROLE_COLORS[m.role] ?? ""}`}>{ROLE_LABELS[m.role] ?? m.role}</span>
               </div>
               <div className="space-y-2">
-                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: m.restaurantId } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>Bestellungen</span>
                 </Link>
                 {(m.role === "kitchen" || m.role === "manager") && (
-                  <Link href={{ pathname: "/staff/availability", query: { restaurantID: m.restaurantId } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                  <Link href={{ pathname: "/staff/availability", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                     <span className="text-xl">🧑‍🍳</span>
                     <span>Verfügbarkeit</span>
                   </Link>

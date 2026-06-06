@@ -53,6 +53,5 @@ export async function GET(req, { params }) {
   if (!menu) {
     return NextResponse.json({ error: "Kein Menü gefunden." }, { status: 404 });
   }
-
   return NextResponse.json({ menu });
 }

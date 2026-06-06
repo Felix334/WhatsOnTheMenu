@@ -168,6 +168,7 @@ model Category {
   dishes          Dish[]
 
   @@index([menuId])
+  @@index([categoryGroupID])
 }
 
 model Dish {
@@ -335,6 +336,8 @@ model CategoryGroup {
   menuID     String
   categories Category[]
   Menu       Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
+
+  @@index([menuID])
 }
 
 enum Role {

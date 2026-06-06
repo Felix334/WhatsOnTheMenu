@@ -10,21 +10,26 @@ const ROLE_PERMISSIONS = {
   kitchen: ["availability", "orders"],
 };
 
-/**
- * Gibt die Staff-Rolle des eingeloggten Users für ein Restaurant zurück.
- * Gibt null zurück wenn kein Zugriff oder Owner kein Professional-Abo hat.
- */
 export async function getStaffAccess(_req, restaurantId) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
-  const restaurant = await prisma.restaurant.findUnique({
-    where: { id: restaurantId },
-    select: {
-      ownerId: true,
-      owner: { select: { subscription: true } },
-    },
-  });
+  const userId = session.user.id;
+  const isOwner = session.user.role === "Owner";
+
+  // Run restaurant lookup and (for non-owners) staff membership check in parallel
+  const [restaurant, membership] = await Promise.all([
+    prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+      select: { ownerId: true, owner: { select: { subscription: true } } },
+    }),
+    isOwner
+      ? Promise.resolve(null)
+      : prisma.restaurantStaff.findFirst({
+          where: { userId, restaurantId, approved: true },
+          select: { role: true },
+        }),
+  ]);
 
   if (!restaurant) return null;
 
@@ -32,14 +37,9 @@ export async function getStaffAccess(_req, restaurantId) {
   if (restaurant.owner.subscription !== "Professional") return null;
 
   // Owner hat immer vollen Zugriff auf sein eigenes Restaurant
-  if (session.user.role === "Owner" && restaurant.ownerId === session.user.id) {
-    return { role: "owner", permissions: ["orders", "availability", "staff_view", "settings"] };
+  if (isOwner && restaurant.ownerId === userId) {
+    return { role: "owner", permissions: ALL_PERMISSIONS };
   }
-
-  const membership = await prisma.restaurantStaff.findFirst({
-    where: { userId: session.user.id, restaurantId, approved: true },
-    select: { role: true },
-  });
 
   if (!membership) return null;
 
