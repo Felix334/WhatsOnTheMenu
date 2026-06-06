@@ -36,9 +36,9 @@ function AvailabilityContent() {
     // Optimistisch sofort aktualisieren
     setMenu((prev) => ({
       ...prev,
-      categoryGroups: prev.categoryGroups.map((cg) => ({
+      categoryGroup: prev.categoryGroup.map((cg) => ({
         ...cg,
-        categorys: cg.categorys.map((cat) => ({
+        categories: cg.categories.map((cat) => ({
           ...cat,
           dishes: cat.dishes.map((d) =>
             d.id === dishId ? { ...d, stock: newStock } : d
@@ -60,9 +60,9 @@ function AvailabilityContent() {
         // Zurücksetzen bei Fehler
         setMenu((prev) => ({
           ...prev,
-          categoryGroups: prev.categoryGroups.map((cg) => ({
+          categoryGroup: prev.categoryGroup.map((cg) => ({
             ...cg,
-            categorys: cg.categorys.map((cat) => ({
+            categories: cg.categories.map((cat) => ({
               ...cat,
               dishes: cat.dishes.map((d) =>
                 d.id === dishId ? { ...d, stock: currentStock } : d
@@ -74,9 +74,9 @@ function AvailabilityContent() {
     } catch {
       setMenu((prev) => ({
         ...prev,
-        categoryGroups: prev.categoryGroups.map((cg) => ({
+        categoryGroup: prev.categoryGroup.map((cg) => ({
           ...cg,
-          categorys: cg.categorys.map((cat) => ({
+          categories: cg.categories.map((cat) => ({
             ...cat,
             dishes: cat.dishes.map((d) =>
               d.id === dishId ? { ...d, stock: currentStock } : d
@@ -136,8 +136,8 @@ function AvailabilityContent() {
     );
   }
 
-  const allDishes = menu?.categoryGroups.flatMap((cg) =>
-    cg.categorys.flatMap((c) => c.dishes)
+  const allDishes = menu?.categoryGroup.flatMap((cg) =>
+    cg.categories.flatMap((c) => c.dishes)
   ) ?? [];
   const availableCount = allDishes.filter((d) => d.stock !== "outOfStock").length;
   const unavailableCount = allDishes.filter((d) => d.stock === "outOfStock").length;
@@ -187,8 +187,8 @@ function AvailabilityContent() {
         </div>
 
         {/* Kategorien & Gerichte */}
-        {menu?.categoryGroups.map((cg) =>
-          cg.categorys
+        {menu?.categoryGroup.map((cg) =>
+          cg.categories
             .filter((cat) => cat.dishes.length > 0)
             .map((cat) => (
               <div

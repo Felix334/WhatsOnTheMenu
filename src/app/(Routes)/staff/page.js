@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense } from "react";
 
 const ROLE_LABELS = { manager: "Manager", waiter: "Kellner", kitchen: "Küchenleitung" };
 const ROLE_COLORS = {
@@ -13,15 +13,6 @@ const ROLE_COLORS = {
 
 function StaffDashboardContent() {
   const { data: session, status } = useSession();
-  const [ownerRestaurant, setOwnerRestaurant] = useState(null);
-
-  useEffect(() => {
-    if (session?.user?.role === "Owner") {
-      fetch("/api/restaurant/mine")
-        .then((r) => r.json())
-        .then((d) => setOwnerRestaurant(d.restaurant ?? null));
-    }
-  }, [session]);
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Laden...</div>;
@@ -40,6 +31,8 @@ function StaffDashboardContent() {
 
   const memberships = session.user?.staffMemberships ?? [];
   const isOwner = session.user.role === "Owner";
+  const restaurantId = session.user.restaurantId;
+  const userID = session.user.id
 
   if (!isOwner && memberships.length === 0) {
     return (
@@ -47,9 +40,7 @@ function StaffDashboardContent() {
         <div className="text-center space-y-3 max-w-sm">
           <p className="text-4xl">👋</p>
           <p className="font-semibold text-gray-800 text-lg">Kein Restaurant zugewiesen</p>
-          <p className="text-sm text-gray-500">
-            Dein Restaurant-Inhaber muss dich zuerst hinzufügen und genehmigen.
-          </p>
+          <p className="text-sm text-gray-500">Dein Restaurant-Inhaber muss dich zuerst hinzufügen und genehmigen.</p>
         </div>
       </div>
     );
@@ -65,26 +56,17 @@ function StaffDashboardContent() {
 
         <div className="space-y-3">
           {/* Owner-Karte */}
-          {isOwner && ownerRestaurant && (
+          {isOwner && restaurantId && (
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold px-3 py-1 rounded-full border bg-green-100 text-green-800 border-green-200">
-                  Owner
-                </span>
-                <span className="text-sm text-gray-500">{ownerRestaurant.name}</span>
+                <span className="text-sm font-semibold px-3 py-1 rounded-full border bg-green-100 text-green-800 border-green-200">Owner</span>
               </div>
               <div className="space-y-2">
-                <Link
-                  href={`/staff/bestellungen?restaurantID=${ownerRestaurant.id}`}
-                  className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors"
-                >
+                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: restaurantId } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>Bestellungen</span>
                 </Link>
-                <Link
-                  href={`/staff/availability?restaurantID=${ownerRestaurant.id}`}
-                  className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors"
-                >
+                <Link href={{ pathname: "/staff/availability", query: { restaurantID: restaurantId, ...userID } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🧑‍🍳</span>
                   <span>Verfügbarkeit</span>
                 </Link>
@@ -96,23 +78,15 @@ function StaffDashboardContent() {
           {memberships.map((m) => (
             <div key={m.restaurantId} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className={`text-sm font-semibold px-3 py-1 rounded-full border ${ROLE_COLORS[m.role]}`}>
-                  {ROLE_LABELS[m.role]}
-                </span>
+                <span className={`text-sm font-semibold px-3 py-1 rounded-full border ${ROLE_COLORS[m.role] ?? ""}`}>{ROLE_LABELS[m.role] ?? m.role}</span>
               </div>
               <div className="space-y-2">
-                <Link
-                  href={`/staff/bestellungen?restaurantID=${m.restaurantId}`}
-                  className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors"
-                >
+                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: m.restaurantId } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>Bestellungen</span>
                 </Link>
                 {(m.role === "kitchen" || m.role === "manager") && (
-                  <Link
-                    href={`/staff/availability?restaurantID=${m.restaurantId}`}
-                    className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors"
-                  >
+                  <Link href={{ pathname: "/staff/availability", query: { restaurantID: m.restaurantId } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                     <span className="text-xl">🧑‍🍳</span>
                     <span>Verfügbarkeit</span>
                   </Link>

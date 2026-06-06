@@ -5,7 +5,7 @@ import { getStaffAccess, can } from "@/lib/staffAuth";
 export const dynamic = "force-dynamic";
 
 export async function GET(req, { params }) {
-  const { restaurantID } = params;
+  const { restaurantID } = await params;
 
   const access = await getStaffAccess(req, restaurantID);
   if (!access) {
@@ -21,16 +21,16 @@ export async function GET(req, { params }) {
     );
   }
 
-  const menu = await prisma.menu.findUnique({
+  const menu = await prisma.menu.findFirst({
     where: { restaurantId: restaurantID },
     select: {
-      categoryGroups: {
-        orderBy: { createdAt: "asc" },
+      categoryGroup: {
+        orderBy: { position: "asc" },
         select: {
           id: true,
           name: true,
-          categorys: {
-            orderBy: { createdAt: "asc" },
+          categories: {
+            orderBy: { position: "asc" },
             select: {
               id: true,
               name: true,

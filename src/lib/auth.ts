@@ -102,11 +102,23 @@ export const authOptions: NextAuthOptions = {
       }
       if (user || trigger === 'update') {
         const userId = (user?.id ?? token.id) as string;
+        const role = ((user as any)?.role ?? token.role) as string;
+
         const memberships = await prisma.restaurantStaff.findMany({
           where: { userId, approved: true },
           select: { restaurantId: true, role: true },
         });
         token.staffMemberships = memberships;
+
+        if (role === 'Owner') {
+          const restaurant = await prisma.restaurant.findFirst({
+            where: { ownerId: userId },
+            select: { id: true },
+          });
+          token.restaurantId = restaurant?.id ?? undefined;
+        } else if (memberships.length > 0) {
+          token.restaurantId = memberships[0].restaurantId;
+        }
       }
       return token;
     },
@@ -117,6 +129,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string;
         session.user.subscription = token.subscription as Subscription;
         session.user.staffMemberships = (token.staffMemberships ?? []) as any;
+        session.user.restaurantId = token.restaurantId;
       }
       return session;
     },

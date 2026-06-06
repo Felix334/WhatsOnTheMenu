@@ -60,7 +60,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
         bgColor: editedBgColor,
         font: editedFont,
         restaurantID,
-        userID
+        userID,
       }),
       credentials: "include",
     });
@@ -271,7 +271,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
             )}
           </div>
 
-              {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
+          {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
         </ScrollArea>
       </SheetContent>
     </Sheet>
@@ -283,12 +283,12 @@ export { OptionMenu };
 /* ===================== SOCIAL LINKS EDITOR ===================== */
 
 const SOCIAL_PLATFORMS = [
-  { key: "instagram", label: "Instagram",  placeholder: "https://instagram.com/deinrestaurant" },
-  { key: "facebook",  label: "Facebook",   placeholder: "https://facebook.com/deinrestaurant" },
-  { key: "tiktok",    label: "TikTok",     placeholder: "https://tiktok.com/@deinrestaurant" },
-  { key: "twitter",   label: "X / Twitter",placeholder: "https://x.com/deinrestaurant" },
-  { key: "whatsapp",  label: "WhatsApp",   placeholder: "https://wa.me/49123456789" },
-  { key: "website",   label: "Website",    placeholder: "https://www.deinrestaurant.de" },
+  { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/deinrestaurant" },
+  { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/deinrestaurant" },
+  { key: "tiktok", label: "TikTok", placeholder: "https://tiktok.com/@deinrestaurant" },
+  { key: "twitter", label: "X / Twitter", placeholder: "https://x.com/deinrestaurant" },
+  { key: "whatsapp", label: "WhatsApp", placeholder: "https://wa.me/49123456789" },
+  { key: "website", label: "Website", placeholder: "https://www.deinrestaurant.de" },
 ];
 
 const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
@@ -335,11 +335,7 @@ const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
           <div key={key}>
             <Label className="text-sm text-gray-600">{label}</Label>
             {isEditing ? (
-              <Input
-                value={links[key] ?? ""}
-                placeholder={placeholder}
-                onChange={(e) => setLinks((prev) => ({ ...prev, [key]: e.target.value }))}
-              />
+              <Input value={links[key] ?? ""} placeholder={placeholder} onChange={(e) => setLinks((prev) => ({ ...prev, [key]: e.target.value }))} />
             ) : (
               <p className="text-sm truncate">
                 {saved[key] ? (
@@ -360,7 +356,9 @@ const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? "Speichern..." : "Speichern"}
               </Button>
-              <Button variant="outline" onClick={handleCancel}>Abbrechen</Button>
+              <Button variant="outline" onClick={handleCancel}>
+                Abbrechen
+              </Button>
             </>
           ) : (
             <Button onClick={() => setIsEditing(true)}>Bearbeiten</Button>
@@ -385,7 +383,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
   const [originalLocations, setOriginalLocations] = useState([]);
   const [errors, setErrors] = useState({});
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     if (isEditing && restaurant) {
@@ -430,7 +428,9 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
     const resp = await fetch(`/api/deleteAccount/${userID}`, { method: "DELETE" });
     if (resp.ok) {
       toast.success("Account erfolgreich gelöscht!");
-      await signOut().then(() => {router.push("./")})
+      await signOut().then(() => {
+        router.push("./");
+      });
     } else {
       toast.error("Fehler beim Löschen des Accounts");
     }
@@ -508,13 +508,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
               <Label>Name</Label>
               <Input value={editedRestaurant?.name || ""} onChange={(e) => updateRestaurantField("name", e.target.value)} />
               <Label>Beschreibung</Label>
-              <textarea
-                value={editedRestaurant?.description || ""}
-                onChange={(e) => updateRestaurantField("description", e.target.value)}
-                rows={3}
-                placeholder="Kurze Beschreibung des Restaurants..."
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-              />
+              <textarea value={editedRestaurant?.description || ""} onChange={(e) => updateRestaurantField("description", e.target.value)} rows={3} placeholder="Kurze Beschreibung des Restaurants..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none" />
               <Label>Muttergesellschaft</Label>
               <Input value={editedRestaurant?.parentCompany || ""} onChange={(e) => updateRestaurantField("parentCompany", e.target.value)} />
             </>
@@ -605,22 +599,14 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/settings">⚙️ Einstellungen</Link>
+          <Link href={{ pathname: "/settings", query: { ...(userID && { userID }), ...(restaurantID && { restaurantID }) } }}>⚙️ Einstellungen</Link>
         </Button>
       </div>
       {/* ── Öffnungszeiten ─────────────────────────────────────────────────── */}
-      <OpeningHoursEditor
-        restaurantId={restaurant?.id}
-        userID={userID}
-        initialHours={restaurant?.openingHours ?? null}
-      />
+      <OpeningHoursEditor restaurantId={restaurant?.id} userID={userID} initialHours={restaurant?.openingHours ?? null} />
 
       {/* ── Social Media Links ──────────────────────────────────────────────── */}
-      <SocialLinksEditor
-        restaurantId={restaurant?.id}
-        userID={userID}
-        initialLinks={restaurant?.socialLinks ?? {}}
-      />
+      <SocialLinksEditor restaurantId={restaurant?.id} userID={userID} initialLinks={restaurant?.socialLinks ?? {}} />
 
       <div>
         <Button variant="destructive" onClick={deleteRestaurant}>
@@ -628,15 +614,7 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
         </Button>
       </div>
 
-      <ConfirmDialog
-        open={confirmDeleteOpen}
-        onOpenChange={setConfirmDeleteOpen}
-        title="Account wirklich löschen?"
-        description="Gelöschte Daten können nicht wiederhergestellt werden!"
-        confirmLabel="Endgültig löschen"
-        onConfirm={handleConfirmDelete}
-      />
+      <ConfirmDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen} title="Account wirklich löschen?" description="Gelöschte Daten können nicht wiederhergestellt werden!" confirmLabel="Endgültig löschen" onConfirm={handleConfirmDelete} />
     </div>
   );
 };
-

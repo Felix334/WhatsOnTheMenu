@@ -7,6 +7,7 @@ declare module "next-auth" {
       role: string;
       subscription: 'FreeTier' | 'Professional' | 'Business' | 'Individuell';
       staffMemberships: { restaurantId: string; role: string }[];
+      restaurantId?: string;
     } & DefaultSession["user"];
   }
 
@@ -20,5 +21,6 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     staffMemberships?: { restaurantId: string; role: string }[];
+    restaurantId?: string;
   }
 }
