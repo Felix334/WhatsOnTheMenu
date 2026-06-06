@@ -233,17 +233,6 @@ function HomeContent() {
                       >
                         Beispiele
                       </Button>
-
-                      <Button variant="ghost" asChild>
-                        <Link
-                          href={{
-                            pathname: "/UnserePartner",
-                            query: { ...router.queryString },
-                          }}
-                        >
-                          Unsere Partner
-                        </Link>
-                      </Button>
                       {status === "authenticated" || userID ? null : (
                         <Button
                           variant="outlined"
@@ -284,10 +273,6 @@ function HomeContent() {
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
                       Kostenlose Standardversion verfügbar
-                    </div>
-                    <div className="flex items-center text-yellow-500">
-                      <span className="text-green-300 mr-2">✓</span>
-                      Premium für 14 Tage kostenlos testen
                     </div>
                   </div>
                 </div>
