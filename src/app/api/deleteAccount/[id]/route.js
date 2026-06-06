@@ -1,12 +1,11 @@
 import { authOptions } from "@/lib/auth";
-import { getServerSession, signOut } from "next-auth";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
-import { devLog } from "@/lib/logger";
 
 export async function DELETE(request, { params }) {
-  const id = params.id;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
@@ -14,7 +13,7 @@ export async function DELETE(request, { params }) {
 
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
   }
 
@@ -31,23 +30,27 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Stripe cleanup — wrapped separately so a Stripe error doesn't block DB deletion
     if (user.stripeCustomerId) {
-      const subscriptions = await stripe.subscriptions.list({
-        customer: user.stripeCustomerId,
-        status: "active",
-      });
-
-      for (const sub of subscriptions.data) {
-        await stripe.subscriptions.cancel(sub.id);
+      try {
+        const subscriptions = await stripe.subscriptions.list({
+          customer: user.stripeCustomerId,
+          status: "active",
+        });
+        for (const sub of subscriptions.data) {
+          await stripe.subscriptions.cancel(sub.id);
+        }
+        await stripe.customers.del(user.stripeCustomerId);
+      } catch (stripeErr) {
+        // Log but continue — customer may already be deleted on Stripe side
+        console.error("Stripe cleanup error (continuing with DB delete):", stripeErr);
       }
-
-      await stripe.customers.del(user.stripeCustomerId);
     }
 
-    // 2. Account in DB löschen
+    // DB löschen — cascade entfernt Restaurant, Menü, Bestellungen usw.
     await prisma.user.delete({ where: { id } });
 
-    // 3. DSGVO-Logging
+    // DSGVO-Audit-Log (bleibt auch in production)
     console.info(
       `Account deleted | id: ${id} | by: ${session.user.id} | timestamp: ${new Date().toISOString()}`
     );
@@ -62,11 +65,5 @@ export async function DELETE(request, { params }) {
       { error: "Failed to delete account" },
       { status: 500 }
     );
-  }finally{
-    var findUser = await prisma.user.findUnique({ where: { id }}).then(() => {
-      if(!findUser){
-        devLog("Kein Benutzer gefunden!\nNutzer erfolgreich gelöscht")
-      }
-    })
   }
 }
