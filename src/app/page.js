@@ -456,6 +456,12 @@ function HomeContent() {
           </section>
         </main>
         <FooterPart />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Script id="adsbygoogle-init" strategy="afterInteractive">
           {`(adsbygoogle = window.adsbygoogle || []).push({});`}
         </Script>
