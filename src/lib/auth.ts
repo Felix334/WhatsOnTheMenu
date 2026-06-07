@@ -102,7 +102,20 @@ export const authOptions: NextAuthOptions = {
       }
       if (user || trigger === 'update') {
         const userId = (user?.id ?? token.id) as string;
-        const role = ((user as any)?.role ?? token.role) as string;
+
+        // Always re-fetch role from DB on update so stale JWT claims clear automatically
+        if (trigger === 'update') {
+          const freshUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: true, subscription: true },
+          });
+          if (freshUser) {
+            token.role = freshUser.role;
+            token.subscription = freshUser.subscription;
+          }
+        }
+
+        const role = (token.role ?? (user as any)?.role) as string;
 
         const memberships = await prisma.restaurantStaff.findMany({
           where: { userId, approved: true },

@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function Providers({ children }) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={true}>
       {children}
       <Toaster />
     </SessionProvider>
