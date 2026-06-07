@@ -6,7 +6,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import * as CryptoJS from "crypto-js";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
@@ -288,15 +287,12 @@ export default function PageBuilder() {
     setIsLoading(true);
 
     try {
-      const { enc_data, encrypted_restaurant_id, encrypted_user_id } = await encrypt_data(userID, menuData, restaurantID);
-
       const saveResponse = await fetch("/api/user/profil/setData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          encrypted_user_id,
-          encrypted_restaurant_id,
-          encrypted_data: enc_data,
+          restaurantId: restaurantID,
+          data: menuData,
         }),
       });
 
@@ -306,32 +302,21 @@ export default function PageBuilder() {
         throw new Error(saveResult.message || `HTTP ${saveResponse.status}`);
       }
 
-      console.log("✅ Save successful:", saveResult);
-
       // Handle deletions separately
       if (deletedDishes.length > 0 || deletedCategories.length > 0) {
-        const deletePayload = {
-          dishes: deletedDishes,
-          categories: deletedCategories,
-          files: [],
-        };
-
-        const { enc_data: del_enc, encrypted_restaurant_id: del_rest, encrypted_user_id: del_user } = await encrypt_data(userID, deletePayload, restaurantID);
-
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            encrypted_user_id: del_user,
-            encrypted_restaurant_id: del_rest,
-            encrypted_data: del_enc,
+            restaurantId: restaurantID,
+            dishes: deletedDishes,
+            categories: deletedCategories,
+            files: [],
           }),
         });
 
-        const deleteResult = await deleteResponse.json();
-        console.log("🗑️ Delete result:", deleteResult);
-
         if (!deleteResponse.ok) {
+          const deleteResult = await deleteResponse.json();
           console.warn("Delete failed but save succeeded:", deleteResult);
         }
       }
@@ -347,23 +332,6 @@ export default function PageBuilder() {
       alert(`Fehler: ${error.message}`);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const encrypt_data = async (userID, components, restaurantID) => {
-    const data = JSON.stringify(components);
-    try {
-      const enc_data = CryptoJS.AES.encrypt(data, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_restaurant_id = CryptoJS.AES.encrypt(restaurantID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      const encrypted_user_id = CryptoJS.AES.encrypt(userID, process.env.NEXT_PUBLIC_ENCRYPTION_KEY).toString();
-      return {
-        enc_data,
-        encrypted_restaurant_id,
-        encrypted_user_id,
-      };
-    } catch (error) {
-      console.log(error);
-      throw error;
     }
   };
 

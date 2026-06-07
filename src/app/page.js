@@ -326,7 +326,7 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>Bis zu 7 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 50 Gerichte
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 30 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
@@ -411,17 +411,11 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants
                       </li>
-                      <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Update-Alarm
-                      </li>
                       <li>
                         <span className="text-green-300 mr-2">✓</span>Management-System
                       </li>
                       <li>
                         <span className="text-green-300 mr-2">✓</span>Verfügbarkeitsanzeige
-                      </li>
-                      <li>
-                        <span className="text-green-300 mr-2">✓</span>Bestellfunktion
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
