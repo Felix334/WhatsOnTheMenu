@@ -88,3 +88,14 @@ als "Ein höheres Abbo wird bereits genutzt" angezeigt
 => AGBs fertig stellen
 
 => Wiederrufsrecht für Abbos => GANZ WICHTIG
+
+
+"PastDueBanner.js — new client component that reads session.user.subscriptionStatus. Shows nothing if not "past_due". Renders a yellow warning bar with a "Jetzt bezahlen" button that opens the Stripe billing portal. Invisible to Staff/unrelated users.
+
+portal/route.js — new API route that creates a Stripe billing portal session using the user's stripeCustomerId and redirects them back to /profil.
+
+auth.ts — refactored JWT callback: now runs a Promise.all to fetch fresh user data (role, subscription, subscriptionStatus) AND staffMemberships in parallel on sign-in and trigger=update. subscriptionStatus is now correctly set from DB from the very first login.
+
+next-auth.d.ts — added subscriptionStatus?: string to Session.user and JWT interfaces.
+
+One prerequisite for the portal button to work: you need to enable the Stripe Customer Portal in your Stripe dashboard under Billing → Customer portal settings, otherwise the API will throw. It's a one-click activation."

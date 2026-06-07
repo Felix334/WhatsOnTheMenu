@@ -35,8 +35,8 @@ const features = [
   },
   {
     icon: "⚡",
-    title: "Echtzeit Updates",
-    description: "Ändern Sie Preise, Bilder oder Gerichte sofort - Aktualisieren in Echtzeit möglich",
+    title: "Verfügbarkeits-Updates",
+    description: "Zeigen sie Ihren Kunden ob ein Gericht verfügbar ist oder nocht, kein unnöties Fragen mehr nötig.",
   },
   {
     icon: "📊",

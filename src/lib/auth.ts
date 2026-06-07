@@ -97,32 +97,30 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role;
-        token.subscription = user.subscription;
       }
       if (user || trigger === 'update') {
         const userId = (user?.id ?? token.id) as string;
 
-        // Always re-fetch role from DB on update so stale JWT claims clear automatically
-        if (trigger === 'update') {
-          const freshUser = await prisma.user.findUnique({
+        const [freshUser, memberships] = await Promise.all([
+          prisma.user.findUnique({
             where: { id: userId },
-            select: { role: true, subscription: true },
-          });
-          if (freshUser) {
-            token.role = freshUser.role;
-            token.subscription = freshUser.subscription;
-          }
+            select: { role: true, subscription: true, subscriptionStatus: true },
+          }),
+          prisma.restaurantStaff.findMany({
+            where: { userId, approved: true },
+            select: { restaurantId: true, role: true },
+          }),
+        ]);
+
+        if (freshUser) {
+          token.role = freshUser.role;
+          token.subscription = freshUser.subscription;
+          token.subscriptionStatus = freshUser.subscriptionStatus ?? undefined;
         }
 
-        const role = (token.role ?? (user as any)?.role) as string;
-
-        const memberships = await prisma.restaurantStaff.findMany({
-          where: { userId, approved: true },
-          select: { restaurantId: true, role: true },
-        });
         token.staffMemberships = memberships;
 
+        const role = token.role as string;
         if (role === 'Owner') {
           const restaurant = await prisma.restaurant.findFirst({
             where: { ownerId: userId },
@@ -141,6 +139,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.subscription = token.subscription as Subscription;
+        session.user.subscriptionStatus = token.subscriptionStatus as string | undefined;
         session.user.staffMemberships = (token.staffMemberships ?? []) as any;
         session.user.restaurantId = token.restaurantId;
       }

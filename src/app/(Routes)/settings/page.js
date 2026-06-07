@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 // ─── Konstanten ───────────────────────────────────────────────────────────────
 const ROLE_LABELS = { manager: "Manager", waiter: "Kellner", kitchen: "Küchenleitung" };
@@ -181,9 +182,149 @@ function StaffSection() {
   );
 }
 
+// ─── Abonnement-Verwaltung ────────────────────────────────────────────────────
+const TIER_LABELS = { FreeTier: "Free", Professional: "Professional", Business: "Business", Individuell: "Business" };
+const TIER_COLORS = {
+  FreeTier: "bg-gray-100 text-gray-700",
+  Professional: "bg-amber-100 text-amber-800",
+  Business: "bg-orange-100 text-orange-800",
+  Individuell: "bg-orange-100 text-orange-800",
+};
+
+function SubscriptionSection() {
+  const [sub, setSub] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [working, setWorking] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/payment/subscription")
+      .then((r) => r.json())
+      .then((d) => setSub(d.subscription))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleCancel = async () => {
+    setWorking(true);
+    const res = await fetch("/api/payment/cancel", { method: "POST" });
+    if (res.ok) {
+      setSub((prev) => ({ ...prev, cancelAtPeriodEnd: true, status: "canceling" }));
+      toast.success("Abonnement wird zum Periodenende gekündigt");
+    } else {
+      toast.error("Fehler beim Kündigen");
+    }
+    setWorking(false);
+    setConfirmCancel(false);
+  };
+
+  const handleReactivate = async () => {
+    setWorking(true);
+    const res = await fetch("/api/payment/reactivate", { method: "POST" });
+    if (res.ok) {
+      setSub((prev) => ({ ...prev, cancelAtPeriodEnd: false, status: "active" }));
+      toast.success("Abonnement reaktiviert");
+    } else {
+      toast.error("Fehler beim Reaktivieren");
+    }
+    setWorking(false);
+  };
+
+  const openPortal = async () => {
+    setWorking(true);
+    const res = await fetch("/api/payment/portal", { method: "POST" });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { toast.error("Portal konnte nicht geöffnet werden"); setWorking(false); }
+  };
+
+  if (loading) return <p className="text-sm text-gray-400">Lädt…</p>;
+
+  if (!sub) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-sm text-gray-500 mb-4">Du hast noch kein aktives Abonnement.</p>
+          <Button asChild><a href="/pricing">Tarife ansehen</a></Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const periodEnd = sub.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd * 1000).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  const isCanceling = sub.cancelAtPeriodEnd;
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <h2 className="text-base font-semibold">Aktuelles Abonnement</h2>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${TIER_COLORS[sub.tier] ?? "bg-gray-100 text-gray-700"}`}>
+              {TIER_LABELS[sub.tier] ?? sub.tier}
+            </span>
+            {isCanceling ? (
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-700 border border-red-200">
+                Läuft aus am {periodEnd}
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-50 text-green-700 border border-green-200">
+                Aktiv · Verlängert am {periodEnd}
+              </span>
+            )}
+          </div>
+
+          {isCanceling && (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+              Du behältst bis zum <strong>{periodEnd}</strong> vollen Zugang. Danach wird dein Konto auf FreeTier zurückgesetzt.
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Button variant="outline" onClick={openPortal} disabled={working}>
+              Zahlungsmethode ändern
+            </Button>
+            {isCanceling ? (
+              <Button onClick={handleReactivate} disabled={working}>
+                {working ? "Wird reaktiviert…" : "Kündigung rückgängig machen"}
+              </Button>
+            ) : (
+              <Button variant="destructive" onClick={() => setConfirmCancel(true)} disabled={working}>
+                Abonnement kündigen
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Dialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Abonnement kündigen?</DialogTitle>
+            <DialogDescription>
+              Du behältst deinen Zugang bis zum <strong>{periodEnd}</strong>. Danach wird dein Konto auf FreeTier zurückgesetzt. Du kannst die Kündigung jederzeit rückgängig machen.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmCancel(false)} disabled={working}>Abbrechen</Button>
+            <Button variant="destructive" onClick={handleCancel} disabled={working}>
+              {working ? "Wird gekündigt…" : "Ja, kündigen"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 // ─── Navigation ───────────────────────────────────────────────────────────────
 const SECTIONS = [
   { id: "staff", label: "Mitarbeiter", icon: "👥" },
+  { id: "subscription", label: "Abonnement", icon: "💳" },
 ];
 
 // ─── Seite ────────────────────────────────────────────────────────────────────
@@ -226,6 +367,7 @@ export default function SettingsPage() {
           {/* Inhalt */}
           <div className="flex-1 min-w-0">
             {activeSection === "staff" && <StaffSection />}
+            {activeSection === "subscription" && <SubscriptionSection />}
           </div>
         </div>
       </div>
