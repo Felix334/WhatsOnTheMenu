@@ -2,6 +2,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -455,7 +456,9 @@ function HomeContent() {
           </section>
         </main>
         <FooterPart />
-        {/* Footer */}
+        <Script id="adsbygoogle-init" strategy="afterInteractive">
+          {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+        </Script>
 
         <div className="fixed align-top grid z-10 mt-0 top-0">
           {renderLogin && <LoginForm renderLogin={setRenderLogin} />}

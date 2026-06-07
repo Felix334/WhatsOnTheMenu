@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import CookieBanner from "./components/cookieWin";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -65,9 +64,6 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
           <Analytics />
-          <Script id="adsbygoogle-init" strategy="afterInteractive">
-            {`(adsbygoogle = window.adsbygoogle || []).push({});`}
-          </Script>
           <SpeedInsights />
           <CookieBanner />
         </Providers>
