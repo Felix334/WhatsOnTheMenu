@@ -26,9 +26,9 @@ export default function ImprintPage() {
             Angaben gemäß § 5 TMG
           </h2>
           <div className="text-sm text-gray-600 space-y-1 leading-relaxed">
-            <p className="font-medium text-gray-800">[DEIN VOLLSTÄNDIGER NAME]</p>
-            <p>[STRASSE UND HAUSNUMMER]</p>
-            <p>[PLZ ORT]</p>
+            <p className="font-medium text-gray-800">Felix Mayer</p>
+            <p>Mühlenblick 16</p>
+            <p>74372 Sersheim</p>
             <p>Deutschland</p>
           </div>
         </div>
@@ -61,9 +61,9 @@ export default function ImprintPage() {
             Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
           </h2>
           <div className="text-sm text-gray-600 space-y-1">
-            <p>[DEIN VOLLSTÄNDIGER NAME]</p>
-            <p>[STRASSE UND HAUSNUMMER]</p>
-            <p>[PLZ ORT]</p>
+            <p>Felix Mayer</p>
+            <p>Mühlenblick 16</p>
+            <p>74372 Sersheim</p>
           </div>
         </div>
 

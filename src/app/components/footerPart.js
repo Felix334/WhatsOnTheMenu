@@ -1,6 +1,16 @@
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { usePathname, useSearchParams } from "next/navigation";
+
 export const revalidate = 600;
 
 const FooterPart = () => {
+  const { data: session } = useSession();
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const queryString = searchParams.toString();
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,31 +21,28 @@ const FooterPart = () => {
           </div>
           <div>
             <h4 className="font-semibold mb-4">Produkt</h4>
-            <ul className="space-y-2 text-gray-400">
-              
-            </ul>
+            <ul className="space-y-2 text-gray-400"></ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Unternehmen</h4>
-            <ul className="space-y-2 text-gray-400">
-            </ul>
+            <ul className="space-y-2 text-gray-400"></ul>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">© 2026 WhatIsOnMyMenu. Alle Rechte vorbehalten.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
+            <Link className="text-gray-400 text-sm" href={`/privacy${queryString ? `?${queryString}` : ""}`}>
               Datenschutz
-            </a>
-            <a href="/AGBs" className="text-gray-400 hover:text-white text-sm transition-colors">
+            </Link>
+            <Link className="text-gray-400 text-sm" href={`/AGBs${queryString ? `?${queryString}` : ""}`}>
               AGB
-            </a>
-            <a href="/imprint" className="text-gray-400 hover:text-white text-sm transition-colors">
+            </Link>
+            <Link className="text-gray-400 text-sm" href={`/Impressum${queryString ? `?${queryString}` : ""}`}>
               Impressum
-            </a>
+            </Link>
           </div>
         </div>
       </div>
