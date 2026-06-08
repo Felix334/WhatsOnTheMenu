@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
-async function getOwnerRestaurant(session) {
-  if (!session || session.user?.role !== "Owner") return null;
+async function getOwnerRestaurant(token) {
+  if (!token || token.role !== "Owner") return null;
   return prisma.restaurant.findUnique({
-    where: { ownerId: session.user.id },
+    where: { ownerId: token.id },
     select: { id: true },
   });
 }
 
-// GET — alle Staff-Einträge des Restaurants abrufen
 export async function GET(req) {
-  const session = await getServerSession(authOptions);
-  const restaurant = await getOwnerRestaurant(session);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const restaurant = await getOwnerRestaurant(token);
   if (!restaurant) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const staff = await prisma.restaurantStaff.findMany({
@@ -26,10 +24,9 @@ export async function GET(req) {
   return NextResponse.json({ staff });
 }
 
-// POST — neues Staff-Mitglied hinzufügen
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  const restaurant = await getOwnerRestaurant(session);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const restaurant = await getOwnerRestaurant(token);
   if (!restaurant) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { email, role } = await req.json();
@@ -38,12 +35,10 @@ export async function POST(req) {
     return NextResponse.json({ message: "Ungültige Daten" }, { status: 400 });
   }
 
-  // Prüfen ob der Owner sich selbst einladen will
-  if (email === session.user.email) {
+  if (email === token.email) {
     return NextResponse.json({ message: "Du kannst dich nicht selbst einladen" }, { status: 400 });
   }
 
-  // User bereits vorhanden? → direkt verknüpfen
   const existingUser = await prisma.user.findUnique({
     where: { email },
     select: { id: true },

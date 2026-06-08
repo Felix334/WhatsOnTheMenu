@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 export async function GET(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user?.role !== "Owner") {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -17,7 +16,7 @@ export async function GET(req, { params }) {
       include: { restaurant: { select: { ownerId: true } } },
     });
 
-    if (!order || order.restaurant.ownerId !== session.user.id) {
+    if (!order || order.restaurant.ownerId !== token.id) {
       return NextResponse.json({ message: "Nicht gefunden" }, { status: 404 });
     }
 

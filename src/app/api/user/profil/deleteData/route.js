@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { setup_logger } from "@/logger";
 import path from "path";
 import { unlink, access } from "fs/promises";
@@ -9,11 +8,11 @@ import { unlink, access } from "fs/promises";
 const logger = setup_logger();
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  if (session.user.role !== "Owner") {
+  if (token.role !== "Owner") {
     return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
   }
 
@@ -27,7 +26,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "restaurantId fehlt" }, { status: 400 });
     }
 
-    const userID = session.user.id;
+    const userID = token.id;
 
     // Ownership check
     const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
@@ -42,7 +41,6 @@ export async function POST(req) {
       await prisma.dish.deleteMany({
         where: {
           id: { in: dishes },
-          // Only delete dishes that actually belong to this restaurant
           category: {
             categoryGroup: {
               Menu: { restaurantId },
@@ -54,7 +52,6 @@ export async function POST(req) {
 
     if (categories && Array.isArray(categories)) {
       await prisma.$transaction(async (tx) => {
-        // Delete dishes scoped to the restaurant's categories
         await tx.dish.deleteMany({
           where: {
             category: {
@@ -65,7 +62,6 @@ export async function POST(req) {
             },
           },
         });
-        // Delete categories scoped to the restaurant
         await tx.category.deleteMany({
           where: {
             id: { in: categories },
@@ -82,7 +78,6 @@ export async function POST(req) {
     // -----------------------------
     if (files && Array.isArray(files)) {
       for (const fileName of files) {
-        // security: prevent directory traversal
         if (fileName.includes("..") || fileName.includes("/")) continue;
 
         const filePath = path.join(
@@ -98,7 +93,6 @@ export async function POST(req) {
           await access(filePath);
           await unlink(filePath);
         } catch (err) {
-          // Ignore "file not found"
           if (err.code !== "ENOENT") {
             console.error("File delete error:", err);
           }

@@ -1,18 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { stripe, getPriceId } from "@/lib/stripe";
 import { devLog, devWarn } from "@/lib/logger";
 
 export async function POST(request) {
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!session?.user?.id) {
+  if (!token?.id) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   const body = await request.json();
-
   const { tier, restaurant } = body;
 
   const priceId = getPriceId(tier);
@@ -22,22 +20,17 @@ export async function POST(request) {
     return new Response("Invalid tier", { status: 400 });
   }
 
-  // ---------------------------
-  // Stripe Customer holen / erstellen
-  // ---------------------------
   const dbUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: token.id },
     select: { stripeCustomerId: true, stripeSubscriptionId: true, subscriptionStatus: true },
   });
 
-  // Bereits aktives Abo → kein zweites erstellen
   if (dbUser?.stripeSubscriptionId && dbUser?.subscriptionStatus === "active") {
     return new Response("Already subscribed", { status: 409 });
   }
 
   let customerId = dbUser?.stripeCustomerId;
 
-  // Verify existing customer still exists in Stripe (handles deleted customers and env mismatches)
   if (customerId) {
     try {
       const existing = await stripe.customers.retrieve(customerId);
@@ -59,16 +52,14 @@ export async function POST(request) {
   if (!customerId) {
     try {
       const customer = await stripe.customers.create({
-        email: session.user.email,
-        metadata: {
-          userId: session.user.id,
-        },
+        email: token.email,
+        metadata: { userId: token.id },
       });
 
       customerId = customer.id;
 
       await prisma.user.update({
-        where: { id: session.user.id },
+        where: { id: token.id },
         data: { stripeCustomerId: customerId },
       });
 
@@ -79,37 +70,20 @@ export async function POST(request) {
     }
   }
 
-  // ---------------------------
-  // URLs
-  // ---------------------------
-  const baseUrl =
-    process.env.NEXT_PUBLIC_URL || "https://www.whatisonmymenu.com";
+  const baseUrl = process.env.NEXT_PUBLIC_URL || "https://www.whatisonmymenu.com";
+  const successUrl = `${baseUrl}/pricing/success?session_id={CHECKOUT_SESSION_ID}`;
+  const cancelUrl = `${baseUrl}/pricing/cancel?cancelled=true`;
 
-  const successUrl =
-    `${baseUrl}/pricing/success?session_id={CHECKOUT_SESSION_ID}`;
-
-  const cancelUrl =
-    `${baseUrl}/pricing/cancel?cancelled=true`;
-
-  // ---------------------------
-  // Checkout Session erstellen
-  // ---------------------------
   try {
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        userId: session.user.id,
+        userId: token.id,
         tier,
-        // Stripe metadata values are limited to 500 chars — only include fields used in the webhook
         restaurantDetails: JSON.stringify({
           restaurantName: restaurant?.restaurantName || "",
           category: restaurant?.category || "",
@@ -124,11 +98,7 @@ export async function POST(request) {
 
     return new Response(
       JSON.stringify({ url: checkoutSession.url }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
   } catch (err) {
     console.error("Checkout creation failed:", err);

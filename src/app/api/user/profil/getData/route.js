@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "src/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { devLog } from "src/lib/logger";
 
-// Force dynamic rendering - this route should never be statically generated
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "Owner") {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || token.role !== "Owner") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
@@ -22,8 +20,8 @@ export async function POST(req) {
     if (!id) {
       return NextResponse.json({ status: 400, error: "userID is required" });
     }
-    if(id !== session.user.id){
-      return NextResponse.json({status: 401, message: "Unautherized"})
+    if (id !== token.id) {
+      return NextResponse.json({ status: 401, message: "Unauthorized" });
     }
 
     const userData = await main(id);

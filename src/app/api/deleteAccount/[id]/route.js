@@ -1,5 +1,4 @@
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
@@ -11,14 +10,14 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   }
 
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  if (!session?.user) {
+  if (!token) {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
   }
 
-  const isSelf = session.user.id === id;
-  const isAdmin = session.user.role === "Admin";
+  const isSelf = token.id === id;
+  const isAdmin = token.role === "Admin";
 
   if (!isSelf && !isAdmin) {
     return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
@@ -30,7 +29,6 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Stripe cleanup — wrapped separately so a Stripe error doesn't block DB deletion
     if (user.stripeCustomerId) {
       try {
         const subscriptions = await stripe.subscriptions.list({
@@ -42,17 +40,14 @@ export async function DELETE(request, { params }) {
         }
         await stripe.customers.del(user.stripeCustomerId);
       } catch (stripeErr) {
-        // Log but continue — customer may already be deleted on Stripe side
         console.error("Stripe cleanup error (continuing with DB delete):", stripeErr);
       }
     }
 
-    // DB löschen — cascade entfernt Restaurant, Menü, Bestellungen usw.
     await prisma.user.delete({ where: { id } });
 
-    // DSGVO-Audit-Log (bleibt auch in production)
     console.info(
-      `Account deleted | id: ${id} | by: ${session.user.id} | timestamp: ${new Date().toISOString()}`
+      `Account deleted | id: ${id} | by: ${token.id} | timestamp: ${new Date().toISOString()}`
     );
 
     return NextResponse.json(

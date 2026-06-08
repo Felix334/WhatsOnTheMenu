@@ -1,22 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-async function authorize(req) {
-  const [session, token] = await Promise.all([
-    getServerSession(authOptions),
-    getToken({ req, secret: process.env.NEXTAUTH_SECRET }),
-  ]);
-  if (!session || !token || token.role !== "Owner") return null;
-  return token;
-}
-
 export async function POST(req) {
   try {
-    const token = await authorize(req);
-    if (!token) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
@@ -48,7 +37,6 @@ export async function POST(req) {
       });
 
       if (!menu) {
-        // if no menu exists, create one with defaults
         return tx.menu.create({
           data: {
             name: "Default Menü",
@@ -56,8 +44,7 @@ export async function POST(req) {
             restaurantId: restaurantID,
             bgColor: bgColor ?? "#FFFFFF",
             font: font ?? "Arial",
-            categoryGroup: {
-            },
+            categoryGroup: {},
           },
         });
       }
@@ -87,10 +74,6 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
-

@@ -1,21 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-async function authorize(req) {
-  const [session, token] = await Promise.all([
-    getServerSession(authOptions),
-    getToken({ req, secret: process.env.NEXTAUTH_SECRET }),
-  ]);
-  if (!session || !token || token.role !== "Owner") return null;
-  return token;
-}
-
 export async function GET(req) {
   try {
-    if (!(await authorize(req))) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
@@ -43,8 +33,8 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const token = await authorize(req);
-    if (!token) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Not Authorized" }, { status: 401 });
     }
 
@@ -73,13 +63,13 @@ export async function POST(req) {
           parentCompany: restaurant.parentCompany,
           openingHours: restaurant.openingHours,
           socialLinks: restaurant.socialLinks,
-        }).filter(([_, v]) => v !== undefined)
+        }).filter(([, v]) => v !== undefined)
       );
 
       const locationOps = (locations ?? []).map((location) => {
         const { id, ...rest } = location;
         const locationData = Object.fromEntries(
-          Object.entries(rest).filter(([_, v]) => v !== undefined)
+          Object.entries(rest).filter(([, v]) => v !== undefined)
         );
         if (id) {
           return Object.keys(locationData).length > 0

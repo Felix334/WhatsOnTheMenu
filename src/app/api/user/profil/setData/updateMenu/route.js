@@ -1,22 +1,27 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
-import { authOptions } from "src/lib/auth";
-import { getServerSession } from "next-auth";
 
 export async function GET(req, { params }) {
   try {
-    const session = await getServerSession(authOptions);
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    if (!token || token.role !== "Owner" || !session) {
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
 
-    // Next.js 15 App Router liefert params direkt als Objekt
     const { restaurantID } = await params;
 
     if (!restaurantID) {
       return NextResponse.json({ message: "Invalid restaurant ID" }, { status: 400 });
+    }
+
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantID },
+      select: { ownerId: true },
+    });
+
+    if (!restaurant || restaurant.ownerId !== token.id) {
+      return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
 
     const menu = await prisma.menu.findFirst({
@@ -37,10 +42,10 @@ export async function GET(req, { params }) {
 export async function POST(req) {
   try {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-    const session = await getServerSession(authOptions);
-    if (!token || token.role !== "Owner" || !session) {
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
     }
+
     const { bgColor, font, description, restaurantID } = await req.json();
 
     if (!restaurantID) {
@@ -65,7 +70,7 @@ export async function POST(req) {
     }
 
     const updateData = Object.fromEntries(
-      Object.entries({ bgColor, font, description }).filter(([_, v]) => v !== undefined)
+      Object.entries({ bgColor, font, description }).filter(([, v]) => v !== undefined)
     );
 
     const updatedMenu = await prisma.menu.updateMany({

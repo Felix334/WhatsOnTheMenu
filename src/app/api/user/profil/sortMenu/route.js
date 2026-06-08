@@ -1,20 +1,17 @@
-// app/api/sort/route.js
-
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 export async function PATCH(req) {
   try {
-    const session = await getServerSession(authOptions);
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    if (!session || session.user.role !== "Owner") {
+    if (!token || token.role !== "Owner") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const restaurant = await prisma.restaurant.findUnique({
-      where: { ownerId: session.user.id },
+      where: { ownerId: token.id },
       select: { id: true },
     });
 

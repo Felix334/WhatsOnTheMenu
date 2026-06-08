@@ -1,27 +1,22 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { devLog } from "@/lib/logger";
-
 
 export async function POST(req) {
   try {
-    // Pass request to getServerSession
-    const session = await getServerSession(authOptions);
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-    if (!session) {
+    if (!token || token.role !== "Admin") {
       return NextResponse.json({ status: 401, message: "Not authenticated" });
     }
 
-    const userID = session.user.id;
-    const role = session.user.role;
-    devLog("Check1", role, userID);
+    devLog("Check1", token.role, token.id);
 
     const data = await req.json();
     let searchData = data?.search || null;
 
-    const userData = await handleUserRequest(role, searchData);
+    const userData = await handleUserRequest(token.role, searchData);
     devLog("User Data:", userData);
 
     if (!userData || userData.length === 0) {
@@ -40,7 +35,6 @@ async function handleUserRequest(role, searchData) {
 
   if (role === "Admin") {
     if (!searchData) {
-      // Return first 20 users, select only necessary fields
       const userList = await prisma.user.findMany({
         skip: 0,
         select: {
@@ -52,19 +46,7 @@ async function handleUserRequest(role, searchData) {
       });
       devLog("User List:", userList);
       return userList;
-    } 
-    /*
-    else {
-      // Optional: filter by name
-      return prisma.user.findMany({
-        where: {
-          name: { contains: searchData.name, mode: "insensitive" },
-          role: "Owner",
-        },
-        select: { id: true, name: true, email: true, role: true },
-      });
     }
-    */
   }
 
   return null;
