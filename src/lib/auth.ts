@@ -6,6 +6,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from 'src/lib/prisma';
+import { stripe } from 'src/lib/stripe';
 import { Subscription } from '@prisma/client';
 
 export const authOptions: NextAuthOptions = {
@@ -104,7 +105,7 @@ export const authOptions: NextAuthOptions = {
         const [freshUser, memberships] = await Promise.all([
           prisma.user.findUnique({
             where: { id: userId },
-            select: { role: true, subscription: true, subscriptionStatus: true },
+            select: { role: true, subscription: true, subscriptionStatus: true, stripeSubscriptionId: true },
           }),
           prisma.restaurantStaff.findMany({
             where: { userId, approved: true },
@@ -116,6 +117,36 @@ export const authOptions: NextAuthOptions = {
           token.role = freshUser.role;
           token.subscription = freshUser.subscription;
           token.subscriptionStatus = freshUser.subscriptionStatus ?? undefined;
+
+          // Sicherheitscheck: Owner mit bezahltem Plan → Stripe-Abo verifizieren
+          if (freshUser.role === 'Owner' && freshUser.subscription !== 'FreeTier') {
+            if (!freshUser.stripeSubscriptionId) {
+              // Keine Stripe-ID in DB → definitiv kein Abo
+              await prisma.user.update({
+                where: { id: userId },
+                data: { subscription: 'FreeTier', subscriptionStatus: 'canceled' },
+              });
+              token.subscription = 'FreeTier';
+              token.subscriptionStatus = 'canceled';
+            } else {
+              // Stripe-ID vorhanden → direkt bei Stripe verifizieren
+              try {
+                const stripeSub = await stripe.subscriptions.retrieve(freshUser.stripeSubscriptionId);
+                const isValid = ['active', 'trialing', 'past_due'].includes(stripeSub.status);
+                if (!isValid) {
+                  await prisma.user.update({
+                    where: { id: userId },
+                    data: { subscription: 'FreeTier', subscriptionStatus: 'canceled' },
+                  });
+                  token.subscription = 'FreeTier';
+                  token.subscriptionStatus = 'canceled';
+                }
+              } catch (err) {
+                // Stripe nicht erreichbar → kein Downgrade, Fehler loggen
+                console.error('Stripe-Verifikation beim Login fehlgeschlagen:', err);
+              }
+            }
+          }
         }
 
         token.staffMemberships = memberships;

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
-async function verifyOwnership(session, staffID) {
-  if (!session || session.user?.role !== "Owner") return null;
+async function verifyOwnership(token, staffID) {
+  if (!token || token.role !== "Owner") return null;
   const restaurant = await prisma.restaurant.findUnique({
-    where: { ownerId: session.user.id },
+    where: { ownerId: token.id },
     select: { id: true },
   });
   if (!restaurant) return null;
@@ -17,11 +16,10 @@ async function verifyOwnership(session, staffID) {
   return entry;
 }
 
-// PATCH — genehmigen oder Rolle ändern
 export async function PATCH(req, { params }) {
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { staffID } = await params;
-  const entry = await verifyOwnership(session, staffID);
+  const entry = await verifyOwnership(token, staffID);
   if (!entry) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { approved, role } = await req.json();
@@ -35,7 +33,6 @@ export async function PATCH(req, { params }) {
     include: { user: { select: { id: true, name: true, email: true } } },
   });
 
-  // Wenn genehmigt → User.role auf "Staff" setzen
   if (approved === true && updated.userId) {
     await prisma.user.update({
       where: { id: updated.userId },
@@ -46,16 +43,14 @@ export async function PATCH(req, { params }) {
   return NextResponse.json({ staff: updated });
 }
 
-// DELETE — Mitarbeiter entfernen
 export async function DELETE(req, { params }) {
-  const session = await getServerSession(authOptions);
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { staffID } = await params;
-  const entry = await verifyOwnership(session, staffID);
+  const entry = await verifyOwnership(token, staffID);
   if (!entry) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   await prisma.restaurantStaff.delete({ where: { id: staffID } });
 
-  // Wenn der User keine weiteren Staff-Einträge hat → Rolle zurücksetzen
   if (entry.userId) {
     const remaining = await prisma.restaurantStaff.count({
       where: { userId: entry.userId, approved: true },
