@@ -1,4 +1,4 @@
-const LAST_UPDATED = "29. Mai 2026";
+const LAST_UPDATED = "09. Juni 2026";
 
 const sections = [
   {
@@ -9,101 +9,140 @@ const sections = [
       "Die jeweils aktuelle Version der AGB ist auf der Website unter /AGBs abrufbar.",
     ],
   },
+
   {
-    title: "§ 2 Leistungsbeschreibung",
+    title: "§ 2 Vertragsgegenstand und Leistungsbeschreibung",
     content: [
       "WhatIsOnMyMenu.com ist eine Software-as-a-Service-Plattform zur Erstellung, Verwaltung und Veröffentlichung digitaler Speisekarten für Gastronomiebetriebe.",
-      "Der Anbieter stellt je nach gewähltem Tarif folgende Kernfunktionen bereit: Erstellung und Bearbeitung digitaler Speisekarten, Verwaltung von Kategorien und Gerichten, Generierung von QR-Codes sowie Bereitstellung einer öffentlich zugänglichen Menüansicht.",
-      "Der genaue Funktionsumfang richtet sich nach dem jeweiligen Abonnement-Tarif (Starter, Business, Professional, Enterprise). Änderungen am Funktionsumfang werden den Nutzern rechtzeitig mitgeteilt.",
+      "Der Anbieter stellt dem Nutzer eine cloudbasierte Softwarelösung zur Verfügung. Der konkrete Funktionsumfang richtet sich nach dem gewählten Tarif.",
+      "Der Anbieter ist berechtigt, die Plattform weiterzuentwickeln, Funktionen zu ändern oder anzupassen, sofern hierdurch der Vertragszweck nicht wesentlich beeinträchtigt wird.",
+      "Ein Anspruch auf bestimmte Funktionen außerhalb des gebuchten Tarifs besteht nicht.",
     ],
   },
+
   {
     title: "§ 3 Vertragsschluss und Registrierung",
     content: [
-      "Der Vertrag kommt durch die Registrierung des Nutzers auf der Plattform und die Bestätigung dieser AGB zustande.",
-      "Die Registrierung erfolgt ausschließlich über Google OAuth. Der Nutzer ist verpflichtet, wahrheitsgemäße Angaben zu machen und sein Konto vor unbefugtem Zugriff zu schützen.",
-      "Ein Anspruch auf Registrierung besteht nicht. Der Anbieter behält sich das Recht vor, Registrierungen ohne Angabe von Gründen abzulehnen.",
-      "Der Nutzer darf pro Betrieb nur ein Konto anlegen. Die Nutzung mehrerer Konten für denselben Betrieb ist untersagt.",
+      "Der Vertrag kommt durch Registrierung des Nutzers und Bestätigung dieser AGB zustande.",
+      "Die Registrierung erfolgt ausschließlich über Google OAuth. Der Nutzer ist verpflichtet, korrekte Angaben zu machen und Zugangsdaten sowie verbundene Konten vor unbefugtem Zugriff zu schützen.",
+      "Der Anbieter ist berechtigt, Registrierungen ohne Angabe von Gründen abzulehnen.",
+      "Pro Betrieb darf nur ein Hauptkonto erstellt werden.",
+      "Der Nutzer ist für alle Aktivitäten innerhalb seines Kontos verantwortlich, unabhängig davon, ob diese durch ihn selbst oder durch von ihm autorisierte Personen erfolgen.",
     ],
   },
+
   {
-    title: "§ 4 Tarife und Preise",
+    title: "§ 4 Unternutzer und Zugriffsberechtigungen",
     content: [
-      "Der Anbieter bietet folgende Tarife an:",
-      "• Starter (kostenlos): Bis zu 7 Kategorien, bis zu 50 Gerichte, Basis-Templates, QR-Code.",
-      "• Business (7,99 €/Monat): Bis zu 15 Kategorien, bis zu 100 Gerichte, Basis-Templates, QR-Code.",
-      "• Professional (14,99 €/Monat): Bis zu 25 Kategorien, bis zu 200 Gerichte, Premium-Templates, QR-Code, Event-Kalender, Verfügbarkeitsanzeige.",
-      "• Enterprise (individuell): Individuell vereinbarte Leistungen.",
-      "Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer. Der Anbieter behält sich Preisanpassungen vor, die dem Nutzer mindestens 30 Tage vor Inkrafttreten mitgeteilt werden.",
+      "Der Hauptnutzer kann weiteren Personen (z. B. Mitarbeitern) Zugriff auf sein Konto gewähren.",
+      "Unternutzer handeln im Auftrag und unter Verantwortung des Hauptnutzers.",
+      "Der Hauptnutzer haftet für sämtliche Handlungen, Inhalte und Änderungen, die durch von ihm autorisierte Unternutzer vorgenommen werden.",
+      "Der Hauptnutzer ist verpflichtet, Zugriffsrechte regelmäßig zu kontrollieren und bei Bedarf zu entziehen.",
     ],
   },
+
   {
-    title: "§ 5 Zahlung und Abrechnung",
+    title: "§ 5 Tarife und Preise",
     content: [
-      "Kostenpflichtige Tarife werden monatlich im Voraus abgerechnet. Der Abrechnungszeitraum beginnt mit dem Tag der Buchung.",
-      "Die Zahlung erfolgt über die auf der Plattform angebotenen Zahlungsmethoden. Bei Zahlungsverzug ist der Anbieter berechtigt, den Zugang zu kostenpflichtigen Funktionen bis zur vollständigen Begleichung der offenen Beträge zu sperren.",
-      "Rückerstattungen werden nur in gesetzlich vorgesehenen Fällen gewährt.",
+      "Der Anbieter bietet verschiedene Tarife an (Starter, Business, Professional, Enterprise).",
+      "Die jeweiligen Leistungsumfänge ergeben sich aus der Tarifbeschreibung auf der Website.",
+      "Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer.",
+      "Der Anbieter behält sich Preisanpassungen mit einer Ankündigungsfrist von 30 Tagen vor.",
     ],
   },
+
   {
-    title: "§ 6 Laufzeit und Kündigung",
+    title: "§ 6 Zahlung und Abrechnung",
     content: [
-      "Der Starter-Tarif ist unbefristet und kann jederzeit durch Löschung des Kontos beendet werden.",
-      "Kostenpflichtige Tarife haben eine monatliche Laufzeit und können mit einer Frist von 7 Tagen zum Ende des jeweiligen Abrechnungszeitraums gekündigt werden.",
-      "Die Kündigung erfolgt in Textform (E-Mail) oder über die Kontoeinstellungen auf der Plattform.",
-      "Der Anbieter ist berechtigt, das Nutzerkonto bei schwerwiegenden Verstößen gegen diese AGB mit sofortiger Wirkung zu kündigen.",
+      "Kostenpflichtige Tarife werden monatlich im Voraus abgerechnet.",
+      "Die Zahlung erfolgt über die angebotenen Zahlungsdienstleister.",
+      "Bei Zahlungsverzug kann der Zugriff auf kostenpflichtige Funktionen eingeschränkt oder gesperrt werden.",
+      "Rückerstattungen erfolgen nur im gesetzlich vorgesehenen Rahmen.",
     ],
   },
+
   {
-    title: "§ 7 Pflichten des Nutzers",
+    title: "§ 7 Laufzeit und Kündigung",
     content: [
-      "Der Nutzer ist verantwortlich für alle Inhalte, die er auf der Plattform einstellt (Gerichte, Bilder, Beschreibungen, Preise). Er stellt sicher, dass diese Inhalte zutreffend, vollständig und rechtlich unbedenklich sind.",
-      "Der Nutzer ist verpflichtet, die geltenden Kennzeichnungspflichten für Speisen und Allergene (insbesondere die EU-Lebensmittelinformationsverordnung Nr. 1169/2011) einzuhalten.",
-      "Folgende Nutzungen sind untersagt: Einstellung rechtswidriger, irreführender oder beleidigender Inhalte; Verwendung der Plattform für Spam oder unerwünschte Werbung; Manipulation der Plattform oder ihrer Infrastruktur; Weitergabe von Zugangsdaten an Dritte.",
+      "Kostenpflichtige Verträge haben eine monatliche Laufzeit und verlängern sich automatisch.",
+      "Die Kündigung ist mit einer Frist von 7 Tagen zum Ende des Abrechnungszeitraums möglich.",
+      "Die Kündigung kann über die Plattform oder in Textform erfolgen.",
+      "Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt.",
     ],
   },
+
   {
-    title: "§ 8 Urheberrecht und Lizenzen",
+    title: "§ 8 Pflichten des Nutzers",
     content: [
-      "Der Nutzer räumt dem Anbieter mit Einstellung von Inhalten (Bilder, Texte etc.) eine einfache, nicht übertragbare Lizenz ein, diese Inhalte zum Zweck der Bereitstellung des Dienstes zu verwenden, zu speichern und anzuzeigen.",
-      "Die Plattform, ihre Software sowie alle vom Anbieter erstellten Inhalte und Designs sind urheberrechtlich geschützt und dürfen ohne ausdrückliche Genehmigung nicht vervielfältigt oder verbreitet werden.",
+      "Der Nutzer ist verantwortlich für sämtliche Inhalte, die er auf der Plattform erstellt oder hochlädt.",
+      "Der Nutzer stellt sicher, dass Inhalte rechtlich zulässig sind (insbesondere Lebensmittelkennzeichnung, Urheberrecht, Wettbewerbsrecht).",
+      "Untersagt sind insbesondere rechtswidrige Inhalte, Manipulation der Plattform und Weitergabe von Zugangsdaten.",
+      "Der Nutzer ist verpflichtet, eigene Sicherungskopien wichtiger Daten zu erstellen.",
     ],
   },
+
   {
-    title: "§ 9 Verfügbarkeit und Wartung",
+    title: "§ 9 Drittanbieter und externe Dienste",
     content: [
-      "Der Anbieter strebt eine Verfügbarkeit der Plattform von 99 % im Jahresdurchschnitt an. Wartungsarbeiten werden nach Möglichkeit in Zeiten geringer Nutzung durchgeführt und vorab angekündigt.",
-      "Ein Anspruch auf ununterbrochene Verfügbarkeit besteht nicht. Der Anbieter haftet nicht für Ausfälle, die auf Umstände außerhalb seines Einflussbereichs zurückzuführen sind (z. B. höhere Gewalt, Ausfall von Drittanbietern).",
+      "Die Plattform nutzt externe Dienste wie Authentifizierungs- und Zahlungsanbieter.",
+      "Der Anbieter übernimmt keine Verantwortung für Störungen oder Ausfälle dieser Drittanbieter.",
+      "Es gelten zusätzlich die Nutzungsbedingungen der jeweiligen Drittanbieter.",
     ],
   },
+
   {
-    title: "§ 10 Haftungsbeschränkung",
+    title: "§ 10 Verfügbarkeit und technische Leistung",
     content: [
-      "Der Anbieter haftet unbeschränkt für Schäden aus der Verletzung des Lebens, des Körpers oder der Gesundheit sowie für vorsätzlich oder grob fahrlässig verursachte Schäden.",
-      "Für einfache Fahrlässigkeit haftet der Anbieter nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten), und zwar auf den vorhersehbaren, vertragstypischen Schaden begrenzt.",
-      "Eine weitergehende Haftung des Anbieters ist ausgeschlossen. Der Anbieter übernimmt keine Haftung für die inhaltliche Richtigkeit der vom Nutzer eingestellten Speisekarten-Informationen.",
+      "Der Anbieter bemüht sich um eine durchschnittliche jährliche Verfügbarkeit der Plattform von 99 %.",
+      "Ausgenommen sind Wartungsarbeiten, Sicherheitsupdates sowie Ausfälle von Drittanbietern oder höhere Gewalt.",
+      "Ein Anspruch auf jederzeitige, ununterbrochene Verfügbarkeit besteht nicht.",
     ],
   },
+
   {
-    title: "§ 11 Datenschutz",
+    title: "§ 11 Haftung",
     content: [
-      "Die Erhebung und Verarbeitung personenbezogener Daten erfolgt gemäß der Datenschutzerklärung des Anbieters, die unter /privacy abrufbar ist.",
-      "Zur Authentifizierung wird Google OAuth eingesetzt. Dabei gelten zusätzlich die Datenschutzbestimmungen von Google (Google LLC).",
+      "Der Anbieter haftet unbeschränkt für Vorsatz sowie für Schäden aus der Verletzung von Leben, Körper oder Gesundheit.",
+      "Bei einfacher Fahrlässigkeit haftet der Anbieter nur bei Verletzung wesentlicher Vertragspflichten und beschränkt auf den vorhersehbaren Schaden.",
+      "Der Anbieter haftet nicht für Inhalte, die durch Nutzer oder Unternutzer erstellt werden.",
+      "Der Anbieter haftet nicht für Datenverluste, sofern diese nicht vorsätzlich oder grob fahrlässig verursacht wurden.",
     ],
   },
+
   {
-    title: "§ 12 Änderungen der AGB",
+    title: "§ 12 Account-Zugriff und Wiederherstellung",
     content: [
-      "Der Anbieter behält sich das Recht vor, diese AGB jederzeit mit Wirkung für die Zukunft zu ändern. Änderungen werden dem Nutzer mindestens 30 Tage vor Inkrafttreten per E-Mail oder über eine Benachrichtigung auf der Plattform mitgeteilt.",
-      "Widerspricht der Nutzer den geänderten AGB nicht innerhalb von 30 Tagen nach Bekanntgabe, gelten die neuen AGB als akzeptiert. Auf dieses Widerspruchsrecht und die Folgen des Schweigens wird im Rahmen der Bekanntgabe ausdrücklich hingewiesen.",
+      "Der Zugriff erfolgt primär über Google OAuth.",
+      "Der Nutzer ist verpflichtet, eine Wiederherstellungs-E-Mail und Zahlungsinformationen bereitzuhalten.",
+      "Im Falle eines Zugangsverlusts kann der Anbieter nach angemessener Prüfung der Identität den Zugriff wiederherstellen oder neu zuweisen.",
+      "Der Anbieter kann hierfür insbesondere Zahlungsnachweise, Rechnungsdaten oder Unternehmensnachweise verlangen.",
+      "Ein Anspruch auf Wiederherstellung besteht nur bei ausreichendem Identitätsnachweis.",
     ],
   },
+
   {
-    title: "§ 13 Schlussbestimmungen",
+    title: "§ 13 Datenschutz",
     content: [
-      "Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG).",
-      "Ist der Nutzer Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen, ist Gerichtsstand der Sitz des Anbieters.",
-      "Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.",
+      "Die Verarbeitung personenbezogener Daten erfolgt gemäß der Datenschutzerklärung.",
+      "Zur Anmeldung wird Google OAuth verwendet. Es gelten zusätzlich die Datenschutzbestimmungen von Google LLC.",
+    ],
+  },
+
+  {
+    title: "§ 14 Änderungen der AGB",
+    content: [
+      "Der Anbieter kann diese AGB mit Wirkung für die Zukunft ändern.",
+      "Änderungen werden mindestens 30 Tage vorher angekündigt.",
+      "Widerspricht der Nutzer nicht innerhalb dieser Frist, gelten die Änderungen als akzeptiert.",
+    ],
+  },
+
+  {
+    title: "§ 15 Schlussbestimmungen",
+    content: [
+      "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts.",
+      "Gerichtsstand ist der Sitz des Anbieters, sofern der Nutzer Kaufmann ist.",
+      "Sollten einzelne Bestimmungen unwirksam sein, bleibt der Rest gültig.",
     ],
   },
 ];
