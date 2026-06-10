@@ -349,15 +349,7 @@ export default function RestaurantForm() {
 
         {/* Buttons */}
         <div className="pt-4">
-          <Button
-            type="button"
-            onClick={handleProCheckout}
-            disabled={!isFormValid() || !isBusinessConfirmed}
-            className={`w-full font-semibold py-3 rounded-xl shadow-xl text-lg transition-all
-    ${isFormValid() && isBusinessConfirmed ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-          >
-            💳 Professional Abo aktivieren (€14.99/Monat)
-          </Button>
+
         </div>
       </form>
     </div>
