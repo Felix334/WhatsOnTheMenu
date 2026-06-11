@@ -334,6 +334,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Daten erfolgreich bearbeitet", restaurantId, menuId }, { status: 200 });
   } catch (err: any) {
     console.error("❌ Serverfehler:", err);
-    return NextResponse.json({ message: "Serverfehler", error: err?.message ?? err }, { status: 500 });
+    return NextResponse.json({ message: "Serverfehler" }, { status: 500 });
   }
 }

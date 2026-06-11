@@ -126,6 +126,6 @@ export async function GET(req, { params }) {
     });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
-    return NextResponse.json({ message: "Internal server error", error: error.message }, { status: 500 });
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

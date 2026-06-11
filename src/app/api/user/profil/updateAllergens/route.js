@@ -83,7 +83,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("updateAllergens error:", error);
     return NextResponse.json(
-      { error: "Interner Serverfehler", details: error.message },
+      { error: "Interner Serverfehler" },
       { status: 500 }
     );
   }
