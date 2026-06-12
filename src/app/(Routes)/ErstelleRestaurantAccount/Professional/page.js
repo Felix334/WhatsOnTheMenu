@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -29,7 +29,7 @@ const restaurantSchema = z.object({
   description: z.string().max(300, "Maximal 2-3 Sätze (höchstens 300 Zeichen)").optional(),
 });
 
-export default function RestaurantForm() {
+function RestaurantForm() {
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
     restaurantName: "",
@@ -168,7 +168,7 @@ export default function RestaurantForm() {
   };
 
   const handleProCheckout = async () => {
-    try {
+    /*try {
       console.log("Sende Daten:", restaurant);
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
@@ -180,7 +180,7 @@ export default function RestaurantForm() {
     } catch (err) {
       console.error("Checkout error:", err);
       setSubmitError("Fehler beim Starten des Checkout.");
-    }
+    }*/
   };
 
   return (
@@ -384,4 +384,22 @@ export default function RestaurantForm() {
       </Card>
     </section>
   );
+}
+
+export default function Page(){
+    const { status, data: session } = useSession();
+  
+    if (status === "loading") {
+      return <div className="min-h-screen flex items-center justify-center text-gray-500">Lade...</div>;
+    }
+  
+    if (!session?.user?.id) {
+      return <div className="min-h-screen flex items-center justify-center text-gray-500">Bitte anmelden</div>;
+    }
+  
+    return (
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Lade...</div>}>
+        <RestaurantForm />
+      </Suspense>
+    );
 }
