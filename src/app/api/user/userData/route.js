@@ -17,11 +17,34 @@ export async function POST(req) {
           name: { contains: data.name, mode: "insensitive" },
           role: "Owner",
         },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          subscription: true,
+          subscriptionStatus: true,
+          image: true,
+          createdAt: true,
+        },
       });
       return NextResponse.json({ status: 200, data: users });
     }
 
-    const users = await prisma.user.findMany({ take: 20, skip: 0 });
+    const users = await prisma.user.findMany({
+      take: 20,
+      skip: 0,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        subscription: true,
+        subscriptionStatus: true,
+        image: true,
+        createdAt: true,
+      },
+    });
     return NextResponse.json({ status: 200, data: users });
   } catch (e) {
     console.error("Database Error", e);

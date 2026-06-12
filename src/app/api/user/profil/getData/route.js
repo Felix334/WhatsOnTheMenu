@@ -41,9 +41,28 @@ async function main(userId) {
   try {
     const userData = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        role: true,
+        subscription: true,
+        subscriptionStatus: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
         restaurant: {
-          include: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            parentCompany: true,
+            ownerName: true,
+            category: true,
+            openingHours: true,
+            socialLinks: true,
+            createdAt: true,
             locations: true,
             menu: {
               select: {
@@ -56,11 +75,30 @@ async function main(userId) {
                 createdAt: true,
                 updatedAt: true,
                 categoryGroup: {
-                  include: {
+                  select: {
+                    id: true,
+                    name: true,
+                    position: true,
+                    color: true,
                     categories: {
-                      include: {
+                      select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        position: true,
+                        bgColor: true,
+                        font: true,
+                        fontColor: true,
                         dishes: {
-                          include: {
+                          select: {
+                            id: true,
+                            name: true,
+                            description: true,
+                            price: true,
+                            imageUrl: true,
+                            createdAt: true,
+                            updatedAt: true,
+                            stock: true,
                             ingredients: true,
                             reviews: true,
                           },
