@@ -3,6 +3,5 @@ export function setup_logger() {
   return {
     info: (msg) => console.log(`INFO: ${msg}`),
     error: (msg) => console.error(`ERROR: ${msg}`),
-    hmrRefreshes: (msg) => console.log(`Server-Component-Refresh: ${msg}`)
   };
 }

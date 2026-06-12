@@ -5,7 +5,7 @@ declare module "next-auth" {
     user: {
       id: string;
       role: string;
-      subscription: 'FreeTier' | 'Professional' | 'Business' | 'Individuell';
+      subscription: 'NoSubscription' | 'FreeTier' | 'Professional' | 'Business';
       subscriptionStatus?: string;
       staffMemberships: { restaurantId: string; role: string }[];
       restaurantId?: string;
@@ -15,7 +15,7 @@ declare module "next-auth" {
   interface User {
     id: string;
     role: string;
-    subscription: 'FreeTier' | 'Professional' | 'Business' | 'Individuell';
+    subscription: 'NoSubscription' | 'FreeTier' | 'Professional' | 'Business';
   }
 }
 

@@ -14,7 +14,7 @@ model User {
   emailVerified        DateTime?
   password             String?
   role                 Role             @default(User)
-  subscription         Subscription     @default(FreeTier)
+  subscription         Subscription     @default(NoSubscription)
   companyId            String?
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
@@ -250,7 +250,7 @@ model RestaurantQueue {
   city           String
   postalCode     String
   country        String
-  subscription   Subscription
+  subscription   Subscription  @default(NoSubscription)
   owner          User         @relation(fields: [ownerId], references: [id])
 
   @@index([ownerId])
@@ -350,6 +350,7 @@ enum Role {
 }
 
 enum Subscription {
+  NoSubscription
   FreeTier
   Professional
   Business

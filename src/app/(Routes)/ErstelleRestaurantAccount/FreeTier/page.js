@@ -25,7 +25,6 @@ const restaurantSchema = z.object({
 });
 
 export default function RestaurantForm() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
     restaurantName: "",
@@ -48,15 +47,16 @@ export default function RestaurantForm() {
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
 
   const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
+  useEffect(() => {
+    if (isAuthenticated && session?.user?.id) {
+      setRestaurant((prev) => ({ ...prev, ownerID: session.user.id }));
+    }
+  }, [isAuthenticated, session?.user?.id]);
 
   if (status === "loading") {
     return <div>Seite wird geladen</div>;
-  } else {
-    if (status === "authenticated") {
-      restaurant.ownerID = session?.user?.id;
-      console.log(session.user.id);
-      setIsAuthenticated(true);
-    }
   }
 
   const handleChange = (e) => {

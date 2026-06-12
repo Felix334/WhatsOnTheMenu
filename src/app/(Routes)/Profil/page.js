@@ -825,7 +825,7 @@ export default function PageBuilder() {
 
           {/* Abo-Badge mit Live-Zähler */}
           <div className="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Individuell" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription ?? "FreeTier"}</span>
+            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Business" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription === "NoSubscription" ? "Kein Abo" : session?.user?.subscription ?? "Kein Abo"}</span>
             <span className="text-gray-300">|</span>
             <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
               {catCount}/{Limit.CategoryLimit ?? "?"} Kat.
