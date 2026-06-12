@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DynamicLinkButton } from "@/app/components/DynamicLink";
 
 export const metadata = {
   title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code | WhatIsOnMyMenu",
@@ -135,12 +134,12 @@ export default function Page() {
             öffnen – ohne App, ohne Papier, jederzeit aktuell.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
-              <Link href="/ErstelleRestaurantAccount/FreeTier">Kostenlos starten</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
-              <Link href="/pricing">Alle Tarife ansehen</Link>
-            </Button>
+            <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
+              Kostenlos starten
+            </DynamicLinkButton>
+            <DynamicLinkButton size="lg" variant="outline" href="/pricing" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              Alle Tarife ansehen
+            </DynamicLinkButton>
           </div>
         </div>
       </section>
@@ -216,9 +215,9 @@ export default function Page() {
             title="Starte kostenlos – wachse, wenn du bereit bist"
             subtitle="Im Free-Tarif baust du deine digitale Karte mit QR-Code völlig kostenlos. Mehr Kategorien, Gerichte und Funktionen schaltest du jederzeit mit einem Upgrade frei."
           />
-          <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
-            <Link href="/pricing">Tarife vergleichen</Link>
-          </Button>
+          <DynamicLinkButton size="lg" href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
+            Tarife vergleichen
+          </DynamicLinkButton>
         </div>
       </section>
 
@@ -229,9 +228,9 @@ export default function Page() {
           <p className="text-amber-50 mb-8 text-lg">
             Erstelle dein Restaurant kostenlos und teile deine Karte noch heute per QR-Code mit deinen Gästen.
           </p>
-          <Button asChild size="lg" className="bg-white text-amber-700 hover:bg-amber-50 font-semibold shadow-lg">
-            <Link href="/ErstelleRestaurantAccount/FreeTier">Jetzt kostenlos starten</Link>
-          </Button>
+          <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-white text-amber-700 hover:bg-amber-50 font-semibold shadow-lg">
+            Jetzt kostenlos starten
+          </DynamicLinkButton>
         </div>
       </section>
     </main>

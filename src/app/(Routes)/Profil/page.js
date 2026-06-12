@@ -3,6 +3,7 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { DynamicLink } from "@/app/components/DynamicLink";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -526,9 +527,9 @@ export default function PageBuilder() {
           {exeedDishLimit ? (
             <div className="flex items-center gap-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 w-full">
               <span>Gericht-Limit ({Limit.DishLimit}) erreicht.</span>
-              <Link href="/pricing" className="ml-auto font-semibold underline text-amber-600 hover:text-amber-700 whitespace-nowrap">
+              <DynamicLink href="/pricing" className="ml-auto font-semibold underline text-amber-600 hover:text-amber-700 whitespace-nowrap">
                 ↑ Upgrade
-              </Link>
+              </DynamicLink>
             </div>
           ) : (
             <Button
@@ -812,9 +813,9 @@ export default function PageBuilder() {
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
                   Kategorie-Limit ({Limit.CategoryLimit}) erreicht —{" "}
-                  <Link href="/pricing" className="underline font-medium">
+                  <DynamicLink href="/pricing" className="underline font-medium">
                     Upgrade
-                  </Link>
+                  </DynamicLink>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -835,9 +836,9 @@ export default function PageBuilder() {
               {dishCount}/{Limit.DishLimit ?? "?"} Gerichte
             </span>
             {(exeedCatLimit || exeedDishLimit) && (
-              <Link href="/pricing" className="ml-1 text-amber-600 hover:text-amber-700 font-semibold hover:underline">
+              <DynamicLink href="/pricing" className="ml-1 text-amber-600 hover:text-amber-700 font-semibold hover:underline">
                 ↑ Upgrade
-              </Link>
+              </DynamicLink>
             )}
           </div>
 

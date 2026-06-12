@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AdminLink, ProfilLink } from "./renderDynamicLinks"; // Use dynamic links for auth routes
-import Link from "next/link";
+import { DynamicLinkButton } from "./DynamicLink";
 
 export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOpen, onMobileMenuToggle, navShadow }) {
   const [renderCookieWin, setRenderCookieWin] = useState(false);
@@ -58,7 +58,7 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
                   <AdminLink asChild><Button variant="ghost">Admin Konsole</Button></AdminLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href="/UnserePartner" asChild><Button variant="ghost">Unsere Partner</Button></Link>
+                  <DynamicLinkButton href="/UnserePartner" variant="ghost">Unsere Partner</DynamicLinkButton>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Button variant="ghost" onClick={() => scrollToSection("#features")}>
@@ -131,7 +131,7 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
                   }}>
                     Beispiele
                   </Button>
-                  <Link href="/UnserePartner" asChild><Button variant="ghost">Unsere Partner</Button></Link>
+                  <DynamicLinkButton href="/UnserePartner" variant="ghost">Unsere Partner</DynamicLinkButton>
                   {!userID && (
                     <Button variant="outlined" aria-label="Log in" onClick={() => {
                       toggleMobileMenu();
