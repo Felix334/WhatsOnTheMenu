@@ -77,7 +77,7 @@ function PricingContent() {
           {TIERS.map((tier) => {
             const active = tier.isActive(sub);
             return (
-              <Card key={tier.id} className={`flex flex-col transition-all duration-300 ${tier.featured ? "border-2 border-amber-500 bg-white shadow-xl scale-105 relative" : tier.color === "orange" ? "border border-orange-200 bg-white hover:shadow-lg" : "border border-gray-200 bg-white hover:shadow-lg"}`}>
+              <Card key={tier.id} className={`flex flex-col transition-all from-amber-500 to-orange-500 duration-300 ${tier.featured ? "border-2 border-amber-500 bg-white shadow-xl scale-105 relative" : tier.color === "orange" ? "border border-orange-200 bg-white hover:shadow-lg" : "border border-gray-200 bg-white hover:shadow-lg"}`}>
                 {tier.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>}
 
                 <CardHeader className={`pb-2 ${tier.featured ? "pt-7" : ""}`}>

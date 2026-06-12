@@ -16,7 +16,7 @@ const restaurantSchema = z.object({
   website: z.string().url("Die Website muss eine gültige URL sein").optional().or(z.literal("")),
   openingHours: z.string().optional(),
   category: z.string(),
-  description: z.string().optional(),
+  description: z.string().max(300, "Maximal 2-3 Sätze (höchstens 300 Zeichen)").optional(),
 });
 
 export default function RestaurantForm() {
@@ -166,13 +166,6 @@ export default function RestaurantForm() {
 
         {/* Website */}
 
-        {/* Öffnungszeiten */}
-        <div>
-          <label className="block font-medium text-red-700 mb-1" htmlFor="openingHours">
-            Öffnungszeiten(noch nicht möglich)
-          </label>
-          <input id="openingHours" name="openingHours" type="text" value={restaurant.openingHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Mo-Fr 09:00-18:00" />
-        </div>
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="category">
             Kategorie wählen:

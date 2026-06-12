@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const restaurantSchema = z.object({
   ownerName: z.string().min(2, "Ein Name ist erforderlich"),
@@ -19,7 +20,7 @@ const restaurantSchema = z.object({
     .regex(/^\+?\d+$/, "Die Telefonnummer ist ungültig"),
   website: z.string().url("Die Website muss eine gültige URL sein").optional().or(z.literal("")),
   category: z.string().min(1, "Kategorie auswählen"),
-  description: z.string().optional(),
+  description: z.string().max(300, "Maximal 2-3 Sätze (höchstens 300 Zeichen)").optional(),
   openingHours: z.string().optional(),
   ownerID: z.string(),
 });
@@ -142,15 +143,21 @@ export default function RestaurantForm() {
     }
   };
 
-  const inputStyle = (field) => `w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`;
+  const inputStyle = (field) => `w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`;
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl">
-      <h1 className="text-3xl font-bold text-center mb-6">Dein Restaurant registrieren</h1>
+    <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-16 px-4">
+      <Card className="max-w-3xl mx-auto border-amber-100 shadow-xl">
+        <CardContent className="p-8 sm:p-10">
+          <div className="text-center mb-8">
+            <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
+              Free · €0/Monat
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">Dein Restaurant registrieren</h1>
+            <p className="text-gray-500 max-w-md mx-auto">Fülle alle relevanten Informationen aus, damit wir dein Restaurant anzeigen können.</p>
+          </div>
 
-      <p className="text-gray-600 text-center mb-8">Fülle alle relevanten Informationen aus, damit wir dein Restaurant anzeigen können.</p>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block font-medium mb-1">Name des Besitzers *</label>
 
@@ -223,12 +230,6 @@ export default function RestaurantForm() {
           <label className="block font-medium mb-1">Website</label>
 
           <input name="website" value={restaurant.website} onChange={handleChange} className={inputStyle("website")} />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Öffnungszeiten</label>
-
-          <textarea name="openingHours" value={restaurant.openingHours} onChange={handleChange} className={inputStyle("openingHours")} />
         </div>
 
         <div>
@@ -311,7 +312,7 @@ export default function RestaurantForm() {
         <div>
           <label className="block font-medium mb-1">Beschreibung</label>
 
-          <textarea name="description" value={restaurant.description} onChange={handleChange} className={inputStyle("description")} />
+          <textarea name="description" maxLength={300} value={restaurant.description} onChange={handleChange} className={inputStyle("description")} />
         </div>
 
         {submitError && <p className="text-red-500 font-medium">{submitError}</p>}
@@ -369,7 +370,9 @@ export default function RestaurantForm() {
             <div>Bitte Anmelden</div>
           )}
         </div>
-      </form>
-    </div>
+          </form>
+        </CardContent>
+      </Card>
+    </section>
   );
 }

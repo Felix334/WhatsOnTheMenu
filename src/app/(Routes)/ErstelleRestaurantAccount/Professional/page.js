@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Zod Schema für das Restaurant
 const restaurantSchema = z.object({
@@ -23,7 +24,7 @@ const restaurantSchema = z.object({
   website: z.string().url("Die Website muss eine gültige URL sein").optional().or(z.literal("")),
   openingHours: z.string().optional(),
   category: z.string(),
-  description: z.string().optional(),
+  description: z.string().max(300, "Maximal 2-3 Sätze (höchstens 300 Zeichen)").optional(),
 });
 
 export default function RestaurantForm() {
@@ -50,6 +51,28 @@ export default function RestaurantForm() {
   const [renderRequestBtn, setRenderRequestBtn] = useState(false);
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
   const { data: session, status } = useSession();
+
+  // 🔒 Route vorübergehend gesperrt (Seite noch nicht fertig). Zum Freischalten: auf false setzen.
+  const ROUTE_LOCKED = true;
+  if (ROUTE_LOCKED) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-16">
+        <Card className="max-w-md w-full border-amber-100 shadow-xl text-center">
+          <CardContent className="p-10">
+            <div className="text-5xl mb-4">🚧</div>
+            <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
+              Professional
+            </span>
+            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Bald verfügbar</h1>
+            <p className="text-gray-500 mb-6">Die Professional-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
+            <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+              <a href="/ErstelleRestaurantAccount">Zurück zur Tarifübersicht</a>
+            </Button>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
 
   if (status === "loading") {
     return <div>Seite wird geladen</div>;
@@ -157,17 +180,24 @@ export default function RestaurantForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dein Restaurant registrieren</h1>
-      <p className="text-gray-600 text-center mb-8">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
+    <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-16 px-4">
+      <Card className="max-w-3xl mx-auto border-amber-100 shadow-xl">
+        <CardContent className="p-8 sm:p-10">
+          <div className="text-center mb-8">
+            <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
+              Professional · €14.99/Monat
+            </span>
+            <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">Dein Restaurant registrieren</h1>
+            <p className="text-gray-500 max-w-md mx-auto">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
         {/* Owner Name */}
         <div>
           <label className="block font-medium text-gray-700 mb-1" htmlFor="ownerName">
             Name (Voller legaler Name) <span className="text-red-500">*</span>
           </label>
-          <input id="ownerName" name="ownerName" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="ownerName" name="ownerName" type="text" value={restaurant.ownerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.ownerName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           {errors.ownerName && <p className="text-red-500 mt-1">{errors.ownerName}</p>}
         </div>
 
@@ -177,7 +207,7 @@ export default function RestaurantForm() {
             Name des Restaurants <span className="text-red-500">*</span>
           </label>
 
-          <input id="restaurantName" name="restaurantName" type="text" value={restaurant.restaurantName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.restaurantName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="restaurantName" name="restaurantName" type="text" value={restaurant.restaurantName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.restaurantName ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
 
           {errors.restaurantName && <p className="text-red-500 mt-1">{errors.restaurantName}</p>}
         </div>
@@ -186,7 +216,7 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="name">
             Kurze Beschreibung <span className="text-red-500">*</span>
           </label>
-          <input id="description" name="description" type="text" value={restaurant.description} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.description ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="description" name="description" type="text" maxLength={300} value={restaurant.description} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.description ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           {errors.description && <p className="text-red-500 mt-1">{errors.description}</p>}
         </div>
 
@@ -195,7 +225,7 @@ export default function RestaurantForm() {
           <label className="block font-medium text-gray-700 mb-1" htmlFor="email">
             Email<span className="text-red-500">*</span>
           </label>
-          <input id="email" name="email" type="email" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="email" name="email" type="email" value={restaurant.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
         </div>
 
@@ -205,13 +235,13 @@ export default function RestaurantForm() {
             <label htmlFor="postalCode" className="block font-medium text-gray-700 mb-1">
               Postleitzahl <span className="text-red-500">*</span>
             </label>
-            <input id="postalCode" name="postalCode" type="text" value={restaurant.postalCode} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.postalCode ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+            <input id="postalCode" name="postalCode" type="text" value={restaurant.postalCode} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.postalCode ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           </div>
           <div>
             <label htmlFor="city" className="block font-medium text-gray-700 mb-1">
               Stadt <span className="text-red-500">*</span>
             </label>
-            <input id="city" name="city" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.city ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+            <input id="city" name="city" type="text" value={restaurant.city} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.city ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           </div>
         </div>
 
@@ -221,13 +251,13 @@ export default function RestaurantForm() {
             <label htmlFor="street" className="block font-medium text-gray-700 mb-1">
               Straße <span className="text-red-500">*</span>
             </label>
-            <input id="street" name="street" type="text" value={restaurant.street} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.street ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+            <input id="street" name="street" type="text" value={restaurant.street} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.street ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           </div>
           <div>
             <label htmlFor="houseNumber" className="block font-medium text-gray-700 mb-1">
               Hausnummer <span className="text-red-500">*</span>
             </label>
-            <input id="houseNumber" name="houseNumber" type="text" value={restaurant.houseNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.houseNumber ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+            <input id="houseNumber" name="houseNumber" type="text" value={restaurant.houseNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.houseNumber ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
           </div>
         </div>
 
@@ -236,21 +266,15 @@ export default function RestaurantForm() {
           <label htmlFor="phone" className="block font-medium text-gray-700 mb-1">
             Telefonnummer <span className="text-red-500">*</span>
           </label>
-          <input id="phone" name="phone" type="tel" value={restaurant.phone} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.phone ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-400"}`} />
+          <input id="phone" name="phone" type="tel" value={restaurant.phone} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.phone ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-amber-400"}`} />
         </div>
 
-        {/* Website / Öffnungszeiten */}
+        {/* Website */}
         <div>
           <label htmlFor="website" className="block font-medium text-gray-700 mb-1">
             Website
           </label>
-          <input id="website" name="website" type="text" value={restaurant.website} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" />
-        </div>
-        <div>
-          <label htmlFor="openingHours" className="block font-medium text-gray-700 mb-1">
-            Öffnungszeiten
-          </label>
-          <input id="openingHours" name="openingHours" type="text" value={restaurant.openingHours} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Mo-Fr 09:00-18:00" />
+          <input id="website" name="website" type="text" value={restaurant.website} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400" />
         </div>
 
         {/* Kategorie */}
@@ -258,7 +282,7 @@ export default function RestaurantForm() {
           <label htmlFor="category" className="block font-medium text-gray-700 mb-1">
             Kategorie
           </label>
-          <select id="category" name="category" value={restaurant.category} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <select id="category" name="category" value={restaurant.category} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
             <option value="">Bitte wählen</option>
             <option value="italienisch">Italienisch</option>
             <option value="deutsch">Deutsch</option>
@@ -351,7 +375,9 @@ export default function RestaurantForm() {
         <div className="pt-4">
 
         </div>
-      </form>
-    </div>
+          </form>
+        </CardContent>
+      </Card>
+    </section>
   );
 }
