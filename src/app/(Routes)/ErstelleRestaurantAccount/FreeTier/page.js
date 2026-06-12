@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 
 const restaurantSchema = z.object({
@@ -47,7 +48,8 @@ export default function RestaurantForm() {
   const [submitError, setSubmitError] = useState(null);
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
+  const router = useRouter();
   const isAuthenticated = status === "authenticated";
 
   useEffect(() => {
@@ -111,23 +113,9 @@ export default function RestaurantForm() {
       setSuccess(true);
       window.alert("Restaurant erfolgreich registriert! \nHerzlichen Glückwunsch!");
 
-      setRestaurant({
-        ownerName: "",
-        restaurantName: "",
-        email: "",
-        postalCode: "",
-        city: "",
-        street: "",
-        houseNumber: "",
-        phone: "",
-        website: "",
-        category: "",
-        description: "",
-        openingHours: "",
-        ownerID: session.user.id,
-      });
-
-      setErrors({});
+      // JWT auffrischen (role → Owner, subscription → FreeTier) und ins Profil weiterleiten
+      await update();
+      router.push("/Profil");
     } catch (err) {
       if (err instanceof z.ZodError) {
         const fieldErrors = {};

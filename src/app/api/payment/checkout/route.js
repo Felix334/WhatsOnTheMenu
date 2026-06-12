@@ -1,6 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
 import { stripe, getPriceId } from "@/lib/stripe";
+import { restaurantCheckoutSchema } from "@/lib/schemas/restaurant";
 import { devLog, devWarn } from "@/lib/logger";
 
 export async function POST(request) {
@@ -10,7 +11,10 @@ export async function POST(request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body.tier !== "string") {
+    return new Response("Invalid request", { status: 400 });
+  }
   const { tier, restaurant } = body;
 
   const priceId = getPriceId(tier);
@@ -19,6 +23,15 @@ export async function POST(request) {
     console.error("Invalid tier:", tier);
     return new Response("Invalid tier", { status: 400 });
   }
+
+  // Serverseitige Validierung der Restaurant-Metadaten (Client-Validierung ist umgehbar).
+  const parsedRestaurant = restaurant
+    ? restaurantCheckoutSchema.safeParse(restaurant)
+    : { success: true, data: undefined };
+  if (!parsedRestaurant.success) {
+    return new Response("Invalid restaurant data", { status: 400 });
+  }
+  const restaurantData = parsedRestaurant.data;
 
   const dbUser = await prisma.user.findUnique({
     where: { id: token.id },
@@ -85,13 +98,13 @@ export async function POST(request) {
         userId: token.id,
         tier,
         restaurantDetails: JSON.stringify({
-          restaurantName: restaurant?.restaurantName || "",
-          category: restaurant?.category || "",
-          street: restaurant?.street || "",
-          houseNumber: restaurant?.houseNumber || "",
-          postalCode: restaurant?.postalCode || "",
-          city: restaurant?.city || "",
-          country: restaurant?.country || "DE",
+          restaurantName: restaurantData?.restaurantName || "",
+          category: restaurantData?.category || "",
+          street: restaurantData?.street || "",
+          houseNumber: restaurantData?.houseNumber || "",
+          postalCode: restaurantData?.postalCode || "",
+          city: restaurantData?.city || "",
+          country: restaurantData?.country || "DE",
         }),
       },
     });
