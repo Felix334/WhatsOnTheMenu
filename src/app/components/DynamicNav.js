@@ -49,7 +49,7 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
             )}
           </div>
           <div className="flex items-center justify-center md:justify-start">
-            <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatsOnMyMenu</div>
+            <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatIsOnMyMenu</div>
           </div>
           <div className="hidden right-0 md:block">
             <NavigationMenu>

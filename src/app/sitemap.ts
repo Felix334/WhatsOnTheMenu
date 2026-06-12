@@ -3,6 +3,9 @@ import { MetadataRoute } from "next";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  // Nur öffentlich crawlbare Seiten. Login-pflichtige Formulare
+  // (/ErstelleRestaurantAccount/*) und Seiten ohne öffentlichen Inhalt
+  // gehören NICHT in die Sitemap – sonst meldet Google "Soft 404".
   return [
     {
       url: baseUrl,
@@ -23,42 +26,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/ErstelleRestaurantAccount`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/ErstelleRestaurantAccount/FreeTier`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/ErstelleRestaurantAccount/Business`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/ErstelleRestaurantAccount/Professional`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/ErstelleRestaurantAccount/Individuell`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/UnserePartner/Restaurants/Menu`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
       url: `${baseUrl}/UnserTeam`,
       lastModified: new Date(),
       changeFrequency: "monthly",
@@ -77,7 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/imprint`,
+      url: `${baseUrl}/Impressum`,
       lastModified: new Date(),
       changeFrequency: "yearly",
       priority: 0.3,

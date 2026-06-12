@@ -25,7 +25,7 @@ export const metadata = {
     title: "Online Speisekarte erstellen",
     description: "Erstelle digitale Speisekarten für dein Restaurant in Sekunden.",
     url: "https://www.whatisonmymenu.com/",
-    siteName: "What's On The Menu",
+    siteName: "WhatIsOnMyMenu",
     images: [
       {
         url: "/og-image.png",

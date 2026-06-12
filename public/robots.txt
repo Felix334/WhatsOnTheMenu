@@ -11,3 +11,5 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /protecting/
 Disallow: /Admin/
+
+Sitemap: https://www.whatisonmymenu.com/sitemap.xml
