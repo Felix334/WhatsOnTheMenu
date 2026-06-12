@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,6 +53,8 @@ export default function RestaurantForm() {
   const [renderRequestBtn, setRenderRequestBtn] = useState(false);
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
 
   // 🔒 Route vorübergehend gesperrt (Seite noch nicht fertig). Zum Freischalten: auf false setzen.
   const ROUTE_LOCKED = true;
@@ -66,7 +70,7 @@ export default function RestaurantForm() {
             <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Bald verfügbar</h1>
             <p className="text-gray-500 mb-6">Die Professional-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
             <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
-              <a href="/ErstelleRestaurantAccount">Zurück zur Tarifübersicht</a>
+              <Link href={`/ErstelleRestaurantAccount${queryString ? `?${queryString}` : ""}`}>Zurück zur Tarifübersicht</Link>
             </Button>
           </CardContent>
         </Card>

@@ -63,7 +63,7 @@ function PricingContent() {
   const sub = session?.user?.subscription;
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-20">
+    <section className="min-h-screen bg-linear-to-br from-amber-50 via-orange-50 to-amber-100 py-20">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-14">
@@ -78,7 +78,7 @@ function PricingContent() {
             const active = tier.isActive(sub);
             return (
               <Card key={tier.id} className={`flex flex-col transition-all from-amber-500 to-orange-500 duration-300 ${tier.featured ? "border-2 border-amber-500 bg-white shadow-xl scale-105 relative" : tier.color === "orange" ? "border border-orange-200 bg-white hover:shadow-lg" : "border border-gray-200 bg-white hover:shadow-lg"}`}>
-                {tier.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>}
+                {tier.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>}
 
                 <CardHeader className={`pb-2 ${tier.featured ? "pt-7" : ""}`}>
                   <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${tier.color === "amber" ? "text-amber-500" : tier.color === "orange" ? "text-orange-400" : "text-gray-400"}`}>{tier.label}</p>
@@ -107,7 +107,7 @@ function PricingContent() {
                         Aktiver Plan
                       </Button>
                     ) : (
-                      <Button asChild className={tier.featured ? "w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow" : tier.color === "orange" ? "w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400" : "w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"} variant={tier.featured ? undefined : "outline"}>
+                      <Button asChild className={tier.featured ? "w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow" : tier.color === "orange" ? "w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400" : "w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"} variant={tier.featured ? undefined : "outline"}>
                         <Link href={`${tier.href}${queryString ? `?${queryString}` : ""}`}>{tier.cta}</Link>
                       </Button>
                     )}
