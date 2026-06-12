@@ -22,7 +22,7 @@ import RenderUserID from "./components/renderUserID";
 
 import SpeiseKarteLaptop from "./components/img/ResizedLaptopImage.png";
 import SpeiseKarteHandy from "./components/img/Speisekarte_HandybildschirmNeu.png";
-import { AdminLink, FreeTierLink } from "./components/renderDynamicLinks";
+import { AdminLink, FreeTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
 
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -151,6 +151,11 @@ function HomeContent() {
                     <NavigationMenuItem>
                       <Button variant="ghost" onClick={() => scrollToSection("#features")}>
                         Features
+                      </Button>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Button variant="ghost">
+                        <WieFunktionierts />
                       </Button>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
@@ -455,12 +460,7 @@ function HomeContent() {
           </section>
         </main>
         <FooterPart />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossOrigin="anonymous" strategy="afterInteractive" />
         <Script id="adsbygoogle-init" strategy="afterInteractive">
           {`(adsbygoogle = window.adsbygoogle || []).push({});`}
         </Script>

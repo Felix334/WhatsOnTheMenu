@@ -100,4 +100,10 @@ export function RegisterLink() {
   return <Link href={`/register${queryString}`}>Kostenlos registrieren</Link>;
 }
 
+export function WieFunktionierts() {
+  const query = useQueryObject();
+  const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
+  return <Link href={`/WieFunktionierts${queryString}`}>Wie Funktionierts</Link>;
+}
+
 export { AdminLink, FreeTierLink };
