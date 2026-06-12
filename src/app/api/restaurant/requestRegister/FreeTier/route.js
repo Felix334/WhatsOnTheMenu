@@ -52,7 +52,7 @@ export async function POST(req) {
           menu: {
             create: {
               name: "Standard Menü",
-              description: "Default Menü",
+              description: data.description || null,
               bgColor: "#ffffff",
               font: "Inter",
             },

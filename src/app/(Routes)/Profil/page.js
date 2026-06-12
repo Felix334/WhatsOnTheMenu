@@ -828,7 +828,7 @@ export default function PageBuilder() {
             <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Business" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription === "NoSubscription" ? "Kein Abo" : session?.user?.subscription ?? "Kein Abo"}</span>
             <span className="text-gray-300">|</span>
             <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
-              {catCount}/{Limit.CategoryLimit ?? "?"} Kat.
+              {catCount}/{Limit.CategoryLimit ?? "?"} Kategorien
             </span>
             <span className="text-gray-300">|</span>
             <span className={dishCount >= Limit.DishLimit ? "text-red-500 font-medium" : "text-gray-500"}>
