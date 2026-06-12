@@ -17,11 +17,15 @@ export async function GET(req) {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
-      include: { locations: true, owner: true },
+      include: { locations: true, owner: { select: { id: true, name: true } } },
     });
 
     if (!restaurant) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
+    }
+
+    if (restaurant.ownerId !== token.id) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     return NextResponse.json({ message: "Restaurant data retrieved", data: { userData: { restaurant } } });
@@ -88,7 +92,7 @@ export async function POST(req) {
 
       return tx.restaurant.findUnique({
         where: { id: restaurantID },
-        include: { locations: true, owner: true },
+        include: { locations: true, owner: { select: { id: true, name: true } } },
       });
     });
 
