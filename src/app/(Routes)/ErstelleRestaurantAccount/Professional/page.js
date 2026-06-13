@@ -29,7 +29,9 @@ const restaurantSchema = z.object({
   description: z.string().max(300, "Maximal 2-3 Sätze (höchstens 300 Zeichen)").optional(),
 });
 
-function RestaurantForm() {
+// Vollständiges Registrierungsformular – aktuell NICHT aktiv (Professional gesperrt,
+// siehe Page() unten). Bleibt erhalten, um es später freizuschalten.
+export function RestaurantForm() {
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
     restaurantName: "",
@@ -53,30 +55,6 @@ function RestaurantForm() {
   const [renderRequestBtn, setRenderRequestBtn] = useState(false);
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
   const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const queryString = searchParams.toString();
-
-  // 🔒 Route vorübergehend gesperrt (Seite noch nicht fertig). Zum Freischalten: auf false setzen.
-  const ROUTE_LOCKED = true;
-  if (ROUTE_LOCKED) {
-    return (
-      <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-16">
-        <Card className="max-w-md w-full border-amber-100 shadow-xl text-center">
-          <CardContent className="p-10">
-            <div className="text-5xl mb-4">🚧</div>
-            <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
-              Professional
-            </span>
-            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Bald verfügbar</h1>
-            <p className="text-gray-500 mb-6">Die Professional-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
-            <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
-              <Link href={`/ErstelleRestaurantAccount${queryString ? `?${queryString}` : ""}`}>Zurück zur Tarifübersicht</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
-    );
-  }
 
   if (status === "loading") {
     return <div>Seite wird geladen</div>;
@@ -386,20 +364,34 @@ function RestaurantForm() {
   );
 }
 
-export default function Page(){
-    const { status, data: session } = useSession();
-  
-    if (status === "loading") {
-      return <div className="min-h-screen flex items-center justify-center text-gray-500">Lade...</div>;
-    }
-  
-    if (!session?.user?.id) {
-      return <div className="min-h-screen flex items-center justify-center text-gray-500">Bitte anmelden</div>;
-    }
-  
-    return (
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Lade...</div>}>
-        <RestaurantForm />
-      </Suspense>
-    );
+// 🔒 Professional ist noch nicht fertig → komplett gesperrt.
+// Zum Freischalten: <LockedNotice /> unten durch <RestaurantForm /> ersetzen.
+function LockedNotice() {
+  const searchParams = useSearchParams();
+  const queryString = searchParams.toString();
+  return (
+    <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-16">
+      <Card className="max-w-md w-full border-amber-100 shadow-xl text-center">
+        <CardContent className="p-10">
+          <div className="text-5xl mb-4">🚧</div>
+          <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
+            Professional
+          </span>
+          <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Bald verfügbar</h1>
+          <p className="text-gray-500 mb-6">Die Professional-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
+          <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+            <Link href={`/ErstelleRestaurantAccount${queryString ? `?${queryString}` : ""}`}>Zurück zur Tarifübersicht</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <LockedNotice />
+    </Suspense>
+  );
 }
