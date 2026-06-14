@@ -356,8 +356,8 @@ function HomeContent() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-2 relative bg-amber-600 text-white">
-                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Empfohlen</Badge>
+                <Card className="border-2 relative bg-amber-400 text-black">
+                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
                     <div className="text-3xl font-bold ">
