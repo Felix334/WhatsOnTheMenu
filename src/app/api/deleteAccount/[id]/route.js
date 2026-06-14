@@ -31,16 +31,39 @@ export async function DELETE(request, { params }) {
 
     if (user.stripeCustomerId) {
       try {
+        // Alle noch nicht gekündigten Abos beenden …
         const subscriptions = await stripe.subscriptions.list({
           customer: user.stripeCustomerId,
-          status: "active",
+          status: "all",
         });
         for (const sub of subscriptions.data) {
-          await stripe.subscriptions.cancel(sub.id);
+          if (sub.status !== "canceled") {
+            await stripe.subscriptions.cancel(sub.id);
+          }
         }
+        // … und den Customer löschen (kündigt sicherheitshalber alles Übrige).
         await stripe.customers.del(user.stripeCustomerId);
       } catch (stripeErr) {
-        console.error("Stripe cleanup error (continuing with DB delete):", stripeErr);
+        // Existiert der Customer bei Stripe nicht (mehr)? Dann ist das Ziel – kein
+        // aktives Abo – bereits erreicht (z. B. in einem früheren, teilweise
+        // erfolgreichen Versuch). Dann weiterlöschen → macht Retries idempotent.
+        const alreadyGone =
+          stripeErr?.code === "resource_missing" || stripeErr?.statusCode === 404;
+
+        if (!alreadyGone) {
+          // Echter Stripe-Fehler: NICHT weiterlöschen – sonst bliebe evtl. ein
+          // aktives Abo bestehen, während der Account schon weg ist (Billing-Risiko).
+          console.error("Stripe cleanup failed, aborting account deletion:", stripeErr);
+          return NextResponse.json(
+            { error: "Abo konnte nicht gekündigt werden – Account wurde NICHT gelöscht. Bitte später erneut versuchen." },
+            { status: 502 }
+          );
+        }
+
+        console.warn(
+          "Stripe customer already removed, continuing with account deletion:",
+          user.stripeCustomerId
+        );
       }
     }
 
