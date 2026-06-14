@@ -31,7 +31,8 @@ const restaurantSchema = z.object({
 
 // Vollständiges Registrierungsformular – aktuell NICHT aktiv (Professional gesperrt,
 // siehe Page() unten). Bleibt erhalten, um es später freizuschalten.
-export function RestaurantForm() {
+// eslint-disable-next-line no-unused-vars
+function RestaurantForm() {
   const [restaurant, setRestaurant] = useState({
     ownerName: "",
     restaurantName: "",
