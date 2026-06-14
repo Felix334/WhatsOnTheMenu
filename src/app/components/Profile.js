@@ -108,6 +108,13 @@ const Profile = () => {
 
             {/* Buttons */}
             <div className="space-y-2 grid">
+              {/* Eigene Konto-Seite – für jeden angemeldeten Nutzer */}
+              <Link href={`/Konto?${queryString}`} onClick={() => setOpenProfil(false)}>
+                <Button variant="outline" className="w-full">
+                  Mein Konto
+                </Button>
+              </Link>
+
               {(role === "Owner" || role === "Admin" || role === "Staff") && (
                 <Link href={`/Profil?${queryString}`} onClick={() => setOpenProfil(false)}>
                   <Button variant="outline" className="w-full">
