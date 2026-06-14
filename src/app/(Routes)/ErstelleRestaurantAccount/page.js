@@ -21,6 +21,7 @@ const TIERS = [
     cta: "Kostenlos starten",
     isActive: (sub) => !sub || sub === "FreeTier",
     color: "gray",
+    status: false,
   },
   {
     id: "Professional",
@@ -35,6 +36,7 @@ const TIERS = [
     featured: true,
     isActive: (sub) => sub === "Professional",
     color: "amber",
+    status: true,
   },
   {
     id: "Business",
@@ -48,6 +50,7 @@ const TIERS = [
     cta: "Business abonnieren",
     isActive: (sub) => sub === "Business",
     color: "orange",
+    status: true,
   },
 ];
 
@@ -76,6 +79,7 @@ function PricingContent() {
         <div className="grid md:grid-cols-3 gap-6 items-start">
           {TIERS.map((tier) => {
             const active = tier.isActive(sub);
+            const status = tier.status;
             return (
               <Card key={tier.id} className={`flex flex-col transition-all from-amber-500 to-orange-500 duration-300 ${tier.featured ? "border-2 border-amber-500 bg-white shadow-xl scale-105 relative" : tier.color === "orange" ? "border border-orange-200 bg-white hover:shadow-lg" : "border border-gray-200 bg-white hover:shadow-lg"}`}>
                 {tier.featured && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-linear-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>}
@@ -101,17 +105,19 @@ function PricingContent() {
                     ))}
                   </ul>
 
-                  <div className="mt-auto">
-                    {active ? (
-                      <Button disabled className="w-full">
-                        Aktiver Plan
-                      </Button>
-                    ) : (
-                      <Button asChild className={tier.featured ? "w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow" : tier.color === "orange" ? "w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400" : "w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"} variant={tier.featured ? undefined : "outline"}>
-                        <Link href={`${tier.href}${queryString ? `?${queryString}` : ""}`}>{tier.cta}</Link>
-                      </Button>
-                    )}
-                  </div>
+                  {status ? null : (
+                    <div className="mt-auto">
+                      {active ? (
+                        <Button disabled className="w-full">
+                          Aktiver Plan
+                        </Button>
+                      ) : (
+                        <Button asChild className={tier.featured ? "w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow" : tier.color === "orange" ? "w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400" : "w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"} variant={tier.featured ? undefined : "outline"}>
+                          <Link href={`${tier.href}${queryString ? `?${queryString}` : ""}`}>{tier.cta}</Link>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
