@@ -37,7 +37,7 @@ export function ProfilLink() {
   const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
   const { authorizedUser } = useAuth();
   if (!authorizedUser) return null;
-  return <Link href={`/profile${queryString}`}>Profil</Link>;
+  return <Link href={`/profile${queryString}`} prefetch={false}>Profil</Link>;
 }
 
 function AdminLink() {
@@ -71,7 +71,7 @@ export function ProfessionalTierLink() {
   const { userID } = useAuth();
   return (
     <Button className="bg-yellow-400 hover:bg-green-600 text-black" asChild>
-      <Link href={{ pathname: "/ErstelleRestaurantAccount/Professional", query: { ...query, ...(userID ? { userID } : {}) } }}>
+      <Link href={{ pathname: "/ErstelleRestaurantAccount/Professional", query: { ...query, ...(userID ? { userID } : {}) } }} prefetch={false}>
         Abo abschließen
       </Link>
     </Button>
@@ -103,7 +103,7 @@ export function RegisterLink() {
 export function WieFunktionierts() {
   const query = useQueryObject();
   const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
-  return <Link href={`/WieFunktionierts${queryString}`}>Wie Funktionierts</Link>;
+  return <Link href={`/WieFunktionierts${queryString}`} prefetch={false}>Wie Funktionierts</Link>;
 }
 
 export { AdminLink, FreeTierLink };

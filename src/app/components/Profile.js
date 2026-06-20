@@ -116,7 +116,7 @@ const Profile = () => {
               </Link>
 
               {(role === "Owner" || role === "Admin" || role === "Staff") && (
-                <Link href={`/Profil?${queryString}`} onClick={() => setOpenProfil(false)}>
+                <Link href={`/Profil?${queryString}`} onClick={() => setOpenProfil(false)} prefetch={false}>
                   <Button variant="outline" className="w-full">
                     Profil
                   </Button>
@@ -124,12 +124,12 @@ const Profile = () => {
               )}
 
               {role !== "Owner" && role !== "Admin" && role !== "Staff" && (
-                <Link href={`/ErstelleRestaurantAccount?${queryString}`} onClick={() => setOpenProfil(false)}>
+                <Link href={`/ErstelleRestaurantAccount?${queryString}`} onClick={() => setOpenProfil(false)} prefetch={false}>
                   <Button className="w-full">Unser Partnerprogramm</Button>
                 </Link>
               )}
               {(role === "Owner" || role === "Staff" || staffMembershipsRole === "manager" || staffMembershipsRole === "waiter" || staffMembershipsRole === "kitchen") && (
-                <Link href={`/staff?${queryString}`} onClick={() => setOpenProfil(false)}>
+                <Link href={`/staff?${queryString}`} onClick={() => setOpenProfil(false)} prefetch={false}>
                   <Button variant="outline" className="w-full">
                     Einstellungen
                   </Button>

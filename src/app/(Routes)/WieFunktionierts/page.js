@@ -2,6 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DynamicLinkButton } from "@/app/components/DynamicLink";
 
+export const dynamic = "force-static";
+
 export const metadata = {
   title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code | WhatIsOnMyMenu",
   description:
