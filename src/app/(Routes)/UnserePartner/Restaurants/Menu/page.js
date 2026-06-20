@@ -55,12 +55,7 @@ const HeroSection = ({ restaurantData, menuFont }) => {
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
       <h1 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">{restaurantData?.name || "Restaurant"}</h1>
       {restaurantData?.description && <p className="mt-3 text-white/80 text-base max-w-lg mx-auto">{restaurantData.description}</p>}
-      {restaurantData?.menu?.[0]?.description && <p className="mt-1 text-amber-100 text-sm max-w-md mx-auto italic">{restaurantData.menu[0].description}</p>}
-      {loc && (
-        <p className="mt-3 text-amber-100 text-sm">
-          {loc.street} {loc.houseNumber}, {loc.postalCode} {loc.city}
-        </p>
-      )}
+
       <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm">
         <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold ${isOpen ? "bg-green-500/80 text-white" : "bg-black/30 text-amber-200"}`}>
           <span className={`inline-block w-2 h-2 rounded-full ${isOpen ? "bg-white animate-pulse" : "bg-amber-400"}`} />
