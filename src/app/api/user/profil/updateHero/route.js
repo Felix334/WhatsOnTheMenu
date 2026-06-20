@@ -9,13 +9,13 @@ export async function POST(req) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { restaurantId, name, description, heroColor } = await req.json();
+    const { restaurantId, name, description, heroColor, heroTextColor } = await req.json();
 
     if (!restaurantId) {
       return NextResponse.json({ message: "restaurantId is required" }, { status: 400 });
     }
-    if (name === undefined && description === undefined && heroColor === undefined) {
-      return NextResponse.json({ message: "At least one field (name, description, heroColor) is required" }, { status: 400 });
+    if (name === undefined && description === undefined && heroColor === undefined && heroTextColor === undefined) {
+      return NextResponse.json({ message: "At least one field is required" }, { status: 400 });
     }
 
     // Updates run in parallel — WHERE ownerId handles authorization implicitly.
@@ -31,7 +31,7 @@ export async function POST(req) {
     }
 
     const menuData = Object.fromEntries(
-      Object.entries({ description, heroColor }).filter(([_, v]) => v !== undefined)
+      Object.entries({ description, heroColor, heroTextColor }).filter(([_, v]) => v !== undefined)
     );
 
     if (Object.keys(menuData).length > 0) {

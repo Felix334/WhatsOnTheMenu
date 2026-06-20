@@ -40,6 +40,7 @@ const HERO_COLOR_PRESETS = [
   { key: "red", label: "Rot", gradient: "from-red-700 via-rose-600 to-red-500" },
   { key: "purple", label: "Lila", gradient: "from-purple-700 via-violet-600 to-purple-500" },
   { key: "dark", label: "Dunkel", gradient: "from-gray-900 via-gray-800 to-gray-700" },
+  { key: "white", label: "Weiß", gradient: "white"}
 ];
 
 const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient]));
@@ -69,6 +70,7 @@ export default function PageBuilder() {
   const [heroName, setHeroName] = useState("");
   const [heroDescription, setHeroDescription] = useState("");
   const [heroColor, setHeroColor] = useState(null);
+  const [heroTextColor, setHeroTextColor] = useState("#ffffff");
   const [savingHero, setSavingHero] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
 
@@ -116,6 +118,7 @@ export default function PageBuilder() {
     setHeroName(serverData?.userData?.restaurant?.name || "");
     setHeroDescription(serverData?.userData?.restaurant?.menu?.[0]?.description || "");
     setHeroColor(serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null);
+    setHeroTextColor(serverData?.userData?.restaurant?.menu?.[0]?.heroTextColor || "#ffffff");
   }, [serverData]);
 
   const saveHero = async () => {
@@ -125,7 +128,7 @@ export default function PageBuilder() {
       const res = await fetch("/api/user/profil/updateHero", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurantId, name: heroName, description: heroDescription, heroColor }),
+        body: JSON.stringify({ restaurantId, name: heroName, description: heroDescription, heroColor, heroTextColor }),
       });
       if (!res.ok) throw new Error("Fehler beim Speichern");
       toast.success("Header gespeichert!");
@@ -811,16 +814,74 @@ export default function PageBuilder() {
         </div>
       </header>
 
-      <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center relative`}>
+      <div className={`w-full ${heroColor?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center relative`} style={heroColor?.startsWith("#") ? { background: heroColor } : {}}>
         {isEditingHero ? (
           <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
-            <input value={heroName} onChange={(e) => setHeroName(e.target.value)} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Restaurant Name" />
-            <input value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} className="text-sm text-center bg-white/20 backdrop-blur text-white placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Kurze Beschreibung (z.B. Authentische italienische Küche)" />
+            <input value={heroName} onChange={(e) => setHeroName(e.target.value)} style={{ color: heroTextColor }} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Restaurant Name" />
+            <input value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} style={{ color: heroTextColor }} className="text-sm text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Kurze Beschreibung (z.B. Authentische italienische Küche)" />
 
-            {/* Farbpalette */}
-            <div className="flex flex-wrap justify-center gap-2 mt-1">
+            {/* Hintergrundfarbe */}
+            <p className="text-xs text-white/60 uppercase tracking-widest">Hintergrundfarbe</p>
+            <div className="flex flex-wrap justify-center gap-2">
               {HERO_COLOR_PRESETS.map(({ key, label, gradient }) => (
-                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${(heroColor ?? "amber") === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
+                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${heroColor === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
+              ))}
+              {[
+                { color: "#ffffff", label: "Weiß" },
+                { color: "#f5f5f5", label: "Hellgrau" },
+                { color: "#d1d5db", label: "Grau" },
+                { color: "#6b7280", label: "Mittelgrau" },
+                { color: "#1f2937", label: "Dunkelgrau" },
+                { color: "#000000", label: "Schwarz" },
+                { color: "#fbbf24", label: "Amber" },
+                { color: "#f59e0b", label: "Orange" },
+                { color: "#f97316", label: "Orange-Rot" },
+                { color: "#f87171", label: "Rot" },
+                { color: "#ef4444", label: "Kräftig Rot" },
+                { color: "#ec4899", label: "Pink" },
+                { color: "#a855f7", label: "Lila" },
+                { color: "#6366f1", label: "Indigo" },
+                { color: "#60a5fa", label: "Blau" },
+                { color: "#22d3ee", label: "Cyan" },
+                { color: "#34d399", label: "Grün" },
+                { color: "#86efac", label: "Hellgrün" },
+                { color: "#fde68a", label: "Gelb" },
+              ].map(({ color, label }) => (
+                <button key={color} title={label} onClick={() => setHeroColor(color)} className={`w-8 h-8 rounded-full border-2 transition-all ${heroColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
+              ))}
+            </div>
+
+            {/* Textfarbe */}
+            <p className="text-xs text-white/60 uppercase tracking-widest">Textfarbe</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { color: "#ffffff", label: "Weiß" },
+                { color: "#f5f5f5", label: "Hellgrau" },
+                { color: "#d1d5db", label: "Grau" },
+                { color: "#6b7280", label: "Mittelgrau" },
+                { color: "#1f2937", label: "Dunkelgrau" },
+                { color: "#000000", label: "Schwarz" },
+                { color: "#fbbf24", label: "Amber" },
+                { color: "#f59e0b", label: "Orange" },
+                { color: "#f97316", label: "Orange-Rot" },
+                { color: "#f87171", label: "Rot" },
+                { color: "#ef4444", label: "Kräftig Rot" },
+                { color: "#ec4899", label: "Pink" },
+                { color: "#a855f7", label: "Lila" },
+                { color: "#6366f1", label: "Indigo" },
+                { color: "#60a5fa", label: "Blau" },
+                { color: "#22d3ee", label: "Cyan" },
+                { color: "#34d399", label: "Grün" },
+                { color: "#86efac", label: "Hellgrün" },
+                { color: "#fde68a", label: "Gelb" },
+              ].map(({ color, label }) => (
+                <button
+                  key={color}
+                  title={label}
+                  onClick={() => setHeroTextColor(color)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${heroTextColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`}
+                  style={{ backgroundColor: color }}
+                />
               ))}
             </div>
 
@@ -836,6 +897,7 @@ export default function PageBuilder() {
                   setHeroName(serverData?.userData?.restaurant?.name || "");
                   setHeroDescription(serverData?.userData?.restaurant?.menu?.[0]?.description || "");
                   setHeroColor(serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null);
+                  setHeroTextColor(serverData?.userData?.restaurant?.menu?.[0]?.heroTextColor || "#ffffff");
                 }}
                 className="text-white border border-white/40 hover:bg-white/10"
               >
@@ -845,8 +907,8 @@ export default function PageBuilder() {
           </div>
         ) : (
           <>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow">{heroName || serverData?.userData?.restaurant?.name || "Restaurant"}</h1>
-            {heroDescription && <p className="mt-3 text-white/80 text-sm max-w-md mx-auto">{heroDescription}</p>}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow" style={{ color: heroTextColor }}>{heroName || serverData?.userData?.restaurant?.name || "Restaurant"}</h1>
+            {heroDescription && <p className="mt-3 text-sm max-w-md mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>{heroDescription}</p>}
           </>
         )}
 
