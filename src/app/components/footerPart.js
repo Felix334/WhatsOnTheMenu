@@ -1,13 +1,8 @@
+"use client";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { usePathname, useSearchParams } from "next/navigation";
-
-export const revalidate = 600;
+import { useSearchParams } from "next/navigation";
 
 const FooterPart = () => {
-  const { data: session } = useSession();
-
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const queryString = searchParams.toString();

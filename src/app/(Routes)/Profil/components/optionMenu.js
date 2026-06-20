@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -19,38 +19,27 @@ import { OpeningHoursEditor } from "./openingHours";
 /* ===================== OPTION MENU ===================== */
 
 const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, restaurantID, serverData, allowPremiumColor }) => {
-  const [serverData_, setServerData_] = useState(null);
-  const [menuData, setMenuData] = useState(null);
+  const [localServerData, setLocalServerData] = useState(serverData);
   const [isEditingMenu, setIsEditingMenu] = useState(false);
-  const [editedBgColor, setEditedBgColor] = useState(bgColor);
+  const [editedBgColor, setEditedBgColor] = useState(bgColor ?? "");
   const [editedFont, setEditedFont] = useState("Arial");
 
   const { data: session } = useSession();
   const userID = session?.user?.id;
-  const role = session?.user?.role || "";
-  const authorizedUser = userID && role === "Owner";
+
+  // Sync wenn Parent-Daten asynchron ankommen
+  useEffect(() => {
+    setLocalServerData(serverData);
+  }, [serverData]);
 
   useEffect(() => {
-    console.log("optionMenu-Daten:", allowPremiumColor);
-    setServerData_(serverData || null);
-  }, [serverData, allowPremiumColor]);
+    if (bgColor) setEditedBgColor(bgColor);
+  }, [bgColor]);
 
   useEffect(() => {
-    if (!authorizedUser || !restaurantID) return;
-
-    const fetchMenuData = async () => {
-      const resp = await fetch(`/api/restaurant/${restaurantID}/updateMenu`, { credentials: "include" });
-
-      if (resp.ok) {
-        const data = await resp.json();
-        setMenuData(data.data);
-        setEditedBgColor(data.data.bgColor || bgColor);
-        setEditedFont(data.data.font || "Arial");
-      }
-    };
-
-    fetchMenuData();
-  }, [restaurantID, authorizedUser, bgColor]);
+    const font = serverData?.userData?.restaurant?.menu?.[0]?.font;
+    if (font) setEditedFont(font);
+  }, [serverData]);
 
   const handleSaveMenu = async () => {
     const response = await fetch(`/api/user/profil/updateMenu`, {
@@ -66,8 +55,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
     });
 
     if (response.ok) {
-      const updated = await response.json();
-      setMenuData(updated.data);
       setNewBgColor(editedBgColor);
       setIsEditingMenu(false);
       toast.success("Design gespeichert!");
@@ -78,8 +65,8 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   };
 
   const handleCancelMenu = () => {
-    setEditedBgColor(menuData?.bgColor || bgColor);
-    setEditedFont(menuData?.font || "Arial");
+    setEditedBgColor(bgColor ?? "");
+    setEditedFont(serverData?.userData?.restaurant?.menu?.[0]?.font || "Arial");
     setIsEditingMenu(false);
   };
 
@@ -107,7 +94,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                 <select value={isEditingMenu ? editedBgColor : bgColor} disabled={!isEditingMenu} onChange={(e) => setEditedBgColor(e.target.value)} className="border rounded px-2 py-1">
                   <option value="">Farbe wählen</option>
 
-                  {/* Weiß & Grautöne */}
                   <option value="#FFFFFF">Weiß</option>
                   <option className="bg-gray-50" value="#F8F9FA">
                     Grau 50
@@ -168,7 +154,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                     Dunkelorange
                   </option>
 
-                  {/* Gelbtöne */}
                   <option className="bg-yellow-100" value="#FFF9C4">
                     Hellgelb
                   </option>
@@ -184,8 +169,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                   <option className="bg-yellow-400" value="#FFD700">
                     Gold
                   </option>
-
-                  {/* Grüntöne */}
                   <option className="bg-green-100" value="#C8E6C9">
                     Hellgrün
                   </option>
@@ -198,8 +181,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                   <option className="bg-green-700 text-white" value="#388E3C">
                     Dunkelgrün
                   </option>
-
-                  {/* Blautöne */}
                   <option className="bg-blue-100" value="#BBDEFB">
                     Hellblau
                   </option>
@@ -218,8 +199,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                   <option className="bg-cyan-700 text-white" value="#138496">
                     Dunkelcyan
                   </option>
-
-                  {/* Lila / Pink */}
                   <option className="bg-purple-200" value="#E1BEE7">
                     Helllila
                   </option>
@@ -238,8 +217,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                   <option className="bg-pink-500 text-white" value="#E83E8C">
                     Pink 500
                   </option>
-
-                  {/* Schwarz & dunkel */}
                   <option value="#343A40" className="text-white bg-gray-800">
                     Schwarzgrau
                   </option>
@@ -271,7 +248,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
             )}
           </div>
 
-          {serverData_ && <RestaurantData serverData={serverData_} setServerData={setServerData_} restaurantID={restaurantID} userID={userID} />}
+          {localServerData && <RestaurantData serverData={localServerData} setServerData={setLocalServerData} restaurantID={restaurantID} userID={userID} />}
         </ScrollArea>
       </SheetContent>
     </Sheet>
@@ -279,8 +256,6 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
 };
 
 export { OptionMenu };
-
-/* ===================== SOCIAL LINKS EDITOR ===================== */
 
 const SOCIAL_PLATFORMS = [
   { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/deinrestaurant" },
@@ -370,8 +345,6 @@ const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
 };
 
 export { SocialLinksEditor };
-
-/* ===================== RESTAURANT DATA ===================== */
 
 const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => {
   const restaurant = serverData?.userData?.restaurant;
@@ -542,8 +515,6 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
                   <strong>Adresse:</strong> {loc.street} {loc.houseNumber} {loc.postalCode} {loc.city}, {loc.country}
                 </p>
               )}
-
-              {/* Inputs nur im Bearbeitungsmodus */}
               {isEditing && (
                 <>
                   {[
@@ -602,12 +573,8 @@ const RestaurantData = ({ serverData, setServerData, restaurantID, userID }) => 
           <Link href={{ pathname: "/settings", query: { ...(userID && { userID }), ...(restaurantID && { restaurantID }) } }}>⚙️ Einstellungen</Link>
         </Button>
       </div>
-      {/* ── Öffnungszeiten ─────────────────────────────────────────────────── */}
       <OpeningHoursEditor restaurantId={restaurant?.id} userID={userID} initialHours={restaurant?.openingHours ?? null} />
-
-      {/* ── Social Media Links ──────────────────────────────────────────────── */}
       <SocialLinksEditor restaurantId={restaurant?.id} userID={userID} initialLinks={restaurant?.socialLinks ?? {}} />
-
       <div>
         <Button variant="destructive" onClick={deleteRestaurant}>
           Account löschen

@@ -17,13 +17,8 @@ const Profile = () => {
   const { data: session } = useSession();
 
   const role = session?.user?.role;
-  const staffMembershipsRole = session?.user?.staffMemberships.role;
-  console.log("Staffmembership", staffMembershipsRole);
-  const googleImg = window.sessionStorage.getItem("googleProfileImg");
-  if (!googleImg) {
-    const setGoogleImg = session.user?.image;
-    window.sessionStorage.setItem("googleProfileImg", setGoogleImg);
-  }
+  const staffMembershipsRole = session?.user?.staffMemberships?.role;
+  const googleImg = session?.user?.image;
 
   // Toggle
   const toggleWindow = () => {
@@ -51,14 +46,7 @@ const Profile = () => {
   // Logout
 
   const logout = async () => {
-    // 1️⃣ Optional: eigenes sessionStorage/Cookies aufräumen
-    sessionStorage.removeItem("googleProfileImg");
-
-    // 2️⃣ NextAuth ausloggen
-    await signOut({
-      redirect: true, // redirect true sorgt für sauberen Logout
-      callbackUrl: "/", // wohin nach Logout
-    });
+    await signOut({ redirect: true, callbackUrl: "/" });
   };
 
   // Query bauen
@@ -84,7 +72,7 @@ const Profile = () => {
 
       {/* Modal */}
       {openProfil && (
-        <div className="fixed inset-0 z-[100] bg-black/20 flex items-center justify-center">
+        <div className="fixed inset-0 z-100 bg-black/20 flex items-center justify-center">
           <div ref={modalRef} className="bg-white rounded-2xl shadow-lg p-6 w-80 text-center space-y-4">
             {/* Avatar groß */}
             <Avatar className="w-20 h-20 mx-auto">

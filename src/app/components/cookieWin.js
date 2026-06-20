@@ -1,15 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
-  const router = useRouter();
-  const { data: session } = useSession();
-
-  const userID = session?.user?.id || "";
 
   useEffect(() => {
     // Cookie prüfen
@@ -77,14 +71,7 @@ export default function CookieBanner() {
           color: "#9ca3af",
         }}
       >
-        <Link
-          href={{
-            pathname: "/AGBs",
-            query: { ...router.query, ...(userID ? { userID } : {}) },
-          }}
-        >
-          Datenschutzerklärung →
-        </Link>
+        <Link href="/AGBs">Datenschutzerklärung →</Link>
       </p>
 
       <button

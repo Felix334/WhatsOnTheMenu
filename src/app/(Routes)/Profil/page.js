@@ -1,32 +1,28 @@
 "use client";
 
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import Link from "next/link";
 import { DynamicLink } from "@/app/components/DynamicLink";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
 import { CheckCircle, XCircle } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
-import { menuSchema, itemSchema } from "./components/menuSchema";
+import { menuSchema } from "./components/menuSchema";
 import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
@@ -36,11 +32,6 @@ import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 
-// Feheler kam nachdem ich ein neues Schema hinzugefügt hatte und geht jetzt nicht mehr weg
-
-//const schnitzel = require("./img/SchnitzelMitSpätzle.jpg");
-// const restaurant_icon = require("./img/restaurantLabelIcon.png");
-//const newImag = require("../public/uploads/Restaurant/cmjfraygl000055s0lz2ld3d1/DRK-LogoUK.jpg")
 
 const HERO_COLOR_PRESETS = [
   { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
@@ -56,12 +47,10 @@ const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, grad
 export default function PageBuilder() {
   const router = useRouter();
 
-  const [components, setComponents] = useState([]); // will hold { type: "menuSection", section: { title, items } }
-  const [edditComponents, setEdditComponents] = useState([]);
-  const [deletedDishes, setDeletedDishes] = useState([]); // Track deleted dish IDs
-  const [deletedCategories, setDeletedCategories] = useState([]); // Track deleted category IDs
-  const [deleteCategoryGroup, setDeleteCategoryGroup] = useState([]);
-  const [newBgColor, setNewBgColor] = useState();
+  const [components, setComponents] = useState([]);
+  const [deletedDishes, setDeletedDishes] = useState([]);
+  const [deletedCategories, setDeletedCategories] = useState([]);
+  const [, setNewBgColor] = useState();
 
   const deletedDishesRef = useRef([]);
   const deletedCategoriesRef = useRef([]);
@@ -69,14 +58,11 @@ export default function PageBuilder() {
   const [userID, setUserID] = useState("");
 
   const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading } = useRestaurantData(userID);
-  console.log("New BG:", bgColor);
-  console.log("New Font:", font);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
-  const [fontNew, setFontNew] = useState("");
 
   // Hero editing
   const [isEditingHero, setIsEditingHero] = useState(false);
@@ -175,11 +161,6 @@ export default function PageBuilder() {
   const { control, handleSubmit, reset, watch, setValue } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
-  const menuEntry = serverData?.menu?.[0];
-
-  //const font = serverData.menu[0].font
-  console.log("Font:", font);
-
   const renderCategoryGroupEdit = (id) => {
     setRenderCatGroupMenu((prev) => (prev === id ? null : id));
   };
@@ -214,8 +195,7 @@ export default function PageBuilder() {
     const updatedItems = await Promise.all(
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
-          if (selectedFiles[index]) {
-            try {
+          try {
               const uploadData = new FormData();
 
               uploadData.append("image", selectedFiles[index]);
@@ -240,7 +220,6 @@ export default function PageBuilder() {
             } catch (error) {
               console.error(error);
             }
-          }
         }
         return item;
       }),
@@ -254,10 +233,6 @@ export default function PageBuilder() {
 
   const submitData = async () => {
     const restaurantID = serverData.userData.restaurant.id;
-    console.log(`Vor dem Senden: UserID: ${userID}, RestaurantID: ${restaurantID}`);
-    console.log("Deleted Dishes:", deletedDishes);
-    console.log("Deleted Categories:", deletedCategories);
-
     setIsLoading(true);
 
     try {
@@ -277,8 +252,6 @@ export default function PageBuilder() {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
       }
 
-      // Then, handle deletions if any
-      console.log(`Gerichte löschen ${deletedDishes}, Kategorien löschen: ${deletedCategories}, Gruppen löschen: ${deleteCategoryGroup}`);
       if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0) {
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
@@ -594,39 +567,15 @@ export default function PageBuilder() {
         toast.error("Status konnte nicht geändert werden");
       }
     };
-    const [itemData, setItemData] = useState({
-      id: "",
-      name: "",
-      price: 0,
-      description: "",
-    });
-    // Optimistischer Item-Cache: { [dishId]: updatedItem }
     const [changedItems, setChangedItems] = useState({});
-    // Merge: lokale Änderungen haben Vorrang vor serverData
     const displayItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
-    const [changedCategories, setChangedCategories] = useState([]);
+    const [, setChangedCategories] = useState([]);
     const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
     const [pendingDeleteDishId, setPendingDeleteDishId] = useState(null);
     const [confirmDeleteCategory, setConfirmDeleteCategory] = useState(false);
 
-    const [edditCategoryData, setEdditCategoryData] = useState([
-      {
-        color: "",
-        position: "",
-        name: "",
-        boder: "",
-      },
-    ]);
-
     const openMenuItemEddit = (item) => {
-      setSelectedItem(item); // vollständiges Item inkl. ingredients für Allergen-Dialog
-      setItemData((prev) => ({
-        ...prev,
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        description: item.description,
-      }));
+      setSelectedItem(item);
       setOpenItem(true);
     };
 
@@ -667,7 +616,7 @@ export default function PageBuilder() {
             <TableHeader>
               <TableRow className={`hover:bg-gray-100 w-full ${bgColor}`}>
                 <TableHead className="text-left">Aktionen</TableHead>
-                <TableHead className="text-left" style={{ fontFamily: fontNew }}>
+                <TableHead className="text-left" style={{ fontFamily: font }}>
                   Speisen
                 </TableHead>
                 <TableHead className="text-right right-1 absolute">Preis:</TableHead>
@@ -676,7 +625,7 @@ export default function PageBuilder() {
 
             <TableBody className="">
               {displayItems.map((item, index) => (
-                <React.Fragment key={index}>
+                <Fragment key={index}>
                   <TableRow
                     className={`
                       ${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-50"} 
@@ -733,7 +682,7 @@ export default function PageBuilder() {
                       </TableCell>
                     </TableRow>
                   )}
-                </React.Fragment>
+                </Fragment>
               ))}
             </TableBody>
           </Table>
@@ -790,13 +739,13 @@ export default function PageBuilder() {
   };
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: fontNew }}>
+    <div className="min-h-screen" style={{ fontFamily: font }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
 
       <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between h-12 gap-2">
           <div className="flex gap-3 items-center">
-            <Button onClick={goBackBtn} style={{ fontFamily: fontNew }}>
+            <Button onClick={goBackBtn} style={{ fontFamily: font }}>
               Zurück
             </Button>
 

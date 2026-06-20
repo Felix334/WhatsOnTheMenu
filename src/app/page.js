@@ -4,14 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu";
 
 import LoginForm from "./components/Anmelden";
 import Registrieren from "./components/Registrieren";
@@ -28,24 +28,15 @@ function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
   const [navShadow, setNavShadow] = useState(false);
-  const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [renderLogin, setRenderLogin] = useState(false);
-  const [adminAcces, setAdminAccess] = useState(false);
 
   const { data: session, status } = useSession();
   const router = useRouter();
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
-  // const autherizedUser = userID && (role === "Owner" || role === "Admin") && status === "authenticated";
   const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
-
-  useEffect(() => {
-    if (adminAcc) {
-      setAdminAccess(true);
-    }
-  }, [adminAcc]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,22 +53,7 @@ function HomeContent() {
     }
   };
 
-  const renderLoginW = () => {
-    if (!renderLogin) {
-      setRenderLogin(true);
-    } else {
-      setRenderLogin(false);
-    }
-  };
-
-  const memoizedQuery = useMemo(() => {
-    return { ...router.queryString };
-  }, [router.queryString]);
-
-  const goToExamplePage = () => {
-    const url = window.location.origin;
-    console.log("URL", url);
-  };
+  const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
     <div>
       <Head>
@@ -292,10 +268,10 @@ function HomeContent() {
                 <p className="mt-3 text-gray-500 text-sm sm:text-base">Optimiert für Smartphone, Tablet und Desktop – ohne Kompromisse im Design.</p>
               </header>
               <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
-                <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-[4/3]">
+                <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-4/3">
                   <Image src={SpeiseKarteLaptop} className="object-cover" alt="Speisekarte Laptop" />
                 </div>
-                <div className="relative w-full max-w-[280px] sm:max-w-[120px] md:max-w-[250px] aspect-[9/16]">
+                <div className="relative w-full max-w-70 sm:max-w-30 md:max-w-62.5 aspect-9/16">
                   <Image src={SpeiseKarteHandy} className="object-cover" alt="Speisekarte Handy" />
                 </div>
               </div>
@@ -342,10 +318,6 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>
                         QR-Code
                       </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        Perfekt für Veranstaltungen und kleine Restaurants
-                      </li>
                     </ul>
 
                     {/* Button nach unten drücken */}
@@ -381,17 +353,13 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>
                         QR-Code
                       </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        Perfekt für kleine Restaurants
-                      </li>
                     </ul>
 
                     {/* Button nach unten drücken */}
                   </CardContent>
                 </Card>
 
-                <Card className="bg-red-800 text-white border-2 border-red-600 relative">
+                <Card className="bg-red-800 text-white border-2 border-red-600 relative min-h-100 h-120">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
@@ -414,9 +382,7 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-300 mr-2">✓</span>QR-Code
                       </li>
-                      <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Perfekt für mittelgroße/große Restaurants
-                      </li>
+
                       <li>
                         <span className="text-green-300 mr-2">✓</span>Management-System
                       </li>
