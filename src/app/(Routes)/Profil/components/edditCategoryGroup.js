@@ -8,11 +8,23 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "./ColorPicker";
 
-export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, restaurantID, allowPremiumColor }) {
+const BORDER_RADIUS_OPTIONS = [
+  { value: "none", label: "Eckig" },
+  { value: "sm", label: "Leicht" },
+  { value: "md", label: "Gerundet" },
+  { value: "xl", label: "Sehr rund" },
+];
+
+export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, borderRadius: initialBorderRadius, restaurantID, allowPremiumColor, onBorderRadiusChange, onColorChange }) {
   const [newName, setNewName] = useState(name);
   const [newColor, setNewColor] = useState(bgColor ?? "");
+  const [borderRadius, setBorderRadius] = useState(initialBorderRadius || "md");
 
   const saveData = async () => {
+    const prev = initialBorderRadius;
+    const prevColor = bgColor;
+    onBorderRadiusChange?.(borderRadius);
+    onColorChange?.(newColor);
     const resp = await fetch("/api/user/profil/edditData", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -24,12 +36,15 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
             id,
             name: newName ?? null,
             color: newColor ?? null,
+            borderRadius,
           },
         },
       }),
     });
 
     if (!resp.ok) {
+      onBorderRadiusChange?.(prev);
+      onColorChange?.(prevColor);
       toast.error("Fehler beim Speichern: " + resp.status);
     } else {
       toast.success("Kategorie-Gruppe gespeichert!");
@@ -54,6 +69,26 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground tracking-wide">Hintergrundfarbe</label>
             <ColorPicker value={newColor} onChange={setNewColor} allowPremiumColor={allowPremiumColor} />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground tracking-wide">Rand</label>
+            <div className="flex gap-2">
+              {BORDER_RADIUS_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setBorderRadius(value)}
+                  className={`flex-1 py-2 text-sm border-2 transition-all ${
+                    borderRadius === value
+                      ? "border-gray-900 bg-gray-900 text-white font-semibold"
+                      : "border-gray-200 text-gray-600 hover:border-gray-400"
+                  } ${value === "none" ? "rounded-none" : value === "sm" ? "rounded-lg" : value === "md" ? "rounded-xl" : "rounded-3xl"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

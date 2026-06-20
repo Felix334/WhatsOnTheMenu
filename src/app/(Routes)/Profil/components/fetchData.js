@@ -17,7 +17,6 @@ const fetchRestaurantData = async (userID, signal) => {
 
 const extractMenuData = (data) => {
   const restaurant = data?.userData?.restaurant;
-  console.log("First Check!:", restaurant)
   const menu = restaurant?.menu[0];
   const categoryGroup = menu?.categoryGroup ?? [];
   categoryGroup.sort((a,b) => Number(a.position) - Number(b.position))
@@ -56,7 +55,5 @@ export const useRestaurantData = (userID) => {
     return () => controller.abort();
   }, [userID]);
 
-  console.log("Server Response-API:", serverData);
-  console.log("Second Check", extractMenuData(serverData));
   return { serverData, isLoading, setIsLoading, ...extractMenuData(serverData) };
 };

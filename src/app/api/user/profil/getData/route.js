@@ -80,6 +80,7 @@ async function main(userId) {
                     name: true,
                     position: true,
                     color: true,
+                    borderRadius: true,
                     categories: {
                       select: {
                         id: true,
@@ -89,6 +90,7 @@ async function main(userId) {
                         bgColor: true,
                         font: true,
                         fontColor: true,
+                        borderRadius: true,
                         dishes: {
                           select: {
                             id: true,

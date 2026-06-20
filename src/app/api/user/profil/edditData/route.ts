@@ -226,6 +226,7 @@ export async function POST(req: NextRequest) {
                 ...(cat.name && { name: cat.name }),
                 ...(cat.position !== undefined && { position: cat.position }),
                 ...(cat.color && { bgColor: cat.color }),
+                ...(cat.borderRadius !== undefined && { borderRadius: cat.borderRadius }),
               },
             }),
           `category.updateMany (${cat.name || cat.id})`,
@@ -290,6 +291,7 @@ export async function POST(req: NextRequest) {
                 data: {
                   ...(newName && { name: newName }),
                   ...(newColor && { color: newColor }),
+                  ...(entry.categoryGroup.borderRadius !== undefined && { borderRadius: entry.categoryGroup.borderRadius }),
                 },
               }),
             `categoryGroup.updateMany(${catGroupID})`,

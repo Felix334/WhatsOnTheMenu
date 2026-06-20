@@ -166,6 +166,7 @@ model Category {
   bgColor         String?
   font            String?
   fontColor       String?
+  borderRadius    String?
   menuId          String?
   categoryGroupID String
   categoryGroup   CategoryGroup @relation(fields: [categoryGroupID], references: [id], onDelete: Cascade)
@@ -333,11 +334,12 @@ model EmailInbox {
 }
 
 model CategoryGroup {
-  id         String     @id @default(cuid())
-  name       String
-  position   Int
-  color      String
-  menuID     String
+  id           String     @id @default(cuid())
+  name         String
+  position     Int
+  color        String
+  borderRadius String?
+  menuID       String
   categories Category[]
   Menu       Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
 

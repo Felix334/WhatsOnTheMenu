@@ -51,10 +51,12 @@ export default function PageBuilder() {
   const [components, setComponents] = useState([]);
   const [deletedDishes, setDeletedDishes] = useState([]);
   const [deletedCategories, setDeletedCategories] = useState([]);
+  const [deleteCategoryGroups, setDeleteCategoryGroups] = useState([])
   const [, setNewBgColor] = useState();
 
   const deletedDishesRef = useRef([]);
   const deletedCategoriesRef = useRef([]);
+  const deletedCategoryGroupRef = useRef([]);
 
   const [userID, setUserID] = useState("");
 
@@ -80,7 +82,10 @@ export default function PageBuilder() {
   const [catCount, setCatCount] = useState(0);
   const [dishCount, setDishCount] = useState(0);
   const [allowPremiumColor, setAllowPremiumColor] = useState(false);
+  const [allowAvailability, setAllowAvailability] = useState(false);
   const [renderCatGroupMenu, setRenderCatGroupMenu] = useState(null);
+  const [groupBorderMap, setGroupBorderMap] = useState({});
+  const [groupColorMap, setGroupColorMap] = useState({});
 
   const { data: session, status } = useSession();
 
@@ -100,10 +105,12 @@ export default function PageBuilder() {
       case "Professional":
         setLimit(TierSystem.Professional);
         setAllowPremiumColor(true);
+        setAllowAvailability(true);
         break;
       case "Individuell":
         setLimit(TierSystem.Individuell);
         setAllowPremiumColor(true);
+        setAllowAvailability(true);
         break;
       default:
         setLimit(TierSystem.FreeTier);
@@ -183,6 +190,13 @@ export default function PageBuilder() {
       return updated;
     });
   };
+  const updateDeleteCategorieGroups = (id) => {
+    setDeleteCategoryGroups((prev) => {
+      const updated = [...prev, id];
+      deletedCategoriesGroupRef.current = updated;
+      return updated
+    })
+  }
 
   const submitToServer = (data) => {
     const newSection = {
@@ -263,6 +277,7 @@ export default function PageBuilder() {
             restaurantId: restaurantID,
             dishes: deletedDishesRef.current,
             categories: deletedCategoriesRef.current,
+            categoryGroups:  deletedCategoryGroupRef.current
           }),
         });
 
@@ -535,7 +550,11 @@ export default function PageBuilder() {
     );
   }
 
-  const MenuSection = ({ title, menuItems, categoryId, bgColor }) => {
+  const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
+
+  const MenuSection = ({ title, menuItems, categoryId, bgColor, borderRadius }) => {
+    const [localBorderRadius, setLocalBorderRadius] = useState(borderRadius);
+    const [localBgColor, setLocalBgColor] = useState(bgColor);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -595,8 +614,8 @@ export default function PageBuilder() {
     };
 
     return (
-      <div className={`rounded-xl shadow-lg max-w-6xl w-full overflow-hidden ${bgColorClass(bgColor)}`} style={bgColorStyle(bgColor)}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(bgColor)}`} style={bgColorStyle(bgColor)}>
+      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} shadow-lg max-w-6xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
+        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
@@ -661,9 +680,11 @@ export default function PageBuilder() {
                         </Button>
 
                         {/* Verfügbarkeits-Toggle */}
-                        <Button size="icon" variant="outline" title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"} onClick={(e) => toggleAvailability(e, item.id)} className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}>
-                          {stockMap[item.id] === "outOfStock" ? <XCircle className="size-4" /> : <CheckCircle className="size-4" />}
-                        </Button>
+                        {allowAvailability && (
+                          <Button size="icon" variant="outline" title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"} onClick={(e) => toggleAvailability(e, item.id)} className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}>
+                            {stockMap[item.id] === "outOfStock" ? <XCircle className="size-4" /> : <CheckCircle className="size-4" />}
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
 
@@ -671,7 +692,7 @@ export default function PageBuilder() {
                       <div className="flex flex-col">
                         <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
                         {item.description && <span className="text-sm text-gray-500">{item.description}</span>}
-                        {stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
+                        {allowAvailability && stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
@@ -725,11 +746,13 @@ export default function PageBuilder() {
           selectedCategory={{
             name: title,
             position: 0,
-            color: "",
-            border: "",
+            color: localBgColor,
+            borderRadius: localBorderRadius,
             id: categoryId,
           }}
           setChangedCategory={setChangedCategories}
+          onBorderRadiusChange={setLocalBorderRadius}
+          onColorChange={setLocalBgColor}
           category={title}
           restaurantId={serverData?.userData?.restaurant?.id}
           userID={userID}
@@ -742,7 +765,7 @@ export default function PageBuilder() {
   };
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: font }}>
+    <div className="min-h-screen flex flex-col" style={{ fontFamily: font }}>
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
 
       <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
@@ -919,22 +942,22 @@ export default function PageBuilder() {
         )}
       </div>
 
-      <div className={`text-gray-900 font-sans ${!bgColor ? "bg-amber-50" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
+      <div className={`flex-1 text-gray-900 font-sans ${!bgColor ? "bg-amber-50" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
         <main className="w-full">
           <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
             {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
               serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
-                <div key={group.id} className={`rounded-2xl shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
+                <div key={group.id} className={`${RADIUS_CLASS[groupBorderMap[group.id] ?? group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(groupColorMap[group.id] ?? group.color) || "bg-white"}`} style={bgColorStyle(groupColorMap[group.id] ?? group.color)}>
                   <div>
                     <Button onClick={() => renderCategoryGroupEdit(group.id)}>
                       <FaPen />
                     </Button>
                   </div>
-                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={group.color} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} />}
+                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={groupColorMap[group.id] ?? group.color} borderRadius={groupBorderMap[group.id] ?? group.borderRadius} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))} onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))} />}
                   <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
-                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} />
+                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} borderRadius={category.borderRadius} />
                     ))}
                   </div>
                 </div>

@@ -20,7 +20,7 @@ export async function GET(req, { params }) {
         openingHours: true,
         createdAt: true,
         owner: {
-          select: { name: true },
+          select: { name: true, subscription: true },
         },
         menu: {
           select: {
@@ -37,6 +37,7 @@ export async function GET(req, { params }) {
                 name: true,
                 position: true,
                 color: true,
+                borderRadius: true,
                 categories: {
                   select: {
                     id: true,
@@ -46,6 +47,7 @@ export async function GET(req, { params }) {
                     bgColor: true,
                     font: true,
                     fontColor: true,
+                    borderRadius: true,
                     dishes: {
                       select: {
                         name: true,
@@ -111,7 +113,8 @@ export async function GET(req, { params }) {
       name: restaurant.name,
       description: restaurant.description ?? null,
       parentCompany: restaurant.parentCompany,
-      owner: restaurant.owner,
+      owner: { name: restaurant.owner.name },
+      ownerSubscription: restaurant.owner.subscription,
       menu: menuWithRatings,
       locations: restaurant.locations,
       openingHours: restaurant.openingHours ?? null,
