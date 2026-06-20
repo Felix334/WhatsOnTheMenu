@@ -50,17 +50,10 @@ export default function KontoPage() {
 
   useEffect(() => {
     if (status !== "authenticated") return;
-    let active = true;
-    fetch("/api/user/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (active && d?.user) setAccount(d.user);
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
-  }, [status]);
+    if (session) {
+      setAccount(session.user);
+    }
+  }, [status, session]);
 
   if (status === "loading") return <Centered>Lädt…</Centered>;
   if (status === "unauthenticated") return <Centered>Bitte melde dich an.</Centered>;
@@ -73,9 +66,7 @@ export default function KontoPage() {
 
   const roleLabel = ROLE_LABELS[user.role] ?? user.role ?? "Nutzer";
   const subscriptionLabel = SUBSCRIPTION_LABELS[user.subscription] ?? user.subscription ?? "Kein Abo";
-  const memberSince = account?.createdAt
-    ? new Date(account.createdAt).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" })
-    : null;
+  const memberSince = account?.createdAt ? new Date(account.createdAt).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" }) : null;
 
   const handleDelete = async () => {
     setConfirmOpen(false);
@@ -92,9 +83,7 @@ export default function KontoPage() {
     }
   };
 
-  const deleteDescription = hasRestaurant
-    ? "Dein Account UND dein Restaurant (inkl. Menü, Gerichte, Bestellungen und Mitarbeiter) werden unwiderruflich gelöscht. Ein aktives Abonnement wird automatisch gekündigt. Diese Aktion kann nicht rückgängig gemacht werden."
-    : "Dein Account wird unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.";
+  const deleteDescription = hasRestaurant ? "Dein Account UND dein Restaurant (inkl. Menü, Gerichte, Bestellungen und Mitarbeiter) werden unwiderruflich gelöscht. Ein aktives Abonnement wird automatisch gekündigt. Diese Aktion kann nicht rückgängig gemacht werden." : "Dein Account wird unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.";
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-16 px-4">
@@ -126,9 +115,7 @@ export default function KontoPage() {
             <InfoRow label="E-Mail" value={user.email || "—"} />
             <InfoRow label="Rolle" value={roleLabel} />
             {(isOwner || user.subscription) && <InfoRow label="Abo" value={subscriptionLabel} />}
-            {isOwner && account?.subscriptionStatus && (
-              <InfoRow label="Abo-Status" value={account.subscriptionStatus} />
-            )}
+            {isOwner && account?.subscriptionStatus && <InfoRow label="Abo-Status" value={account.subscriptionStatus} />}
             {hasRestaurant && <InfoRow label="Restaurant" value={account.restaurant.name} />}
             {memberSince && <InfoRow label="Mitglied seit" value={memberSince} />}
           </CardContent>
@@ -140,11 +127,7 @@ export default function KontoPage() {
             <CardTitle className="text-lg text-red-700">Account löschen</CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-4">
-            <p className="text-sm text-gray-500">
-              {isOwner
-                ? "Beim Löschen deines Accounts wird auch dein Restaurant mit allen Daten entfernt und ein laufendes Abonnement gekündigt."
-                : "Hier kannst du deinen Account unwiderruflich löschen."}
-            </p>
+            <p className="text-sm text-gray-500">{isOwner ? "Beim Löschen deines Accounts wird auch dein Restaurant mit allen Daten entfernt und ein laufendes Abonnement gekündigt." : "Hier kannst du deinen Account unwiderruflich löschen."}</p>
             <Button variant="destructive" disabled={deleting} onClick={() => setConfirmOpen(true)}>
               {deleting ? "Wird gelöscht…" : "Account löschen"}
             </Button>
@@ -152,14 +135,7 @@ export default function KontoPage() {
         </Card>
       </div>
 
-      <ConfirmDialog
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        title="Account wirklich löschen?"
-        description={deleteDescription}
-        confirmLabel="Endgültig löschen"
-        onConfirm={handleDelete}
-      />
+      <ConfirmDialog open={confirmOpen} onOpenChange={setConfirmOpen} title="Account wirklich löschen?" description={deleteDescription} confirmLabel="Endgültig löschen" onConfirm={handleDelete} />
     </main>
   );
 }
