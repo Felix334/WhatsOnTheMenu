@@ -80,8 +80,8 @@ export const authOptions: NextAuthOptions = {
           token.subscription = freshUser.subscription;
           token.subscriptionStatus = freshUser.subscriptionStatus ?? undefined;
 
-          // Sicherheitscheck: Owner mit bezahltem Plan → Stripe-Abo verifizieren
-          if (freshUser.role === 'Owner' && freshUser.subscription !== 'FreeTier') {
+          // Sicherheitscheck: Owner mit bezahltem Plan → Stripe-Abo verifizieren (nur in Prod)
+          if (process.env.NODE_ENV !== 'development' && freshUser.role === 'Owner' && freshUser.subscription !== 'FreeTier') {
             if (!freshUser.stripeSubscriptionId) {
               // Keine Stripe-ID in DB → definitiv kein Abo
               await prisma.user.update({
