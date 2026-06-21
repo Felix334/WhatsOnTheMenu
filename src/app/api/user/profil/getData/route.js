@@ -72,6 +72,7 @@ async function main(userId) {
                 bgColor: true,
                 font: true,
                 heroColor: true,
+                heroTextColor: true,
                 createdAt: true,
                 updatedAt: true,
                 categoryGroup: {

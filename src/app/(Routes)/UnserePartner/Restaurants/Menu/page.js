@@ -46,16 +46,22 @@ const SOCIAL_ICONS = [
 ];
 
 // ─── Hero-Banner ───────────────────────────────────────────────────────────────
-const HeroSection = ({ restaurantData, menuFont }) => {
+const HeroSection = ({ restaurantData, menuFont, color }) => {
   const loc = restaurantData?.locations?.[0];
   const { isOpen, todayHours } = getOpenStatus(restaurantData?.openingHours);
+  console.log("Zeige HeroColor:", color);
 
   return (
-    <div className={`w-full bg-gradient-to-r ${HERO_GRADIENT_MAP[restaurantData?.menu?.[0]?.heroColor] ?? HERO_GRADIENT_MAP.amber} text-white py-10 px-4 text-center`}>
+    <div className={`w-full bg-gradient-to-r text-white py-10 px-4 text-center`} style={{ backgroundColor: color }}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
-      <h1 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">{restaurantData?.name || "Restaurant"}</h1>
-      {restaurantData?.description && <p className="mt-3 text-white/80 text-base max-w-lg mx-auto">{restaurantData.description}</p>}
-
+      <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">
+        {restaurantData?.name || "Restaurant"}
+      </h1>
+      {restaurantData?.description && (
+        <p className="mt-3 text-white/80 text-base max-w-lg mx-auto" style={{ color: restaurantData.menu?.[0]?.heroTextColor }}>
+          {restaurantData.description}
+        </p>
+      )}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm">
         <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold ${isOpen ? "bg-green-500/80 text-white" : "bg-black/30 text-amber-200"}`}>
           <span className={`inline-block w-2 h-2 rounded-full ${isOpen ? "bg-white animate-pulse" : "bg-amber-400"}`} />
@@ -263,11 +269,15 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
       <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
         {qty > 0 && (
           <>
-            <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center transition-colors">−</button>
+            <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center transition-colors">
+              −
+            </button>
             <span className="w-5 text-center text-sm font-semibold">{qty}</span>
           </>
         )}
-        <button onClick={() => addToCart(item)} className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-700 text-white font-bold text-sm flex items-center justify-center transition-colors">+</button>
+        <button onClick={() => addToCart(item)} className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-700 text-white font-bold text-sm flex items-center justify-center transition-colors">
+          +
+        </button>
       </div>
     );
   };
@@ -275,7 +285,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
   return (
     <div id={id} className={`${bgColor} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
       <div className="mb-8 text-center pb-6">
-        <h3 style={fontStyle} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">{title}</h3>
+        <h3 style={fontStyle} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
+          {title}
+        </h3>
       </div>
 
       {/* Mobile: Card-Layout */}
@@ -287,7 +299,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
               <div onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
                 <div className="flex-1 pr-2">
                   <div className="flex items-center gap-2">
-                    <p style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>{item.name}</p>
+                    <p style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
+                      {item.name}
+                    </p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
                   </div>
                   {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
@@ -328,7 +342,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
                     <TableCell className="align-top py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>{item.name}</span>
+                          <span style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
+                            {item.name}
+                          </span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
                         </div>
                         {item.description && <span className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
@@ -336,7 +352,11 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
                       </div>
                     </TableCell>
                     <TableCell className={`text-right font-mono whitespace-nowrap align-middle py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
-                    {orderMode && <TableCell className="align-middle py-4 w-32"><div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div></TableCell>}
+                    {orderMode && (
+                      <TableCell className="align-middle py-4 w-32">
+                        <div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div>
+                      </TableCell>
+                    )}
                   </TableRow>
 
                   {expandedIndex === index && item.imageUrl && (
@@ -480,7 +500,9 @@ const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => 
         <ul className="space-y-1 text-sm border rounded-xl p-3 bg-gray-50">
           {items.map((i) => (
             <li key={i.dishId} className="flex justify-between">
-              <span>{i.quantity}× {i.name}</span>
+              <span>
+                {i.quantity}× {i.name}
+              </span>
               <span className="font-mono text-gray-600">{(i.price * i.quantity).toFixed(2)} €</span>
             </li>
           ))}
@@ -492,13 +514,7 @@ const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => 
 
         <div>
           <label className="text-sm font-medium text-gray-700">Anmerkung (optional)</label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            rows={2}
-            placeholder="z.B. ohne Zwiebeln..."
-            className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-400"
-          />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="z.B. ohne Zwiebeln..." className="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-gray-400" />
         </div>
 
         <div className="flex gap-3 pt-1">
@@ -609,6 +625,7 @@ const MenuContent = () => {
   const menuEntry = serverData?.menu?.[0];
   const bgColor = menuEntry?.bgColor;
   const menuFont = menuEntry?.font || null;
+  const heroColor = menuEntry.heroColor;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
   const showAvailability = ["Professional", "Business"].includes(serverData?.ownerSubscription);
 
@@ -620,7 +637,7 @@ const MenuContent = () => {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       {menuFont && <link href={GOOGLE_FONTS_URL} rel="stylesheet" />}
       <Header name={name} activePage={activePage} setActivePage={setActivePage} />
-      <HeroSection restaurantData={serverData} menuFont={menuFont} />
+      <HeroSection restaurantData={serverData} menuFont={menuFont} color={heroColor} />
       {activePage === "menu" && categoryGroups.length > 0 && <CategoryNav categories={categoryGroups.flatMap((g) => g.categories ?? [])} activeId={activeId} />}
 
       {activePage === "info" ? (
@@ -631,14 +648,18 @@ const MenuContent = () => {
             {tableNumber && (
               <div className="mb-6 flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 w-fit shadow-sm">
                 <span>🪑</span>
-                <span>Tisch <strong className="text-gray-900">{tableNumber}</strong> · Wähle deine Gerichte aus</span>
+                <span>
+                  Tisch <strong className="text-gray-900">{tableNumber}</strong> · Wähle deine Gerichte aus
+                </span>
               </div>
             )}
             {categoryGroups.length > 0 ? (
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
                   <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
+                    <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">
+                      {group.name}
+                    </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
                         <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} />
@@ -662,14 +683,16 @@ const MenuContent = () => {
           cart={cart}
           tableNumber={tableNumber}
           restaurantId={restaurantId}
-          onSuccess={(id) => { setOrderId(id); setOrderStep("qr"); setCart({}); }}
+          onSuccess={(id) => {
+            setOrderId(id);
+            setOrderStep("qr");
+            setCart({});
+          }}
           onClose={() => setOrderStep(null)}
         />
       )}
 
-      {orderStep === "qr" && (
-        <QRModal orderId={orderId} tableNumber={tableNumber} onClose={() => setOrderStep(null)} />
-      )}
+      {orderStep === "qr" && <QRModal orderId={orderId} tableNumber={tableNumber} onClose={() => setOrderStep(null)} />}
     </div>
   );
 };

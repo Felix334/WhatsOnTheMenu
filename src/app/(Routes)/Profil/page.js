@@ -542,10 +542,6 @@ export default function PageBuilder() {
     </Sheet>
   );
 
-  /* ---------- Options Sheet ---------- */
-
-  /* ---------- Menu Section Presentation ---------- */
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -566,7 +562,6 @@ export default function PageBuilder() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
 
-    // Optimistisches Stock-State: { [dishId]: "isAvailable" | "outOfStock" }
     const [stockMap, setStockMap] = useState(() => Object.fromEntries((menuItems ?? []).map((d) => [d.id, d.stock ?? "isAvailable"])));
 
     const toggleAvailability = async (e, dishId) => {

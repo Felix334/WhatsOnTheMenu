@@ -29,6 +29,7 @@ export async function GET(req, { params }) {
             bgColor: true,
             font: true,
             heroColor: true,
+            heroTextColor: true,
             createdAt: true,
             updatedAt: true,
             categoryGroup: {

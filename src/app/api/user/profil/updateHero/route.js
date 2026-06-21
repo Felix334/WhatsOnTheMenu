@@ -29,6 +29,16 @@ export async function POST(req) {
         })
       );
     }
+    if(description !== undefined){
+      ops.push(
+        prisma.restaurant.update({
+          where:{id: restaurantId},
+          data: {
+            description: description
+          }
+        })
+      )
+    }
 
     const menuData = Object.fromEntries(
       Object.entries({ description, heroColor, heroTextColor }).filter(([_, v]) => v !== undefined)
