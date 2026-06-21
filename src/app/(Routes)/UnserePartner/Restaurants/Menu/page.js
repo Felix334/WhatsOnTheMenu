@@ -49,7 +49,7 @@ const SOCIAL_ICONS = [
 const HeroSection = ({ restaurantData, menuFont, color }) => {
   const loc = restaurantData?.locations?.[0];
   const { isOpen, todayHours } = getOpenStatus(restaurantData?.openingHours);
-  console.log("Zeige HeroColor:", color);
+  if (process.env.NODE_ENV === "development") console.log("Zeige HeroColor:", color);
 
   return (
     <div className={`w-full bg-gradient-to-r text-white py-10 px-4 text-center`} style={{ backgroundColor: color }}>
@@ -605,7 +605,7 @@ const MenuContent = () => {
         }
 
         const data = await resp.json();
-        console.log("Server Daten(Sort)", data);
+        if (process.env.NODE_ENV === "development") console.log("Server Daten(Sort)", data);
         data.menu[0].categoryGroup.sort((a, b) => Number(a.position) - Number(b.position));
         setServerData(data);
         setName(data.name || "Unbenanntes Restaurant");

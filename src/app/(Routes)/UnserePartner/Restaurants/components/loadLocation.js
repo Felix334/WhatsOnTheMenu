@@ -12,7 +12,7 @@ const checkCoordinates = () => {
     navigator.geolocation.getCurrentPosition((position) => {
         const lat = position.coords.latitude;
         const long = position.coords.longitude;
-        console.log("Koordinaten:", lat, long);
+        if (process.env.NODE_ENV === "development") console.log("Koordinaten:", lat, long);
     }, (error) => {
         switch (error.code) {
             case 1:

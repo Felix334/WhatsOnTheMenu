@@ -94,7 +94,7 @@ export default function RestaurantForm() {
 
     try {
       restaurantSchema.parse(restaurant);
-      console.log("Sende Daten: ", restaurant);
+      if (process.env.NODE_ENV === "development") console.log("Sende Daten: ", restaurant);
 
       const res = await fetch("/api/restaurant/requestRegister/FreeTier", {
         method: "POST",
@@ -106,7 +106,7 @@ export default function RestaurantForm() {
 
       if (!res.ok) {
         const data = await res.json();
-        console.log(data);
+        if (process.env.NODE_ENV === "development") console.log(data);
         throw new Error(data.message || "Fehler beim Speichern");
       }
 

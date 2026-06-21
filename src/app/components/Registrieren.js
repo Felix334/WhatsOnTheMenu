@@ -17,9 +17,9 @@ export default function Home({ renderRegistrieren }) {
 
   const [submittedData, setSubmittedData] = useState(null);
   const submitToServer = async (user_data) => {
-    console.log("Submitted data sending: ", user_data);
+    if (process.env.NODE_ENV === "development") console.log("Submitted data sending: ", user_data);
     var { email, password, name } = user_data;
-    console.log("Data unpacked: ", email, password, name);
+    if (process.env.NODE_ENV === "development") console.log("Data unpacked: ", email, password, name);
     try {
       const resp = await fetch("./api/Auth/register", {
         method: "POST",
@@ -34,7 +34,7 @@ export default function Home({ renderRegistrieren }) {
         window.sessionStorage.setItem("sessionID", data.sessionID); // Überarbeiten
         setSubmittedData(data);
         renderRegistrieren(false);
-        console.log("Data send succeess");
+        if (process.env.NODE_ENV === "development") console.log("Data send succeess");
       } else {
         console.error("Failed to submit data:", resp.status);
       }
@@ -44,9 +44,9 @@ export default function Home({ renderRegistrieren }) {
   };
   // Define the onSubmit function
   const onSubmit = (data) => {
-    console.log("onSubmit data param:", data);
+    if (process.env.NODE_ENV === "development") console.log("onSubmit data param:", data);
     if (data.password != data.repeatPassword) {
-      console.log("Passwords do not match");
+      if (process.env.NODE_ENV === "development") console.log("Passwords do not match");
       window.alert("Nicht das selbe Passwort!");
     } else {
       submitToServer(data);
@@ -55,7 +55,7 @@ export default function Home({ renderRegistrieren }) {
   };
   useEffect(() => {
     if (submittedData) {
-      console.log("submittedData updated:", submittedData);
+      if (process.env.NODE_ENV === "development") console.log("submittedData updated:", submittedData);
     }
   }, [submittedData]);
 

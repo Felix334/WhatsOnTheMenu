@@ -12,14 +12,14 @@ const PermControleLocation = ({ children }) => {
   const requestLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => console.log("Latitude: " + position.coords.latitude),
-        (error) => console.log("Error occurred. Error code: " + error.code),
+        (position) => { if (process.env.NODE_ENV === "development") console.log("Latitude: " + position.coords.latitude); },
+        (error) => { if (process.env.NODE_ENV === "development") console.log("Error occurred. Error code: " + error.code); },
         {
           timeout: 10000,
         }
       );
     } else {
-      console.log("Geolocation is not supported by this browser.");
+      if (process.env.NODE_ENV === "development") console.log("Geolocation is not supported by this browser.");
     }
   };
 

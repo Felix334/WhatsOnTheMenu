@@ -66,28 +66,30 @@ export default function PageBuilder() {
     if (status !== "authenticated" || !session?.user || autherized) return;
 
     if (session.user.role === "Owner") {
-      console.log("Signed in as:", session.user.id);
-      console.log("User Data:", session.user);
-      console.log("User Subscription:", session.user.subscription);
+      if (process.env.NODE_ENV === "development") {
+        console.log("Signed in as:", session.user.id);
+        console.log("User Data:", session.user);
+        console.log("User Subscription:", session.user.subscription);
+      }
 
       setUserID(session.user.id);
 
       switch (session.user.subscription) {
         case "Basic":
           setLimit(TierSystem.FreeTier);
-          console.log("Free Tier Limit freigeschalten:", TierSystem.FreeTier);
+          if (process.env.NODE_ENV === "development") console.log("Free Tier Limit freigeschalten:", TierSystem.FreeTier);
           break;
         case "Professional":
           setLimit(TierSystem.PremiumTier);
           setAllowPremiumColor(true);
-          console.log("Premium Tier Limit freigeschalten:", TierSystem.PremiumTier);
+          if (process.env.NODE_ENV === "development") console.log("Premium Tier Limit freigeschalten:", TierSystem.PremiumTier);
           break;
         case "Advantst":
           setLimit(TierSystem.Advantst);
-          console.log("Advantst Tier Limit freigeschalten:", TierSystem.Advantst);
+          if (process.env.NODE_ENV === "development") console.log("Advantst Tier Limit freigeschalten:", TierSystem.Advantst);
           break;
         default:
-          console.log("Kein bekanntes Abo:", session.user.subscription);
+          if (process.env.NODE_ENV === "development") console.log("Kein bekanntes Abo:", session.user.subscription);
           break;
       }
 
@@ -96,14 +98,16 @@ export default function PageBuilder() {
   }, [status, autherized, session]);
 
   const calculateLimit = useCallback(() => {
-    console.log("Caclulate Data")
+    if (process.env.NODE_ENV === "development") console.log("Caclulate Data")
     if (!serverData) return;
     const catCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroups?.reduce((total, cg) => total + (cg.categorys?.length || 0), 0) || 0) + (components.length || 0);
     const dishCount = (serverData?.userData?.restaurant?.menu?.[0]?.categoryGroups?.flatMap((cg) => cg.categorys?.flatMap((c) => c.dishes || []) || []).length || 0) + components.reduce((acc, c) => acc + (c.section.items?.length || 0), 0);
-    console.log("Limit:", Limit);
-    console.log("TierSystem:", TierSystem);
-    console.log("Calc Limit", catCount, dishCount);
-    console.log(exeedCatLimit, exeedDishLimit);
+    if (process.env.NODE_ENV === "development") {
+      console.log("Limit:", Limit);
+      console.log("TierSystem:", TierSystem);
+      console.log("Calc Limit", catCount, dishCount);
+      console.log(exeedCatLimit, exeedDishLimit);
+    }
     setExeedCatLimit(catCount >= Limit.CategoryLimit);
     setExeedDishLimit(dishCount >= Limit.DishLimit);
   }, [serverData, components, Limit, exeedCatLimit, exeedDishLimit]);
@@ -154,7 +158,7 @@ export default function PageBuilder() {
         }
 
         const freshData = await response.json();
-        console.log("Server Response:", freshData);
+        if (process.env.NODE_ENV === "development") console.log("Server Response:", freshData);
 
         setServerData(freshData);
         setRestaurantID(freshData.userData.restaurant.id);
@@ -185,7 +189,7 @@ export default function PageBuilder() {
   };
 
   const onSubmit = async (data) => {
-    console.log("Execute Submit Data:", data)
+    if (process.env.NODE_ENV === "development") console.log("Execute Submit Data:", data)
     const updatedItems = await Promise.all(
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
@@ -228,13 +232,15 @@ export default function PageBuilder() {
   };
 
   const submitData = async () => {
-    console.log("🖱️ Speichern button clicked!");
-    console.log("📊 serverData:", !!serverData);
-    console.log("🏪 restaurant:", !!serverData?.userData?.restaurant);
-    console.log("🍽️  menu:", !!serverData?.userData?.restaurant?.menu?.[0]);
-    console.log("📱 components:", components.length);
-    console.log("🗑️  deletedDishes:", deletedDishes.length);
-    console.log("🗑️  deletedCategories:", deletedCategories.length);
+    if (process.env.NODE_ENV === "development") {
+      console.log("🖱️ Speichern button clicked!");
+      console.log("📊 serverData:", !!serverData);
+      console.log("🏪 restaurant:", !!serverData?.userData?.restaurant);
+      console.log("🍽️  menu:", !!serverData?.userData?.restaurant?.menu?.[0]);
+      console.log("📱 components:", components.length);
+      console.log("🗑️  deletedDishes:", deletedDishes.length);
+      console.log("🗑️  deletedCategories:", deletedCategories.length);
+    }
     if (!serverData || !serverData.userData?.restaurant) {
       alert("Lade Daten zuerst...");
       return;
@@ -282,7 +288,7 @@ export default function PageBuilder() {
       });
     });
 
-    console.log("📤 Sending menuData:", menuData);
+    if (process.env.NODE_ENV === "development") console.log("📤 Sending menuData:", menuData);
 
     setIsLoading(true);
 
@@ -569,11 +575,11 @@ export default function PageBuilder() {
     };
 
     const deleteDish = (dishId) => {
-      console.log("Deleting dish:", dishId);
+      if (process.env.NODE_ENV === "development") console.log("Deleting dish:", dishId);
       if (window.confirm("Sind Sie sicher, dass Sie dieses Gericht löschen möchten?")) {
         setDeletedDishes((prev) => {
           const newList = [...prev, dishId];
-          console.log("Updated deletedDishes:", newList);
+          if (process.env.NODE_ENV === "development") console.log("Updated deletedDishes:", newList);
           return newList;
         });
         // Keep in UI but mark as deleted (will be styled red)

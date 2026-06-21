@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   const handleCredentialResponse = useCallback((response) => {
-    console.log("Encoded JWT ID token: " + response.credential);
+    if (process.env.NODE_ENV === "development") console.log("Encoded JWT ID token: " + response.credential);
     
     // Send this to your backend for verification
     fetch('/api/Auth/google', {
@@ -19,7 +19,7 @@ export default function Home() {
     })
     .then(response => response.json())
     .then(data => {
-      console.log('Success:', data);
+      if (process.env.NODE_ENV === "development") console.log('Success:', data);
       router.push('/dashboard');
     })
     .catch((error) => {

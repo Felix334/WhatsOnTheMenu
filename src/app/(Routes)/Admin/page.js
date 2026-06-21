@@ -237,7 +237,7 @@ export default function AdminConsole() {
 
   function renderRequests(requests) {
     const confirmRequest = async () => {
-      console.log("Sende:", requests);
+      if (process.env.NODE_ENV === "development") console.log("Sende:", requests);
       const resp = await fetch("/api/restaurant/Admin/postRequests", {
         method: "POST",
         body: JSON.stringify({ requests }),
@@ -247,7 +247,7 @@ export default function AdminConsole() {
       }
     };
 
-    console.log("Render Reuests", requests);
+    if (process.env.NODE_ENV === "development") console.log("Render Reuests", requests);
     const requestArray = Array.isArray(requests) ? requests : [];
 
     return (

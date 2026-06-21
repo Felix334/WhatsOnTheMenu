@@ -291,7 +291,7 @@ export default function PageBuilder() {
         setDeletedDishes([]);
         setDeletedCategories([]);
       } else {
-        console.log("No deletions to process");
+        if (process.env.NODE_ENV === "development") console.log("No deletions to process");
       }
 
       toast.success("Daten erfolgreich gespeichert!");
@@ -628,7 +628,7 @@ export default function PageBuilder() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <Table className="w-full min-w-[700px] table-fixed">
+          <Table className="w-full `min-w-175` table-fixed">
             <colgroup>
               <col className="w-24" />
               <col className="w-full" />

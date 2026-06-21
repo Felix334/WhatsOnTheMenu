@@ -22,7 +22,7 @@ function AvailabilityContent() {
     fetch(`/api/staff/availability/${restaurantID}`)
       .then(async (r) => {
         const data = await r.json();
-        console.log("Daten:", data)
+        if (process.env.NODE_ENV === "development") console.log("Daten:", data)
         if (!r.ok) throw new Error(data.error || "Fehler beim Laden");
         return data;
       })
