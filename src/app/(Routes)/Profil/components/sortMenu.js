@@ -4,7 +4,9 @@ import { useState, useRef } from "react";
 
 function SortComponents({ componentList }) {
   const [groups, setGroups] = useState([...componentList].sort((a, b) => a.position - b.position));
-  console.log("Sort-Check:", componentList);
+  if(process.env.NODE_ENV === "development"){
+      console.log("Sort-Check:", componentList);
+  }
 
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);

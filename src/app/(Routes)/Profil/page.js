@@ -32,7 +32,6 @@ import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 
-
 const HERO_COLOR_PRESETS = [
   { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
   { key: "green", label: "Grün", gradient: "from-emerald-700 via-green-600 to-teal-600" },
@@ -40,7 +39,7 @@ const HERO_COLOR_PRESETS = [
   { key: "red", label: "Rot", gradient: "from-red-700 via-rose-600 to-red-500" },
   { key: "purple", label: "Lila", gradient: "from-purple-700 via-violet-600 to-purple-500" },
   { key: "dark", label: "Dunkel", gradient: "from-gray-900 via-gray-800 to-gray-700" },
-  { key: "white", label: "Weiß", gradient: "white"}
+  { key: "white", label: "Weiß", gradient: "white" },
 ];
 
 const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient]));
@@ -51,7 +50,7 @@ export default function PageBuilder() {
   const [components, setComponents] = useState([]);
   const [deletedDishes, setDeletedDishes] = useState([]);
   const [deletedCategories, setDeletedCategories] = useState([]);
-  const [deleteCategoryGroups, setDeleteCategoryGroups] = useState([])
+  const [deleteCategoryGroups, setDeleteCategoryGroups] = useState([]);
   const [, setNewBgColor] = useState();
 
   const deletedDishesRef = useRef([]);
@@ -194,9 +193,9 @@ export default function PageBuilder() {
     setDeleteCategoryGroups((prev) => {
       const updated = [...prev, id];
       deletedCategoriesGroupRef.current = updated;
-      return updated
-    })
-  }
+      return updated;
+    });
+  };
 
   const submitToServer = (data) => {
     const newSection = {
@@ -213,30 +212,30 @@ export default function PageBuilder() {
       data.items.map(async (item, index) => {
         if (selectedFiles[index]) {
           try {
-              const uploadData = new FormData();
+            const uploadData = new FormData();
 
-              uploadData.append("image", selectedFiles[index]);
-              uploadData.append("restaurantID", restaurantID);
-              uploadData.append("userID", userID);
+            uploadData.append("image", selectedFiles[index]);
+            uploadData.append("restaurantID", restaurantID);
+            uploadData.append("userID", userID);
 
-              const response = await fetch("/api/user/profil/uploadImg", {
-                method: "POST",
-                body: uploadData,
-              });
+            const response = await fetch("/api/user/profil/uploadImg", {
+              method: "POST",
+              body: uploadData,
+            });
 
-              if (response.ok) {
-                const result = await response.json();
+            if (response.ok) {
+              const result = await response.json();
 
-                return {
-                  ...item,
-                  image: result.path,
-                };
-              } else {
-                toast.error(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
-              }
-            } catch (error) {
-              console.error(error);
+              return {
+                ...item,
+                image: result.path,
+              };
+            } else {
+              toast.error(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
             }
+          } catch (error) {
+            console.error(error);
+          }
         }
         return item;
       }),
@@ -277,7 +276,7 @@ export default function PageBuilder() {
             restaurantId: restaurantID,
             dishes: deletedDishesRef.current,
             categories: deletedCategoriesRef.current,
-            categoryGroups:  deletedCategoryGroupRef.current
+            categoryGroups: deletedCategoryGroupRef.current,
           }),
         });
 
@@ -339,13 +338,17 @@ export default function PageBuilder() {
   };
 
   const categoryGroups = serverData?.userData?.restaurant?.menu[0]?.categoryGroup ?? [];
-  console.log("Group-Test z319:", serverData?.userData?.restaurant?.menu[0].categoryGroup);
-  console.log("Groups-Test z320", categoryGroups);
+  if (process.env.NODE_ENV === "development") {
+    console.log("Group-Test z342:", serverData?.userData?.restaurant?.menu[0].categoryGroup);
+    console.log("Groups-Test z43", categoryGroups);
+  }
   const categoryGroupNames = [...(categoryGroups?.map((group) => group.name) ?? []), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"].filter((name) => name && name.trim());
 
   // Kategorien-Namen (korrigiert)
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
-  console.log("CategorieNames", categoryNames);
+  if (process.env.NODE_ENV === "development") {
+    console.log("CategorieNames", categoryNames);
+  }
 
   const MenuEditor = ({ categoryGroupNames }) => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -552,8 +555,9 @@ export default function PageBuilder() {
 
   const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
 
-  const MenuSection = ({ title, menuItems, categoryId, bgColor, borderRadius }) => {
+  const MenuSection = ({ title, menuItems, categoryId, bgColor, borderRadius, elevated }) => {
     const [localBorderRadius, setLocalBorderRadius] = useState(borderRadius);
+    const [localElevated, setLocalElevated] = useState(elevated ?? true);
     const [localBgColor, setLocalBgColor] = useState(bgColor);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
@@ -568,7 +572,6 @@ export default function PageBuilder() {
       const current = stockMap[dishId] ?? "isAvailable";
       const next = current === "isAvailable" ? "outOfStock" : "isAvailable";
 
-      // Optimistisch aktualisieren
       setStockMap((prev) => ({ ...prev, [dishId]: next }));
 
       try {
@@ -584,7 +587,6 @@ export default function PageBuilder() {
         if (!resp.ok) throw new Error("Fehler");
         toast.success(next === "isAvailable" ? "Gericht als verfügbar markiert" : "Gericht als nicht verfügbar markiert");
       } catch {
-        // Zurücksetzen bei Fehler
         setStockMap((prev) => ({ ...prev, [dishId]: current }));
         toast.error("Status konnte nicht geändert werden");
       }
@@ -614,7 +616,7 @@ export default function PageBuilder() {
     };
 
     return (
-      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} shadow-lg max-w-6xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
+      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-6xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`}>{title}</h3>
 
@@ -748,10 +750,12 @@ export default function PageBuilder() {
             position: 0,
             color: localBgColor,
             borderRadius: localBorderRadius,
+            elevated: localElevated,
             id: categoryId,
           }}
           setChangedCategory={setChangedCategories}
           onBorderRadiusChange={setLocalBorderRadius}
+          onElevatedChange={setLocalElevated}
           onColorChange={setLocalBgColor}
           category={title}
           restaurantId={serverData?.userData?.restaurant?.id}
@@ -801,7 +805,7 @@ export default function PageBuilder() {
 
           {/* Abo-Badge mit Live-Zähler */}
           <div className="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Business" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription === "NoSubscription" ? "Kein Abo" : session?.user?.subscription ?? "Kein Abo"}</span>
+            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Business" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription === "NoSubscription" ? "Kein Abo" : (session?.user?.subscription ?? "Kein Abo")}</span>
             <span className="text-gray-300">|</span>
             <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
               {catCount}/{Limit.CategoryLimit ?? "?"} Kategorien
@@ -819,9 +823,7 @@ export default function PageBuilder() {
 
           <div className="flex items-center gap-2">
             <Button asChild variant="outline">
-              <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>
-                🍽️ Bestellungen
-              </Link>
+              <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>🍽️ Bestellungen</Link>
             </Button>
             <Button asChild>
               <Link
@@ -898,13 +900,7 @@ export default function PageBuilder() {
                 { color: "#86efac", label: "Hellgrün" },
                 { color: "#fde68a", label: "Gelb" },
               ].map(({ color, label }) => (
-                <button
-                  key={color}
-                  title={label}
-                  onClick={() => setHeroTextColor(color)}
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${heroTextColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`}
-                  style={{ backgroundColor: color }}
-                />
+                <button key={color} title={label} onClick={() => setHeroTextColor(color)} className={`w-8 h-8 rounded-full border-2 transition-all ${heroTextColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
               ))}
             </div>
 
@@ -930,8 +926,14 @@ export default function PageBuilder() {
           </div>
         ) : (
           <>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow" style={{ color: heroTextColor }}>{heroName || serverData?.userData?.restaurant?.name || "Restaurant"}</h1>
-            {heroDescription && <p className="mt-3 text-sm max-w-md mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>{heroDescription}</p>}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold tracking-wide drop-shadow" style={{ color: heroTextColor }}>
+              {heroName || serverData?.userData?.restaurant?.name || "Restaurant"}
+            </h1>
+            {heroDescription && (
+              <p className="mt-3 text-sm max-w-md mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>
+                {heroDescription}
+              </p>
+            )}
           </>
         )}
 
@@ -957,7 +959,7 @@ export default function PageBuilder() {
                   <h2 className="text-2xl font-semibold mb-6 border-b pb-4">{group.name}</h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
-                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} borderRadius={category.borderRadius} />
+                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} borderRadius={category.borderRadius} elevated={category.elevated} />
                     ))}
                   </div>
                 </div>

@@ -48,6 +48,7 @@ export async function GET(req, { params }) {
                     font: true,
                     fontColor: true,
                     borderRadius: true,
+                    elevated: true,
                     dishes: {
                       select: {
                         name: true,

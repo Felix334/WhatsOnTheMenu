@@ -249,7 +249,7 @@ const AllergenBadges = ({ ingredients }) => {
 // ─── Menu Section ──────────────────────────────────────────────────────────────
 const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-2xl", xl: "rounded-3xl" };
 
-const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
 
@@ -273,7 +273,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
   };
 
   return (
-    <div id={id} className={`${bgColor} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} shadow-xl w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
+    <div id={id} className={`${bgColor} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
       <div className="mb-8 text-center pb-6">
         <h3 style={fontStyle} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">{title}</h3>
       </div>
@@ -641,7 +641,7 @@ const MenuContent = () => {
                     <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">{group.name}</h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} />
                       ))}
                     </div>
                   </div>

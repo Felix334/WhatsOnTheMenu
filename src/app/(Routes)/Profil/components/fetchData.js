@@ -9,8 +9,6 @@ const fetchRestaurantData = async (userID, signal) => {
   });
   if (response.status === 401) throw new Error("UNAUTHORIZED");
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  
-
 
   return response.json();
 };
@@ -40,7 +38,11 @@ export const useRestaurantData = (userID) => {
     (async () => {
       try {
         setIsLoading(true);
-        setServerData(await fetchRestaurantData(userID, controller.signal));
+        var data = await fetchRestaurantData(userID, controller.signal)
+        if(process.env.NODE_ENV === "development"){
+          console.log("Server Data",data)
+        }
+        setServerData(data);
       } catch (err) {
         if (err.message === "UNAUTHORIZED") {
           const { toast } = await import("sonner");

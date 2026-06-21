@@ -91,6 +91,7 @@ async function main(userId) {
                         font: true,
                         fontColor: true,
                         borderRadius: true,
+                        elevated: true,
                         dishes: {
                           select: {
                             id: true,

@@ -17,9 +17,10 @@ const BORDER_RADIUS_OPTIONS = [
   { value: "xl", label: "Sehr rund" },
 ];
 
-const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, category, restaurantId, allowPremiumColor }) => {
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, category, restaurantId, allowPremiumColor }) => {
   const [color, setColor] = useState("");
   const [borderRadius, setBorderRadius] = useState("md");
+  const [elevated, setElevated] = useState(true);
   const formRef = useRef();
 
   const form = useForm({
@@ -37,6 +38,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       formRef.current.setValue("name", selectedCategory.name || "");
       setColor(selectedCategory.color || selectedCategory.bgColor || "");
       setBorderRadius(selectedCategory.borderRadius || "md");
+      setElevated(selectedCategory.elevated ?? true);
     }
   }, [selectedCategory]);
 
@@ -45,8 +47,10 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const onSubmit = async (data) => {
     const prev = selectedCategory?.borderRadius;
     const prevColor = selectedCategory?.color;
+    const prevElevated = selectedCategory?.elevated ?? true;
     onBorderRadiusChange?.(borderRadius);
     onColorChange?.(color);
+    onElevatedChange?.(elevated);
     try {
       const response = await fetch("/api/user/profil/edditData", {
         method: "POST",
@@ -60,6 +64,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
               name: data.name,
               color,
               borderRadius,
+              elevated,
             },
           },
         }),
@@ -75,6 +80,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     } catch (error) {
       onBorderRadiusChange?.(prev);
       onColorChange?.(prevColor);
+      onElevatedChange?.(prevElevated);
       toast.error("Fehler beim Speichern: " + error.message);
     }
   };
@@ -125,6 +131,26 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                     {label}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Abhebung</label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setElevated(true)}
+                  className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${elevated ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                >
+                  Mit Schatten
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setElevated(false)}
+                  className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${!elevated ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                >
+                  Flach
+                </button>
               </div>
             </div>
 

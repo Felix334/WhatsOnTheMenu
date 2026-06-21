@@ -227,6 +227,7 @@ export async function POST(req: NextRequest) {
                 ...(cat.position !== undefined && { position: cat.position }),
                 ...(cat.color && { bgColor: cat.color }),
                 ...(cat.borderRadius !== undefined && { borderRadius: cat.borderRadius }),
+                ...(cat.elevated !== undefined && { elevated: cat.elevated }),
               },
             }),
           `category.updateMany (${cat.name || cat.id})`,
