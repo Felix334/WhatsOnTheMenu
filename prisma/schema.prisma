@@ -339,6 +339,7 @@ model CategoryGroup {
   name         String
   position     Int
   color        String
+  fontColor    String?
   borderRadius String?
   menuID       String
   categories Category[]

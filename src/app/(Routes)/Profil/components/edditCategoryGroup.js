@@ -15,16 +15,19 @@ const BORDER_RADIUS_OPTIONS = [
   { value: "xl", label: "Sehr rund" },
 ];
 
-export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, borderRadius: initialBorderRadius, restaurantID, allowPremiumColor, onBorderRadiusChange, onColorChange }) {
+export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, fontColor: initialFontColor, borderRadius: initialBorderRadius, restaurantID, allowPremiumColor, onBorderRadiusChange, onColorChange, onFontColorChange }) {
   const [newName, setNewName] = useState(name);
   const [newColor, setNewColor] = useState(bgColor ?? "");
+  const [newFontColor, setNewFontColor] = useState(initialFontColor ?? "");
   const [borderRadius, setBorderRadius] = useState(initialBorderRadius || "md");
 
   const saveData = async () => {
     const prev = initialBorderRadius;
     const prevColor = bgColor;
+    const prevFontColor = initialFontColor;
     onBorderRadiusChange?.(borderRadius);
     onColorChange?.(newColor);
+    onFontColorChange?.(newFontColor);
     const resp = await fetch("/api/user/profil/edditData", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,6 +39,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
             id,
             name: newName ?? null,
             color: newColor ?? null,
+            fontColor: newFontColor || null,
             borderRadius,
           },
         },
@@ -45,6 +49,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
     if (!resp.ok) {
       onBorderRadiusChange?.(prev);
       onColorChange?.(prevColor);
+      onFontColorChange?.(prevFontColor);
       toast.error("Fehler beim Speichern: " + resp.status);
     } else {
       toast.success("Kategorie-Gruppe gespeichert!");
@@ -69,6 +74,33 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-muted-foreground tracking-wide">Hintergrundfarbe</label>
             <ColorPicker value={newColor} onChange={setNewColor} allowPremiumColor={allowPremiumColor} />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-muted-foreground tracking-wide">Schriftfarbe</label>
+            <div className="flex items-center gap-3">
+              <Input
+                type="color"
+                value={newFontColor || "#000000"}
+                onChange={(e) => setNewFontColor(e.target.value)}
+                className="h-10 w-16 cursor-pointer rounded-md border p-1"
+              />
+              <div
+                className="flex-1 h-9 rounded-lg border border-gray-200 text-xs flex items-center px-3"
+                style={{ color: newFontColor || undefined }}
+              >
+                {newFontColor ? newFontColor : <span className="text-gray-400">Standard</span>}
+              </div>
+              {newFontColor && (
+                <button
+                  type="button"
+                  onClick={() => setNewFontColor("")}
+                  className="text-xs text-gray-400 hover:text-gray-700 whitespace-nowrap"
+                >
+                  ✕ Zurücksetzen
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">

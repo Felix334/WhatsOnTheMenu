@@ -226,6 +226,7 @@ export async function POST(req: NextRequest) {
                 ...(cat.name && { name: cat.name }),
                 ...(cat.position !== undefined && { position: cat.position }),
                 ...(cat.color && { bgColor: cat.color }),
+                ...(cat.fontColor !== undefined && { fontColor: cat.fontColor || null }),
                 ...(cat.borderRadius !== undefined && { borderRadius: cat.borderRadius }),
                 ...(cat.elevated !== undefined && { elevated: cat.elevated }),
               },
@@ -292,6 +293,7 @@ export async function POST(req: NextRequest) {
                 data: {
                   ...(newName && { name: newName }),
                   ...(newColor && { color: newColor }),
+                  ...(entry.categoryGroup.fontColor !== undefined && { fontColor: entry.categoryGroup.fontColor || null }),
                   ...(entry.categoryGroup.borderRadius !== undefined && { borderRadius: entry.categoryGroup.borderRadius }),
                 },
               }),

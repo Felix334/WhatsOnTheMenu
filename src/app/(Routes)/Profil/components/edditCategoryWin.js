@@ -17,8 +17,9 @@ const BORDER_RADIUS_OPTIONS = [
   { value: "xl", label: "Sehr rund" },
 ];
 
-const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, category, restaurantId, allowPremiumColor }) => {
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, onFontColorChange, category, restaurantId, allowPremiumColor }) => {
   const [color, setColor] = useState("");
+  const [fontColor, setFontColor] = useState("");
   const [borderRadius, setBorderRadius] = useState("md");
   const [elevated, setElevated] = useState(true);
   const formRef = useRef();
@@ -37,6 +38,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     if (selectedCategory && formRef.current) {
       formRef.current.setValue("name", selectedCategory.name || "");
       setColor(selectedCategory.color || selectedCategory.bgColor || "");
+      setFontColor(selectedCategory.fontColor || "");
       setBorderRadius(selectedCategory.borderRadius || "md");
       setElevated(selectedCategory.elevated ?? true);
     }
@@ -48,9 +50,11 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     const prev = selectedCategory?.borderRadius;
     const prevColor = selectedCategory?.color;
     const prevElevated = selectedCategory?.elevated ?? true;
+    const prevFontColor = selectedCategory?.fontColor ?? "";
     onBorderRadiusChange?.(borderRadius);
     onColorChange?.(color);
     onElevatedChange?.(elevated);
+    onFontColorChange?.(fontColor);
     try {
       const response = await fetch("/api/user/profil/edditData", {
         method: "POST",
@@ -63,6 +67,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
               id: selectedCategory?.id ?? category?.id,
               name: data.name,
               color,
+              fontColor: fontColor || null,
               borderRadius,
               elevated,
             },
@@ -75,12 +80,13 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       }
 
       toast.success("Kategorie gespeichert!");
-      setChangedCategory((prev) => [...prev, { id: selectedCategory?.id, name: data.name, color, borderRadius }]);
+      setChangedCategory((prev) => [...prev, { id: selectedCategory?.id, name: data.name, color, fontColor, borderRadius }]);
       onOpenChange(false);
     } catch (error) {
       onBorderRadiusChange?.(prev);
       onColorChange?.(prevColor);
       onElevatedChange?.(prevElevated);
+      onFontColorChange?.(prevFontColor);
       toast.error("Fehler beim Speichern: " + error.message);
     }
   };
@@ -112,6 +118,33 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">Hintergrundfarbe</label>
               <ColorPicker value={color} onChange={setColor} allowPremiumColor={allowPremiumColor} />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Schriftfarbe</label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="color"
+                  value={fontColor || "#000000"}
+                  onChange={(e) => setFontColor(e.target.value)}
+                  className="h-10 w-16 cursor-pointer rounded-md border p-1"
+                />
+                <div
+                  className="flex-1 h-9 rounded-lg border border-gray-200 text-xs flex items-center px-3"
+                  style={{ color: fontColor || undefined }}
+                >
+                  {fontColor ? fontColor : <span className="text-gray-400">Standard</span>}
+                </div>
+                {fontColor && (
+                  <button
+                    type="button"
+                    onClick={() => setFontColor("")}
+                    className="text-xs text-gray-400 hover:text-gray-700 whitespace-nowrap"
+                  >
+                    ✕ Zurücksetzen
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
