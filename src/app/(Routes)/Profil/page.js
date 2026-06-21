@@ -640,7 +640,7 @@ export default function PageBuilder() {
               <col className="w-24" />
             </colgroup>
             <TableHeader>
-              <TableRow className={`hover:bg-gray-100 w-full ${bgColor}`}>
+              <TableRow className={`hover:bg-gray-100 w-full ${bgColorClass(localBgColor)}}`} style={bgColorStyle(localBgColor)}>
                 <TableHead className="text-left">Aktionen</TableHead>
                 <TableHead className="text-left" style={{ fontFamily: font }}>
                   Speisen
