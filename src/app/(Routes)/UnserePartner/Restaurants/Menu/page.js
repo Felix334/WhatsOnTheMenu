@@ -579,7 +579,7 @@ const MenuContent = () => {
       try {
         const resp = await fetch(`/api/restaurant/${restaurantID}/menu`, {
           method: "GET",
-          next: { revalidate: 300 },
+          next: { revalidate: 1000 },
         });
 
         if (!resp.ok) {
