@@ -167,6 +167,7 @@ model Category {
   font            String?
   fontColor       String?
   borderRadius    String?
+  elevated        Boolean       @default(true)
   menuId          String?
   categoryGroupID String
   categoryGroup   CategoryGroup @relation(fields: [categoryGroupID], references: [id], onDelete: Cascade)
