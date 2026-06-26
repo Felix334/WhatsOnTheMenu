@@ -25,9 +25,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const formRef = useRef();
 
   const form = useForm({
-    defaultValues: {
-      name: "",
-    },
+    defaultValues: { name: "" },
   });
 
   useEffect(() => {
@@ -47,14 +45,31 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
   const { handleSubmit } = form;
 
   const onSubmit = async (data) => {
-    const prev = selectedCategory?.borderRadius;
-    const prevColor = selectedCategory?.color;
-    const prevElevated = selectedCategory?.elevated ?? true;
-    const prevFontColor = selectedCategory?.fontColor ?? "";
-    onBorderRadiusChange?.(borderRadius);
-    onColorChange?.(color);
-    onElevatedChange?.(elevated);
-    onFontColorChange?.(fontColor);
+    const initName = selectedCategory?.name || "";
+    const initColor = selectedCategory?.color || selectedCategory?.bgColor || "";
+    const initFontColor = selectedCategory?.fontColor || "";
+    const initBorderRadius = selectedCategory?.borderRadius || "md";
+    const initElevated = selectedCategory?.elevated ?? true;
+
+    // Nur geänderte Felder sammeln
+    const changes = {};
+    if (data.name !== initName) changes.name = data.name;
+    if (color !== initColor) changes.color = color || null;
+    if (fontColor !== initFontColor) changes.fontColor = fontColor || null;
+    if (borderRadius !== initBorderRadius) changes.borderRadius = borderRadius;
+    if (elevated !== initElevated) changes.elevated = elevated;
+
+    if (Object.keys(changes).length === 0) {
+      onOpenChange(false);
+      return;
+    }
+
+    // Optimistisches Update nur für geänderte Felder
+    if ("borderRadius" in changes) onBorderRadiusChange?.(borderRadius);
+    if ("color" in changes) onColorChange?.(color);
+    if ("elevated" in changes) onElevatedChange?.(elevated);
+    if ("fontColor" in changes) onFontColorChange?.(fontColor);
+
     try {
       const response = await fetch("/api/user/profil/edditData", {
         method: "POST",
@@ -65,28 +80,23 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
             type: "categoryUpdate",
             category: {
               id: selectedCategory?.id ?? category?.id,
-              name: data.name,
-              color,
-              fontColor: fontColor || null,
-              borderRadius,
-              elevated,
+              ...changes,
             },
           },
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       toast.success("Kategorie gespeichert!");
-      setChangedCategory((prev) => [...prev, { id: selectedCategory?.id, name: data.name, color, fontColor, borderRadius }]);
+      setChangedCategory((prev) => [...prev, { id: selectedCategory?.id, ...changes }]);
       onOpenChange(false);
     } catch (error) {
-      onBorderRadiusChange?.(prev);
-      onColorChange?.(prevColor);
-      onElevatedChange?.(prevElevated);
-      onFontColorChange?.(prevFontColor);
+      // Optimistisches Update zurücksetzen
+      if ("borderRadius" in changes) onBorderRadiusChange?.(initBorderRadius);
+      if ("color" in changes) onColorChange?.(initColor);
+      if ("elevated" in changes) onElevatedChange?.(initElevated);
+      if ("fontColor" in changes) onFontColorChange?.(initFontColor);
       toast.error("Fehler beim Speichern: " + error.message);
     }
   };

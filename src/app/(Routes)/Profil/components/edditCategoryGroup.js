@@ -22,12 +22,23 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
   const [borderRadius, setBorderRadius] = useState(initialBorderRadius || "md");
 
   const saveData = async () => {
-    const prev = initialBorderRadius;
-    const prevColor = bgColor;
-    const prevFontColor = initialFontColor;
-    onBorderRadiusChange?.(borderRadius);
-    onColorChange?.(newColor);
-    onFontColorChange?.(newFontColor);
+    // Nur geänderte Felder sammeln
+    const changes = {};
+    if (newName !== name) changes.name = newName;
+    if (newColor !== (bgColor ?? "") && newColor) changes.color = newColor; // color ist required in DB
+    if (newFontColor !== (initialFontColor ?? "")) changes.fontColor = newFontColor || null;
+    if (borderRadius !== (initialBorderRadius || "md")) changes.borderRadius = borderRadius;
+
+    if (Object.keys(changes).length === 0) {
+      setRenderCatGroupMenu(null);
+      return;
+    }
+
+    // Optimistisches Update nur für geänderte Felder
+    if ("borderRadius" in changes) onBorderRadiusChange?.(borderRadius);
+    if ("color" in changes) onColorChange?.(newColor);
+    if ("fontColor" in changes) onFontColorChange?.(newFontColor);
+
     const resp = await fetch("/api/user/profil/edditData", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -35,21 +46,16 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
         restaurantId: restaurantID,
         data: {
           type: "categoryGroupUpdate",
-          categoryGroup: {
-            id,
-            name: newName ?? null,
-            color: newColor ?? null,
-            fontColor: newFontColor || null,
-            borderRadius,
-          },
+          categoryGroup: { id, ...changes },
         },
       }),
     });
 
     if (!resp.ok) {
-      onBorderRadiusChange?.(prev);
-      onColorChange?.(prevColor);
-      onFontColorChange?.(prevFontColor);
+      // Optimistisches Update zurücksetzen
+      if ("borderRadius" in changes) onBorderRadiusChange?.(initialBorderRadius);
+      if ("color" in changes) onColorChange?.(bgColor);
+      if ("fontColor" in changes) onFontColorChange?.(initialFontColor);
       toast.error("Fehler beim Speichern: " + resp.status);
     } else {
       toast.success("Kategorie-Gruppe gespeichert!");

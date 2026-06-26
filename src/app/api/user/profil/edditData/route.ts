@@ -223,9 +223,9 @@ export async function POST(req: NextRequest) {
                 categoryGroup: { menuID: menuId },
               },
               data: {
-                ...(cat.name && { name: cat.name }),
+                ...(cat.name !== undefined && { name: cat.name }),
                 ...(cat.position !== undefined && { position: cat.position }),
-                ...(cat.color && { bgColor: cat.color }),
+                ...(cat.color !== undefined && { bgColor: cat.color || null }),
                 ...(cat.fontColor !== undefined && { fontColor: cat.fontColor || null }),
                 ...(cat.borderRadius !== undefined && { borderRadius: cat.borderRadius }),
                 ...(cat.elevated !== undefined && { elevated: cat.elevated }),
@@ -281,24 +281,26 @@ export async function POST(req: NextRequest) {
         }
       }
       if (entry.type === "categoryGroupUpdate") {
-        const catGroupID = entry.categoryGroup.id;
-        const newName = entry.categoryGroup?.name;
-        const newColor = entry.categoryGroup?.color;
+        const catGroup = entry.categoryGroup || {};
+        const catGroupID = catGroup.id;
 
         if (catGroupID) {
-          await safeDb(
-            () =>
-              prisma.categoryGroup.updateMany({
-                where: { id: catGroupID, menuID: menuId },
-                data: {
-                  ...(newName && { name: newName }),
-                  ...(newColor && { color: newColor }),
-                  ...(entry.categoryGroup.fontColor !== undefined && { fontColor: entry.categoryGroup.fontColor || null }),
-                  ...(entry.categoryGroup.borderRadius !== undefined && { borderRadius: entry.categoryGroup.borderRadius }),
-                },
-              }),
-            `categoryGroup.updateMany(${catGroupID})`,
-          );
+          const updateData: Record<string, unknown> = {};
+          if (catGroup.name !== undefined) updateData.name = catGroup.name;
+          if (catGroup.color !== undefined && catGroup.color) updateData.color = catGroup.color; // color ist required in DB
+          if (catGroup.fontColor !== undefined) updateData.fontColor = catGroup.fontColor || null;
+          if (catGroup.borderRadius !== undefined) updateData.borderRadius = catGroup.borderRadius;
+
+          if (Object.keys(updateData).length > 0) {
+            await safeDb(
+              () =>
+                prisma.categoryGroup.updateMany({
+                  where: { id: catGroupID, menuID: menuId },
+                  data: updateData,
+                }),
+              `categoryGroup.updateMany(${catGroupID})`,
+            );
+          }
         }
       }
     }

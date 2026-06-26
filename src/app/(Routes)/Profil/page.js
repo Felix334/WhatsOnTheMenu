@@ -615,7 +615,9 @@ export default function PageBuilder() {
     return (
       <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-6xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={!deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {}}>{title}</h3>
+          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={!deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {}}>
+            {title}
+          </h3>
 
           <div className="absolute left-2 sm:left-4 flex gap-2">
             <Button onClick={openCategoryMenu_} size="icon" variant="outline">
@@ -955,7 +957,9 @@ export default function PageBuilder() {
                     </Button>
                   </div>
                   {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={groupColorMap[group.id] ?? group.color} fontColor={groupFontColorMap[group.id] ?? group.fontColor ?? ""} borderRadius={groupBorderMap[group.id] ?? group.borderRadius} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))} onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))} onFontColorChange={(val) => setGroupFontColorMap((prev) => ({ ...prev, [group.id]: val }))} />}
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={groupFontColorMap[group.id] ?? group.fontColor ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}}>{group.name}</h2>
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={(groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}}>
+                    {group.name}
+                  </h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
                       <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} fontColor={category.fontColor} borderRadius={category.borderRadius} elevated={category.elevated} />

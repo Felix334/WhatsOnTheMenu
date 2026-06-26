@@ -387,7 +387,7 @@ function HomeContent() {
                         <span className="text-green-300 mr-2">✓</span>Management-System
                       </li>
                       <li>
-                        <span className="text-green-300 mr-2">✓</span>Verfügbarkeitsanzeige
+                        <span className="text-green-300 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
                       </li>
                     </ul>
                     <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
