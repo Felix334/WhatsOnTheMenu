@@ -236,25 +236,48 @@ function HomeContent() {
 
         <main>
           {/* Hero Section */}
-          <section className="gradient-bg text-red-800 py-20">
+          <section className="gradient-bg text-white py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Digitale Speisekarten in <span className="text-yellow-600">wenigen Minuten</span> erstellen
+                    Digitale Speisekarten in <span className="text-yellow-300">wenigen Minuten</span> erstellen
                   </h1>
-                  <p className="text-xl mb-8 text-gray-400">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-white/80">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
-                      <Button asChild className="bg-white text-gray-900 hover:bg-yellow-300">
-                        <a href="/editor">Jetzt kostenlos starten</a>
+                      <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-8 py-3 h-auto shadow-lg">
+                        <a href="/ErstelleRestaurantAccount/FreeTier">Jetzt kostenlos starten</a>
+                      </Button>
+                    )}
+                    {!userID && (
+                      <Button variant="outline" className="border-white/50 text-black hover:text-white hover:bg-white/10 font-medium text-base px-8 py-3 h-auto" onClick={renderLoginW}>
+                        Anmelden
                       </Button>
                     )}
                   </div>
-                  <div className="mt-8 flex items-center space-x-6 text-sm text-yellow-500">
+                  <div className="mt-8 flex items-center space-x-6 text-sm text-white/70">
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
                       Kostenlose Standardversion verfügbar
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-green-300 mr-2">✓</span>
+                      Keine Kreditkarte nötig
+                    </div>
+                  </div>
+                </div>
+
+                {/* Produkt-Vorschau rechts */}
+                <div className="hidden lg:flex justify-center items-center">
+                  <div className="relative floating">
+                    <div className="menu-card rounded-2xl p-4 shadow-2xl">
+                      <Image
+                        src={SpeiseKarteLaptop}
+                        alt="Digitale Speisekarte Vorschau"
+                        className="rounded-xl object-cover w-full max-w-md"
+                        priority
+                      />
                     </div>
                   </div>
                 </div>
@@ -265,7 +288,7 @@ function HomeContent() {
             <div className="mx-auto max-w-6xl text-center">
               <header className="mb-10">
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">Passt sich einfach Ihren Geräten an</h2>
-                <p className="mt-3 text-gray-500 text-sm sm:text-base">Optimiert für Smartphone, Tablet und Desktop – ohne Kompromisse im Design.</p>
+                <p className="mt-3 text-gray-500 text-sm sm:text-base">Optimiert für Smartphone, Tablet und Desktop - ohne Kompromisse im Design.</p>
               </header>
               <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
                 <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-4/3">
@@ -282,8 +305,17 @@ function HomeContent() {
           <section className="py-20 bg-red-800 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für ihre erste digitale Speisekarte?</h2>
-              <p className="text-xl mb-8 text-indigo-100">Schließe sie sich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center"></div>
+              <p className="text-xl mb-8 text-red-100">Schließe sie sich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {!userID && (
+                  <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-10 py-3 h-auto shadow-lg">
+                    <a href="/ErstelleRestaurantAccount/FreeTier">Kostenlos loslegen</a>
+                  </Button>
+                )}
+                <Button asChild variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
+                  <a href="#pricing">Preise ansehen</a>
+                </Button>
+              </div>
             </div>
           </section>
 
@@ -390,7 +422,6 @@ function HomeContent() {
                         <span className="text-green-300 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
                       </li>
                     </ul>
-                    <Button asChild className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300"></Button>
                   </CardContent>
                 </Card>
 
@@ -416,10 +447,6 @@ function HomeContent() {
                       </li>
                     </ul>
 
-                    {/* Button nach unten */}
-                    <div className="mt-auto">
-                      <Button asChild className="w-full" disable></Button>
-                    </div>
                   </CardContent>
                 </Card>
               </div>
