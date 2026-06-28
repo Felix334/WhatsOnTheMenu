@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+
+let cachedData = null;
 
 const fetchRestaurantData = async (userID, signal) => {
   const response = await fetch("/api/user/profil/getData", {
@@ -17,7 +19,7 @@ const extractMenuData = (data) => {
   const restaurant = data?.userData?.restaurant;
   const menu = restaurant?.menu[0];
   const categoryGroup = menu?.categoryGroup ?? [];
-  categoryGroup.sort((a,b) => Number(a.position) - Number(b.position))
+  categoryGroup.sort((a, b) => Number(a.position) - Number(b.position));
   return {
     restaurantID: restaurant?.id ?? "",
     bgColor: menu?.bgColor ?? "",
@@ -28,8 +30,17 @@ const extractMenuData = (data) => {
 };
 
 export const useRestaurantData = (userID) => {
-  const [serverData, setServerData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [serverData, setServerDataState] = useState(cachedData);
+  // No spinner when cache already has data
+  const [isLoading, setIsLoading] = useState(cachedData === null);
+
+  const setServerData = useCallback((updater) => {
+    setServerDataState((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      cachedData = next;
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     if (!userID) return;
@@ -37,18 +48,22 @@ export const useRestaurantData = (userID) => {
 
     (async () => {
       try {
-        setIsLoading(true);
-        var data = await fetchRestaurantData(userID, controller.signal)
-        if(process.env.NODE_ENV === "development"){
-          console.log("Server Data",data)
+        // Only show full loading spinner on first load (no cache)
+        if (cachedData === null) setIsLoading(true);
+
+        const data = await fetchRestaurantData(userID, controller.signal);
+        if (process.env.NODE_ENV === "development") {
+          console.log("Server Data", data);
         }
-        setServerData(data);
+        cachedData = data;
+        setServerDataState(data);
       } catch (err) {
         if (err.message === "UNAUTHORIZED") {
           const { toast } = await import("sonner");
           toast.error("Bitte melden Sie sich an");
+        } else if (err.name !== "AbortError") {
+          console.error("Fetch failed:", err);
         }
-        else if (err.name !== "AbortError") console.error("Fetch failed:", err);
       } finally {
         setIsLoading(false);
       }
