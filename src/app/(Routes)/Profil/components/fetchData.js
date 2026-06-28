@@ -57,5 +57,5 @@ export const useRestaurantData = (userID) => {
     return () => controller.abort();
   }, [userID]);
 
-  return { serverData, isLoading, setIsLoading, ...extractMenuData(serverData) };
+  return { serverData, setServerData, isLoading, setIsLoading, ...extractMenuData(serverData) };
 };

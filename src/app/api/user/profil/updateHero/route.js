@@ -18,7 +18,6 @@ export async function POST(req) {
       return NextResponse.json({ message: "At least one field is required" }, { status: 400 });
     }
 
-    // Updates run in parallel — WHERE ownerId handles authorization implicitly.
     const ops = [];
 
     if (name !== undefined) {
@@ -29,15 +28,13 @@ export async function POST(req) {
         })
       );
     }
-    if(description !== undefined){
+    if (description !== undefined) {
       ops.push(
-        prisma.restaurant.update({
-          where:{id: restaurantId},
-          data: {
-            description: description
-          }
+        prisma.restaurant.updateMany({
+          where: { id: restaurantId, ownerId: token.id },
+          data: { description },
         })
-      )
+      );
     }
 
     const menuData = Object.fromEntries(

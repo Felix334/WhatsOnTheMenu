@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
 import { setup_logger } from "@/logger";
-import path from "path";
-import { unlink, access } from "fs/promises";
 
 const logger = setup_logger();
 
@@ -20,7 +18,7 @@ export async function POST(req) {
     const body = await req.json();
     logger.info(`Request received: ${req.method} ${req.url}`);
 
-    const { restaurantId, dishes, categories, files } = body;
+    const { restaurantId, dishes, categories } = body;
 
     if (!restaurantId) {
       return NextResponse.json({ error: "restaurantId fehlt" }, { status: 400 });
@@ -28,15 +26,11 @@ export async function POST(req) {
 
     const userID = token.id;
 
-    // Ownership check
     const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
     if (!restaurant || restaurant.ownerId !== userID) {
       return NextResponse.json({ error: "Unauthorized or restaurant not found" }, { status: 403 });
     }
 
-    // -----------------------------
-    // DELETE DB ITEMS  (scoped to the verified restaurant)
-    // -----------------------------
     if (dishes && Array.isArray(dishes)) {
       await prisma.dish.deleteMany({
         where: {
@@ -71,33 +65,6 @@ export async function POST(req) {
           },
         });
       });
-    }
-
-    // -----------------------------
-    // DELETE FILES FROM DISK
-    // -----------------------------
-    if (files && Array.isArray(files)) {
-      for (const fileName of files) {
-        if (fileName.includes("..") || fileName.includes("/")) continue;
-
-        const filePath = path.join(
-          process.cwd(),
-          "public",
-          "uploads",
-          "Restaurant",
-          restaurantId,
-          fileName
-        );
-
-        try {
-          await access(filePath);
-          await unlink(filePath);
-        } catch (err) {
-          if (err.code !== "ENOENT") {
-            console.error("File delete error:", err);
-          }
-        }
-      }
     }
 
     return NextResponse.json({ message: "Data deleted successfully" }, { status: 200 });

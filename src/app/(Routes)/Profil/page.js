@@ -59,7 +59,7 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading } = useRestaurantData(userID);
+  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading } = useRestaurantData(userID);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -801,7 +801,21 @@ export default function PageBuilder() {
             ) : (
               <MenuEditor categoryGroupNames={categoryGroupNames} />
             )}
-            <SortComponents componentList={categoryGroups} />
+            <SortComponents
+              componentList={categoryGroups}
+              onSave={(newGroups) =>
+                setServerData((prev) => ({
+                  ...prev,
+                  userData: {
+                    ...prev.userData,
+                    restaurant: {
+                      ...prev.userData.restaurant,
+                      menu: [{ ...prev.userData.restaurant.menu[0], categoryGroup: newGroups }, ...prev.userData.restaurant.menu.slice(1)],
+                    },
+                  },
+                }))
+              }
+            />
           </div>
 
           {/* Abo-Badge mit Live-Zähler */}

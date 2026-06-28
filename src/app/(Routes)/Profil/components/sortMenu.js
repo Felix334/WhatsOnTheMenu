@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 
-function SortComponents({ componentList }) {
+function SortComponents({ componentList, onSave }) {
   const [groups, setGroups] = useState([...componentList].sort((a, b) => a.position - b.position));
-  if(process.env.NODE_ENV === "development"){
-      console.log("Sort-Check:", componentList);
-  }
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setGroups([...componentList].sort((a, b) => a.position - b.position));
+  }, [componentList]);
 
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
@@ -50,15 +53,33 @@ function SortComponents({ componentList }) {
     dragOverItem.current = null;
   };
 
-  const handleSave = () => {
-    fetch("/api/user/profil/sortMenu", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        groups: groups.map((g) => ({ id: g.id, position: g.position })),
-        categories: groups.flatMap((g) => g.categories.map((c) => ({ id: c.id, position: c.position }))),
-      }),
-    });
+  const handleSave = async () => {
+    const ordered = groups.map((g, i) => ({
+      ...g,
+      position: i,
+      categories: [...g.categories].sort((a, b) => a.position - b.position).map((c, j) => ({ ...c, position: j })),
+    }));
+    const snapshot = componentList;
+
+    onSave?.(ordered);
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/user/profil/sortMenu", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          groups: ordered.map((g) => ({ id: g.id, position: g.position })),
+          categories: ordered.flatMap((g) => g.categories.map((c) => ({ id: c.id, position: c.position }))),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Reihenfolge gespeichert");
+    } catch {
+      onSave?.(snapshot);
+      toast.error("Fehler beim Speichern der Reihenfolge");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -115,7 +136,9 @@ function SortComponents({ componentList }) {
             <Button variant="outline">Abbrechen</Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button onClick={handleSave}>Speichern</Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? "Speichern..." : "Speichern"}
+            </Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
