@@ -217,7 +217,7 @@ function HomeContent() {
                       </Button>
                       {status === "authenticated" || userID ? null : (
                         <Button
-                          variant="outlined"
+                          variant="outline"
                           aria-label="Log in"
                           onClick={() => {
                             setMobileMenuOpen(false);
@@ -236,14 +236,14 @@ function HomeContent() {
 
         <main>
           {/* Hero Section */}
-          <section className="gradient-bg text-white py-20">
+          <section className="gradient-bg text-black py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Digitale Speisekarten in <span className="text-yellow-300">wenigen Minuten</span> erstellen
+                    Digitale Speisekarten in <span className="text-red-800">wenigen Minuten</span> erstellen
                   </h1>
-                  <p className="text-xl mb-8 text-white/80">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-black/80">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
                       <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-8 py-3 h-auto shadow-lg">
@@ -256,22 +256,22 @@ function HomeContent() {
                       </Button>
                     )}
                   </div>
-                  <div className="mt-8 flex items-center space-x-6 text-sm text-white/70">
+                  <div className="mt-8 flex items-center space-x-6 text-sm text-red-800">
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
                       Kostenlose Standardversion verfügbar
                     </div>
                     <div className="flex items-center">
                       <span className="text-green-300 mr-2">✓</span>
-                      Keine Kreditkarte nötig
+                      Übersichtliche Gestaltung für ihre Kunden
                     </div>
                   </div>
                 </div>
 
                 {/* Produkt-Vorschau rechts */}
                 <div className="hidden lg:flex justify-center items-center">
-                  <div className="relative floating">
-                    <div className="menu-card rounded-2xl p-4 shadow-2xl">
+                  <div className="relative">
+                    <div className="menu-card">
                       <Image
                         src={SpeiseKarteLaptop}
                         alt="Digitale Speisekarte Vorschau"
