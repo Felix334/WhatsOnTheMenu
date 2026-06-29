@@ -20,6 +20,10 @@ export async function GET(req, { params }) {
       return NextResponse.json({ message: "Nicht gefunden" }, { status: 404 });
     }
 
+    if (token.subscription !== "Professional") {
+      return NextResponse.json({ message: "Professional-Abonnement erforderlich" }, { status: 403 });
+    }
+
     return NextResponse.json({ order });
   } catch (err) {
     console.error(err);

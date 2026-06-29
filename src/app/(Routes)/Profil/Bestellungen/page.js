@@ -124,6 +124,26 @@ function BestellungenContent() {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Kein Zugriff</div>;
   }
 
+  if (session.user.subscription !== "Professional") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
+          <p className="text-4xl">🔒</p>
+          <h2 className="text-xl font-bold text-gray-900">Professional-Abo erforderlich</h2>
+          <p className="text-gray-500 text-sm">
+            Die Bestellfunktion ist ausschließlich für Professional-Abonnenten verfügbar.
+          </p>
+          <a
+            href="/pricing"
+            className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors"
+          >
+            Jetzt upgraden
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const pending = orders.filter((o) => o.status === "pending");
   const confirmed = orders.filter((o) => o.status === "confirmed");
 
