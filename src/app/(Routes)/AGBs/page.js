@@ -149,29 +149,22 @@ const sections = [
 
 export default function AGBsPage() {
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="w-full bg-gradient-to-r from-amber-700 via-orange-600 to-amber-600 text-white py-12 px-4 text-center">
-        <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">
+      <div className="w-full bg-linear-to-br from-red-900 to-gray-950 text-white py-12 px-4 text-center">
+        <p className="text-white/60 uppercase tracking-widest text-xs font-semibold mb-2">
           WhatIsOnMyMenu.com
         </p>
         <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-wide drop-shadow">
           Allgemeine Geschäftsbedingungen
         </h1>
-        <p className="mt-3 text-amber-100 text-sm">Stand: {LAST_UPDATED}</p>
-      </div>
-
-      {/* Hinweis-Banner */}
-      <div className="max-w-3xl mx-auto px-4 pt-8">
-        <div className="bg-amber-100 border border-amber-300 rounded-xl px-5 py-4 text-sm text-amber-800">
-          <strong>Hinweis:</strong> Diese AGBs wurden für informatorische Zwecke erstellt. Bitte lassen Sie sie vor der Veröffentlichung von einem Rechtsanwalt prüfen.
-        </div>
+        <p className="mt-3 text-white/60 text-sm">Stand: {LAST_UPDATED}</p>
       </div>
 
       {/* Inhalt */}
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6 pb-16">
         {sections.map((section) => (
-          <div key={section.title} className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+          <div key={section.title} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
               {section.title}
             </h2>
@@ -186,10 +179,10 @@ export default function AGBsPage() {
         ))}
 
         {/* Footer-Info */}
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8 text-sm text-gray-500 space-y-1">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 text-sm text-gray-500 space-y-1">
           <p className="font-semibold text-gray-700">Anbieter</p>
           <p>WhatIsOnMyMenu.com</p>
-          <p>E-Mail: <a href="mailto:" className="text-amber-600 hover:underline"></a></p>
+          <p>E-Mail: <a href="mailto:" className="text-red-700 hover:underline"></a></p>
         </div>
       </main>
     </div>

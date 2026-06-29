@@ -2,26 +2,26 @@ const LAST_UPDATED = "31. Mai 2026";
 
 export default function ImprintPage() {
   return (
-    <div className="min-h-screen bg-amber-50">
-      <div className="w-full bg-gradient-to-r from-amber-700 via-orange-600 to-amber-600 text-white py-12 px-4 text-center">
-        <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">
+    <div className="min-h-screen bg-gray-50">
+      <div className="w-full bg-linear-to-br from-red-900 to-gray-950 text-white py-12 px-4 text-center">
+        <p className="text-white/60 uppercase tracking-widest text-xs font-semibold mb-2">
           WhatIsOnMyMenu.com
         </p>
         <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-wide drop-shadow">
           Impressum
         </h1>
-        <p className="mt-3 text-amber-100 text-sm">Stand: {LAST_UPDATED}</p>
+        <p className="mt-3 text-white/60 text-sm">Stand: {LAST_UPDATED}</p>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 pt-8">
-        <div className="bg-amber-100 border border-amber-300 rounded-xl px-5 py-4 text-sm text-amber-800">
+        <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-sm text-red-800">
           <strong>Hinweis:</strong> Ersetzen Sie alle Angaben in eckigen Klammern durch Ihre tatsächlichen Daten. Das Impressum ist gesetzlich verpflichtend (§ 5 TMG).
         </div>
       </div>
 
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6 pb-16">
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Angaben gemäß § 5 TMG
           </h2>
@@ -33,21 +33,21 @@ export default function ImprintPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Kontakt
           </h2>
           <div className="text-sm text-gray-600 space-y-1">
             <p>
               E-Mail:{" "}
-              <a href="mailto:" className="text-amber-600 hover:underline">
+              <a href="mailto:" className="text-red-700 hover:underline">
                 [DEINE E-MAIL-ADRESSE]
               </a>
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Umsatzsteuer-ID
           </h2>
@@ -56,7 +56,7 @@ export default function ImprintPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
           </h2>
@@ -67,7 +67,7 @@ export default function ImprintPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Streitschlichtung
           </h2>
@@ -78,7 +78,7 @@ export default function ImprintPage() {
                 href="https://ec.europa.eu/consumers/odr/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-amber-600 hover:underline"
+                className="text-red-700 hover:underline"
               >
                 https://ec.europa.eu/consumers/odr/
               </a>
@@ -89,7 +89,7 @@ export default function ImprintPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Haftung für Inhalte
           </h2>
@@ -98,7 +98,7 @@ export default function ImprintPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Haftung für Links
           </h2>
@@ -107,7 +107,7 @@ export default function ImprintPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-100 p-6 sm:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
             Urheberrecht
           </h2>
