@@ -5,7 +5,7 @@ const sections = [
     title: "1. Verantwortlicher",
     content: [
       "Verantwortlicher im Sinne der DSGVO ist:",
-      "[DEIN VOLLSTÄNDIGER NAME]\n[STRASSE UND HAUSNUMMER]\n[PLZ ORT]\nDeutschland",
+      "Felix Mayer\nMühlenblick 16\n74372 Sersheim\nDeutschland",
       "E-Mail: [DEINE E-MAIL-ADRESSE]",
     ],
   },
@@ -41,7 +41,8 @@ const sections = [
     title: "5. Cookies",
     content: [
       "Wir setzen ausschließlich technisch notwendige Cookies ein, die für den Betrieb der Plattform erforderlich sind:",
-      "• Session-Cookies: Für die Verwaltung Ihrer Anmeldung (NextAuth.js). Diese werden nach Sitzungsende gelöscht.",
+      "• Session-Cookies: Für die Verwaltung Ihrer Anmeldung (NextAuth.js). Diese bleiben nach Sitzungsende erhalten.",
+      "• Zum Löschen der Session-Cookies bitte im Meü abmelden",
       "• Sicherheits-Cookies: Von Cloudflare zur Erkennung und Abwehr von Angriffen.",
       "• Zahlungs-Cookies: Von Stripe zur sicheren Abwicklung von Transaktionen.",
       "Da es sich ausschließlich um technisch notwendige Cookies handelt, ist für deren Einsatz keine Einwilligung erforderlich (§ 25 Abs. 2 TDDDG).",

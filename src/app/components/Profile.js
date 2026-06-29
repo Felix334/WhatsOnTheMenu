@@ -89,7 +89,7 @@ const Profile = () => {
 
               {role === "Admin" && <p className="text-red-600 font-bold">Admin</p>}
 
-              {role === "Owner" && <p className="text-blue-600 font-bold">Owner</p>}
+              {role === "Owner" && <p className="text-blue-600 font-bold">Restaurant-Besitzer</p>}
 
               {role === "Staff" && <p className="text-green-500 font-bold">Angestellter</p>}
             </div>
