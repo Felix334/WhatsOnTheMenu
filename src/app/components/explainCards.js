@@ -81,6 +81,7 @@ export default function ExplainCards() {
                 duration-300
                 hover:shadow-xl
                 hover:-translate-y-1
+                border-l-4 border-l-red-800
               "
             >
               <CardHeader>

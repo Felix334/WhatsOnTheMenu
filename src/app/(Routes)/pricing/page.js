@@ -72,11 +72,11 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 py-20">
+    <div className="min-h-screen bg-gray-50 py-20">
       <div className="max-w-6xl mx-auto px-4">
         {/* Hero */}
         <div className="text-center mb-14">
-          <p className="text-amber-600 uppercase tracking-widest text-xs font-semibold mb-3">Preise</p>
+          <p className="text-red-700 uppercase tracking-widest text-xs font-semibold mb-3">Preise</p>
           <h1 className="text-4xl sm:text-5xl font-serif font-bold text-gray-900 mb-4">Wähle deinen Tarif</h1>
           <p className="text-gray-500 max-w-md mx-auto">Starte kostenlos und wechsle jederzeit. Keine versteckten Kosten.</p>
         </div>
@@ -111,7 +111,7 @@ export default function PricingPage() {
               </ul>
               <Button
                 variant="outline"
-                className="w-full border-gray-300 hover:border-amber-400 hover:text-amber-700"
+                className="w-full border-gray-300 hover:border-red-400 hover:text-red-700"
                 onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")}
               >
                 Jetzt starten
@@ -120,24 +120,24 @@ export default function PricingPage() {
           </Card>
 
           {/* Pro Tier — hervorgehoben */}
-          <Card className="border-2 border-amber-500 bg-white hover:shadow-2xl transition-all duration-300 relative scale-105 shadow-xl">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">
+          <Card className="border-2 border-red-800 bg-white hover:shadow-2xl transition-all duration-300 relative scale-105 shadow-xl">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-red-800 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">
               ⭐ Empfohlen
             </div>
             <CardHeader className="pb-2 pt-7">
-              <p className="text-xs font-semibold uppercase tracking-widest text-amber-500 mb-1">Beliebteste Wahl</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-red-700 mb-1">Beliebteste Wahl</p>
               <CardTitle className="text-2xl font-bold">Pro</CardTitle>
               <CardDescription>Unbegrenzte Möglichkeiten</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-amber-600">€14.99</span>
+                <span className="text-5xl font-bold text-red-800">€14.99</span>
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
                 {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Mehrere Standorte"].map(f => (
                   <li key={f} className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
                   </li>
                 ))}
@@ -151,7 +151,7 @@ export default function PricingPage() {
                 <DialogTrigger asChild>
                   <Button
                     size="lg"
-                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow"
+                    className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow"
                   >
                     Jetzt Pro abonnieren
                   </Button>
@@ -238,9 +238,9 @@ export default function PricingPage() {
           </Card>
 
           {/* Premium Tier */}
-          <Card className="border border-orange-200 bg-white hover:shadow-lg transition-all duration-300">
+          <Card className="border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-orange-400 mb-1">Enterprise</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Enterprise</p>
               <CardTitle className="text-2xl font-bold">Premium</CardTitle>
               <CardDescription>Maximale Features & Support</CardDescription>
             </CardHeader>
@@ -252,7 +252,7 @@ export default function PricingPage() {
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
                 {["Bis zu 15 Kategorien", "Bis zu 100 Gerichte", "24/7 Premium Support", "Marketing Tools", "Analytics Dashboard"].map(f => (
                   <li key={f} className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
                   </li>
                 ))}
@@ -264,7 +264,7 @@ export default function PricingPage() {
               ) : (
               <Dialog open={showPremiumForm} onOpenChange={setShowPremiumForm}>
                 <DialogTrigger asChild>
-                  <Button size="lg" variant="outline" className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400">
+                  <Button size="lg" variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400">
                     Jetzt Premium abonnieren
                   </Button>
                 </DialogTrigger>

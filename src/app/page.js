@@ -236,14 +236,14 @@ function HomeContent() {
 
         <main>
           {/* Hero Section */}
-          <section className="gradient-bg text-black py-20 bg-white">
+          <section className="py-24 bg-linear-to-br from-red-900 to-gray-950 text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Digitale Speisekarten in <span className="text-red-800">wenigen Minuten</span> erstellen
+                    Digitale Speisekarten in <span className="text-red-300">wenigen Minuten</span> erstellen
                   </h1>
-                  <p className="text-xl mb-8 text-black/80">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-white/70">Erstellen sie professionelle, interaktive Speisekarten für ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
                       <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-8 py-3 h-auto shadow-lg">
@@ -251,18 +251,18 @@ function HomeContent() {
                       </Button>
                     )}
                     {!userID && (
-                      <Button variant="outline" className="border-white/50 text-black hover:text-white hover:bg-white/10 font-medium text-base px-8 py-3 h-auto" onClick={renderLoginW}>
+                      <Button variant="outline" className="border-white/50 text-white hover:bg-white/10 font-medium text-base px-8 py-3 h-auto" onClick={renderLoginW}>
                         Anmelden
                       </Button>
                     )}
                   </div>
-                  <div className="mt-8 flex items-center space-x-6 text-sm text-red-800">
+                  <div className="mt-8 flex items-center space-x-6 text-sm text-white/70">
                     <div className="flex items-center">
-                      <span className="text-green-300 mr-2">✓</span>
+                      <span className="text-green-400 mr-2">✓</span>
                       Kostenlose Standardversion verfügbar
                     </div>
                     <div className="flex items-center">
-                      <span className="text-green-300 mr-2">✓</span>
+                      <span className="text-green-400 mr-2">✓</span>
                       Übersichtliche Gestaltung für ihre Kunden
                     </div>
                   </div>
@@ -271,7 +271,7 @@ function HomeContent() {
                 {/* Produkt-Vorschau rechts */}
                 <div className="hidden lg:flex justify-center items-center">
                   <div className="relative">
-                    <div className="menu-card">
+                    <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10">
                       <Image
                         src={SpeiseKarteLaptop}
                         alt="Digitale Speisekarte Vorschau"
@@ -312,7 +312,7 @@ function HomeContent() {
                     <a href="/ErstelleRestaurantAccount/FreeTier">Kostenlos loslegen</a>
                   </Button>
                 )}
-                <Button asChild variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
+                <Button asChild variant="outline" className="border-white/50 text-white hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
                   <a href="#pricing">Preise ansehen</a>
                 </Button>
               </div>
@@ -360,7 +360,7 @@ function HomeContent() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="border-2 relative bg-amber-400 text-black">
+                <Card className="border-2 border-amber-400 relative">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
@@ -402,24 +402,24 @@ function HomeContent() {
                   <CardContent>
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>
+                        <span className="text-green-400 mr-2">✓</span>
                         Bis zu 25 Kategorien
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>Bis zu 200 Gerichte
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Premium Templates
+                        <span className="text-green-400 mr-2">✓</span>Premium Templates
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>QR-Code
+                        <span className="text-green-400 mr-2">✓</span>QR-Code
                       </li>
 
                       <li>
-                        <span className="text-green-300 mr-2">✓</span>Management-System
+                        <span className="text-green-400 mr-2">✓</span>Management-System
                       </li>
                       <li>
-                        <span className="text-green-300 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
+                        <span className="text-green-400 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
                       </li>
                     </ul>
                   </CardContent>
@@ -443,7 +443,7 @@ function HomeContent() {
                         Eigene Domain
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-300 mr-2">✓</span>Analytics
+                        <span className="text-green-400 mr-2">✓</span>Analytics
                       </li>
                     </ul>
 

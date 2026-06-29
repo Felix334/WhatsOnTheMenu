@@ -114,7 +114,7 @@ const GUEST_POINTS = [
 function SectionHeading({ eyebrow, title, subtitle }) {
   return (
     <div className="text-center max-w-2xl mx-auto mb-12">
-      <p className="text-amber-600 uppercase tracking-widest text-xs font-semibold mb-3">{eyebrow}</p>
+      <p className="text-red-700 uppercase tracking-widest text-xs font-semibold mb-3">{eyebrow}</p>
       <h2 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-4">{title}</h2>
       {subtitle && <p className="text-gray-500">{subtitle}</p>}
     </div>
@@ -125,21 +125,21 @@ export default function Page() {
   return (
     <main className="bg-white">
       {/* ─── Hero ─────────────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 px-4 py-24">
+      <section className="bg-linear-to-br from-red-900 to-gray-950 px-4 py-24">
         <div className="max-w-3xl mx-auto text-center">
-          <Badge className="bg-amber-500/10 text-amber-700 border-amber-200 mb-5">{"So funktioniert's"}</Badge>
-          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-gray-900 mb-5 leading-tight">
+          <Badge className="bg-white/10 text-white border-white/20 mb-5">{"So funktioniert's"}</Badge>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-5 leading-tight">
             Deine digitale Speisekarte –<br className="hidden sm:block" /> in wenigen Minuten startklar
           </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
+          <p className="text-lg text-white/70 mb-8 max-w-xl mx-auto">
             Mit WhatIsOnMyMenu erstellst du eine digitale Speisekarte, die deine Gäste per QR-Code direkt am Tisch
             öffnen – ohne App, ohne Papier, jederzeit aktuell.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
+            <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow-lg">
               Kostenlos starten
             </DynamicLinkButton>
-            <DynamicLinkButton size="lg" variant="outline" href="/pricing" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+            <DynamicLinkButton size="lg" variant="outline" href="/pricing" className="border-white/50 text-white hover:bg-white/10">
               Alle Tarife ansehen
             </DynamicLinkButton>
           </div>
@@ -157,7 +157,7 @@ export default function Page() {
           {STEPS.map((step) => (
             <Card key={step.number} className="relative border-gray-100 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-lg mb-4 shadow">
+                <div className="flex items-center justify-center w-11 h-11 rounded-full bg-red-800 text-white font-bold text-lg mb-4 shadow">
                   {step.number}
                 </div>
                 <div className="text-2xl mb-2">{step.icon}</div>
@@ -217,20 +217,20 @@ export default function Page() {
             title="Starte kostenlos – wachse, wenn du bereit bist"
             subtitle="Im Free-Tarif baust du deine digitale Karte mit QR-Code völlig kostenlos. Mehr Kategorien, Gerichte und Funktionen schaltest du jederzeit mit einem Upgrade frei."
           />
-          <DynamicLinkButton size="lg" href="/pricing" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow">
+          <DynamicLinkButton size="lg" href="/pricing" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow">
             Tarife vergleichen
           </DynamicLinkButton>
         </div>
       </section>
 
       {/* ─── Abschluss-CTA ────────────────────────────────────── */}
-      <section className="bg-gradient-to-br from-amber-500 to-orange-600 px-4 py-20">
+      <section className="bg-red-800 px-4 py-20">
         <div className="max-w-2xl mx-auto text-center text-white">
           <h2 className="text-3xl sm:text-4xl font-serif font-bold mb-4">Bereit für deine digitale Speisekarte?</h2>
-          <p className="text-amber-50 mb-8 text-lg">
+          <p className="text-red-100 mb-8 text-lg">
             Erstelle dein Restaurant kostenlos und teile deine Karte noch heute per QR-Code mit deinen Gästen.
           </p>
-          <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-white text-amber-700 hover:bg-amber-50 font-semibold shadow-lg">
+          <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow-lg">
             Jetzt kostenlos starten
           </DynamicLinkButton>
         </div>
