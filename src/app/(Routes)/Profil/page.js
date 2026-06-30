@@ -305,6 +305,7 @@ export default function PageBuilder() {
   };
 
   const goBackBtn = () => {
+    markUserAnsichtNavigation();
     router.push("../");
   };
 
@@ -837,7 +838,7 @@ export default function PageBuilder() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" onClick={markUserAnsichtNavigation}>
               <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>🍽️ Bestellungen</Link>
             </Button>
             <Button asChild onClick={markUserAnsichtNavigation}>
