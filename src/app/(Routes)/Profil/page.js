@@ -27,7 +27,7 @@ import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
 import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
-import { useRestaurantData } from "./components/fetchData";
+import { useRestaurantData, markUserAnsichtNavigation } from "./components/fetchData";
 import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
@@ -840,7 +840,7 @@ export default function PageBuilder() {
             <Button asChild variant="outline">
               <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>🍽️ Bestellungen</Link>
             </Button>
-            <Button asChild>
+            <Button asChild onClick={markUserAnsichtNavigation}>
               <Link
                 href={{
                   pathname: "/UnserePartner/Restaurants/Menu",

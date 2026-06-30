@@ -2,6 +2,17 @@ import { useEffect, useState, useCallback } from "react";
 
 let cachedData = null;
 
+const consumeSkipFlag = () => {
+  if (typeof window === "undefined") return false;
+  const skip = sessionStorage.getItem("profil_skip_refetch") === "1";
+  if (skip) sessionStorage.removeItem("profil_skip_refetch");
+  return skip;
+};
+
+export const markUserAnsichtNavigation = () => {
+  if (typeof window !== "undefined") sessionStorage.setItem("profil_skip_refetch", "1");
+};
+
 const fetchRestaurantData = async (userID, signal) => {
   const response = await fetch("/api/user/profil/getData", {
     method: "POST",
@@ -44,6 +55,13 @@ export const useRestaurantData = (userID) => {
 
   useEffect(() => {
     if (!userID) return;
+
+    // Skip refetch when returning from User-Ansicht and cache is warm
+    if (cachedData !== null && consumeSkipFlag()) {
+      setIsLoading(false);
+      return;
+    }
+
     const controller = new AbortController();
 
     (async () => {
