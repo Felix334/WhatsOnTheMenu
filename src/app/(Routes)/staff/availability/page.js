@@ -8,7 +8,6 @@ import Link from "next/link";
 function AvailabilityContent() {
   const searchParams = useSearchParams();
   const restaurantID = searchParams.get("restaurantID");
-  const { data: session, status } = useSession();
 
   const [menu, setMenu] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,13 +15,17 @@ function AvailabilityContent() {
   const [updating, setUpdating] = useState({});
 
   useEffect(() => {
-    if (!restaurantID) return;
+    if (!restaurantID) {
+      setError("Keine Restaurant-ID");
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
+    setError(null);
     fetch(`/api/staff/availability/${restaurantID}`)
       .then(async (r) => {
         const data = await r.json();
-        if (process.env.NODE_ENV === "development") console.log("Daten:", data)
         if (!r.ok) throw new Error(data.error || "Fehler beim Laden");
         return data;
       })
@@ -90,18 +93,10 @@ function AvailabilityContent() {
     }
   };
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-400">
         Laden...
-      </div>
-    );
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Bitte einloggen.</p>
       </div>
     );
   }
@@ -118,14 +113,8 @@ function AvailabilityContent() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="max-w-sm w-full bg-white rounded-2xl border border-red-200 p-6 text-center space-y-4 shadow-sm">
-          <p className="text-3xl">🔒</p>
+          <p className="text-3xl">⚠️</p>
           <p className="font-semibold text-gray-800">{error}</p>
-          {error.toLowerCase().includes("professional") && (
-            <p className="text-sm text-gray-500">
-              Die Verfügbarkeitsverwaltung ist nur mit einem{" "}
-              <strong>Professional-Abonnement</strong> verfügbar.
-            </p>
-          )}
           <Link
             href="/staff"
             className="block w-full bg-gray-900 text-white font-semibold rounded-xl px-4 py-3 hover:bg-gray-700 transition-colors"
@@ -269,6 +258,31 @@ function AvailabilityContent() {
 }
 
 export default function AvailabilityPage() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div className="min-h-screen flex items-center justify-center text-gray-400">Laden...</div>;
+  }
+
+  if (!session) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Kein Zugriff</div>;
+  }
+
+  if (session.user.subscription !== "Professional") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
+          <p className="text-4xl">🔒</p>
+          <h2 className="text-xl font-bold text-gray-900">Professional-Abo erforderlich</h2>
+          <p className="text-gray-500 text-sm">Die Verfügbarkeitsverwaltung ist ausschließlich für Professional-Abonnenten verfügbar.</p>
+          <a href="/pricing" className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+            Jetzt upgraden
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Laden...</div>}>
       <AvailabilityContent />

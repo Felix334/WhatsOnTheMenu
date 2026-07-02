@@ -122,6 +122,19 @@ export const authOptions: NextAuthOptions = {
           token.restaurantId = restaurant?.id ?? undefined;
         } else if (memberships.length > 0) {
           token.restaurantId = memberships[0].restaurantId;
+
+          // Staff bekommt die Subscription des Restaurant-Owners in die Session
+          const restaurant = await prisma.restaurant.findUnique({
+            where: { id: memberships[0].restaurantId },
+            select: { ownerId: true },
+          });
+          if (restaurant?.ownerId) {
+            const owner = await prisma.user.findUnique({
+              where: { id: restaurant.ownerId },
+              select: { subscription: true },
+            });
+            if (owner?.subscription) token.subscription = owner.subscription;
+          }
         }
       }
       return token;
