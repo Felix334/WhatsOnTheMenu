@@ -245,7 +245,7 @@ export default function PageBuilder() {
     const updatedData = { ...data, items: updatedItems };
     submitToServer(updatedData);
     setOpenEditor(false);
-    setSelectedFiles({}); // Clear selected files after adding section
+    setSelectedFiles({});
   };
 
   const submitData = async () => {

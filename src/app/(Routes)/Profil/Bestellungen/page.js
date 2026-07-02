@@ -22,9 +22,7 @@ function OrderCard({ order, onStatusChange }) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-lg font-semibold">Tisch {order.tableNumber}</span>
-          <span className={`ml-3 text-xs font-medium px-2 py-0.5 rounded-full border ${STATUS_COLOR[order.status]}`}>
-            {STATUS_LABEL[order.status]}
-          </span>
+          <span className={`ml-3 text-xs font-medium px-2 py-0.5 rounded-full border ${STATUS_COLOR[order.status]}`}>{STATUS_LABEL[order.status]}</span>
         </div>
         <span className="text-xs text-gray-400 shrink-0">{age === 0 ? "gerade eben" : `vor ${age} Min.`}</span>
       </div>
@@ -32,7 +30,9 @@ function OrderCard({ order, onStatusChange }) {
       <ul className="space-y-1 text-sm text-gray-700">
         {items.map((item, i) => (
           <li key={i} className="flex justify-between">
-            <span>{item.quantity}× {item.name}</span>
+            <span>
+              {item.quantity}× {item.name}
+            </span>
             <span className="font-mono text-gray-500">{(item.price * item.quantity).toFixed(2)} €</span>
           </li>
         ))}
@@ -42,26 +42,16 @@ function OrderCard({ order, onStatusChange }) {
         </li>
       </ul>
 
-      {order.note && (
-        <p className="text-sm text-gray-500 italic bg-gray-50 rounded-xl px-3 py-2">
-          📝 {order.note}
-        </p>
-      )}
+      {order.note && <p className="text-sm text-gray-500 italic bg-gray-50 rounded-xl px-3 py-2">📝 {order.note}</p>}
 
       <div className="flex gap-2 pt-1">
         {order.status === "pending" && (
-          <button
-            onClick={() => onStatusChange(order.id, "confirmed")}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl py-2 transition-colors"
-          >
+          <button onClick={() => onStatusChange(order.id, "confirmed")} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl py-2 transition-colors">
             Annehmen
           </button>
         )}
         {(order.status === "pending" || order.status === "confirmed") && (
-          <button
-            onClick={() => onStatusChange(order.id, "done")}
-            className="flex-1 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl py-2 transition-colors"
-          >
+          <button onClick={() => onStatusChange(order.id, "done")} className="flex-1 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-xl py-2 transition-colors">
             Erledigt ✓
           </button>
         )}
@@ -69,14 +59,28 @@ function OrderCard({ order, onStatusChange }) {
     </div>
   );
 }
+function wrongSub() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
+        <p className="text-4xl">🔒</p>
+        <h2 className="text-xl font-bold text-gray-900">Professional-Abo erforderlich</h2>
+        <p className="text-gray-500 text-sm">Die Bestellfunktion ist ausschließlich für Professional-Abonnenten verfügbar.</p>
+        <a href="/pricing" className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+          Jetzt upgraden
+        </a>
+      </div>
+    </div>
+  );
+}
 
 function BestellungenContent() {
-  const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const restaurantID = searchParams.get("restaurantID");
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
 
   const fetchOrders = useCallback(async () => {
     if (!restaurantID) return;
@@ -92,10 +96,34 @@ function BestellungenContent() {
   }, [restaurantID]);
 
   useEffect(() => {
+    if (!session || session.user.subscription !== "Professional") return;
     fetchOrders();
     const interval = setInterval(fetchOrders, 15000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
+  }, [fetchOrders, session]);
+
+  if (!session) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Kein Zugriff</div>;
+  }
+
+  if (session.user.subscription !== "Professional") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
+          <p className="text-4xl">🔒</p>
+          <h2 className="text-xl font-bold text-gray-900">Professional-Abo erforderlich</h2>
+          <p className="text-gray-500 text-sm">Die Bestellfunktion ist ausschließlich für Professional-Abonnenten verfügbar.</p>
+          <a href="/pricing" className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+            Jetzt upgraden
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "loading" || loading) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Laden...</div>;
+  }
 
   const handleStatusChange = async (orderId, newStatus) => {
     const res = await fetch(`/api/orders/${orderId}/status`, {
@@ -116,72 +144,49 @@ function BestellungenContent() {
     }
   };
 
-  if (status === "loading" || loading) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Laden...</div>;
-  }
-
-  if (!session) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Kein Zugriff</div>;
-  }
-
-  if (session.user.subscription !== "Professional") {
+  const pending = orders.filter((o) => o.status === "pending");
+  const confirmed = orders.filter((o) => o.status === "confirmed");
+  if (session.user.subscription === "Professional") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
-          <p className="text-4xl">🔒</p>
-          <h2 className="text-xl font-bold text-gray-900">Professional-Abo erforderlich</h2>
-          <p className="text-gray-500 text-sm">
-            Die Bestellfunktion ist ausschließlich für Professional-Abonnenten verfügbar.
-          </p>
-          <a
-            href="/pricing"
-            className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors"
-          >
-            Jetzt upgraden
-          </a>
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">Bestellungen</h1>
+            <button onClick={fetchOrders} className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 rounded-xl px-3 py-1.5 bg-white transition-colors">
+              Aktualisieren
+            </button>
+          </div>
+
+          {orders.length === 0 ? (
+            <div className="text-center py-20 text-gray-400">
+              <p className="text-4xl mb-3">🍽️</p>
+              <p className="font-medium">Keine offenen Bestellungen</p>
+              <p className="text-sm mt-1">Aktualisiert automatisch alle 15 Sekunden</p>
+            </div>
+          ) : (
+            <>
+              {pending.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-semibold text-amber-700 uppercase tracking-wide">Neu ({pending.length})</h2>
+                  {pending.map((o) => (
+                    <OrderCard key={o.id} order={o} onStatusChange={handleStatusChange} />
+                  ))}
+                </div>
+              )}
+              {confirmed.length > 0 && (
+                <div className="space-y-3">
+                  <h2 className="text-sm font-semibold text-blue-700 uppercase tracking-wide">In Bearbeitung ({confirmed.length})</h2>
+                  {confirmed.map((o) => (
+                    <OrderCard key={o.id} order={o} onStatusChange={handleStatusChange} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     );
   }
-
-  const pending = orders.filter((o) => o.status === "pending");
-  const confirmed = orders.filter((o) => o.status === "confirmed");
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Bestellungen</h1>
-          <button onClick={fetchOrders} className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 rounded-xl px-3 py-1.5 bg-white transition-colors">
-            Aktualisieren
-          </button>
-        </div>
-
-        {orders.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-4xl mb-3">🍽️</p>
-            <p className="font-medium">Keine offenen Bestellungen</p>
-            <p className="text-sm mt-1">Aktualisiert automatisch alle 15 Sekunden</p>
-          </div>
-        ) : (
-          <>
-            {pending.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-amber-700 uppercase tracking-wide">Neu ({pending.length})</h2>
-                {pending.map((o) => <OrderCard key={o.id} order={o} onStatusChange={handleStatusChange} />)}
-              </div>
-            )}
-            {confirmed.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold text-blue-700 uppercase tracking-wide">In Bearbeitung ({confirmed.length})</h2>
-                {confirmed.map((o) => <OrderCard key={o.id} order={o} onStatusChange={handleStatusChange} />)}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </div>
-  );
 }
 
 export default function Bestellungen() {

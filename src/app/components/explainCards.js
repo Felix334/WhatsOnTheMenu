@@ -36,7 +36,7 @@ const features = [
   {
     icon: "⚡",
     title: "Verfügbarkeits-Updates",
-    description: "Zeigen sie Ihren Kunden ob ein Gericht verfügbar ist oder nocht, kein unnöties Fragen mehr nötig.",
+    description: "Zeigen sie Ihren Kunden ob ein Gericht verfügbar ist oder nicht, kein unnöties Fragen mehr nötig.",
   },
   {
     icon: "📊",
