@@ -7,10 +7,6 @@ const isProd = process.env.VERCEL_ENV
 const secretKey = isProd
   ? process.env.STRIPE_SECRET_KEY
   : (process.env.STRIPE_SECRET_KEY_TEST ?? process.env.STRIPE_SECRET_KEY);
-//const publicKey = isProd
-//  ? process.env.STRIPE_PUBLIC_KEY
-//  : (process.env.STRIPE_PUBLIC_KEY_TEST ?? process.env.STRIPE_PUBLIC_KEY);
-
 
 if (!secretKey) {
   throw new Error("Missing Stripe secret key:");
