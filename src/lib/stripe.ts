@@ -1,7 +1,16 @@
 import Stripe from "stripe";
 
-const secretKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_SECRET_KEY : (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_SECRET_KEY_TEST);
-//const publicKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_PUBLIC_KEY : (process.env.STRIPE_PUBLIC_KEY ?? process.env.STRIPE_PUBLIC_KEY_TEST);
+const isProd = process.env.VERCEL_ENV
+  ? process.env.VERCEL_ENV === "production"
+  : process.env.NODE_ENV === "production";
+
+const secretKey = isProd
+  ? process.env.STRIPE_SECRET_KEY
+  : (process.env.STRIPE_SECRET_KEY_TEST ?? process.env.STRIPE_SECRET_KEY);
+//const publicKey = isProd
+//  ? process.env.STRIPE_PUBLIC_KEY
+//  : (process.env.STRIPE_PUBLIC_KEY_TEST ?? process.env.STRIPE_PUBLIC_KEY);
+
 
 if (!secretKey) {
   throw new Error("Missing Stripe secret key:");
