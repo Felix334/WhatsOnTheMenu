@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 
-//const secretKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_SECRET_KEY : (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_SECRET_KEY_TEST);
-const secretKey = process.env.STRIPE_SECRET_KEY;
+const secretKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_SECRET_KEY : (process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_SECRET_KEY_TEST);
+//const publicKey = process.env.NODE_ENV === "production" ? process.env.STRIPE_PUBLIC_KEY : (process.env.STRIPE_PUBLIC_KEY ?? process.env.STRIPE_PUBLIC_KEY_TEST);
 
 if (!secretKey) {
   throw new Error("Missing Stripe secret key:");

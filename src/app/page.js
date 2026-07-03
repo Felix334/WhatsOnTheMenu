@@ -52,6 +52,13 @@ function HomeContent() {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+  const switchEnv = () => {
+    if(process.env.NODE_ENV === "development"){
+      console.log("Dev-Modus:", process.env.NODE_ENV)
+    }else{
+      console.log("Livemodus:", process.env.NODE_ENV)
+    }
+  }
 
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
@@ -111,6 +118,7 @@ function HomeContent() {
               </div>
               <div className="flex items-center justify-center md:justify-start">
                 <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatIsOnMyMenu.com</div>
+                <Button onClick={(switchEnv())}>Check-Var</Button>
               </div>
               <div className="hidden right-0 md:block">
                 <NavigationMenu>
