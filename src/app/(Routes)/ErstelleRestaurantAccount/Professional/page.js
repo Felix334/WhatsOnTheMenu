@@ -364,9 +364,6 @@ function RestaurantForm() {
     </section>
   );
 }
-
-// 🔒 Professional ist noch nicht fertig → komplett gesperrt.
-// Zum Freischalten: <LockedNotice /> unten durch <RestaurantForm /> ersetzen.
 function LockedNotice() {
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();

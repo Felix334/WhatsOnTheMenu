@@ -107,10 +107,9 @@ export default function PageBuilder() {
         setAllowPremiumColor(true);
         setAllowAvailability(true);
         break;
-      case "Individuell":
-        setLimit(TierSystem.Individuell);
+      case "Business":
+        setLimit(TierSystem.Business);
         setAllowPremiumColor(true);
-        setAllowAvailability(true);
         break;
       default:
         setLimit(TierSystem.FreeTier);
