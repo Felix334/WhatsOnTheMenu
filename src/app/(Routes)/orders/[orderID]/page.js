@@ -34,7 +34,7 @@ export default function OrderView() {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Laden...</div>;
   }
 
-  if (!session || session.user?.role !== "Owner") {
+  if (!session || !["Owner", "Staff"].includes(session.user?.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center space-y-2">

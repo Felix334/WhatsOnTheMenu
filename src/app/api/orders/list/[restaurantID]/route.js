@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getStaffAccess, can } from "@/lib/staffAuth";
+import { getStaffAccess } from "@/lib/staffAuth";
 
 export async function GET(req, { params }) {
   try {
     const { restaurantID } = await params;
-    const access = await getStaffAccess(req, restaurantID);
 
-    if (!access || !can(access, "orders")) {
+    // Wie beim Erstellen: jede Rolle außer "User" (Owner/Staff des Professional-
+    // Restaurants) darf die Bestellungen sehen.
+    const access = await getStaffAccess(req, restaurantID);
+    if (!access) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

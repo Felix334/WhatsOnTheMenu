@@ -18,7 +18,7 @@ const ROLE_COLORS = {
 };
 
 // ─── Mitarbeiter-Karte ────────────────────────────────────────────────────────
-function StaffCard({ entry, onApprove, onRemove }) {
+function StaffCard({ entry, onRemove }) {
   return (
     <div className={`flex items-center justify-between rounded-xl border px-4 py-3 ${entry.approved ? "bg-white" : "bg-amber-50 border-amber-200"}`}>
       <div className="space-y-0.5">
@@ -29,13 +29,9 @@ function StaffCard({ entry, onApprove, onRemove }) {
         </span>
       </div>
       <div className="flex gap-2 shrink-0">
-        {!entry.approved && entry.userId && (
-          <Button size="sm" onClick={() => onApprove(entry.id)}>
-            Genehmigen
-          </Button>
-        )}
-        {!entry.approved && !entry.userId && (
-          <span className="text-xs text-amber-600 font-medium self-center">Noch nicht registriert</span>
+        {/* Die Zustimmung trifft der eingeladene Mitarbeiter selbst – der Owner kann nicht mehr im Namen des Users genehmigen. */}
+        {!entry.approved && (
+          <span className="text-xs text-amber-600 font-medium self-center">Wartet auf Zustimmung</span>
         )}
         <Button size="sm" variant="outline" onClick={() => onRemove(entry.id)}>
           Entfernen
@@ -79,20 +75,6 @@ function StaffSection() {
     setLoading(false);
   };
 
-  const handleApprove = async (id) => {
-    const res = await fetch(`/api/restaurant/staff/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ approved: true }),
-    });
-    if (res.ok) {
-      setStaff((prev) => prev.map((s) => (s.id === id ? { ...s, approved: true } : s)));
-      toast.success("Mitarbeiter genehmigt");
-    } else {
-      toast.error("Fehler beim Genehmigen");
-    }
-  };
-
   const handleRemove = async (id) => {
     const res = await fetch(`/api/restaurant/staff/${id}`, { method: "DELETE" });
     if (res.ok) {
@@ -113,7 +95,7 @@ function StaffSection() {
         <CardHeader>
           <h2 className="text-base font-semibold">Mitarbeiter hinzufügen</h2>
           <p className="text-sm text-gray-500">
-            Der Mitarbeiter registriert sich mit dieser E-Mail-Adresse. Du genehmigst den Zugang anschließend hier.
+            Der Mitarbeiter registriert sich mit dieser E-Mail-Adresse und muss die Einladung anschließend selbst bestätigen. Erst danach ist der Zugang aktiv.
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -157,7 +139,7 @@ function StaffSection() {
                 Ausstehend ({pending.length})
               </h3>
               {pending.map((s) => (
-                <StaffCard key={s.id} entry={s} onApprove={handleApprove} onRemove={handleRemove} />
+                <StaffCard key={s.id} entry={s} onRemove={handleRemove} />
               ))}
             </div>
           )}
@@ -168,7 +150,7 @@ function StaffSection() {
                 Aktiv ({approved.length})
               </h3>
               {approved.map((s) => (
-                <StaffCard key={s.id} entry={s} onApprove={handleApprove} onRemove={handleRemove} />
+                <StaffCard key={s.id} entry={s} onRemove={handleRemove} />
               ))}
             </div>
           )}

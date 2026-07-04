@@ -52,6 +52,7 @@ export async function GET(req, { params }) {
                     elevated: true,
                     dishes: {
                       select: {
+                        id: true,
                         name: true,
                         description: true,
                         price: true,

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getStaffAccess, can } from "@/lib/staffAuth";
+import { getStaffAccess } from "@/lib/staffAuth";
 
 export async function PATCH(req, { params }) {
   try {
@@ -18,8 +18,10 @@ export async function PATCH(req, { params }) {
 
     if (!order) return NextResponse.json({ message: "Nicht gefunden" }, { status: 404 });
 
+    // Jede Rolle außer "User" (Owner/Staff des Professional-Restaurants) darf den
+    // Bestellstatus ändern.
     const access = await getStaffAccess(req, order.restaurantId);
-    if (!access || !can(access, "orders")) {
+    if (!access) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

@@ -9,7 +9,6 @@ const menuSchema = z.object({
       price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preis muss eine gültige Dezimalzahl mit bis zu 2 Nachkommastellen sein"),
 
       description: z.string().optional(),
-      image: z.string().optional(), // base64 oder URL
     })
   ),
 });

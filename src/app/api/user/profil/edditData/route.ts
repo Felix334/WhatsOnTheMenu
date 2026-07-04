@@ -202,7 +202,6 @@ export async function POST(req: NextRequest) {
                     name: item.name,
                     description: item.description ?? null,
                     price,
-                    imageUrl: item.image ?? null,
                   },
                 }),
               `dish.update (${item.name})`,

@@ -73,7 +73,9 @@ export default function PageBuilder() {
   const [heroColor, setHeroColor] = useState(null);
   const [heroTextColor, setHeroTextColor] = useState("#ffffff");
   const [savingHero, setSavingHero] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState({}); // { index: File }
+  // Ausgangswerte des Hero-Bereichs – dagegen wird beim Speichern verglichen,
+  // damit nur tatsächlich geänderte Felder ans Backend gehen.
+  const heroBaselineRef = useRef({ name: "", description: "", heroColor: null, heroTextColor: "#ffffff" });
 
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
@@ -121,10 +123,16 @@ export default function PageBuilder() {
 
   useEffect(() => {
     if (!serverData) return;
-    setHeroName(serverData?.userData?.restaurant?.name || "");
-    setHeroDescription(serverData?.userData?.restaurant?.menu?.[0]?.description || "");
-    setHeroColor(serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null);
-    setHeroTextColor(serverData?.userData?.restaurant?.menu?.[0]?.heroTextColor || "#ffffff");
+    const name = serverData?.userData?.restaurant?.name || "";
+    const description = serverData?.userData?.restaurant?.menu?.[0]?.description || "";
+    const heroColorVal = serverData?.userData?.restaurant?.menu?.[0]?.heroColor || null;
+    const heroTextColorVal = serverData?.userData?.restaurant?.menu?.[0]?.heroTextColor || "#ffffff";
+
+    setHeroName(name);
+    setHeroDescription(description);
+    setHeroColor(heroColorVal);
+    setHeroTextColor(heroTextColorVal);
+    heroBaselineRef.current = { name, description, heroColor: heroColorVal, heroTextColor: heroTextColorVal };
   }, [serverData]);
 
   const saveHero = async () => {
@@ -163,11 +171,11 @@ export default function PageBuilder() {
     defaultValues: {
       menu_col: "",
       menu_name: "",
-      items: [{ name: "", price: 0, description: "", image: "" }],
+      items: [{ name: "", price: 0, description: "" }],
     },
   });
 
-  const { control, handleSubmit, reset, watch, setValue } = form;
+  const { control, handleSubmit, reset } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "items" });
 
   const renderCategoryGroupEdit = (id) => {
@@ -208,43 +216,8 @@ export default function PageBuilder() {
   // Duplicate hook removed - using one above
 
   const onSubmit = async (data) => {
-    const updatedItems = await Promise.all(
-      data.items.map(async (item, index) => {
-        if (selectedFiles[index]) {
-          try {
-            const uploadData = new FormData();
-
-            uploadData.append("image", selectedFiles[index]);
-            uploadData.append("restaurantID", restaurantID);
-            uploadData.append("userID", userID);
-
-            const response = await fetch("/api/user/profil/uploadImg", {
-              method: "POST",
-              body: uploadData,
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-
-              return {
-                ...item,
-                image: result.path,
-              };
-            } else {
-              toast.error(`Bild-Upload fehlgeschlagen für Gericht ${index + 1}`);
-            }
-          } catch (error) {
-            console.error(error);
-          }
-        }
-        return item;
-      }),
-    );
-
-    const updatedData = { ...data, items: updatedItems };
-    submitToServer(updatedData);
+    submitToServer(data);
     setOpenEditor(false);
-    setSelectedFiles({});
   };
 
   const submitData = async () => {
@@ -294,7 +267,6 @@ export default function PageBuilder() {
       }
 
       toast.success("Daten erfolgreich gespeichert!");
-      setSelectedFiles({});
     } catch (err) {
       console.error("Failed to save data:", err);
       toast.error("Fehler beim Speichern: " + err.message);
@@ -457,42 +429,6 @@ export default function PageBuilder() {
                           </FormItem>
                         )}
                       />
-                      {/* File input: upload to server */}
-                      <FormField
-                        control={control}
-                        name={`items.${index}.image`}
-                        render={() => (
-                          <FormItem>
-                            <FormLabel className="pt-3">Bild</FormLabel>
-                            <FormControl>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (!file) return;
-
-                                  // nur merken — NICHT hochladen
-                                  setSelectedFiles((prev) => ({
-                                    ...prev,
-                                    [index]: file,
-                                  }));
-
-                                  // Preview anzeigen
-                                  const previewUrl = URL.createObjectURL(file);
-                                  setValue(`items.${index}.image`, previewUrl);
-                                }}
-                              />
-                            </FormControl>
-                            {watch(`items.${index}.image`) && (
-                              <div className="mt-2">
-                                <Image src={String(watch(`items.${index}.image`))} alt="Vorschau" width={200} height={150} className="mt-2 rounded-lg border" />
-                              </div>
-                            )}
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                       <Button type="button" variant="ghost" className="absolute top-2 right-2 text-red-500" onClick={() => remove(index)}>
                         Entfernen
                       </Button>
@@ -531,7 +467,7 @@ export default function PageBuilder() {
               type="button"
               variant="outline"
               onClick={() => {
-                append({ name: "", price: 0, description: "", image: "" });
+                append({ name: "", price: 0, description: "" });
               }}
             >
               Gericht hinzufügen

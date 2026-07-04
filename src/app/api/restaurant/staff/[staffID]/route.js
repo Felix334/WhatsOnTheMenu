@@ -22,23 +22,19 @@ export async function PATCH(req, { params }) {
   const entry = await verifyOwnership(token, staffID);
   if (!entry) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const { approved, role } = await req.json();
+  // Der Owner darf NUR die Rolle einer Einladung ändern. `approved` (= Zustimmung
+  // zur Rollenzuweisung) setzt ausschließlich der eingeladene User selbst über
+  // /api/restaurant/staff/invitations/[staffID]. Sonst könnte ein Owner fremden
+  // Accounts einseitig die globale Rolle überschreiben.
+  const { role } = await req.json();
 
   const updated = await prisma.restaurantStaff.update({
     where: { id: staffID },
     data: {
-      ...(approved !== undefined && { approved }),
       ...(role && ["manager", "waiter", "kitchen"].includes(role) && { role }),
     },
     include: { user: { select: { id: true, name: true, email: true } } },
   });
-
-  if (approved === true && updated.userId) {
-    await prisma.user.update({
-      where: { id: updated.userId },
-      data: { role: "Staff" },
-    });
-  }
 
   return NextResponse.json({ staff: updated });
 }
@@ -56,10 +52,19 @@ export async function DELETE(req, { params }) {
       where: { userId: entry.userId, approved: true },
     });
     if (remaining === 0) {
-      await prisma.user.update({
+      // Nur zurückstufen, wenn der Nutzer wirklich (nur) Staff ist.
+      // Owner/Admin niemals anfassen – deren globale Rolle hängt nicht an einer
+      // Restaurant-Mitgliedschaft.
+      const target = await prisma.user.findUnique({
         where: { id: entry.userId },
-        data: { role: "User" },
+        select: { role: true },
       });
+      if (target?.role === "Staff") {
+        await prisma.user.update({
+          where: { id: entry.userId },
+          data: { role: "User" },
+        });
+      }
     }
   }
 

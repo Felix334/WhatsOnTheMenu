@@ -23,7 +23,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
   const [editName, setEditName] = useState(false);
   const [editDescription, setEditDescription] = useState(false);
   const [editPrice, setEditPrice] = useState(false);
-  const [editImage, setEditImage] = useState(false);
 
   // ── Allergen-State ─────────────────────────────────────────────────────────
   const [selectedAllergens, setSelectedAllergens] = useState([]);
@@ -35,7 +34,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       name: selectedItem?.name || "",
       description: selectedItem?.description || "",
       price: selectedItem?.price || 0,
-      Bild: "",
     },
   });
   const { control, handleSubmit, reset, watch } = form;
@@ -48,7 +46,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
         price: selectedItem.price !== null && selectedItem.price !== undefined
           ? Number(selectedItem.price).toFixed(2)
           : "0.00",
-        Bild: selectedItem.img || "",
       });
 
       // Vorhandene Allergene aus dem Item laden
@@ -60,7 +57,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
     setEditName(false);
     setEditDescription(false);
     setEditPrice(false);
-    setEditImage(false);
   }, [selectedItem, reset]);
 
   // ── Gericht speichern ──────────────────────────────────────────────────────
@@ -76,7 +72,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
         name: data.name || selectedItem.name,
         price: data.price != null ? data.price : selectedItem.price,
         description: data.description || selectedItem.description,
-        image: data.Bild || selectedItem.img,
       };
 
       const menuSectionData = [
@@ -101,7 +96,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       setEditName(false);
       setEditDescription(false);
       setEditPrice(false);
-      setEditImage(false);
 
       try {
         const resp = await fetch("/api/user/profil/edditData", {
@@ -165,7 +159,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       case "name":        setEditName((p) => !p); break;
       case "description": setEditDescription((p) => !p); break;
       case "price":       setEditPrice((p) => !p); break;
-      case "img":         setEditImage((p) => !p); break;
       default: break;
     }
   };
@@ -258,56 +251,6 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                         ) : (
                           <div className="text-sm px-1">
                             {Number(watchedValues.price ?? selectedItem.price ?? 0).toFixed(2)} €
-                          </div>
-                        )}
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={control}
-                    name="Bild"
-                    render={({ field: { onChange, ...field } }) => (
-                      <FormItem>
-                        <FormLabel
-                          onClick={() => toggleEdit("img")}
-                          className="flex items-center gap-1 cursor-pointer select-none"
-                        >
-                          <FaPen className="text-xs" /> Bild
-                        </FormLabel>
-                        {editImage ? (
-                          <FormControl>
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                try {
-                                  const formData = new FormData();
-                                  formData.append("image", file);
-                                  formData.append("restaurantID", restaurantId);
-                                  formData.append("userID", userID);
-                                  const response = await fetch("/api/user/profil/uploadImg", {
-                                    method: "POST",
-                                    body: formData,
-                                  });
-                                  if (response.ok) {
-                                    const result = await response.json();
-                                    onChange(result.path);
-                                  } else {
-                                    toast.error("Bild-Upload fehlgeschlagen");
-                                  }
-                                } catch (error) {
-                                  toast.error("Fehler beim Hochladen: " + error.message);
-                                }
-                              }}
-                              {...field}
-                            />
-                          </FormControl>
-                        ) : (
-                          <div className="text-sm px-1 text-gray-500">
-                            {selectedItem.imageUrl ? "Bild vorhanden" : "Kein Bild"}
                           </div>
                         )}
                         <FormMessage />
