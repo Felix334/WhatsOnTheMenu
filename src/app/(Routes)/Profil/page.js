@@ -136,15 +136,34 @@ export default function PageBuilder() {
   }, [serverData]);
 
   const saveHero = async () => {
+    const restaurantId = serverData?.userData?.restaurant?.id;
+    if (!restaurantId) return;
+
+    // Nur die Felder senden, die sich gegenüber der Baseline geändert haben.
+    const base = heroBaselineRef.current;
+    const changed = {};
+    if (heroName !== base.name) changed.name = heroName;
+    if (heroDescription !== base.description) changed.description = heroDescription;
+    if (heroColor !== base.heroColor) changed.heroColor = heroColor;
+    if (heroTextColor !== base.heroTextColor) changed.heroTextColor = heroTextColor;
+
+    // Nichts geändert → keine Anfrage.
+    if (Object.keys(changed).length === 0) {
+      setIsEditingHero(false);
+      return;
+    }
+
     setSavingHero(true);
     try {
-      const restaurantId = serverData?.userData?.restaurant?.id;
       const res = await fetch("/api/user/profil/updateHero", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurantId, name: heroName, description: heroDescription, heroColor, heroTextColor }),
+        body: JSON.stringify({ restaurantId, ...changed }),
       });
       if (!res.ok) throw new Error("Fehler beim Speichern");
+      // Baseline auf die gespeicherten Werte anheben, damit ein erneutes
+      // Speichern in derselben Sitzung nicht wieder unveränderte Felder schickt.
+      heroBaselineRef.current = { ...base, ...changed };
       toast.success("Header gespeichert!");
       setIsEditingHero(false);
     } catch (err) {

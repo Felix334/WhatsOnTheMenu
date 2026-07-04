@@ -61,16 +61,27 @@ function SortComponents({ componentList, onSave }) {
     }));
     const snapshot = componentList;
 
+    // Ausgangspositionen – nur die wirklich verschobenen Einträge senden.
+    const groupBaseline = new Map(snapshot.map((g) => [g.id, g.position]));
+    const catBaseline = new Map(snapshot.flatMap((g) => g.categories.map((c) => [c.id, c.position])));
+
+    const changedGroups = ordered
+      .map((g) => ({ id: g.id, position: g.position }))
+      .filter((g) => groupBaseline.get(g.id) !== g.position);
+    const changedCategories = ordered
+      .flatMap((g) => g.categories.map((c) => ({ id: c.id, position: c.position })))
+      .filter((c) => catBaseline.get(c.id) !== c.position);
+
+    // Nichts verschoben → keine Anfrage.
+    if (changedGroups.length === 0 && changedCategories.length === 0) return;
+
     onSave?.(ordered);
     setIsSaving(true);
     try {
       const res = await fetch("/api/user/profil/sortMenu", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          groups: ordered.map((g) => ({ id: g.id, position: g.position })),
-          categories: ordered.flatMap((g) => g.categories.map((c) => ({ id: c.id, position: c.position }))),
-        }),
+        body: JSON.stringify({ groups: changedGroups, categories: changedCategories }),
       });
       if (!res.ok) throw new Error();
       toast.success("Reihenfolge gespeichert");
