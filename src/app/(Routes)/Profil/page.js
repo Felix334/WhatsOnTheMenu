@@ -88,6 +88,7 @@ export default function PageBuilder() {
   const [groupBorderMap, setGroupBorderMap] = useState({});
   const [groupColorMap, setGroupColorMap] = useState({});
   const [groupFontColorMap, setGroupFontColorMap] = useState({});
+  const [groupAlignMap, setGroupAlignMap] = useState({});
 
   const { data: session, status } = useSession();
 
@@ -568,7 +569,7 @@ export default function PageBuilder() {
     };
 
     return (
-      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-6xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
+      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
           <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={!deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {}}>
             {title}
@@ -925,8 +926,8 @@ export default function PageBuilder() {
                       <FaPen />
                     </Button>
                   </div>
-                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={groupColorMap[group.id] ?? group.color} fontColor={groupFontColorMap[group.id] ?? group.fontColor ?? ""} borderRadius={groupBorderMap[group.id] ?? group.borderRadius} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))} onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))} onFontColorChange={(val) => setGroupFontColorMap((prev) => ({ ...prev, [group.id]: val }))} />}
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={(groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}}>
+                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={groupColorMap[group.id] ?? group.color} fontColor={groupFontColorMap[group.id] ?? group.fontColor ?? ""} borderRadius={groupBorderMap[group.id] ?? group.borderRadius} titleAlign={groupAlignMap[group.id] ?? group.titleAlign} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))} onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))} onFontColorChange={(val) => setGroupFontColorMap((prev) => ({ ...prev, [group.id]: val }))} onTitleAlignChange={(val) => setGroupAlignMap((prev) => ({ ...prev, [group.id]: val }))} />}
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={{ ...((groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}), textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left" }}>
                     {group.name}
                   </h2>
                   <div className="space-y-8">

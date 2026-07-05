@@ -15,11 +15,18 @@ const BORDER_RADIUS_OPTIONS = [
   { value: "xl", label: "Sehr rund" },
 ];
 
-export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, fontColor: initialFontColor, borderRadius: initialBorderRadius, restaurantID, allowPremiumColor, onBorderRadiusChange, onColorChange, onFontColorChange }) {
+const TITLE_ALIGN_OPTIONS = [
+  { value: "left", label: "Links" },
+  { value: "center", label: "Mitte" },
+  { value: "right", label: "Rechts" },
+];
+
+export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMenu, name, position, bgColor, fontColor: initialFontColor, borderRadius: initialBorderRadius, titleAlign: initialTitleAlign, restaurantID, allowPremiumColor, onBorderRadiusChange, onColorChange, onFontColorChange, onTitleAlignChange }) {
   const [newName, setNewName] = useState(name);
   const [newColor, setNewColor] = useState(bgColor ?? "");
   const [newFontColor, setNewFontColor] = useState(initialFontColor ?? "");
   const [borderRadius, setBorderRadius] = useState(initialBorderRadius || "md");
+  const [titleAlign, setTitleAlign] = useState(initialTitleAlign || "left");
 
   const saveData = async () => {
     // Nur geänderte Felder sammeln
@@ -28,6 +35,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
     if (newColor !== (bgColor ?? "") && newColor) changes.color = newColor; // color ist required in DB
     if (newFontColor !== (initialFontColor ?? "")) changes.fontColor = newFontColor || null;
     if (borderRadius !== (initialBorderRadius || "md")) changes.borderRadius = borderRadius;
+    if (titleAlign !== (initialTitleAlign || "left")) changes.titleAlign = titleAlign;
 
     if (Object.keys(changes).length === 0) {
       setRenderCatGroupMenu(null);
@@ -38,6 +46,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
     if ("borderRadius" in changes) onBorderRadiusChange?.(borderRadius);
     if ("color" in changes) onColorChange?.(newColor);
     if ("fontColor" in changes) onFontColorChange?.(newFontColor);
+    if ("titleAlign" in changes) onTitleAlignChange?.(titleAlign);
 
     const resp = await fetch("/api/user/profil/edditData", {
       method: "POST",
@@ -122,6 +131,26 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
                       ? "border-gray-900 bg-gray-900 text-white font-semibold"
                       : "border-gray-200 text-gray-600 hover:border-gray-400"
                   } ${value === "none" ? "rounded-none" : value === "sm" ? "rounded-lg" : value === "md" ? "rounded-xl" : "rounded-3xl"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground tracking-wide">Ausrichtung der Überschrift</label>
+            <div className="flex gap-2">
+              {TITLE_ALIGN_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTitleAlign(value)}
+                  className={`flex-1 py-2 text-sm rounded-lg border-2 transition-all ${
+                    titleAlign === value
+                      ? "border-gray-900 bg-gray-900 text-white font-semibold"
+                      : "border-gray-200 text-gray-600 hover:border-gray-400"
+                  }`}
                 >
                   {label}
                 </button>

@@ -670,7 +670,7 @@ const MenuContent = () => {
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
                   <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 style={menuFont ? { fontFamily: menuFont } : undefined} className="text-2xl font-semibold mb-6 pb-2">
+                    <h2 style={{ ...(menuFont ? { fontFamily: menuFont } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
                       {group.name}
                     </h2>
                     <div className="space-y-8">

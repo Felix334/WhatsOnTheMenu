@@ -289,6 +289,9 @@ export async function POST(req: NextRequest) {
           if (catGroup.color !== undefined && catGroup.color) updateData.color = catGroup.color; // color ist required in DB
           if (catGroup.fontColor !== undefined) updateData.fontColor = catGroup.fontColor || null;
           if (catGroup.borderRadius !== undefined) updateData.borderRadius = catGroup.borderRadius;
+          if (catGroup.titleAlign !== undefined && ["left", "center", "right"].includes(catGroup.titleAlign)) {
+            updateData.titleAlign = catGroup.titleAlign;
+          }
 
           if (Object.keys(updateData).length > 0) {
             await safeDb(

@@ -39,6 +39,7 @@ export async function GET(req, { params }) {
                 position: true,
                 color: true,
                 borderRadius: true,
+                titleAlign: true,
                 categories: {
                   select: {
                     id: true,

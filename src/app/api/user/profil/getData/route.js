@@ -83,6 +83,7 @@ async function main(userId) {
                     color: true,
                     fontColor: true,
                     borderRadius: true,
+                    titleAlign: true,
                     categories: {
                       select: {
                         id: true,

@@ -341,6 +341,7 @@ model CategoryGroup {
   color        String
   fontColor    String?
   borderRadius String?
+  titleAlign   String?    @default("left")
   menuID       String
   categories Category[]
   Menu       Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
