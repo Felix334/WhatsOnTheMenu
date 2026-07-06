@@ -65,6 +65,7 @@ export function EdditCategoryGroup({ id, renderCatGroupMenu, setRenderCatGroupMe
       if ("borderRadius" in changes) onBorderRadiusChange?.(initialBorderRadius);
       if ("color" in changes) onColorChange?.(bgColor);
       if ("fontColor" in changes) onFontColorChange?.(initialFontColor);
+      if ("titleAlign" in changes) onTitleAlignChange?.(initialTitleAlign || "left");
       toast.error("Fehler beim Speichern: " + resp.status);
     } else {
       toast.success("Kategorie-Gruppe gespeichert!");

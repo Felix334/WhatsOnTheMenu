@@ -35,6 +35,9 @@ const FooterPart = () => {
             <Link className="text-gray-400 text-sm" href={`/AGBs${queryString ? `?${queryString}` : ""}`}>
               AGB
             </Link>
+            <Link className="text-gray-400 text-sm" href={`/Widerruf${queryString ? `?${queryString}` : ""}`}>
+              Widerruf
+            </Link>
             <Link className="text-gray-400 text-sm" href={`/Impressum${queryString ? `?${queryString}` : ""}`}>
               Impressum
             </Link>

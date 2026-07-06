@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { stripe, webhookSecret, getSubscriptionTier } from "@/lib/stripe";
 import { devLog, devWarn } from "@/lib/logger";
+import { sendRegistrationConfirmation } from "@/lib/registrationMail";
 
 export async function POST(req) {
   const body = await req.text();
@@ -41,7 +42,7 @@ export async function POST(req) {
         const priceId = subscription.items.data[0].price.id;
         const subscriptionTier = getSubscriptionTier(tier);
 
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
           where: { id: userId },
           data: {
             stripeSubscriptionId: subscriptionId,
@@ -50,6 +51,7 @@ export async function POST(req) {
             subscription: subscriptionTier,
             role: "Owner",
           },
+          select: { name: true, email: true },
         });
 
         if (restaurantDetailsStr) {
@@ -59,6 +61,15 @@ export async function POST(req) {
           } catch {
             console.error("Failed to parse restaurantDetails metadata");
             break;
+          }
+
+          // Bestätigungsmail nicht abwarten — der Webhook muss schnell mit 200 antworten.
+          if (updatedUser?.email) {
+            sendRegistrationConfirmation({
+              to: updatedUser.email,
+              restaurantName: restaurantDetails.restaurantName || "Dein Restaurant",
+              tier: subscriptionTier,
+            }).catch((err) => console.error("Registrierungs-Mail fehlgeschlagen:", err));
           }
 
           const existingRestaurant = await prisma.restaurant.findUnique({

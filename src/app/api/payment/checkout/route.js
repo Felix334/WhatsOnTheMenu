@@ -24,6 +24,14 @@ export async function POST(request) {
     return new Response("Invalid tier", { status: 400 });
   }
 
+  // Widerrufsbelehrung (EU-Verbraucherrecht): Ohne ausdrückliche Zustimmung zum
+  // sofortigen Leistungsbeginn und Kenntnisnahme des Erlöschens des Widerrufsrechts
+  // darf kein kostenpflichtiges Abo gestartet werden. Serverseitig erzwungen,
+  // da Client-Checks umgehbar sind.
+  if (body.withdrawalConsent !== true) {
+    return new Response("Zustimmung zur Widerrufsbelehrung erforderlich", { status: 400 });
+  }
+
   // Serverseitige Validierung der Restaurant-Metadaten (Client-Validierung ist umgehbar).
   const parsedRestaurant = restaurant
     ? restaurantCheckoutSchema.safeParse(restaurant)
@@ -97,6 +105,8 @@ export async function POST(request) {
       metadata: {
         userId: token.id,
         tier,
+        // Nachweis der Widerrufs-Zustimmung (Zeitpunkt der Checkout-Erstellung)
+        withdrawalConsentAt: new Date().toISOString(),
         restaurantDetails: JSON.stringify({
           restaurantName: restaurantData?.restaurantName || "",
           category: restaurantData?.category || "",

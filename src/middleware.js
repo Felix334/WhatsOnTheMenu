@@ -23,6 +23,18 @@ export async function middleware(req) {
     }
   }
 
+  if (process.env.NODE_ENV === "production") {
+    if (pathname.startsWith("/ErstelleRestaurantAccount/Business")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    if (pathname.startsWith("/ErstelleRestaurantAccount/Professional")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
   // /staff/* — nur Staff und Owner
   if (pathname.startsWith("/staff")) {
     if (!token || (token.role !== "Staff" && token.role !== "Owner")) {
@@ -41,14 +53,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: [
-    "/Admin/:path*",
-    "/api/Admin/:path*",
-    "/api/restaurant/Admin/:path*",
-    "/Profil/:path*",
-    "/staff/:path*",
-    "/staff",
-    "/settings/:path*",
-    "/settings",
-  ],
+  matcher: ["/Admin/:path*", "/api/Admin/:path*", "/api/restaurant/Admin/:path*", "/Profil/:path*", "/staff/:path*", "/staff", "/settings/:path*", "/settings", "/ErstelleRestaurantAccount/Business/:path*", "/ErstelleRestaurantAccount/Business", "/ErstelleRestaurantAccount/Professional/:path*", "/ErstelleRestaurantAccount/Professional"],
 };

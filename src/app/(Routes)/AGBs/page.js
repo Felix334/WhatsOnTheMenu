@@ -62,6 +62,15 @@ const sections = [
   },
 
   {
+    title: "§ 6a Widerrufsrecht",
+    content: [
+      "Verbrauchern steht ein gesetzliches Widerrufsrecht von 14 Tagen ab Vertragsschluss zu. Einzelheiten, die Widerrufsfolgen und ein Muster-Widerrufsformular ergeben sich aus der Widerrufsbelehrung, abrufbar unter /Widerruf.",
+      "Beim Abschluss eines kostenpflichtigen Abonnements holt der Anbieter vor dem Bezahlvorgang die ausdrückliche Zustimmung des Nutzers zum sofortigen Leistungsbeginn sowie die Bestätigung seiner Kenntnis ein, dass das Widerrufsrecht mit vollständiger Vertragserfüllung erlischt (§ 356 Abs. 4 und 5 BGB).",
+      "Handelt der Nutzer als Unternehmer im Sinne des § 14 BGB, besteht kein Widerrufsrecht.",
+    ],
+  },
+
+  {
     title: "§ 7 Laufzeit und Kündigung",
     content: [
       "Kostenpflichtige Verträge haben eine monatliche Laufzeit und verlängern sich automatisch.",

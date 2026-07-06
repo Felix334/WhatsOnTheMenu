@@ -47,6 +47,7 @@ export default function RestaurantForm() {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [isBusinessConfirmed, setIsBusinessConfirmed] = useState(false);
+  const [withdrawalConsent, setWithdrawalConsent] = useState(false);
 
   const { data: session, status, update } = useSession();
   const router = useRouter();
@@ -334,22 +335,36 @@ export default function RestaurantForm() {
                   FreeTier registrieren
                 </button>
 
-                <div>
+                <div className="space-y-3">
+                  {/* Widerrufs-Zustimmung — Pflicht vor kostenpflichtigem Checkout */}
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={withdrawalConsent}
+                      onChange={(e) => setWithdrawalConsent(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-indigo-600 shrink-0"
+                    />
+                    <span className="text-sm text-gray-600">
+                      Nur für das Pro-Upgrade: Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die{" "}
+                      <a href="/AGBs" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">AGB</a> und die{" "}
+                      <a href="/Widerruf" target="_blank" className="text-indigo-600 underline hover:text-indigo-800">Widerrufsbelehrung</a>.
+                    </span>
+                  </label>
                   <button
                     type="button"
-                    disabled={!isBusinessConfirmed}
+                    disabled={!isBusinessConfirmed || !withdrawalConsent}
                     onClick={async () => {
                       const res = await fetch("/api/payment/checkout", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ tier: "pro" }),
+                        body: JSON.stringify({ tier: "pro", withdrawalConsent }),
                       });
                       const { url } = await res.json();
                       if (url) window.location.href = url;
                     }}
-                    className={`w-full font-semibold py-3 rounded-lg transition-all ${isBusinessConfirmed ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                    className={`w-full font-semibold py-3 rounded-lg transition-all ${isBusinessConfirmed && withdrawalConsent ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
                   >
-                    💳 Zu Pro upgrade (€19/Monat)
+                    💳 Zu Pro upgrade (€14.99/Monat)
                   </button>
                 </div>
               </>

@@ -19,7 +19,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, ArrowLeft, ClipboardList, Eye, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import { menuSchema } from "./components/menuSchema";
@@ -59,7 +61,9 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, positionNum, setIsLoading } = useRestaurantData(userID);
+  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, positionNum } = useRestaurantData(userID);
+
+  const [isSaving, setIsSaving] = useState(false);
 
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
@@ -220,7 +224,7 @@ export default function PageBuilder() {
   const updateDeleteCategorieGroups = (id) => {
     setDeleteCategoryGroups((prev) => {
       const updated = [...prev, id];
-      deletedCategoriesGroupRef.current = updated;
+      deletedCategoryGroupRef.current = updated;
       return updated;
     });
   };
@@ -242,7 +246,7 @@ export default function PageBuilder() {
 
   const submitData = async () => {
     const restaurantID = serverData.userData.restaurant.id;
-    setIsLoading(true);
+    setIsSaving(true);
 
     try {
       // First, save the data
@@ -291,7 +295,7 @@ export default function PageBuilder() {
       console.error("Failed to save data:", err);
       toast.error("Fehler beim Speichern: " + err.message);
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -366,7 +370,7 @@ export default function PageBuilder() {
                       <FormLabel>Kategorie-Gruppe</FormLabel>
                       <>
                         <FormControl>
-                          <Input list="categoryGroup" minLength={1} autoComplete="new-password" autoCorrect="off" spellCheck="false" placeholder="Hinzufügen order erstellen" {...field} className="w-[90%]" />
+                          <Input list="categoryGroup" minLength={1} autoComplete="new-password" autoCorrect="off" spellCheck="false" placeholder="Hinzufügen oder erstellen" {...field} className="w-[90%]" />
                         </FormControl>
                         <datalist id="categoryGroup">
                           {categoryGroupNames.map((name) => (
@@ -399,8 +403,6 @@ export default function PageBuilder() {
                     </FormItem>
                   )}
                 />
-                <h1>Der Neue aber kaputte Code = der useFieldArray stört die Sheets</h1>
-
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold">Gerichte:</h3>
                   {fields.map((item, index) => (
@@ -730,82 +732,98 @@ export default function PageBuilder() {
       <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;500;700&family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto+Slab:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"></link>
 
       <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between h-12 gap-2">
-          <div className="flex gap-3 items-center">
-            <Button onClick={goBackBtn} style={{ fontFamily: font }}>
-              Zurück
+        {/* Zeile 1: Navigation */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Button variant="ghost" size="sm" onClick={goBackBtn} style={{ fontFamily: font }}>
+              <ArrowLeft className="size-4" />
+              <span className="hidden sm:inline">Zurück</span>
             </Button>
-
-            <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
-
-            {exeedCatLimit ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span>
-                    <Button variant="outline" disabled>
-                      Hinzufügen
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  Kategorie-Limit ({Limit.CategoryLimit}) erreicht —{" "}
-                  <DynamicLink href="/pricing" className="underline font-medium">
-                    Upgrade
-                  </DynamicLink>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              <MenuEditor categoryGroupNames={categoryGroupNames} />
-            )}
-            <SortComponents
-              componentList={categoryGroups}
-              onSave={(newGroups) =>
-                setServerData((prev) => ({
-                  ...prev,
-                  userData: {
-                    ...prev.userData,
-                    restaurant: {
-                      ...prev.userData.restaurant,
-                      menu: [{ ...prev.userData.restaurant.menu[0], categoryGroup: newGroups }, ...prev.userData.restaurant.menu.slice(1)],
-                    },
-                  },
-                }))
-              }
-            />
-          </div>
-
-          {/* Abo-Badge mit Live-Zähler */}
-          <div className="hidden sm:flex items-center gap-2 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">
-            <span className={`font-semibold ${session?.user?.subscription === "Professional" ? "text-amber-600" : session?.user?.subscription === "Business" ? "text-orange-500" : "text-gray-500"}`}>{session?.user?.subscription === "NoSubscription" ? "Kein Abo" : (session?.user?.subscription ?? "Kein Abo")}</span>
-            <span className="text-gray-300">|</span>
-            <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
-              {catCount}/{Limit.CategoryLimit ?? "?"} Kategorien
-            </span>
-            <span className="text-gray-300">|</span>
-            <span className={dishCount >= Limit.DishLimit ? "text-red-500 font-medium" : "text-gray-500"}>
-              {dishCount}/{Limit.DishLimit ?? "?"} Gerichte
-            </span>
-            {(exeedCatLimit || exeedDishLimit) && (
-              <DynamicLink href="/pricing" className="ml-1 text-amber-600 hover:text-amber-700 font-semibold hover:underline">
-                ↑ Upgrade
-              </DynamicLink>
-            )}
+            <Separator orientation="vertical" className="h-5" />
+            <span className="text-sm font-semibold text-gray-900 truncate">Speisekarte bearbeiten</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button asChild variant="outline" onClick={markUserAnsichtNavigation}>
-              <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>🍽️ Bestellungen</Link>
+            <Button asChild variant="outline" size="sm" onClick={markUserAnsichtNavigation}>
+              <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>
+                <ClipboardList className="size-4" />
+                <span className="hidden sm:inline">Bestellungen</span>
+              </Link>
             </Button>
-            <Button asChild onClick={markUserAnsichtNavigation}>
+            <Button asChild size="sm" onClick={markUserAnsichtNavigation}>
               <Link
                 href={{
                   pathname: "/UnserePartner/Restaurants/Menu",
                   query: { userID, restaurantID },
                 }}
               >
-                User-Ansicht
+                <Eye className="size-4" />
+                <span className="hidden sm:inline">User-Ansicht</span>
               </Link>
             </Button>
+          </div>
+        </div>
+
+        {/* Zeile 2: Bearbeitungswerkzeuge + Abo-Status */}
+        <div className="border-t border-gray-100 bg-gray-50/60">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-1.5 flex items-center justify-between gap-3 overflow-x-auto">
+            <div className="flex items-center gap-2 shrink-0">
+              <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+
+              {exeedCatLimit ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" disabled>
+                        Hinzufügen
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Kategorie-Limit ({Limit.CategoryLimit}) erreicht —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <MenuEditor categoryGroupNames={categoryGroupNames} />
+              )}
+              <SortComponents
+                componentList={categoryGroups}
+                onSave={(newGroups) =>
+                  setServerData((prev) => ({
+                    ...prev,
+                    userData: {
+                      ...prev.userData,
+                      restaurant: {
+                        ...prev.userData.restaurant,
+                        menu: [{ ...prev.userData.restaurant.menu[0], categoryGroup: newGroups }, ...prev.userData.restaurant.menu.slice(1)],
+                      },
+                    },
+                  }))
+                }
+              />
+            </div>
+
+            {/* Abo-Status mit Live-Zähler — auch mobil sichtbar */}
+            <div className="flex items-center gap-2 text-xs shrink-0">
+              <Badge variant="outline" className={session?.user?.subscription === "Professional" ? "border-amber-300 text-amber-600" : session?.user?.subscription === "Business" ? "border-orange-300 text-orange-500" : "text-gray-500"}>
+                {session?.user?.subscription === "NoSubscription" ? "Kein Abo" : (session?.user?.subscription ?? "Kein Abo")}
+              </Badge>
+              <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
+                {catCount}/{Limit.CategoryLimit ?? "?"} <span className="hidden sm:inline">Kategorien</span><span className="sm:hidden">Kat.</span>
+              </span>
+              <span className="text-gray-300">|</span>
+              <span className={dishCount >= Limit.DishLimit ? "text-red-500 font-medium" : "text-gray-500"}>
+                {dishCount}/{Limit.DishLimit ?? "?"} <span className="hidden sm:inline">Gerichte</span><span className="sm:hidden">Ger.</span>
+              </span>
+              {(exeedCatLimit || exeedDishLimit) && (
+                <DynamicLink href="/pricing" className="text-amber-600 hover:text-amber-700 font-semibold hover:underline whitespace-nowrap">
+                  ↑ Upgrade
+                </DynamicLink>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -944,9 +962,22 @@ export default function PageBuilder() {
         </main>
       </div>
 
-      <div className="fixed bottom-6 left-6 z-20">
-        <Button onClick={() => submitData()}>Speichern (Server)</Button>
-      </div>
+      {/* Speichern-Leiste — erscheint nur bei ungespeicherten Änderungen */}
+      {(components.length > 0 || deletedDishes.length > 0 || deletedCategories.length > 0 || deleteCategoryGroups.length > 0) && (
+        <div className="fixed bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+          <div className="pointer-events-auto flex items-center gap-3 bg-white border border-gray-200 shadow-lg rounded-full pl-5 pr-2 py-2">
+            <span className="text-sm text-gray-600">
+              Ungespeicherte Änderungen
+              {components.length > 0 && ` · ${components.length} neu`}
+              {deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length > 0 && ` · ${deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length} gelöscht`}
+            </span>
+            <Button onClick={() => submitData()} disabled={isSaving} className="rounded-full">
+              <Save className="size-4" />
+              {isSaving ? "Speichert…" : "Speichern"}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

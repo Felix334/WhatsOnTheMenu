@@ -1,14 +1,30 @@
 "use client";
 
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+/* Unternehmer-Bestätigung + Widerrufs-Zustimmung — Pflicht vor jedem Abo-Checkout */
+function LegalConsentCheckbox({ checked, onCheckedChange }) {
+  return (
+    <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-gray-200 bg-gray-50 p-3">
+      <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="mt-0.5 shrink-0" />
+      <span className="text-xs text-gray-600 leading-relaxed">
+        Ich bestätige, dass ich als <strong>Unternehmer/Gewerbetreibender</strong> handle. Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die{" "}
+        <Link href="/AGBs" target="_blank" className="text-red-700 underline hover:text-red-800">AGB</Link> und die{" "}
+        <Link href="/Widerruf" target="_blank" className="text-red-700 underline hover:text-red-800">Widerrufsbelehrung</Link>. <span className="text-red-500">*</span>
+      </span>
+    </label>
+  );
+}
 
 export default function PricingPage() {
   const { data: session, status } = useSession();
@@ -35,6 +51,7 @@ export default function PricingPage() {
 
   const [showProForm, setShowProForm] = useState(false);
   const [showPremiumForm, setShowPremiumForm] = useState(false);
+  const [legalConsent, setLegalConsent] = useState(false);
   const [restaurantData, setRestaurantData] = useState({
     restaurantName: "",
     email: "",
@@ -54,7 +71,7 @@ export default function PricingPage() {
       const res = await fetch("/api/payment/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier, restaurant: restaurantData }),
+        body: JSON.stringify({ tier, restaurant: restaurantData, withdrawalConsent: legalConsent }),
       });
 
       if (!res.ok) {
@@ -224,11 +241,12 @@ export default function PricingPage() {
                           <Input required value={restaurantData.city} onChange={(e) => updateRestaurantData("city", e.target.value)} />
                         </div>
                       </div>
+                      <LegalConsentCheckbox checked={legalConsent} onCheckedChange={setLegalConsent} />
                       <div className="pt-4 space-x-2 flex justify-end">
                         <Button type="button" variant="outline" onClick={() => setShowProForm(false)}>
                           Abbrechen
                         </Button>
-                        <Button type="submit" disabled={isPendingPro}>
+                        <Button type="submit" disabled={isPendingPro || !legalConsent}>
                           {isPendingPro ? "Verarbeite..." : "Mit Stripe bezahlen"}
                         </Button>
                       </div>
@@ -330,11 +348,12 @@ export default function PricingPage() {
                           <Input required value={restaurantData.city} onChange={(e) => updateRestaurantData("city", e.target.value)} />
                         </div>
                       </div>
+                      <LegalConsentCheckbox checked={legalConsent} onCheckedChange={setLegalConsent} />
                       <div className="pt-4 space-x-2 flex justify-end">
                         <Button type="button" variant="outline" onClick={() => setShowPremiumForm(false)}>
                           Abbrechen
                         </Button>
-                        <Button type="submit" disabled={isPendingPremium}>
+                        <Button type="submit" disabled={isPendingPremium || !legalConsent}>
                           {isPendingPremium ? "Verarbeite..." : "Mit Stripe bezahlen"}
                         </Button>
                       </div>
