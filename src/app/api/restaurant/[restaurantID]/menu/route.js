@@ -18,6 +18,7 @@ export async function GET(req, { params }) {
         description: true,
         parentCompany: true,
         openingHours: true,
+        socialLinks: true,
         createdAt: true,
         owner: {
           select: { name: true, subscription: true },
@@ -99,6 +100,7 @@ export async function GET(req, { params }) {
       menu: restaurant.menu ?? { categoryGroup: [] },
       locations: restaurant.locations,
       openingHours: restaurant.openingHours ?? null,
+      socialLinks: restaurant.socialLinks ?? null,
       createdAt: restaurant.createdAt,
     };
 

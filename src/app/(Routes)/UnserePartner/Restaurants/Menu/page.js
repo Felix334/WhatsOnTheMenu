@@ -47,6 +47,7 @@ const SOCIAL_ICONS = [
   { key: "twitter", label: "X", icon: "𝕏" },
   { key: "whatsapp", label: "WhatsApp", icon: "💬" },
   { key: "website", label: "Website", icon: "🌐" },
+  { key: "google", label: "Google-Bewertung", icon: "⭐" },
 ];
 
 // ─── Hero-Banner ───────────────────────────────────────────────────────────────
@@ -234,6 +235,55 @@ const AllergenLegend = () => {
   );
 };
 
+// ─── Allergen-Filter (Gäste) ───────────────────────────────────────────────────
+const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-6">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border shadow-sm transition-all
+          ${excluded.length > 0 ? "bg-yellow-400 border-yellow-400 text-gray-900" : "bg-white border-gray-200 text-gray-600 hover:border-yellow-300 hover:bg-yellow-50"}`}
+      >
+        <span>🥗</span>
+        Allergen-Filter
+        {excluded.length > 0 && <span className="font-semibold">({excluded.length} aktiv)</span>}
+        <span className={`text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
+      </button>
+
+      {open && (
+        <div className="mt-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <p className="text-xs text-gray-500 mb-3">Wähle aus, was du nicht verträgst — Gerichte mit diesen Allergenen werden ausgeblendet:</p>
+          <div className="flex flex-wrap gap-2">
+            {ALLERGEN_LIST.map(({ letter, name }) => {
+              const active = excluded.includes(name);
+              return (
+                <button
+                  key={letter}
+                  onClick={() => onToggle(name)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all
+                    ${active ? "bg-yellow-400 border-yellow-400 text-gray-900" : "bg-white border-gray-200 text-gray-600 hover:bg-yellow-50 hover:border-yellow-300"}`}
+                >
+                  <span className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold border shrink-0
+                    ${active ? "bg-white/70 text-gray-900 border-gray-900/20" : "bg-amber-100 text-amber-800 border-amber-300"}`}>
+                    {letter}
+                  </span>
+                  ohne {name}
+                </button>
+              );
+            })}
+          </div>
+          {excluded.length > 0 && (
+            <button onClick={onClear} className="mt-3 text-xs text-gray-400 hover:text-gray-600 underline transition-colors">
+              Filter zurücksetzen
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Allergen Badges ───────────────────────────────────────────────────────────
 const ALLERGEN_LETTER = {
   Gluten: "A",
@@ -268,9 +318,15 @@ const AllergenBadges = ({ ingredients }) => {
 // ─── Menu Section ──────────────────────────────────────────────────────────────
 const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-2xl", xl: "rounded-3xl" };
 
-const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
+
+  const visibleItems =
+    excludedAllergens.length > 0
+      ? (menuItems ?? []).filter((item) => !item.ingredients?.some((ing) => excludedAllergens.includes(ing.name)))
+      : menuItems ?? [];
+  const hiddenCount = (menuItems?.length ?? 0) - visibleItems.length;
 
   const toggleExpand = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -305,7 +361,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
 
       {/* Mobile: Card-Layout */}
       <div className="block sm:hidden space-y-3">
-        {menuItems?.map((item, index) => {
+        {visibleItems.map((item, index) => {
           const unavailable = showAvailability && item.stock === "outOfStock";
           return (
             <React.Fragment key={item.id || index}>
@@ -347,7 +403,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
           </TableHeader>
 
           <TableBody>
-            {menuItems?.map((item, index) => {
+            {visibleItems.map((item, index) => {
               const unavailable = showAvailability && item.stock === "outOfStock";
               return (
                 <React.Fragment key={item.id || index}>
@@ -387,6 +443,12 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
           </TableBody>
         </Table>
       </div>
+
+      {hiddenCount > 0 && (
+        <p className="mt-4 text-xs text-gray-400 text-center">
+          {hiddenCount} {hiddenCount === 1 ? "Gericht" : "Gerichte"} durch den Allergen-Filter ausgeblendet
+        </p>
+      )}
     </div>
   );
 };
@@ -544,7 +606,7 @@ const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => 
 };
 
 // ─── QR Modal ─────────────────────────────────────────────────────────────────
-const QRModal = ({ orderId, tableNumber, onClose }) => {
+const QRModal = ({ orderId, tableNumber, googleReviewUrl, onClose }) => {
   const url = typeof window !== "undefined" ? `${window.location.origin}/orders/${orderId}` : `/orders/${orderId}`;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -555,6 +617,16 @@ const QRModal = ({ orderId, tableNumber, onClose }) => {
           <QRCodeSVG value={url} size={180} />
         </div>
         <p className="text-xs text-gray-400">Die Bedienung scannt den Code um deine Bestellung zu sehen</p>
+        {googleReviewUrl && (
+          <a
+            href={googleReviewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full bg-yellow-50 border border-yellow-300 hover:bg-yellow-100 text-gray-900 rounded-xl py-2 text-sm font-semibold transition-colors"
+          >
+            ⭐ Gefällt es dir hier? Bewerte uns auf Google
+          </a>
+        )}
         <button onClick={onClose} className="w-full bg-gray-900 text-white rounded-xl py-2 text-sm font-semibold hover:bg-gray-700 transition-colors">
           Schließen
         </button>
@@ -575,6 +647,11 @@ const MenuContent = () => {
 
   const tableNumber = searchParams.get("tableNumber");
   const [cart, setCart] = useState({});
+  const [excludedAllergens, setExcludedAllergens] = useState([]);
+
+  const toggleAllergen = useCallback((name) => {
+    setExcludedAllergens((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
+  }, []);
   const [orderStep, setOrderStep] = useState(null); // null | "confirm" | "qr"
   const [orderId, setOrderId] = useState(null);
 
@@ -666,6 +743,7 @@ const MenuContent = () => {
                 </span>
               </div>
             )}
+            <AllergenFilterBar excluded={excludedAllergens} onToggle={toggleAllergen} onClear={() => setExcludedAllergens([])} />
             {categoryGroups.length > 0 ? (
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
@@ -675,7 +753,7 @@ const MenuContent = () => {
                     </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
                       ))}
                     </div>
                   </div>
@@ -705,7 +783,7 @@ const MenuContent = () => {
         />
       )}
 
-      {orderStep === "qr" && <QRModal orderId={orderId} tableNumber={tableNumber} onClose={() => setOrderStep(null)} />}
+      {orderStep === "qr" && <QRModal orderId={orderId} tableNumber={tableNumber} googleReviewUrl={serverData?.socialLinks?.google} onClose={() => setOrderStep(null)} />}
     </div>
   );
 };

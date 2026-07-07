@@ -264,6 +264,7 @@ const SOCIAL_PLATFORMS = [
   { key: "twitter", label: "X / Twitter", placeholder: "https://x.com/deinrestaurant" },
   { key: "whatsapp", label: "WhatsApp", placeholder: "https://wa.me/49123456789" },
   { key: "website", label: "Website", placeholder: "https://www.deinrestaurant.de" },
+  { key: "google", label: "Google-Bewertungslink", placeholder: "https://g.page/r/.../review", hint: "Gäste sehen nach einer Bestellung einen Button, der direkt zu deiner Google-Bewertungsseite führt. Den Link findest du im Google-Unternehmensprofil unter „Rezensionen erhalten“." },
 ];
 
 const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
@@ -306,11 +307,14 @@ const SocialLinksEditor = ({ restaurantId, userID, initialLinks }) => {
         <h2 className="text-xl font-semibold">Social Media</h2>
       </CardHeader>
       <CardContent className="space-y-3">
-        {SOCIAL_PLATFORMS.map(({ key, label, placeholder }) => (
+        {SOCIAL_PLATFORMS.map(({ key, label, placeholder, hint }) => (
           <div key={key}>
             <Label className="text-sm text-gray-600">{label}</Label>
             {isEditing ? (
-              <Input value={links[key] ?? ""} placeholder={placeholder} onChange={(e) => setLinks((prev) => ({ ...prev, [key]: e.target.value }))} />
+              <>
+                <Input value={links[key] ?? ""} placeholder={placeholder} onChange={(e) => setLinks((prev) => ({ ...prev, [key]: e.target.value }))} />
+                {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
+              </>
             ) : (
               <p className="text-sm truncate">
                 {saved[key] ? (

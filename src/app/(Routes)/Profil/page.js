@@ -657,14 +657,6 @@ export default function PageBuilder() {
                     </TableCell>
                     <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{Number(item.price).toFixed(2)}€</TableCell>
                   </TableRow>
-
-                  {expandedIndex === index && (
-                    <TableRow className="bg-gray-50">
-                      <TableCell colSpan={4} className="px-4 sm:px-6 py-4">
-                        {item.imageUrl ? <Image src={item.imageUrl} alt="Vorschau" width={800} height={800} className="mt-2 rounded-lg border max-w-full h-auto" /> : <p className="text-gray-500">Kein Bild vorhanden</p>}
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </Fragment>
               ))}
             </TableBody>
