@@ -17,13 +17,13 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Online Speisekarte erstellen | QR Menü Generator",
-  description: "Erstelle digitale und kostenlose Speisekarten für dein Restaurant in Sekunden. Einfach, schnell und mobil per QR-Code nutzbar.",
+  description: "Erstelle digitale und kostenlose Speisekarten für dein Restaurant. Einfach, schnell und mobil per QR-Code nutzbar. Direkt im Browser ohne Extra Software",
 
   metadataBase: new URL("https://www.whatisonmymenu.com/"),
 
   openGraph: {
     title: "Online Speisekarte erstellen",
-    description: "Erstelle digitale und Speisekarten für dein Restaurant in Sekunden.",
+    description: "Erstelle digitale und Speisekarten für dein Restaurant.",
     url: "https://www.whatisonmymenu.com/",
     siteName: "WhatIsOnMyMenu",
     images: [
@@ -39,7 +39,7 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Online Speisekarte erstellen",
-    description: "Digitale Menüs für Restaurants - einfach per QR-Code.",
+    description: "Digitale Menüs für Restaurants - einfach per QR-Code ohne extra Software.",
     images: ["/og-image.png"],
   },
   icons: {
