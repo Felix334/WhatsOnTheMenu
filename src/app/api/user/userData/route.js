@@ -28,7 +28,7 @@ export async function POST(req) {
           createdAt: true,
         },
       });
-      return NextResponse.json({ status: 200, data: users });
+      return NextResponse.json({ data: users });
     }
 
     const users = await prisma.user.findMany({
@@ -45,7 +45,7 @@ export async function POST(req) {
         createdAt: true,
       },
     });
-    return NextResponse.json({ status: 200, data: users });
+    return NextResponse.json({ data: users });
   } catch (e) {
     console.error("Database Error", e);
     return NextResponse.json({ error: "Datenbankfehler" }, { status: 500 });

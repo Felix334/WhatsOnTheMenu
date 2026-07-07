@@ -13,27 +13,27 @@ export async function POST(req) {
   try {
     const data = await req.json();
     if (!data) {
-      return NextResponse.json({ status: 400, error: "No data provided" });
+      return NextResponse.json({ error: "No data provided" }, { status: 400 });
     }
     const id = data.userID;
 
     if (!id) {
-      return NextResponse.json({ status: 400, error: "userID is required" });
+      return NextResponse.json({ error: "userID is required" }, { status: 400 });
     }
     if (id !== token.id) {
-      return NextResponse.json({ status: 401, message: "Unauthorized" });
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const userData = await main(id);
 
     if (!userData) {
-      return NextResponse.json({ status: 404, error: "User not found" });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ status: 200, userData });
+    return NextResponse.json({ userData });
   } catch (error) {
     console.error("Error in POST handler:", error);
-    return NextResponse.json({ status: 500, error: "Internal server error" });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

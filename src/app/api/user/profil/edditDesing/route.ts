@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
     }
 
-    return NextResponse.json({ status: 200, message: "OK" });
+    return NextResponse.json({ message: "OK" });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: "Interner Serverfehler" }, { status: 500 });

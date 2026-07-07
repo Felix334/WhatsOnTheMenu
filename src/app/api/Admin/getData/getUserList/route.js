@@ -8,7 +8,7 @@ export async function POST(req) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
     if (!token || token.role !== "Admin") {
-      return NextResponse.json({ status: 401, message: "Not authenticated" });
+      return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
     }
 
     devLog("Check1", token.role, token.id);
@@ -20,13 +20,13 @@ export async function POST(req) {
     devLog("User Data:", userData);
 
     if (!userData || userData.length === 0) {
-      return NextResponse.json({ status: 404, message: "No data found" });
+      return NextResponse.json({ message: "No data found" }, { status: 404 });
     }
 
-    return NextResponse.json({ status: 200, data: userData });
+    return NextResponse.json({ data: userData });
   } catch (err) {
     console.error("API Error:", err);
-    return NextResponse.json({ status: 500, message: "Server error" });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
 

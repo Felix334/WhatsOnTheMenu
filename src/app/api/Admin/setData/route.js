@@ -8,7 +8,7 @@ export async function POST(req) {
   }
   const data = await req.json();
   if (!data) {
-    return NextResponse.json({ status: 400, message: "Keine Daten gesendet" });
+    return NextResponse.json({ message: "Keine Daten gesendet" }, { status: 400 });
   }
-  return NextResponse.json({ status: 200, message: "Data processed successfully" });
+  return NextResponse.json({ message: "Data processed successfully" });
 }

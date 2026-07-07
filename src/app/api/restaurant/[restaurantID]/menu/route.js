@@ -89,29 +89,6 @@ export async function GET(req, { params }) {
       return NextResponse.json({ message: "Restaurant not found" }, { status: 404 });
     }
 
-    const menuWithRatings = restaurant.menu
-      ? {
-          ...restaurant.menu,
-          categoryGroup:
-            restaurant.menu.categoryGroup?.map((group) => ({
-              ...group,
-              categories:
-                group.categories?.map((category) => ({
-                  ...category,
-                  dishes:
-                    category.dishes?.map((dish) => {
-                      const avgRating = dish.reviews?.length > 0 ? dish.reviews.reduce((sum, r) => sum + r.rating, 0) / dish.reviews.length : 0;
-                      return {
-                        ...dish,
-                        averageRating: Number(avgRating.toFixed(1)),
-                        reviewCount: dish.reviews?.length || 0,
-                      };
-                    }) || [],
-                })) || [],
-            })) || [],
-        }
-      : { categoryGroup: [] };
-
     const response = {
       id: restaurant.id,
       name: restaurant.name,
@@ -119,7 +96,7 @@ export async function GET(req, { params }) {
       parentCompany: restaurant.parentCompany,
       owner: { name: restaurant.owner.name },
       ownerSubscription: restaurant.owner.subscription,
-      menu: menuWithRatings,
+      menu: restaurant.menu ?? { categoryGroup: [] },
       locations: restaurant.locations,
       openingHours: restaurant.openingHours ?? null,
       createdAt: restaurant.createdAt,
