@@ -57,7 +57,7 @@ const HeroSection = ({ restaurantData, menuFont, color }) => {
   if (process.env.NODE_ENV === "development") console.log("Zeige HeroColor:", color);
 
   return (
-    <div className={`w-full bg-gradient-to-r text-white py-10 px-4 text-center`} style={{ backgroundColor: color }}>
+    <div className={`w-full ${color?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[color] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center`} style={color?.startsWith("#") ? { background: color } : {}}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
       <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">
         {restaurantData?.name || "Restaurant"}
@@ -320,7 +320,7 @@ const AllergenBadges = ({ ingredients }) => {
 // ─── Menu Section ──────────────────────────────────────────────────────────────
 const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-2xl", xl: "rounded-3xl" };
 
-const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
 
@@ -354,9 +354,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, menuFont, cart = {}, addTo
   };
 
   return (
-    <div id={id} className={`${bgColor} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`}>
+    <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
       <div className="mb-8 text-center pb-6">
-        <h3 style={fontStyle} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
+        <h3 style={{ ...fontStyle, ...(fontColor ? { color: fontColor } : {}) }} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
           {title}
         </h3>
       </div>
@@ -724,7 +724,7 @@ const MenuContent = () => {
   const restaurantId = serverData?.id;
 
   return (
-    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? "" : "bg-amber-50"}`} style={{ backgroundColor: bgColor || undefined, fontFamily: menuFont || undefined }}>
+    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? bgColorClass(bgColor) : "bg-amber-50"}`} style={{ ...bgColorStyle(bgColor), fontFamily: menuFont || undefined }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       {menuFont && <link href={GOOGLE_FONTS_URL} rel="stylesheet" />}
@@ -750,12 +750,12 @@ const MenuContent = () => {
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
                   <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 style={{ ...(menuFont ? { fontFamily: menuFont } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
+                    <h2 style={{ ...(menuFont ? { fontFamily: menuFont } : {}), ...(group.fontColor ? { color: group.fontColor } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
                       {group.name}
                     </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
                       ))}
                     </div>
                   </div>
