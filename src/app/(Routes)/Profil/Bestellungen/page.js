@@ -98,8 +98,18 @@ function BestellungenContent() {
   useEffect(() => {
     if (!session || session.user.subscription !== "Professional") return;
     fetchOrders();
-    const interval = setInterval(fetchOrders, 15000);
-    return () => clearInterval(interval);
+    // Nur pollen, wenn der Tab sichtbar ist — spart Edge-Requests bei Hintergrund-Tabs
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") fetchOrders();
+    }, 30000);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") fetchOrders();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [fetchOrders, session]);
 
   if (!session) {

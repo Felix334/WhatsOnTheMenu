@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
