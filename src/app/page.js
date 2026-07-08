@@ -24,6 +24,8 @@ import SpeiseKarteLaptop from "./components/img/ResizedLaptopImage.png";
 import SpeiseKarteHandy from "./components/img/Speisekarte_HandybildschirmNeu.png";
 import { AdminLink, FreeTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
 
+import WebsiteIcon from "./icon.svg";
+
 function HomeContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [renderRegister, setRenderRegister] = useState(false);
@@ -110,7 +112,9 @@ function HomeContent() {
                 )}
               </div>
               <div className="flex items-center justify-center md:justify-start">
-                <div className="text-2xl font-bold text-red-800 text-center md:text-left">🍽️ WhatIsOnMyMenu.com</div>
+                <div className="text-2xl font-bold text-red-800 text-center md:text-left">
+                  <Image src={WebsiteIcon} alt="" width={28} height={28} className="inline align-middle mx-1" /> WhatIsOnMyMenu.com
+                </div>
               </div>
               <div className="hidden right-0 md:block">
                 <NavigationMenu>
@@ -272,12 +276,7 @@ function HomeContent() {
                 <div className="hidden lg:flex justify-center items-center">
                   <div className="relative">
                     <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                      <Image
-                        src={SpeiseKarteLaptop}
-                        alt="Digitale Speisekarte Vorschau"
-                        className="rounded-xl object-cover w-full max-w-md"
-                        priority
-                      />
+                      <Image src={SpeiseKarteLaptop} alt="Digitale Speisekarte Vorschau" className="rounded-xl object-cover w-full max-w-md" priority />
                     </div>
                   </div>
                 </div>
@@ -446,7 +445,6 @@ function HomeContent() {
                         <span className="text-green-400 mr-2">✓</span>Analytics
                       </li>
                     </ul>
-
                   </CardContent>
                 </Card>
               </div>
