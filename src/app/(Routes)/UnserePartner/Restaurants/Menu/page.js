@@ -96,31 +96,33 @@ const Header = ({ name, activePage, setActivePage }) => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between h-12 gap-2">
-        <div className="absolute left-0 top-0">
-          <Link href={{ pathname: "/", query: { ...router.query } }} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900">
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 md:px-8 py-2 flex items-center h-12 gap-1">
+        {/* Linke Seite: gleiche flex-1 wie rechts, damit die Tabs exakt zentriert bleiben */}
+        <div className="flex-1 flex justify-start min-w-0">
+          <Link href={{ pathname: "/", query: { ...router.query } }} className="inline-flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900" aria-label="Zur Homepage">
+            <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            Homepage
+            <span className="hidden md:inline">Homepage</span>
           </Link>
         </div>
-        <nav className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+        <nav className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0">
           <button
             onClick={() => setActivePage("menu")}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
               ${activePage === "menu" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
             Speisekarte
           </button>
           <button
             onClick={() => setActivePage("info")}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
               ${activePage === "info" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
             Informationen
           </button>
         </nav>
+        <div className="flex-1" aria-hidden="true" />
       </div>
     </header>
   );
