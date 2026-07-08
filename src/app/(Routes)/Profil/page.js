@@ -743,12 +743,7 @@ export default function PageBuilder() {
               </Link>
             </Button>
             <Button asChild size="sm" onClick={markUserAnsichtNavigation}>
-              <Link
-                href={{
-                  pathname: "/UnserePartner/Restaurants/Menu",
-                  query: { userID, restaurantID },
-                }}
-              >
+              <Link href={`/UnserePartner/Restaurants/Menu/${restaurantID}`}>
                 <Eye className="size-4" />
                 <span className="hidden sm:inline">User-Ansicht</span>
               </Link>

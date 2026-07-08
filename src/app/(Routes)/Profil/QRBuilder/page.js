@@ -5,8 +5,7 @@ import QRCode from "qrcode";
 import { useSearchParams } from "next/navigation";
 
 function buildMenuUrl(origin, restaurantID, tableNumber) {
-  const url = new URL("/UnserePartner/Restaurants/Menu", origin);
-  url.searchParams.set("restaurantID", restaurantID);
+  const url = new URL(`/UnserePartner/Restaurants/Menu/${encodeURIComponent(restaurantID)}`, origin);
   if (tableNumber) url.searchParams.set("tableNumber", tableNumber);
   return url.toString();
 }
