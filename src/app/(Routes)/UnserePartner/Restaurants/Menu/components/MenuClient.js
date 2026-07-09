@@ -320,6 +320,7 @@ const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-2xl"
 const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
+  const colorStyle = fontColor ? { color: fontColor } : {};
 
   const visibleItems =
     excludedAllergens.length > 0
@@ -353,7 +354,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
   return (
     <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
       <div className="mb-8 text-center pb-6">
-        <h3 style={{ ...fontStyle, ...(fontColor ? { color: fontColor } : {}) }} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
+        <h3 style={{ ...fontStyle, ...colorStyle }} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
           {title}
         </h3>
       </div>
@@ -367,16 +368,16 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
               <div onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
                 <div className="flex-1 pr-2">
                   <div className="flex items-center gap-2">
-                    <p style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
+                    <p style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                       {item.name}
                     </p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
                   </div>
-                  {item.description && <p className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
+                  {item.description && <p style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
                   <AllergenBadges ingredients={item.ingredients} />
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
+                  <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
                   {orderMode && !unavailable && <CartControls item={item} />}
                 </div>
               </div>
@@ -395,8 +396,8 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
         <Table className="w-full table-auto">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-left font-semibold">Speisen</TableHead>
-              <TableHead className="text-right font-semibold w-28">Preis</TableHead>
+              <TableHead style={colorStyle} className="text-left font-semibold">Speisen</TableHead>
+              <TableHead style={colorStyle} className="text-right font-semibold w-28">Preis</TableHead>
               {orderMode && <TableHead className="w-32" />}
             </TableRow>
           </TableHeader>
@@ -410,16 +411,16 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
                     <TableCell className="align-top py-4">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span style={fontStyle} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
+                          <span style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                             {item.name}
                           </span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
                         </div>
-                        {item.description && <span className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
+                        {item.description && <span style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
-                    <TableCell className={`text-right font-mono whitespace-nowrap align-middle py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                    <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
                     {orderMode && (
                       <TableCell className="align-middle py-4 w-32">
                         <div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div>
