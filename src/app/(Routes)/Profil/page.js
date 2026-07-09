@@ -570,10 +570,12 @@ export default function PageBuilder() {
       setConfirmDeleteCategory(true);
     };
 
+    const fontStyle = !deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {};
+
     return (
       <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={!deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {}}>
+          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={fontStyle}>
             {title}
           </h3>
 
@@ -588,7 +590,7 @@ export default function PageBuilder() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <Table className="w-full `min-w-175` table-fixed">
+          <Table className="w-full `min-w-175` table-fixed" style={{ fontFamily: font }}>
             <colgroup>
               <col className="w-24" />
               <col className="w-full" />
@@ -596,11 +598,15 @@ export default function PageBuilder() {
             </colgroup>
             <TableHeader>
               <TableRow className={`hover:bg-gray-100 w-full ${bgColorClass(localBgColor)}}`} style={bgColorStyle(localBgColor)}>
-                <TableHead className="text-left">Aktionen</TableHead>
-                <TableHead className="text-left" style={{ fontFamily: font }}>
+                <TableHead className="text-left" style={fontStyle}>
+                  Aktionen
+                </TableHead>
+                <TableHead className="text-left" style={fontStyle}>
                   Speisen
                 </TableHead>
-                <TableHead className="text-right right-1 absolute">Preis:</TableHead>
+                <TableHead className="text-right right-1 absolute" style={fontStyle}>
+                  Preis:
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -647,15 +653,21 @@ export default function PageBuilder() {
                       </div>
                     </TableCell>
 
-                    <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`}>
+                    <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>
                       <div className="flex flex-col">
                         <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
-                        {item.description && <span className="text-sm text-gray-500">{item.description}</span>}
+                        {item.description && (
+                          <span className="text-sm text-gray-500" style={deletedDishes.includes(item.id) ? {} : fontStyle}>
+                            {item.description}
+                          </span>
+                        )}
                         {allowAvailability && stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
-                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`}>{Number(item.price).toFixed(2)}€</TableCell>
+                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>
+                      {Number(item.price).toFixed(2)}€
+                    </TableCell>
                   </TableRow>
                 </Fragment>
               ))}
@@ -799,11 +811,13 @@ export default function PageBuilder() {
                 {session?.user?.subscription === "NoSubscription" ? "Kein Abo" : (session?.user?.subscription ?? "Kein Abo")}
               </Badge>
               <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
-                {catCount}/{Limit.CategoryLimit ?? "?"} <span className="hidden sm:inline">Kategorien</span><span className="sm:hidden">Kat.</span>
+                {catCount}/{Limit.CategoryLimit ?? "?"} <span className="hidden sm:inline">Kategorien</span>
+                <span className="sm:hidden">Kat.</span>
               </span>
               <span className="text-gray-300">|</span>
               <span className={dishCount >= Limit.DishLimit ? "text-red-500 font-medium" : "text-gray-500"}>
-                {dishCount}/{Limit.DishLimit ?? "?"} <span className="hidden sm:inline">Gerichte</span><span className="sm:hidden">Ger.</span>
+                {dishCount}/{Limit.DishLimit ?? "?"} <span className="hidden sm:inline">Gerichte</span>
+                <span className="sm:hidden">Ger.</span>
               </span>
               {(exeedCatLimit || exeedDishLimit) && (
                 <DynamicLink href="/pricing" className="text-amber-600 hover:text-amber-700 font-semibold hover:underline whitespace-nowrap">
@@ -931,7 +945,25 @@ export default function PageBuilder() {
                       <FaPen />
                     </Button>
                   </div>
-                  {renderCatGroupMenu === group.id && <EdditCategoryGroup renderCatGroupMenu={renderCatGroupMenu} setRenderCatGroupMenu={setRenderCatGroupMenu} id={group.id} name={group.name} position={group.position} bgColor={groupColorMap[group.id] ?? group.color} fontColor={groupFontColorMap[group.id] ?? group.fontColor ?? ""} borderRadius={groupBorderMap[group.id] ?? group.borderRadius} titleAlign={groupAlignMap[group.id] ?? group.titleAlign} restaurantID={restaurantID} allowPremiumColor={allowPremiumColor} onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))} onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))} onFontColorChange={(val) => setGroupFontColorMap((prev) => ({ ...prev, [group.id]: val }))} onTitleAlignChange={(val) => setGroupAlignMap((prev) => ({ ...prev, [group.id]: val }))} />}
+                  {renderCatGroupMenu === group.id && (
+                    <EdditCategoryGroup
+                      renderCatGroupMenu={renderCatGroupMenu}
+                      setRenderCatGroupMenu={setRenderCatGroupMenu}
+                      id={group.id}
+                      name={group.name}
+                      position={group.position}
+                      bgColor={groupColorMap[group.id] ?? group.color}
+                      fontColor={groupFontColorMap[group.id] ?? group.fontColor ?? ""}
+                      borderRadius={groupBorderMap[group.id] ?? group.borderRadius}
+                      titleAlign={groupAlignMap[group.id] ?? group.titleAlign}
+                      restaurantID={restaurantID}
+                      allowPremiumColor={allowPremiumColor}
+                      onBorderRadiusChange={(val) => setGroupBorderMap((prev) => ({ ...prev, [group.id]: val }))}
+                      onColorChange={(val) => setGroupColorMap((prev) => ({ ...prev, [group.id]: val }))}
+                      onFontColorChange={(val) => setGroupFontColorMap((prev) => ({ ...prev, [group.id]: val }))}
+                      onTitleAlignChange={(val) => setGroupAlignMap((prev) => ({ ...prev, [group.id]: val }))}
+                    />
+                  )}
                   <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={{ ...((groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}), textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left" }}>
                     {group.name}
                   </h2>

@@ -3,13 +3,18 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import MenuClient from "../components/MenuClient";
 
-// ISR: HTML wird pro Restaurant höchstens alle 5 Minuten neu gerendert,
-// alle weiteren Aufrufe kommen ohne Function-Invocation aus dem CDN-Cache.
-// Das leere generateStaticParams ist nötig, damit die Route ISR statt SSR wird.
 export const revalidate = 300;
 
-export function generateStaticParams() {
-  return [];
+// Alle Speisekarten schon beim Build vorrendern, damit auch der erste
+// Besucher nach einem Deploy keinen kalten Server-Render abwartet
+export async function generateStaticParams() {
+  try {
+    const restaurants = await prisma.restaurant.findMany({ select: { id: true } });
+    return restaurants.map((r) => ({ restaurantID: r.id }));
+  } catch {
+    // Ohne DB-Zugriff beim Build: Seiten entstehen beim ersten Aufruf (ISR)
+    return [];
+  }
 }
 
 // cache() dedupliziert den DB-Zugriff zwischen generateMetadata und Page
