@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
 import { restaurantRegistrationSchema } from "@/lib/schemas/restaurant";
+//import { sendRegistrationConfirmation } from "@/lib/registrationMail";
 
 export async function POST(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -78,6 +79,14 @@ export async function POST(req) {
 
       return created;
     });
+
+    // Bestätigungsmail nicht abwarten — die Registrierung ist bereits erfolgreich,
+    // ein Mailfehler darf sie nicht als fehlgeschlagen erscheinen lassen.
+    /*sendRegistrationConfirmation({
+      to: data.email,
+      restaurantName: data.restaurantName,
+      tier: "Free",
+    }).catch((err) => console.error("Registrierungs-Mail fehlgeschlagen:", err));*/
 
     return NextResponse.json(
       { message: "Restaurant erfolgreich registriert", restaurantId: restaurant.id },
