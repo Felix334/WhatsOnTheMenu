@@ -20,8 +20,8 @@ import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
 import RenderUserID from "./components/renderUserID";
 
-import SpeiseKarteLaptop from "./components/img/ResizedLaptopImage.png";
-import SpeiseKarteHandy from "./components/img/Speisekarte_HandybildschirmNeu.png";
+import SpeiseKarteHandyNeu from "./components/img/SpeisekarteHandyNeu.png"
+import SpeiseKarteLaptopNeu from "./components/img/SpeisekarteLaptopNeu.png"
 import { AdminLink, FreeTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
 
 import WebsiteIcon from "./icon.svg";
@@ -276,7 +276,7 @@ function HomeContent() {
                 <div className="hidden lg:flex justify-center items-center">
                   <div className="relative">
                     <div className="rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                      <Image src={SpeiseKarteLaptop} alt="Digitale Speisekarte Vorschau" className="rounded-xl object-cover w-full max-w-md" priority />
+                      <Image src={SpeiseKarteLaptopNeu} alt="Digitale Speisekarte Vorschau" className="rounded-xl object-cover w-full max-w-md" priority />
                     </div>
                   </div>
                 </div>
@@ -291,10 +291,10 @@ function HomeContent() {
               </header>
               <div className="flex flex-col sm:flex-row gap-6 items-center justify-center w-full max-w-5xl">
                 <div className="relative w-full max-w-sm sm:max-w-xs md:max-w-md aspect-4/3">
-                  <Image src={SpeiseKarteLaptop} className="object-cover" alt="Speisekarte Laptop" />
+                  <Image src={SpeiseKarteLaptopNeu} className="object-cover" alt="Speisekarte Laptop" />
                 </div>
                 <div className="relative w-full max-w-70 sm:max-w-30 md:max-w-62.5 aspect-9/16">
-                  <Image src={SpeiseKarteHandy} className="object-cover" alt="Speisekarte Handy" />
+                  <Image src={SpeiseKarteHandyNeu} className="object-cover" alt="Speisekarte Handy" />
                 </div>
               </div>
             </div>
