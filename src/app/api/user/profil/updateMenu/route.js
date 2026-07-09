@@ -10,10 +10,14 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { restaurantID, font, bgColor } = body ?? {};
+    const { restaurantID, font, bgColor, headingFont, density } = body ?? {};
 
-    if (!restaurantID || (!font && !bgColor)) {
+    if (!restaurantID || (!font && !bgColor && headingFont === undefined && density === undefined)) {
       return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+    }
+
+    if (density !== undefined && density !== "" && !["compact", "normal", "airy"].includes(density)) {
+      return NextResponse.json({ message: "Ungültige Dichte" }, { status: 400 });
     }
 
     const restaurant = await prisma.restaurant.findUnique({
@@ -52,10 +56,14 @@ export async function POST(req) {
       const dataToUpdate = {
         ...(font ? { font } : null),
         ...(bgColor ? { bgColor } : null),
+        // Leerer String = "Standard" → Feld auf null zurücksetzen
+        ...(headingFont !== undefined ? { headingFont: headingFont || null } : null),
+        ...(density !== undefined ? { density: density || null } : null),
       };
 
+      // headingFont/density dürfen null sein (= Standard) — nur undefined rausfiltern
       const cleaned = Object.fromEntries(
-        Object.entries(dataToUpdate).filter(([, v]) => v !== null)
+        Object.entries(dataToUpdate).filter(([, v]) => v !== undefined)
       );
 
       return tx.menu.update({

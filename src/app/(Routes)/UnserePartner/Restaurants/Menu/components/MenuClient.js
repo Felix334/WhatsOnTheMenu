@@ -316,11 +316,17 @@ const AllergenBadges = ({ ingredients }) => {
 
 // ─── Menu Section ──────────────────────────────────────────────────────────────
 const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-2xl", xl: "rounded-3xl" };
+const DENSITY_TEXT = { compact: "text-sm", normal: "", airy: "text-lg" };
+const DENSITY_ROW_DESKTOP = { compact: "py-2", normal: "py-4", airy: "py-6" };
+const DENSITY_ROW_MOBILE = { compact: "py-2", normal: "py-3", airy: "py-5" };
 
-const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headingFont, density = "normal", leaderDots = false, titleAlign, titleUppercase = false, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
   const colorStyle = fontColor ? { color: fontColor } : {};
+  const headingStyle = headingFont || menuFont ? { fontFamily: headingFont || menuFont } : {};
+  const rowPadDesktop = DENSITY_ROW_DESKTOP[density] ?? "py-4";
+  const rowPadMobile = DENSITY_ROW_MOBILE[density] ?? "py-3";
 
   const visibleItems =
     excludedAllergens.length > 0
@@ -352,9 +358,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
   };
 
   return (
-    <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
-      <div className="mb-8 text-center pb-6">
-        <h3 style={{ ...fontStyle, ...colorStyle }} className="text-3xl sm:text-3xl md:text-4xl font-semibold tracking-wide">
+    <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} ${DENSITY_TEXT[density] ?? ""} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
+      <div className="mb-8 pb-6">
+        <h3 style={{ ...headingStyle, ...colorStyle, textAlign: titleAlign || "center" }} className={`text-3xl sm:text-3xl md:text-4xl font-semibold ${titleUppercase ? "uppercase tracking-widest" : "tracking-wide"}`}>
           {title}
         </h3>
       </div>
@@ -365,13 +371,14 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
           const unavailable = showAvailability && item.stock === "outOfStock";
           return (
             <React.Fragment key={item.id || index}>
-              <div onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`flex justify-between items-start py-3 border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
+              <div onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`flex justify-between items-start ${rowPadMobile} border-b transition-colors ${unavailable ? "opacity-50 cursor-not-allowed" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
                 <div className="flex-1 pr-2">
                   <div className="flex items-center gap-2">
                     <p style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                       {item.name}
                     </p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
+                    {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                   </div>
                   {item.description && <p style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
                   <AllergenBadges ingredients={item.ingredients} />
@@ -408,21 +415,22 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, cart 
               return (
                 <React.Fragment key={item.id || index}>
                   <TableRow onClick={() => !unavailable && !orderMode && toggleExpand(index)} className={`transition-all duration-200 border-b ${unavailable ? "opacity-50 cursor-not-allowed bg-gray-50" : orderMode ? "" : "cursor-pointer hover:bg-yellow-50"}`}>
-                    <TableCell className="align-top py-4">
+                    <TableCell className={`align-top ${rowPadDesktop}`}>
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                           <span style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                             {item.name}
                           </span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
+                          {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                         </div>
                         {item.description && <span style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
-                    <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle py-4 w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                    <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle ${rowPadDesktop} w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
                     {orderMode && (
-                      <TableCell className="align-middle py-4 w-32">
+                      <TableCell className={`align-middle ${rowPadDesktop} w-32`}>
                         <div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div>
                       </TableCell>
                     )}
@@ -674,6 +682,8 @@ const MenuClient = ({ serverData }) => {
   const menuEntry = serverData?.menu?.[0];
   const bgColor = menuEntry?.bgColor;
   const menuFont = menuEntry?.font || null;
+  const headingFont = menuEntry?.headingFont || null;
+  const density = menuEntry?.density || "normal";
   const heroColor = menuEntry?.heroColor;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
   const showAvailability = ["Professional", "Business"].includes(serverData?.ownerSubscription);
@@ -707,12 +717,12 @@ const MenuClient = ({ serverData }) => {
               <div className="space-y-12">
                 {categoryGroups.map((group) => (
                   <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 style={{ ...(menuFont ? { fontFamily: menuFont } : {}), ...(group.fontColor ? { color: group.fontColor } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
+                    <h2 style={{ ...(headingFont || menuFont ? { fontFamily: headingFont || menuFont } : {}), ...(group.fontColor ? { color: group.fontColor } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
                       {group.name}
                     </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} headingFont={headingFont} density={density} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
                       ))}
                     </div>
                   </div>

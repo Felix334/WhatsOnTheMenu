@@ -61,7 +61,7 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, positionNum } = useRestaurantData(userID);
+  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -509,12 +509,16 @@ export default function PageBuilder() {
   }
 
   const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
+  const DENSITY_CLASS = { compact: "text-sm", normal: "", airy: "text-lg" };
 
-  const MenuSection = ({ title, menuItems, categoryId, bgColor, fontColor, borderRadius, elevated }) => {
+  const MenuSection = ({ title, menuItems, categoryId, bgColor, fontColor, borderRadius, elevated, leaderDots, titleAlign, titleUppercase }) => {
     const [localBorderRadius, setLocalBorderRadius] = useState(borderRadius);
     const [localElevated, setLocalElevated] = useState(elevated ?? true);
     const [localBgColor, setLocalBgColor] = useState(bgColor);
     const [localFontColor, setLocalFontColor] = useState(fontColor ?? "");
+    const [localLeaderDots, setLocalLeaderDots] = useState(leaderDots ?? false);
+    const [localTitleAlign, setLocalTitleAlign] = useState(titleAlign || "center");
+    const [localTitleUppercase, setLocalTitleUppercase] = useState(titleUppercase ?? false);
     const [expandedIndex, setExpandedIndex] = useState(null);
     const [openItem, setOpenItem] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
@@ -573,9 +577,9 @@ export default function PageBuilder() {
     const fontStyle = !deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {};
 
     return (
-      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
+      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-          <h3 className={`text-center text-2xl sm:text-3xl md:text-4xl font-semibold ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={fontStyle}>
+          <h3 className={`w-full text-2xl sm:text-3xl md:text-4xl font-semibold ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
             {title}
           </h3>
 
@@ -655,7 +659,10 @@ export default function PageBuilder() {
 
                     <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>
                       <div className="flex flex-col">
-                        <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
+                        <div className="flex items-baseline gap-2">
+                          <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
+                          {localLeaderDots && <span aria-hidden className="flex-1 min-w-6 border-b border-dotted border-current opacity-40" />}
+                        </div>
                         {item.description && (
                           <span className="text-sm text-gray-500" style={deletedDishes.includes(item.id) ? {} : fontStyle}>
                             {item.description}
@@ -713,6 +720,9 @@ export default function PageBuilder() {
             fontColor: localFontColor,
             borderRadius: localBorderRadius,
             elevated: localElevated,
+            leaderDots: localLeaderDots,
+            titleAlign: localTitleAlign,
+            titleUppercase: localTitleUppercase,
             id: categoryId,
           }}
           setChangedCategory={setChangedCategories}
@@ -720,6 +730,9 @@ export default function PageBuilder() {
           onElevatedChange={setLocalElevated}
           onColorChange={setLocalBgColor}
           onFontColorChange={setLocalFontColor}
+          onLeaderDotsChange={setLocalLeaderDots}
+          onTitleAlignChange={setLocalTitleAlign}
+          onTitleUppercaseChange={setLocalTitleUppercase}
           category={title}
           restaurantId={serverData?.userData?.restaurant?.id}
           userID={userID}
@@ -964,12 +977,12 @@ export default function PageBuilder() {
                       onTitleAlignChange={(val) => setGroupAlignMap((prev) => ({ ...prev, [group.id]: val }))}
                     />
                   )}
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={{ ...((groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}), textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left" }}>
+                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={{ ...((groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}), textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left", ...(headingFont ? { fontFamily: headingFont } : {}) }}>
                     {group.name}
                   </h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
-                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} fontColor={category.fontColor} borderRadius={category.borderRadius} elevated={category.elevated} />
+                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} fontColor={category.fontColor} borderRadius={category.borderRadius} elevated={category.elevated} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} />
                     ))}
                   </div>
                 </div>

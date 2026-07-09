@@ -15,6 +15,13 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import addressSchema from "./Schema/adressSchema";
 import FontSelector from "./fontList";
 import { OpeningHoursEditor } from "./openingHours";
+import { MENU_THEMES } from "@/lib/menuThemes";
+
+const DENSITY_OPTIONS = [
+  { value: "compact", label: "Kompakt" },
+  { value: "normal", label: "Normal" },
+  { value: "airy", label: "Luftig" },
+];
 
 /* ===================== OPTION MENU ===================== */
 
@@ -23,6 +30,10 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   const [isEditingMenu, setIsEditingMenu] = useState(false);
   const [editedBgColor, setEditedBgColor] = useState(bgColor ?? "");
   const [editedFont, setEditedFont] = useState("Arial");
+  const [editedHeadingFont, setEditedHeadingFont] = useState("");
+  const [editedDensity, setEditedDensity] = useState("normal");
+  const [pendingTheme, setPendingTheme] = useState(null);
+  const [applyingTheme, setApplyingTheme] = useState(false);
 
   const { data: session } = useSession();
   const userID = session?.user?.id;
@@ -37,8 +48,10 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   }, [bgColor]);
 
   useEffect(() => {
-    const font = serverData?.userData?.restaurant?.menu?.[0]?.font;
-    if (font) setEditedFont(font);
+    const menu = serverData?.userData?.restaurant?.menu?.[0];
+    if (menu?.font) setEditedFont(menu.font);
+    setEditedHeadingFont(menu?.headingFont ?? "");
+    setEditedDensity(menu?.density || "normal");
   }, [serverData]);
 
   const handleSaveMenu = async () => {
@@ -48,6 +61,8 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
       body: JSON.stringify({
         bgColor: editedBgColor,
         font: editedFont,
+        headingFont: editedHeadingFont,
+        density: editedDensity,
         restaurantID,
         userID,
       }),
@@ -65,9 +80,30 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   };
 
   const handleCancelMenu = () => {
+    const menu = serverData?.userData?.restaurant?.menu?.[0];
     setEditedBgColor(bgColor ?? "");
-    setEditedFont(serverData?.userData?.restaurant?.menu?.[0]?.font || "Arial");
+    setEditedFont(menu?.font || "Arial");
+    setEditedHeadingFont(menu?.headingFont ?? "");
+    setEditedDensity(menu?.density || "normal");
     setIsEditingMenu(false);
+  };
+
+  const applyTheme = async (themeKey) => {
+    setApplyingTheme(true);
+    try {
+      const response = await fetch(`/api/user/profil/applyTheme`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restaurantID, theme: themeKey }),
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      toast.success("Theme angewendet!");
+      location.reload();
+    } catch {
+      toast.error("Theme konnte nicht angewendet werden");
+      setApplyingTheme(false);
+    }
   };
 
   return (
@@ -236,6 +272,37 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
               </p>
             )}
 
+            <Label>Überschriften-Schriftart</Label>
+            {isEditingMenu ? (
+              <div className="space-y-2">
+                <FontSelector onFontChange={setEditedHeadingFont} value={editedHeadingFont || editedFont} />
+                {editedHeadingFont && (
+                  <button type="button" onClick={() => setEditedHeadingFont("")} className="text-xs text-gray-400 hover:text-gray-700">
+                    ✕ Zurücksetzen (wie Fließtext)
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 py-1" style={{ fontFamily: editedHeadingFont || editedFont || "inherit" }}>
+                {editedHeadingFont || "Wie Fließtext"}
+              </p>
+            )}
+
+            <Label>Zeilendichte</Label>
+            <div className="flex gap-2">
+              {DENSITY_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  disabled={!isEditingMenu}
+                  onClick={() => setEditedDensity(value)}
+                  className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all disabled:opacity-50 ${editedDensity === value ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             {isEditingMenu ? (
               <>
                 <Button onClick={handleSaveMenu}>Speichern</Button>
@@ -246,6 +313,55 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
             ) : (
               <Button onClick={() => setIsEditingMenu(true)}>Menü bearbeiten</Button>
             )}
+
+            <div className="pt-4 border-t space-y-3">
+              <Label>Design-Themes</Label>
+              {!allowPremiumColor && (
+                <p className="text-xs text-amber-600">
+                  Premium-Feature —{" "}
+                  <Link href="/pricing" className="underline font-medium">
+                    Upgrade
+                  </Link>
+                  , um Themes zu nutzen.
+                </p>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(MENU_THEMES).map(([key, theme]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    disabled={!allowPremiumColor || applyingTheme}
+                    onClick={() => setPendingTheme(key)}
+                    className="rounded-xl border-2 border-gray-200 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed text-left overflow-hidden transition-all"
+                  >
+                    <div className="h-10 flex">
+                      <span className="flex-1" style={{ backgroundColor: theme.menu.bgColor }} />
+                      <span className="flex-1" style={{ backgroundColor: theme.category.bgColor }} />
+                      <span className="flex-1" style={{ backgroundColor: theme.category.fontColor }} />
+                    </div>
+                    <div className="p-2">
+                      <p className="text-sm font-semibold" style={{ fontFamily: theme.menu.headingFont }}>
+                        {theme.label}
+                      </p>
+                      <p className="text-xs text-gray-500">{theme.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <ConfirmDialog
+              open={pendingTheme !== null}
+              onOpenChange={(open) => !open && setPendingTheme(null)}
+              title={`Theme „${MENU_THEMES[pendingTheme]?.label ?? ""}“ anwenden?`}
+              description="Das Theme überschreibt Farben, Schriftarten, Ränder und Punktlinien aller Kategorien und Gruppen. Das kann nicht rückgängig gemacht werden."
+              confirmLabel="Anwenden"
+              onConfirm={() => {
+                const themeKey = pendingTheme;
+                setPendingTheme(null);
+                applyTheme(themeKey);
+              }}
+            />
           </div>
 
           {localServerData && <RestaurantData serverData={localServerData} setServerData={setLocalServerData} restaurantID={restaurantID} userID={userID} />}

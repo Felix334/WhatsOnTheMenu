@@ -35,6 +35,8 @@ const extractMenuData = (data) => {
     restaurantID: restaurant?.id ?? "",
     bgColor: menu?.bgColor ?? "",
     font: menu?.font ?? "",
+    headingFont: menu?.headingFont ?? "",
+    density: menu?.density ?? "",
     categoryGroup,
     positionNum: categoryGroup.reduce((n, g) => n + (g?.categories?.length ?? 0), 0),
   };

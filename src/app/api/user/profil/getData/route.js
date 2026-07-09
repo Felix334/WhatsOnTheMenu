@@ -71,6 +71,8 @@ async function main(userId) {
                 description: true,
                 bgColor: true,
                 font: true,
+                headingFont: true,
+                density: true,
                 heroColor: true,
                 heroTextColor: true,
                 createdAt: true,
@@ -95,6 +97,9 @@ async function main(userId) {
                         fontColor: true,
                         borderRadius: true,
                         elevated: true,
+                        leaderDots: true,
+                        titleAlign: true,
+                        titleUppercase: true,
                         dishes: {
                           select: {
                             id: true,

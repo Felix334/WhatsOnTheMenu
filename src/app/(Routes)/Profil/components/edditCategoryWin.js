@@ -17,11 +17,20 @@ const BORDER_RADIUS_OPTIONS = [
   { value: "xl", label: "Sehr rund" },
 ];
 
-const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, onFontColorChange, category, restaurantId, allowPremiumColor }) => {
+const TITLE_ALIGN_OPTIONS = [
+  { value: "left", label: "Links" },
+  { value: "center", label: "Zentriert" },
+  { value: "right", label: "Rechts" },
+];
+
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, onFontColorChange, onLeaderDotsChange, onTitleAlignChange, onTitleUppercaseChange, category, restaurantId, allowPremiumColor }) => {
   const [color, setColor] = useState("");
   const [fontColor, setFontColor] = useState("");
   const [borderRadius, setBorderRadius] = useState("md");
   const [elevated, setElevated] = useState(true);
+  const [leaderDots, setLeaderDots] = useState(false);
+  const [titleAlign, setTitleAlign] = useState("center");
+  const [titleUppercase, setTitleUppercase] = useState(false);
   const formRef = useRef();
 
   const form = useForm({
@@ -39,6 +48,9 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       setFontColor(selectedCategory.fontColor || "");
       setBorderRadius(selectedCategory.borderRadius || "md");
       setElevated(selectedCategory.elevated ?? true);
+      setLeaderDots(selectedCategory.leaderDots ?? false);
+      setTitleAlign(selectedCategory.titleAlign || "center");
+      setTitleUppercase(selectedCategory.titleUppercase ?? false);
     }
   }, [selectedCategory]);
 
@@ -50,6 +62,9 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     const initFontColor = selectedCategory?.fontColor || "";
     const initBorderRadius = selectedCategory?.borderRadius || "md";
     const initElevated = selectedCategory?.elevated ?? true;
+    const initLeaderDots = selectedCategory?.leaderDots ?? false;
+    const initTitleAlign = selectedCategory?.titleAlign || "center";
+    const initTitleUppercase = selectedCategory?.titleUppercase ?? false;
 
     // Nur geänderte Felder sammeln
     const changes = {};
@@ -58,6 +73,9 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     if (fontColor !== initFontColor) changes.fontColor = fontColor || null;
     if (borderRadius !== initBorderRadius) changes.borderRadius = borderRadius;
     if (elevated !== initElevated) changes.elevated = elevated;
+    if (leaderDots !== initLeaderDots) changes.leaderDots = leaderDots;
+    if (titleAlign !== initTitleAlign) changes.titleAlign = titleAlign;
+    if (titleUppercase !== initTitleUppercase) changes.titleUppercase = titleUppercase;
 
     if (Object.keys(changes).length === 0) {
       onOpenChange(false);
@@ -69,6 +87,9 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     if ("color" in changes) onColorChange?.(color);
     if ("elevated" in changes) onElevatedChange?.(elevated);
     if ("fontColor" in changes) onFontColorChange?.(fontColor);
+    if ("leaderDots" in changes) onLeaderDotsChange?.(leaderDots);
+    if ("titleAlign" in changes) onTitleAlignChange?.(titleAlign);
+    if ("titleUppercase" in changes) onTitleUppercaseChange?.(titleUppercase);
 
     try {
       const response = await fetch("/api/user/profil/edditData", {
@@ -97,6 +118,9 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       if ("color" in changes) onColorChange?.(initColor);
       if ("elevated" in changes) onElevatedChange?.(initElevated);
       if ("fontColor" in changes) onFontColorChange?.(initFontColor);
+      if ("leaderDots" in changes) onLeaderDotsChange?.(initLeaderDots);
+      if ("titleAlign" in changes) onTitleAlignChange?.(initTitleAlign);
+      if ("titleUppercase" in changes) onTitleUppercaseChange?.(initTitleUppercase);
       toast.error("Fehler beim Speichern: " + error.message);
     }
   };
@@ -193,6 +217,54 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
                   className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${!elevated ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
                 >
                   Flach
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Titel-Ausrichtung</label>
+              <div className="flex gap-2">
+                {TITLE_ALIGN_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTitleAlign(value)}
+                    className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${titleAlign === value ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Titel-Stil</label>
+              <button
+                type="button"
+                onClick={() => setTitleUppercase(!titleUppercase)}
+                className={`py-2 text-sm rounded-xl border-2 transition-all uppercase tracking-widest ${titleUppercase ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+              >
+                Grossbuchstaben
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">Punktlinien zum Preis</label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLeaderDots(true)}
+                  className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${leaderDots ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                >
+                  <span>An</span>
+                  <span className="hidden sm:inline text-xs opacity-70"> — Gericht ..... 9,50€</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeaderDots(false)}
+                  className={`flex-1 py-2 text-sm rounded-xl border-2 transition-all ${!leaderDots ? "border-gray-900 bg-gray-900 text-white font-semibold" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                >
+                  Aus
                 </button>
               </div>
             </div>

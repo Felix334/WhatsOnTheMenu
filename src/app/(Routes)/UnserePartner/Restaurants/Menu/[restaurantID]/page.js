@@ -38,6 +38,8 @@ const getRestaurantData = cache(async (restaurantID) => {
           description: true,
           bgColor: true,
           font: true,
+          headingFont: true,
+          density: true,
           heroColor: true,
           heroTextColor: true,
           createdAt: true,
@@ -62,6 +64,9 @@ const getRestaurantData = cache(async (restaurantID) => {
                   fontColor: true,
                   borderRadius: true,
                   elevated: true,
+                  leaderDots: true,
+                  titleAlign: true,
+                  titleUppercase: true,
                   dishes: {
                     select: {
                       id: true,

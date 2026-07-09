@@ -150,6 +150,8 @@ model Menu {
   updatedAt     DateTime        @updatedAt
   bgColor       String
   font          String
+  headingFont   String?
+  density       String?
   heroColor     String?
   heroTextColor String?
   categoryGroup CategoryGroup[]
@@ -168,6 +170,9 @@ model Category {
   fontColor       String?
   borderRadius    String?
   elevated        Boolean       @default(true)
+  leaderDots      Boolean       @default(false)
+  titleAlign      String?
+  titleUppercase  Boolean       @default(false)
   menuId          String?
   categoryGroupID String
   categoryGroup   CategoryGroup @relation(fields: [categoryGroupID], references: [id], onDelete: Cascade)
