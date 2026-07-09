@@ -164,8 +164,12 @@ export const authOptions: NextAuthOptions = {
     },
   },
 
+  // Es gibt keine eigene Login-Seite — der Login läuft über das Modal auf der
+  // Homepage. Abbruch/Fehler beim OAuth-Flow landen daher auf "/" mit ?error=…
+  // (wird dort per Toast angezeigt), statt auf der nicht existierenden /login.
   pages: {
-    signIn: '/login',
+    signIn: '/',
+    error: '/',
   },
 };
 
