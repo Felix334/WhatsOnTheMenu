@@ -20,8 +20,8 @@ import ExplainCards from "./components/explainCards";
 import FooterPart from "./components/footerPart";
 import RenderUserID from "./components/renderUserID";
 
-import SpeiseKarteHandyNeu from "./components/img/SpeisekarteHandyNeu.png"
-import SpeiseKarteLaptopNeu from "./components/img/SpeisekarteLaptopNeu.png"
+import SpeiseKarteHandyNeu from "./components/img/SpeisekarteHandyNeu.png";
+import SpeiseKarteLaptopNeu from "./components/img/SpeisekarteLaptopNeu.png";
 import { AdminLink, FreeTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
 
 import WebsiteIcon from "./icon.svg";
@@ -74,20 +74,13 @@ function HomeContent() {
         <RenderUserID />
         <nav className={`bg-white/95 backdrop-blur sticky top-0 z-50 transition-shadow duration-300 ${navShadow ? "shadow-lg" : "shadow-sm"}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-center md:justify-between items-center h-16">
-              <div className="absolute right-0  md:block">
-                {autherizedUser && (
-                  <div>
-                    <Profile />
-                  </div>
-                )}
-              </div>
+            <div className="relative flex justify-center md:justify-between items-center h-16">
               <div className="flex items-center justify-center md:justify-start">
                 <div className="text-2xl font-bold text-red-800 text-center md:text-left">
                   <Image src={WebsiteIcon} alt="" width={28} height={28} className="inline align-middle mx-1" /> WhatIsOnMyMenu.com
                 </div>
               </div>
-              <div className="hidden right-0 md:block">
+              <div className="hidden md:flex items-center gap-3">
                 <NavigationMenu>
                   <NavigationMenuList>
                     <NavigationMenuItem>
@@ -124,8 +117,9 @@ function HomeContent() {
                     )}
                   </NavigationMenuList>
                 </NavigationMenu>
+                {autherizedUser && <Profile />}
               </div>
-              <div className="absolute left-0 flex flex-col md:hidden">
+              <div className="absolute left-0 inset-y-0 flex items-center md:hidden">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon">
@@ -205,6 +199,11 @@ function HomeContent() {
                   </SheetContent>
                 </Sheet>
               </div>
+              {autherizedUser && (
+                <div className="absolute right-0 inset-y-0 flex items-center md:hidden">
+                  <Profile />
+                </div>
+              )}
             </div>
           </div>
         </nav>
@@ -366,7 +365,7 @@ function HomeContent() {
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
                     <div className="text-3xl font-bold">
-                      14.99€<span className="text-lg font-normal">/Monat</span>
+                      <span className="text-lg font-normal">/Monat</span>
                     </div>
                   </CardHeader>
                   <CardContent className="flex flex-col flex-1">
@@ -389,6 +388,9 @@ function HomeContent() {
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
+                      </li>
+                      <li className="flex items-center">
+                        <span className="text-green-400 mr-2">✓</span>Event-Kalender
                       </li>
                     </ul>
                   </CardContent>
