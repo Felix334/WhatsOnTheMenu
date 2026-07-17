@@ -65,6 +65,9 @@ function HomeContent() {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
+    const checkVercelEnv = () => {
+    console.log("Vercel-Env:", process.env.VERCEL_ENV)
+  }
 
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
