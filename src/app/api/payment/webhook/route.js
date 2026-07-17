@@ -23,6 +23,20 @@ export async function POST(req) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // Idempotenz: Stripe stellt Events bei Timeouts/Fehlern erneut zu. Jede Event-ID
+  // wird vor der Verarbeitung in StripeEvent registriert — ein Unique-Konflikt
+  // (P2002) bedeutet "schon verarbeitet" und wird direkt mit 200 quittiert.
+  try {
+    await prisma.stripeEvent.create({ data: { id: event.id, type: event.type } });
+  } catch (err) {
+    if (err?.code === "P2002") {
+      devLog(`Duplicate Stripe event skipped: ${event.id}`);
+      return NextResponse.json({ received: true });
+    }
+    console.error("StripeEvent registration failed:", err);
+    return NextResponse.json({ error: "Event registration failed" }, { status: 500 });
+  }
+
   try {
     switch (event.type) {
 
@@ -152,6 +166,9 @@ export async function POST(req) {
     }
   } catch (err) {
     console.error("Webhook handler error:", err);
+    // Registrierung zurücknehmen, damit der Stripe-Retry das Event erneut
+    // verarbeiten kann statt es als Duplikat zu überspringen.
+    await prisma.stripeEvent.delete({ where: { id: event.id } }).catch(() => {});
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
 

@@ -76,7 +76,6 @@ PROXMOX => als alternative zu Docker
 
 => Schutz gegen erneute Datenkorruption => Anmeldung mit HauptGmail nicht möglich => Wenn login bei felixmayer02@gmail.com probieren wurde ich statdessen bei fm.trashmail@gmail.com angemeldet
 
-=> Session validierung noch nicht sicher genug
 
 => Wenn der Kunde bereits ein höheres(oder gleichwertiges Abbo hat) wird dieses Abbo als entweder "In Nutzung" oder
 als "Ein höheres Abbo wird bereits genutzt" angezeigt

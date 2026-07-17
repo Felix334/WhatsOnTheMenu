@@ -34,6 +34,17 @@ const TIER_ALIAS: Record<string, Tier> = {
   premium: "Business",
 };
 
+// Aktuell buchbare Abo-Stufen — Professional und Business sind noch "Coming Soon".
+// Zum Freischalten das Tier hier eintragen (z. B. ["Business"]); das UI-Pendant
+// ist TIER_AVAILABLE_UI in src/app/(Routes)/pricing/page.js. Professional bleibt
+// bewusst auch nach dem Business-Launch vorerst gesperrt.
+export const AVAILABLE_TIERS: readonly Tier[] = [];
+
+export function isTierAvailable(tier: string): boolean {
+  const key = TIER_ALIAS[tier.toLowerCase()];
+  return key !== undefined && AVAILABLE_TIERS.includes(key);
+}
+
 export function getPriceId(tier: string): string | null {
   const key = TIER_ALIAS[tier.toLowerCase()];
   if (!key) return null;

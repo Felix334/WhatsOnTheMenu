@@ -41,8 +41,7 @@ function HomeContent() {
   const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
 
-  // NextAuth leitet bei abgebrochenem/fehlgeschlagenem OAuth-Login auf "/?error=…" um
-  // (pages.signIn/error in src/lib/auth.ts) — hier anzeigen und URL bereinigen.
+
   useEffect(() => {
     const authError = searchParams.get("error");
     if (!authError) return;
@@ -66,6 +65,10 @@ function HomeContent() {
     }
   };
 
+  const checkVercelEnv = () => {
+    console.log("Vercel-Env:", process.env.VERCEL_ENV)
+  }
+
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
     <div>
@@ -79,6 +82,7 @@ function HomeContent() {
                 <div className="text-2xl font-bold text-red-800 text-center md:text-left">
                   <Image src={WebsiteIcon} alt="" width={28} height={28} className="inline align-middle mx-1" /> WhatIsOnMyMenu.com
                 </div>
+                <Button onClick={checkVercelEnv}>Test-Env</Button>
               </div>
               <div className="hidden md:flex items-center gap-3">
                 <NavigationMenu>
@@ -190,6 +194,7 @@ function HomeContent() {
                           aria-label="Log in"
                           onClick={() => {
                             setMobileMenuOpen(false);
+                            renderLoginW();
                           }}
                         >
                           Anmelden

@@ -1,6 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
-import { stripe, getPriceId } from "@/lib/stripe";
+import { stripe, getPriceId, isTierAvailable } from "@/lib/stripe";
 import { restaurantCheckoutSchema } from "@/lib/schemas/restaurant";
 import { devLog, devWarn } from "@/lib/logger";
 
@@ -22,6 +22,12 @@ export async function POST(request) {
   if (!priceId) {
     console.error("Invalid tier:", tier);
     return new Response("Invalid tier", { status: 400 });
+  }
+
+  // "Coming Soon"-Sperre: nicht freigegebene Tiers serverseitig ablehnen,
+  // unabhängig davon, was irgendein Client anzeigt (Sicherheit vor Effizienz).
+  if (!isTierAvailable(tier)) {
+    return new Response("Dieses Abo ist noch nicht verfügbar", { status: 403 });
   }
 
   // Widerrufsbelehrung (EU-Verbraucherrecht): Ohne ausdrückliche Zustimmung zum

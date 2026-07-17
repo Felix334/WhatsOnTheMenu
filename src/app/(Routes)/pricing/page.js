@@ -12,6 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Bezahlte Tarife sind noch "Coming Soon" — UI-Schalter pro Tarif, passend zur
+// serverseitigen Sperre (AVAILABLE_TIERS in src/lib/stripe.ts). Beides zusammen
+// freischalten. Professional ("Pro") bleibt auch nach dem Business-Launch
+// vorerst gesperrt.
+const TIER_AVAILABLE_UI = {
+  Professional: false,
+  Business: false,
+};
+
 /* Unternehmer-Bestätigung + Widerrufs-Zustimmung — Pflicht vor jedem Abo-Checkout */
 function LegalConsentCheckbox({ checked, onCheckedChange }) {
   return (
@@ -171,16 +180,18 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {isSubscribed ? (
-                currentSub === "Professional" ? (
-                  <Button disabled className="w-full">
-                    Aktiver Plan ✓
-                  </Button>
-                ) : (
-                  <Button size="lg" className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow" onClick={handlePortal} disabled={isPendingPortal}>
-                    {isPendingPortal ? "Weiterleiten..." : "Zu diesem Plan wechseln"}
-                  </Button>
-                )
+              {isSubscribed && currentSub === "Professional" ? (
+                <Button disabled className="w-full">
+                  Aktiver Plan ✓
+                </Button>
+              ) : !TIER_AVAILABLE_UI.Professional ? (
+                <Button size="lg" disabled className="w-full bg-yellow-400 text-gray-900 font-semibold shadow">
+                  Coming Soon
+                </Button>
+              ) : isSubscribed ? (
+                <Button size="lg" className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow" onClick={handlePortal} disabled={isPendingPortal}>
+                  {isPendingPortal ? "Weiterleiten..." : "Zu diesem Plan wechseln"}
+                </Button>
               ) : (
                 <Dialog open={showProForm} onOpenChange={setShowProForm}>
                   <DialogTrigger asChild>
@@ -277,16 +288,18 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              {isSubscribed ? (
-                currentSub === "Business" ? (
-                  <Button disabled className="w-full">
-                    Aktiver Plan ✓
-                  </Button>
-                ) : (
-                  <Button size="lg" variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400" onClick={handlePortal} disabled={isPendingPortal}>
-                    {isPendingPortal ? "Weiterleiten..." : "Zu diesem Plan wechseln"}
-                  </Button>
-                )
+              {isSubscribed && currentSub === "Business" ? (
+                <Button disabled className="w-full">
+                  Aktiver Plan ✓
+                </Button>
+              ) : !TIER_AVAILABLE_UI.Business ? (
+                <Button size="lg" disabled variant="outline" className="w-full border-red-300 text-red-700">
+                  Coming Soon
+                </Button>
+              ) : isSubscribed ? (
+                <Button size="lg" variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400" onClick={handlePortal} disabled={isPendingPortal}>
+                  {isPendingPortal ? "Weiterleiten..." : "Zu diesem Plan wechseln"}
+                </Button>
               ) : (
                 <Dialog open={showPremiumForm} onOpenChange={setShowPremiumForm}>
                   <DialogTrigger asChild>

@@ -651,6 +651,10 @@ const MenuClient = ({ serverData }) => {
   const [activePage, setActivePage] = useState("menu");
 
   const tableNumber = searchParams.get("tableNumber");
+  // Bestellmodus nur für Professional-Restaurants — gleiche Regel wie serverseitig
+  // in getStaffAccess (api/orders/create), sonst zeigt die UI Buttons, die beim
+  // Abschicken ohnehin mit 401 abgelehnt würden.
+  const orderMode = !!tableNumber && serverData?.ownerSubscription === "Professional";
   const [cart, setCart] = useState({});
   const [excludedAllergens, setExcludedAllergens] = useState([]);
 
@@ -703,8 +707,8 @@ const MenuClient = ({ serverData }) => {
         <InfoPage restaurantData={serverData} />
       ) : (
         <>
-          <main className={`w-full max-w-7xl mx-auto px-4 py-8 ${tableNumber ? "pb-28" : ""}`}>
-            {tableNumber && (
+          <main className={`w-full max-w-7xl mx-auto px-4 py-8 ${orderMode ? "pb-28" : ""}`}>
+            {orderMode && (
               <div className="mb-6 flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 w-fit shadow-sm">
                 <span>🪑</span>
                 <span>
@@ -722,7 +726,7 @@ const MenuClient = ({ serverData }) => {
                     </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} headingFont={headingFont} density={density} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={!!tableNumber} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} headingFont={headingFont} density={density} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={orderMode} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
                       ))}
                     </div>
                   </div>
@@ -736,7 +740,7 @@ const MenuClient = ({ serverData }) => {
         </>
       )}
 
-      {tableNumber && <CartBar cart={cart} onOrder={() => setOrderStep("confirm")} />}
+      {orderMode && <CartBar cart={cart} onOrder={() => setOrderStep("confirm")} />}
 
       {orderStep === "confirm" && (
         <OrderModal
