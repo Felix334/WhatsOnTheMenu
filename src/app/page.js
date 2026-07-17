@@ -82,7 +82,7 @@ function HomeContent() {
                 <div className="text-2xl font-bold text-red-800 text-center md:text-left">
                   <Image src={WebsiteIcon} alt="" width={28} height={28} className="inline align-middle mx-1" /> WhatIsOnMyMenu.com
                 </div>
-                <Button onClick={checkVercelEnv}>Test-Env</Button>
+
               </div>
               <div className="hidden md:flex items-center gap-3">
                 <NavigationMenu>
