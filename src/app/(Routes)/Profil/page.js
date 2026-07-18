@@ -249,14 +249,19 @@ export default function PageBuilder() {
     setIsSaving(true);
 
     try {
-      // First, save the data
+      const payload = JSON.stringify({
+        restaurantId: restaurantID,
+        data: components,
+      });
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("Size:", new TextEncoder().encode(payload).length, "Bytes");
+      } 
+
       const response = await fetch("/api/user/profil/setData", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          restaurantId: restaurantID,
-          data: components,
-        }),
+        body: payload,
       });
 
       const resData = await response.json();
@@ -532,7 +537,6 @@ export default function PageBuilder() {
       const next = current === "isAvailable" ? "outOfStock" : "isAvailable";
 
       setStockMap((prev) => ({ ...prev, [dishId]: next }));
-
       try {
         const resp = await fetch("/api/user/profil/updateDishAvailability", {
           method: "POST",
