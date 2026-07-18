@@ -65,9 +65,6 @@ function HomeContent() {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
-    const checkVercelEnv = () => {
-    console.log("Vercel-Env:", process.env.VERCEL_ENV)
-  }
 
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
@@ -293,13 +290,13 @@ function HomeContent() {
 
           {/* Pricing Preview */}
           <section id="pricing" className="py-20 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-16">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Transparente Preise</h2>
                 <p className="text-xl text-gray-600">Wähle den Plan, der zu Ihrem Restaurant passt</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                 <Card className="flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
                     <CardTitle>Starter</CardTitle>
@@ -395,29 +392,8 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>Event-Kalender
                       </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <Card className="flex flex-col h-full relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
-                  <CardHeader>
-                    <CardTitle>Enterprise</CardTitle>
-                    <div className="text-3xl font-bold ">Individuell</div>
-                  </CardHeader>
-
-                  <CardContent className="flex flex-col flex-1">
-                    <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        Alles aus Professional
-                      </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>
-                        Eigene Domain
-                      </li>
-                      <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Analytics
+                        <span className="text-green-400 mr-2">✓</span>Eigene Subdomain
                       </li>
                     </ul>
                   </CardContent>

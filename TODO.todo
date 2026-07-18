@@ -26,11 +26,7 @@ Normaler User kann seinen Account nicht selber löschen
 
 // => Bei jeder API => werden die Daten vorher richtig verarbeitet(JSON.stringify usw)?
 
-=> Bild sollte auf die Bildschirmgröße angepasst werden
-
 => Google Profil-Bild funktioniert (nur in der webversion)
-
-API-Key Abfrage ÜBERALL einfügen
 
 => Fonts Fertig stellen
 => Eddit Fenster schließt automatisch wenn man kurz das den Tab wechselt => Soll offen bleiben
@@ -82,6 +78,8 @@ PROXMOX => als alternative zu Docker
 als "Ein höheres Abbo wird bereits genutzt" angezeigt
 
 => Packetupgrades einfügen
+
+=> Im "Professional"-Abo: Möglichkeit anbieten, eigene Subdomains zu erstellen (z.B. restaurantname.whatisonmymenu.com)
 
 
 
