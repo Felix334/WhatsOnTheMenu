@@ -8,23 +8,23 @@ datasource db {
 }
 
 model User {
-  id                   String           @id @default(uuid())
+  id                   String            @id @default(uuid())
   name                 String
-  email                String           @unique
+  email                String            @unique
   emailVerified        DateTime?
   password             String?
-  role                 Role             @default(User)
-  subscription         Subscription     @default(NoSubscription)
+  role                 Role              @default(User)
+  subscription         Subscription      @default(NoSubscription)
   companyId            String?
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   image                String
-  stripeCustomerId     String?          @unique
+  stripeCustomerId     String?           @unique
   stripeSubscriptionId String?
   stripePriceId        String?
   subscriptionStatus   String?
   accounts             Account[]
-  company              Company?         @relation("CompanyOwner")
+  company              Company?          @relation("CompanyOwner")
   dashboard            Dashboard?
   emails               EmailInbox[]
   payments             Payment[]
@@ -33,7 +33,7 @@ model User {
   restaurantQueues     RestaurantQueue?
   session              Session[]
   staffMemberships     RestaurantStaff[]
-  employeeOf           Company?         @relation("CompanyEmployees", fields: [companyId], references: [id], onDelete: SetNull)
+  employeeOf           Company?          @relation("CompanyEmployees", fields: [companyId], references: [id], onDelete: SetNull)
   favoriteRestaurants  SaveFavorites[]
 
   @@index([companyId])
@@ -84,25 +84,25 @@ model VerificationToken {
 }
 
 model Restaurant {
-  id            String     @id @default(cuid())
+  id            String            @id @default(cuid())
   name          String
   description   String?
   parentCompany String
-  ownerId       String     @unique
+  ownerId       String            @unique
   ownerName     String
-  category      String     @default("NONE")
+  category      String            @default("NONE")
   openingHours  Json?
   socialLinks   Json?
   contactEmail  String?
   contactPhone  String?
   website       String?
-  createdAt     DateTime   @default(now())
+  createdAt     DateTime          @default(now())
   calendar      Calendar[]
   locations     Location[]
   menu          Menu[]
   orders        Order[]
   staff         RestaurantStaff[]
-  owner         User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
@@ -149,6 +149,7 @@ model Menu {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   bgColor       String
+  fontColor     String?
   font          String
   headingFont   String?
   density       String?
@@ -261,7 +262,7 @@ model RestaurantQueue {
   city           String
   postalCode     String
   country        String
-  subscription   Subscription  @default(NoSubscription)
+  subscription   Subscription @default(NoSubscription)
   owner          User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
@@ -348,8 +349,8 @@ model CategoryGroup {
   borderRadius String?
   titleAlign   String?    @default("left")
   menuID       String
-  categories Category[]
-  Menu       Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
+  categories   Category[]
+  Menu         Menu       @relation(fields: [menuID], references: [id], onDelete: Cascade)
 
   @@index([menuID])
 }

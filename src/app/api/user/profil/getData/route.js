@@ -70,6 +70,7 @@ async function main(userId) {
                 name: true,
                 description: true,
                 bgColor: true,
+                fontColor: true,
                 font: true,
                 headingFont: true,
                 density: true,

@@ -10,9 +10,9 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { restaurantID, font, bgColor, headingFont, density } = body ?? {};
+    const { restaurantID, font, bgColor, fontColor, headingFont, density } = body ?? {};
 
-    if (!restaurantID || (!font && !bgColor && headingFont === undefined && density === undefined)) {
+    if (!restaurantID || (!font && !bgColor && fontColor === undefined && headingFont === undefined && density === undefined)) {
       return NextResponse.json({ message: "Bad Request" }, { status: 400 });
     }
 
@@ -57,6 +57,7 @@ export async function POST(req) {
         ...(font ? { font } : null),
         ...(bgColor ? { bgColor } : null),
         // Leerer String = "Standard" → Feld auf null zurücksetzen
+        ...(fontColor !== undefined ? { fontColor: fontColor || null } : null),
         ...(headingFont !== undefined ? { headingFont: headingFont || null } : null),
         ...(density !== undefined ? { density: density || null } : null),
       };

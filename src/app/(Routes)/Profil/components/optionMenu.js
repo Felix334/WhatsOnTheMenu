@@ -25,10 +25,11 @@ const DENSITY_OPTIONS = [
 
 /* ===================== OPTION MENU ===================== */
 
-const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, restaurantID, serverData, allowPremiumColor }) => {
+const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontColor, setNewFontColor, restaurantID, serverData, allowPremiumColor }) => {
   const [localServerData, setLocalServerData] = useState(serverData);
   const [isEditingMenu, setIsEditingMenu] = useState(false);
   const [editedBgColor, setEditedBgColor] = useState(bgColor ?? "");
+  const [editedFontColor, setEditedFontColor] = useState(fontColor ?? "");
   const [editedFont, setEditedFont] = useState("Arial");
   const [editedHeadingFont, setEditedHeadingFont] = useState("");
   const [editedDensity, setEditedDensity] = useState("normal");
@@ -48,6 +49,10 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   }, [bgColor]);
 
   useEffect(() => {
+    setEditedFontColor(fontColor ?? "");
+  }, [fontColor]);
+
+  useEffect(() => {
     const menu = serverData?.userData?.restaurant?.menu?.[0];
     if (menu?.font) setEditedFont(menu.font);
     setEditedHeadingFont(menu?.headingFont ?? "");
@@ -60,6 +65,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         bgColor: editedBgColor,
+        fontColor: editedFontColor,
         font: editedFont,
         headingFont: editedHeadingFont,
         density: editedDensity,
@@ -71,6 +77,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
 
     if (response.ok) {
       setNewBgColor(editedBgColor);
+      setNewFontColor(editedFontColor);
       setIsEditingMenu(false);
       toast.success("Design gespeichert!");
       location.reload();
@@ -82,6 +89,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
   const handleCancelMenu = () => {
     const menu = serverData?.userData?.restaurant?.menu?.[0];
     setEditedBgColor(bgColor ?? "");
+    setEditedFontColor(fontColor ?? "");
     setEditedFont(menu?.font || "Arial");
     setEditedHeadingFont(menu?.headingFont ?? "");
     setEditedDensity(menu?.density || "normal");
@@ -261,6 +269,31 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, resta
                   </option>
                 </select>
               </>
+            )}
+
+            <Label>Schriftfarbe</Label>
+            {allowPremiumColor ? (
+              <>
+                <Input type="color" value={isEditingMenu ? editedFontColor || "#212529" : fontColor || "#212529"} disabled={!isEditingMenu} onChange={(e) => setEditedFontColor(e.target.value)} />
+                {isEditingMenu && editedFontColor && (
+                  <button type="button" onClick={() => setEditedFontColor("")} className="text-xs text-gray-400 hover:text-gray-700 whitespace-nowrap">
+                    ✕ Zurücksetzen (Standard)
+                  </button>
+                )}
+              </>
+            ) : (
+              <select value={isEditingMenu ? editedFontColor : fontColor || ""} disabled={!isEditingMenu} onChange={(e) => setEditedFontColor(e.target.value)} className="border rounded px-2 py-1">
+                <option value="">Standard</option>
+                <option className="text-white bg-black" value="#000000">Schwarz</option>
+                <option value="#212529">Dunkelgrau</option>
+                <option value="#495057">Grau</option>
+                <option className="text-white bg-gray-500" value="#6C757D">Mittelgrau</option>
+                <option className="text-white bg-blue-700" value="#1976D2">Blau</option>
+                <option className="text-white bg-green-700" value="#388E3C">Grün</option>
+                <option className="text-white bg-red-700" value="#D32F2F">Rot</option>
+                <option className="text-white bg-purple-700" value="#6610F2">Lila</option>
+                <option value="#FFFFFF">Weiß</option>
+              </select>
             )}
 
             <Label>Schriftart</Label>

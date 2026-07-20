@@ -54,6 +54,7 @@ export default function PageBuilder() {
   const [deletedCategories, setDeletedCategories] = useState([]);
   const [deleteCategoryGroups, setDeleteCategoryGroups] = useState([]);
   const [, setNewBgColor] = useState();
+  const [, setNewFontColor] = useState();
 
   const deletedDishesRef = useRef([]);
   const deletedCategoriesRef = useRef([]);
@@ -61,7 +62,7 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, setServerData, isLoading, restaurantID, bgColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
+  const { serverData, setServerData, isLoading, restaurantID, bgColor, fontColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -256,7 +257,7 @@ export default function PageBuilder() {
 
       if (process.env.NODE_ENV === "development") {
         console.log("Size:", new TextEncoder().encode(payload).length, "Bytes");
-      } 
+      }
 
       const response = await fetch("/api/user/profil/setData", {
         method: "POST",
@@ -784,7 +785,7 @@ export default function PageBuilder() {
         <div className="border-t border-gray-100 bg-gray-50/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-1.5 flex items-center justify-between gap-3 overflow-x-auto">
             <div className="flex items-center gap-2 shrink-0">
-              <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+              <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} fontColor={fontColor} setNewFontColor={setNewFontColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
 
               {exeedCatLimit ? (
                 <Tooltip>
@@ -856,7 +857,7 @@ export default function PageBuilder() {
             <p className="text-xs text-white/60 uppercase tracking-widest">Hintergrundfarbe</p>
             <div className="flex flex-wrap justify-center gap-2">
               {HERO_COLOR_PRESETS.map(({ key, label, gradient }) => (
-                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-2 transition-all ${heroColor === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
+                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-4 transition-all ${heroColor === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
               ))}
               {[
                 { color: "#ffffff", label: "Weiß" },
@@ -879,8 +880,16 @@ export default function PageBuilder() {
                 { color: "#86efac", label: "Hellgrün" },
                 { color: "#fde68a", label: "Gelb" },
               ].map(({ color, label }) => (
-                <button key={color} title={label} onClick={() => setHeroColor(color)} className={`w-8 h-8 rounded-full border-2 transition-all ${heroColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
+                <button key={color} title={label} onClick={() => setHeroColor(color)} className={`w-8 h-8 rounded-full border-4 transition-all ${heroColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
               ))}
+              {session.user.subscription === "Professional" ? (
+                <div className="flex items-center justify-between gap-4">
+                  <h1 className="text-sm font-medium" style={{color: "black"}}>Fortgeschrittene Farbauswahl:</h1>
+                  <input type="color" title="Eigene Farbe wählen" value={heroColor?.startsWith("#") ? heroColor : "#ffffff"} onChange={(e) => setHeroColor(e.target.value)} className="justify-self-end w-8 h-8 rounded-full border-4 border-white/30 hover:border-white/70 transition-all cursor-pointer bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-none" />
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             {/* Textfarbe */}
@@ -907,8 +916,17 @@ export default function PageBuilder() {
                 { color: "#86efac", label: "Hellgrün" },
                 { color: "#fde68a", label: "Gelb" },
               ].map(({ color, label }) => (
-                <button key={color} title={label} onClick={() => setHeroTextColor(color)} className={`w-8 h-8 rounded-full border-2 transition-all ${heroTextColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
+                <button key={color} title={label} onClick={() => setHeroTextColor(color)} className={`w-8 h-8 rounded-full border-4 transition-all ${heroTextColor === color ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} style={{ backgroundColor: color }} />
               ))}
+              {session.user.subscription === "Professional" ? (
+                <div className="w-full flex items-center justify-center gap-4">
+                  <h1 className="text-sm font-medium" style={{color: "black"}}>Fortgeschrittene Farbauswahl:</h1>
+
+                  <input type="color" title="Eigene Farbe wählen" value={heroTextColor?.startsWith("#") ? heroTextColor : "#ffffff"} onChange={(e) => setHeroTextColor(e.target.value)} className="w-8 h-8 rounded-full border-4 border-white/30 hover:border-white/70 transition-all cursor-pointer bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-none" />
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
 
             <div className="flex gap-2 mt-1">
@@ -946,12 +964,12 @@ export default function PageBuilder() {
 
         {!isEditingHero && (
           <button onClick={() => setIsEditingHero(true)} className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all" title="Header bearbeiten">
-            <FaPen className="w-3.5 h-3.5" />
+            <FaPen className="w-4 h-4 " />
           </button>
         )}
       </div>
 
-      <div className={`flex-1 text-gray-900 font-sans ${!bgColor ? "bg-amber-50" : ""}`} style={bgColor ? { backgroundColor: bgColor } : {}}>
+      <div className={`flex-1 font-sans ${!bgColor ? "bg-amber-50" : ""} ${!fontColor ? "text-gray-900" : ""}`} style={{ ...(bgColor ? { backgroundColor: bgColor } : {}), ...(fontColor ? { color: fontColor } : {}) }}>
         <main className="w-full">
           <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
             {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (

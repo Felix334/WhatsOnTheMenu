@@ -34,6 +34,7 @@ const extractMenuData = (data) => {
   return {
     restaurantID: restaurant?.id ?? "",
     bgColor: menu?.bgColor ?? "",
+    fontColor: menu?.fontColor ?? "",
     font: menu?.font ?? "",
     headingFont: menu?.headingFont ?? "",
     density: menu?.density ?? "",
