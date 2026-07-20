@@ -1,17 +1,14 @@
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getRestaurantMenuData } from "@/app/api/restaurant/[restaurantID]/menu/data";
 import MenuClient from "../components/MenuClient";
 
 export const revalidate = 300;
 
-const BASE_URL = process.env.NEXT_PUBLIC_URL || "https://www.whatisonmymenu.com";
-
 // Alle Speisekarten schon beim Build vorrendern, damit auch der erste
 // Besucher nach einem Deploy keinen kalten Server-Render abwartet.
 // Nur beim Production-Build relevant — im Dev-Server sonst unnötige DB-Query bei jedem Request.
-// Direkter Prisma-Zugriff ist hier unvermeidbar: generateStaticParams läuft
-// beim `next build`, bevor die eigene API überhaupt erreichbar ist.
 export async function generateStaticParams() {
   if (process.env.NODE_ENV !== "production") return [];
   try {
@@ -23,22 +20,15 @@ export async function generateStaticParams() {
   }
 }
 
-// DB-Reads laufen über die eigene API-Route statt per Direktzugriff auf Prisma,
-// damit Rate-Limiting/Caching am Edge (Cloudflare, an /api/* gebunden) auch für
-// den Seitenaufruf greift. `fetch` wird von Next.js pro Request automatisch
-// dedupliziert, daher kein extra cache()-Wrapper nötig.
-async function fetchRestaurantMenuData(restaurantID) {
-  const res = await fetch(`${BASE_URL}/api/restaurant/${restaurantID}/menu`, {
-    next: { revalidate: 300 },
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Fehler beim Laden der Speisekarte");
-  return res.json();
-}
+// Direkter Aufruf der API-Datenschicht statt HTTP-Selbst-Fetch: generateMetadata
+// und die Page-Komponente laufen für alle von generateStaticParams gelieferten
+// IDs während `next build`, wenn der eigene Server noch nicht erreichbar ist —
+// ein fetch() auf die eigene /api-Route würde den Build zum Absturz bringen.
+const getRestaurantData = cache(getRestaurantMenuData);
 
 export async function generateMetadata({ params }) {
   const { restaurantID } = await params;
-  const data = await fetchRestaurantMenuData(restaurantID);
+  const data = await getRestaurantData(restaurantID);
   if (!data) return { title: "Speisekarte" };
   return {
     title: `${data.name} – Speisekarte`,
@@ -48,7 +38,7 @@ export async function generateMetadata({ params }) {
 
 export default async function MenuPage({ params }) {
   const { restaurantID } = await params;
-  const data = await fetchRestaurantMenuData(restaurantID);
+  const data = await getRestaurantData(restaurantID);
   if (!data) notFound();
 
   return (

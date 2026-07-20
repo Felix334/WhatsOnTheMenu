@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
 
 // Einzige Stelle mit dem Prisma-Select für die öffentliche Speisekarte —
-// genutzt vom GET-Handler in route.js. Andere Callstellen (z.B. die
-// Menu/[restaurantID]/page.js) gehen über diese API-Route statt direkt
-// über Prisma, damit DB-Zugriffe an einer Stelle gebündelt bleiben.
+// genutzt von route.js (GET-Handler) UND direkt (ohne HTTP-Umweg) von
+// Menu/[restaurantID]/page.js. Ausnahme von der "DB-Zugriffe immer über API"-
+// Regel: die Seite wird per generateStaticParams beim Build vorgerendert,
+// ein Selbst-Fetch auf die eigene API würde dabei fehlschlagen.
 export async function getRestaurantMenuData(restaurantID) {
   const restaurant = await prisma.restaurant.findUnique({
     where: { id: restaurantID },
