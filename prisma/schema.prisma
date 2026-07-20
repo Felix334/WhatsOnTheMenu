@@ -108,15 +108,26 @@ model Restaurant {
 }
 
 model Calendar {
-  id               String     @id @default(cuid())
+  id               String            @id @default(cuid())
   date             DateTime
   eventName        String
   eventDescription String
   startTime        String
   endTime          String
-  type             String
+  type             CalendarEntryType
+  dishId           String?
   restaurantID     String
-  restaurant       Restaurant @relation(fields: [restaurantID], references: [id], onDelete: Cascade)
+  restaurant       Restaurant        @relation(fields: [restaurantID], references: [id], onDelete: Cascade)
+  dish             Dish?             @relation(fields: [dishId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantID])
+  @@index([dishId])
+}
+
+enum CalendarEntryType {
+  promotion
+  event
+  specialDish
 }
 
 model Location {
@@ -184,19 +195,20 @@ model Category {
 }
 
 model Dish {
-  id          String         @id @default(cuid())
-  name        String
-  description String?
-  price       Decimal        @db.Decimal(10, 2)
-  imageUrl    String?
-  categoryId  String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  category    Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  reports     Report[]
-  reviews     Review[]       @relation("DishReviews")
-  ingredients Ingredient[]   @relation("DishIngredients")
-  stock       DishAvailable?
+  id              String         @id @default(cuid())
+  name            String
+  description     String?
+  price           Decimal        @db.Decimal(10, 2)
+  imageUrl        String?
+  categoryId      String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  category        Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  reports         Report[]
+  reviews         Review[]       @relation("DishReviews")
+  ingredients     Ingredient[]   @relation("DishIngredients")
+  stock           DishAvailable?
+  calendarEntries Calendar[]
 
   @@index([categoryId])
 }

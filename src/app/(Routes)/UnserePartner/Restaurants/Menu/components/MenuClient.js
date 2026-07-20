@@ -88,7 +88,7 @@ const HeroSection = ({ restaurantData, menuFont, color }) => {
 };
 
 // ─── Header (Tab-Navigation) ──────────────────────────────────────────────────
-const Header = ({ name, activePage, setActivePage }) => {
+const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
   const router = useRouter();
 
   return (
@@ -118,6 +118,18 @@ const Header = ({ name, activePage, setActivePage }) => {
           >
             Informationen
           </button>
+          {hasEvents && (
+            <button
+              onClick={() => setActivePage("events")}
+              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
+                ${activePage === "events" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              Aktionen
+              <span className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold leading-none">
+                {eventCount}
+              </span>
+            </button>
+          )}
         </nav>
         <div className="flex-1" aria-hidden="true" />
       </div>
@@ -192,6 +204,17 @@ const InfoPage = ({ restaurantData }) => {
     </div>
   );
 };
+
+// ─── Aktionen & Events Page ─────────────────────────────────────────────────────
+const EventsPage = ({ entries }) => (
+  <div className="w-full max-w-3xl mx-auto py-10 px-4 space-y-6">
+    <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+      <h2 className="text-2xl font-serif font-semibold mb-2 border-b pb-3">Aktionen &amp; Events</h2>
+      <EventsBanner entries={entries} />
+      {entries.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Aktuell keine Aktionen oder Events.</p>}
+    </div>
+  </div>
+);
 
 // ─── Allergen-Legende ──────────────────────────────────────────────────────────
 const ALLERGEN_LIST = [
@@ -283,6 +306,37 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
   );
 };
 
+// ─── Aktionen & Events ──────────────────────────────────────────────────────────
+const CALENDAR_TYPE_ICON = { promotion: "🏷️", event: "🎉", specialDish: "🍽️" };
+
+const EventsBanner = ({ entries }) => {
+  if (!entries || entries.length === 0) return null;
+  const todayStr = new Date().toDateString();
+
+  return (
+    <div className="mb-6 space-y-2">
+      {entries.map((entry) => {
+        const isToday = new Date(entry.date).toDateString() === todayStr;
+        return (
+          <div key={entry.id} className="flex items-start gap-3 bg-white border border-amber-200 rounded-2xl px-4 py-3 shadow-sm">
+            <span className="text-xl shrink-0">{CALENDAR_TYPE_ICON[entry.type] ?? "📅"}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-gray-900">
+                {entry.eventName}
+                {isToday && <span className="ml-2 text-xs font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded-full px-2 py-0.5">Heute</span>}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">{entry.eventDescription}</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {new Date(entry.date).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" })} · {entry.startTime}–{entry.endTime}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ─── Allergen Badges ───────────────────────────────────────────────────────────
 const ALLERGEN_LETTER = {
   Gluten: "A",
@@ -320,7 +374,7 @@ const DENSITY_TEXT = { compact: "text-sm", normal: "", airy: "text-lg" };
 const DENSITY_ROW_DESKTOP = { compact: "py-2", normal: "py-4", airy: "py-6" };
 const DENSITY_ROW_MOBILE = { compact: "py-2", normal: "py-3", airy: "py-5" };
 
-const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headingFont, density = "normal", leaderDots = false, titleAlign, titleUppercase = false, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [] }) => {
+const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headingFont, density = "normal", leaderDots = false, titleAlign, titleUppercase = false, cart = {}, addToCart, removeFromCart, orderMode = false, showAvailability = false, borderRadius, elevated, excludedAllergens = [], specialDishIds }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const fontStyle = menuFont ? { fontFamily: menuFont } : undefined;
   const colorStyle = fontColor ? { color: fontColor } : {};
@@ -378,6 +432,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                       {item.name}
                     </p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
+                    {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
                     {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                   </div>
                   {item.description && <p style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
@@ -422,6 +477,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                             {item.name}
                           </span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
+                          {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
                           {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                         </div>
                         {item.description && <span style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
@@ -691,6 +747,8 @@ const MenuClient = ({ serverData }) => {
   const heroColor = menuEntry?.heroColor;
   const categoryGroups = menuEntry?.categoryGroup ?? [];
   const showAvailability = ["Professional", "Business"].includes(serverData?.ownerSubscription);
+  const calendarEntries = showAvailability ? (serverData?.calendar ?? []) : [];
+  const specialDishIds = new Set(calendarEntries.filter((e) => e.type === "specialDish" && e.dishId).map((e) => e.dishId));
 
   const restaurantId = serverData?.id;
 
@@ -699,12 +757,14 @@ const MenuClient = ({ serverData }) => {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       {menuFont && <link href={GOOGLE_FONTS_URL} rel="stylesheet" />}
-      <Header name={name} activePage={activePage} setActivePage={setActivePage} />
+      <Header name={name} activePage={activePage} setActivePage={setActivePage} hasEvents={calendarEntries.length > 0} eventCount={calendarEntries.length} />
       <HeroSection restaurantData={serverData} menuFont={menuFont} color={heroColor} />
       {activePage === "menu" && categoryGroups.length > 0 && <CategoryNav categories={categoryGroups.flatMap((g) => g.categories ?? [])} activeId={activeId} />}
 
       {activePage === "info" ? (
         <InfoPage restaurantData={serverData} />
+      ) : activePage === "events" ? (
+        <EventsPage entries={calendarEntries} />
       ) : (
         <>
           <main className={`w-full max-w-7xl mx-auto px-4 py-8 ${orderMode ? "pb-28" : ""}`}>
@@ -726,7 +786,7 @@ const MenuClient = ({ serverData }) => {
                     </h2>
                     <div className="space-y-8">
                       {group.categories?.map((category) => (
-                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} headingFont={headingFont} density={density} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={orderMode} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} />
+                        <MenuSection key={category.id} id={category.id} title={category.name} menuItems={category.dishes} bgColor={category.bgColor} fontColor={category.fontColor} menuFont={menuFont} headingFont={headingFont} density={density} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} orderMode={orderMode} showAvailability={showAvailability} borderRadius={category.borderRadius} elevated={category.elevated} excludedAllergens={excludedAllergens} specialDishIds={specialDishIds} />
                       ))}
                     </div>
                   </div>

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const ALL_PERMISSIONS = ["orders", "availability", "staff_view", "settings"];
+const ALL_PERMISSIONS = ["orders", "availability", "staff_view", "settings", "calendar"];
 
 const ROLE_PERMISSIONS = {
   manager: ALL_PERMISSIONS,

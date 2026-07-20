@@ -1,13 +1,19 @@
-import { Suspense, cache } from "react";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import MenuClient from "../components/MenuClient";
 
 export const revalidate = 300;
 
+const BASE_URL = process.env.NEXT_PUBLIC_URL || "https://www.whatisonmymenu.com";
+
 // Alle Speisekarten schon beim Build vorrendern, damit auch der erste
-// Besucher nach einem Deploy keinen kalten Server-Render abwartet
+// Besucher nach einem Deploy keinen kalten Server-Render abwartet.
+// Nur beim Production-Build relevant — im Dev-Server sonst unnötige DB-Query bei jedem Request.
+// Direkter Prisma-Zugriff ist hier unvermeidbar: generateStaticParams läuft
+// beim `next build`, bevor die eigene API überhaupt erreichbar ist.
 export async function generateStaticParams() {
+  if (process.env.NODE_ENV !== "production") return [];
   try {
     const restaurants = await prisma.restaurant.findMany({ select: { id: true } });
     return restaurants.map((r) => ({ restaurantID: r.id }));
@@ -17,119 +23,22 @@ export async function generateStaticParams() {
   }
 }
 
-// cache() dedupliziert den DB-Zugriff zwischen generateMetadata und Page
-const getRestaurantData = cache(async (restaurantID) => {
-  const restaurant = await prisma.restaurant.findUnique({
-    where: { id: restaurantID },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      parentCompany: true,
-      openingHours: true,
-      socialLinks: true,
-      createdAt: true,
-      owner: {
-        select: { name: true, subscription: true },
-      },
-      menu: {
-        select: {
-          name: true,
-          description: true,
-          bgColor: true,
-          font: true,
-          headingFont: true,
-          density: true,
-          heroColor: true,
-          heroTextColor: true,
-          createdAt: true,
-          updatedAt: true,
-          categoryGroup: {
-            select: {
-              id: true,
-              name: true,
-              position: true,
-              color: true,
-              fontColor: true,
-              borderRadius: true,
-              titleAlign: true,
-              categories: {
-                select: {
-                  id: true,
-                  name: true,
-                  description: true,
-                  position: true,
-                  bgColor: true,
-                  font: true,
-                  fontColor: true,
-                  borderRadius: true,
-                  elevated: true,
-                  leaderDots: true,
-                  titleAlign: true,
-                  titleUppercase: true,
-                  dishes: {
-                    select: {
-                      id: true,
-                      name: true,
-                      description: true,
-                      price: true,
-                      imageUrl: true,
-                      stock: true,
-                      ingredients: {
-                        where: { isAllergen: true },
-                        select: { name: true },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      locations: {
-        select: {
-          street: true,
-          houseNumber: true,
-          city: true,
-          postalCode: true,
-          country: true,
-          reservation: {
-            select: { phoneNumber: true },
-          },
-        },
-      },
-    },
+// DB-Reads laufen über die eigene API-Route statt per Direktzugriff auf Prisma,
+// damit Rate-Limiting/Caching am Edge (Cloudflare, an /api/* gebunden) auch für
+// den Seitenaufruf greift. `fetch` wird von Next.js pro Request automatisch
+// dedupliziert, daher kein extra cache()-Wrapper nötig.
+async function fetchRestaurantMenuData(restaurantID) {
+  const res = await fetch(`${BASE_URL}/api/restaurant/${restaurantID}/menu`, {
+    next: { revalidate: 300 },
   });
-
-  if (!restaurant) return null;
-
-  const menu = restaurant.menu ?? [];
-  for (const entry of menu) {
-    entry.categoryGroup?.sort((a, b) => Number(a.position) - Number(b.position));
-  }
-
-  const response = {
-    id: restaurant.id,
-    name: restaurant.name,
-    description: restaurant.description ?? null,
-    parentCompany: restaurant.parentCompany,
-    owner: { name: restaurant.owner.name },
-    ownerSubscription: restaurant.owner.subscription,
-    menu,
-    locations: restaurant.locations,
-    openingHours: restaurant.openingHours ?? null,
-    socialLinks: restaurant.socialLinks ?? null,
-    createdAt: restaurant.createdAt,
-  };
-
-  // Dates/Decimals in JSON-kompatible Werte wandeln — Client bekam bisher auch nur JSON
-  return JSON.parse(JSON.stringify(response));
-});
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Fehler beim Laden der Speisekarte");
+  return res.json();
+}
 
 export async function generateMetadata({ params }) {
   const { restaurantID } = await params;
-  const data = await getRestaurantData(restaurantID);
+  const data = await fetchRestaurantMenuData(restaurantID);
   if (!data) return { title: "Speisekarte" };
   return {
     title: `${data.name} – Speisekarte`,
@@ -139,7 +48,7 @@ export async function generateMetadata({ params }) {
 
 export default async function MenuPage({ params }) {
   const { restaurantID } = await params;
-  const data = await getRestaurantData(restaurantID);
+  const data = await fetchRestaurantMenuData(restaurantID);
   if (!data) notFound();
 
   return (

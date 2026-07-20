@@ -65,7 +65,7 @@ Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden
 PROXMOX => als alternative zu Docker
 
 
-=> Zusätzliche Premium-Funktion => Beim Hintergrund eine from-to Auswahl(Bsp:  bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200)
+=> Zusätzliche Premium-Funktion => Beim Hintergrund eine from-to Auswahl(Bsp:  bg-linear-to-r from-yellow-50 via-yellow-100 to-yellow-200) => Für die Hero-Section im Profil (heroColor/heroTextColor, page.js), zusätzlich zu den festen Presets + der neuen Professional-Hex-Farbwahl
 
 => NextJS-Feature: serverAction => setzt erlaubte URLs fest
 

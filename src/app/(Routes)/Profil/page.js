@@ -33,6 +33,7 @@ import { useRestaurantData, markUserAnsichtNavigation } from "./components/fetch
 import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
+import { CalendarWin } from "./components/calendarWin";
 
 const HERO_COLOR_PRESETS = [
   { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
@@ -69,6 +70,7 @@ export default function PageBuilder() {
   // Controlled sheets
   const [openEditor, setOpenEditor] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
+  const [openCalendarWin, setOpenCalendarWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
 
   // Hero editing
@@ -78,10 +80,7 @@ export default function PageBuilder() {
   const [heroColor, setHeroColor] = useState(null);
   const [heroTextColor, setHeroTextColor] = useState("#ffffff");
   const [savingHero, setSavingHero] = useState(false);
-  // Ausgangswerte des Hero-Bereichs – dagegen wird beim Speichern verglichen,
-  // damit nur tatsächlich geänderte Felder ans Backend gehen.
   const heroBaselineRef = useRef({ name: "", description: "", heroColor: null, heroTextColor: "#ffffff" });
-
   const [Limit, setLimit] = useState({});
   const [exeedCatLimit, setExeedCatLimit] = useState(false);
   const [exeedDishLimit, setExeedDishLimit] = useState(false);
@@ -806,6 +805,27 @@ export default function PageBuilder() {
               ) : (
                 <MenuEditor categoryGroupNames={categoryGroupNames} />
               )}
+              {allowPremiumColor ? (
+                <Button variant="outline" size="sm" onClick={() => setOpenCalendarWin(true)}>
+                  Aktionen
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" size="sm" disabled>
+                        Aktionen
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Aktionen &amp; Events sind ein Premium-Feature —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <SortComponents
                 componentList={categoryGroups}
                 onSave={(newGroups) =>
@@ -846,6 +866,13 @@ export default function PageBuilder() {
           </div>
         </div>
       </header>
+
+      <CalendarWin
+        open={openCalendarWin}
+        onOpenChange={setOpenCalendarWin}
+        restaurantId={restaurantID}
+        dishes={serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []) ?? []}
+      />
 
       <div className={`w-full ${heroColor?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center relative`} style={heroColor?.startsWith("#") ? { background: heroColor } : {}}>
         {isEditingHero ? (

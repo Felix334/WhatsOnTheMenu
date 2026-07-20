@@ -70,6 +70,10 @@ function StaffDashboardContent() {
                   <span className="text-xl">🧑‍🍳</span>
                   <span>Verfügbarkeit</span>
                 </Link>
+                <Link href={{ pathname: "/staff/calendar", query: { restaurantID: restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                  <span className="text-xl">📅</span>
+                  <span>Aktionen &amp; Events</span>
+                </Link>
               </div>
             </div>
           )}
@@ -89,6 +93,12 @@ function StaffDashboardContent() {
                   <Link href={{ pathname: "/staff/availability", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                     <span className="text-xl">🧑‍🍳</span>
                     <span>Verfügbarkeit</span>
+                  </Link>
+                )}
+                {m.role === "manager" && (
+                  <Link href={{ pathname: "/staff/calendar", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                    <span className="text-xl">📅</span>
+                    <span>Aktionen &amp; Events</span>
                   </Link>
                 )}
               </div>
