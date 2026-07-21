@@ -1,5 +1,11 @@
 const LAST_UPDATED = "31. Mai 2026";
 
+export const metadata = {
+  title: "Impressum | WhatIsOnMyMenu.com",
+  description:
+    "Impressum und Anbieterkennzeichnung gemäß § 5 TMG von WhatIsOnMyMenu.com – der Plattform für digitale Speisekarten per QR-Code.",
+};
+
 export default function ImprintPage() {
   return (
     <div className="min-h-screen bg-gray-50">

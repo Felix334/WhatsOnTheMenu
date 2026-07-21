@@ -1,5 +1,11 @@
 const LAST_UPDATED = "31. Mai 2026";
 
+export const metadata = {
+  title: "Datenschutzerklärung | WhatIsOnMyMenu.com",
+  description:
+    "Informationen gemäß DSGVO zur Verarbeitung personenbezogener Daten bei der Nutzung von WhatIsOnMyMenu.com.",
+};
+
 const sections = [
   {
     title: "1. Verantwortlicher",

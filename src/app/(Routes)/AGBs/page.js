@@ -1,5 +1,11 @@
 const LAST_UPDATED = "09. Juni 2026";
 
+export const metadata = {
+  title: "AGB | WhatIsOnMyMenu.com",
+  description:
+    "Allgemeine Geschäftsbedingungen für die Nutzung der WhatIsOnMyMenu.com-Plattform zur Erstellung digitaler Speisekarten für Gastronomiebetriebe.",
+};
+
 const sections = [
   {
     title: "§ 1 Geltungsbereich",
