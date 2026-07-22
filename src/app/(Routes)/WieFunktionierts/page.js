@@ -7,7 +7,7 @@ export const dynamic = "force-static";
 export const metadata = {
   title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code | WhatIsOnMyMenu",
   description:
-    "In wenigen Minuten zur digitalen Speisekarte: Restaurant anlegen, Menü gestalten, QR-Code drucken. Deine Gäste scannen und sehen Gerichte, Preise, Allergene und Verfügbarkeit – ganz ohne App.",
+    "In wenigen Minuten zur digitalen Speisekarte: Restaurant anlegen, Menü gestalten, QR-Code drucken. Ihre Gäste scannen und sehen Gerichte, Preise, Allergene und Verfügbarkeit – ganz ohne App.",
 };
 
 // ─── Schritte für Restaurants ──────────────────────────────────────────────
@@ -15,25 +15,25 @@ const STEPS = [
   {
     number: "1",
     title: "Kostenlos anmelden",
-    text: "Melde dich in Sekunden mit deinem Google-Konto an – keine Kreditkarte nötig. Du startest direkt im Free-Tarif.",
+    text: "Melden Sie sich in Sekunden mit Ihrem Google-Konto an – keine Kreditkarte nötig. Sie starten direkt im Free-Tarif.",
     icon: "👤",
   },
   {
     number: "2",
     title: "Restaurant & Menü anlegen",
-    text: "Trage die Eckdaten deines Restaurants ein und baue deine Speisekarte: Kategorien, Gerichte, Preise, Beschreibungen und Allergene.",
+    text: "Tragen Sie die Eckdaten Ihres Restaurants ein und bauen Sie Ihre Speisekarte: Kategorien, Gerichte, Preise, Beschreibungen und Allergene.",
     icon: "🍽️",
   },
   {
     number: "3",
     title: "Design anpassen",
-    text: "Wähle Farben, Schriftarten und ein Hero-Design, das zu deinem Restaurant passt – deine digitale Karte sieht aus wie deine Marke.",
+    text: "Wählen Sie Farben, Schriftarten und ein Hero-Design, das zu Ihrem Restaurant passt – Ihre digitale Karte sieht aus wie Ihre Marke.",
     icon: "🎨",
   },
   {
     number: "4",
     title: "QR-Code teilen",
-    text: "Generiere deinen QR-Code, drucke ihn und platziere ihn auf den Tischen. Gäste scannen ihn und deine Karte öffnet sich sofort.",
+    text: "Generieren Sie Ihren QR-Code, drucken Sie ihn und platzieren Sie ihn auf den Tischen. Gäste scannen ihn und Ihre Karte öffnet sich sofort.",
     icon: "📲",
   },
 ];
@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: "📋",
     title: "Digitale Speisekarte",
-    text: "Strukturiere dein Angebot in Gruppen, Kategorien und Gerichten – mit Preisen und Beschreibungen.",
+    text: "Strukturieren Sie Ihr Angebot in Gruppen, Kategorien und Gerichten – mit Preisen und Beschreibungen.",
   },
   {
     icon: "🔳",
@@ -58,12 +58,12 @@ const FEATURES = [
   {
     icon: "⚠️",
     title: "Allergene & Zutaten",
-    text: "Hinterlege Allergene pro Gericht. Deine Gäste sehen auf einen Blick, was drin ist – rechtssicher und transparent.",
+    text: "Hinterlegen Sie Allergene pro Gericht. Ihre Gäste sehen auf einen Blick, was drin ist – rechtssicher und transparent.",
   },
   {
     icon: "🟢",
     title: "Echtzeit-Verfügbarkeit",
-    text: "Markiere Gerichte mit einem Klick als „ausverkauft\". Gäste sehen sofort, was gerade verfügbar ist.",
+    text: "Markieren Sie Gerichte mit einem Klick als „ausverkauft\". Gäste sehen sofort, was gerade verfügbar ist.",
   },
   {
     icon: "⭐",
@@ -73,17 +73,17 @@ const FEATURES = [
   {
     icon: "👥",
     title: "Team-Verwaltung",
-    text: "Lade Mitarbeiter ein und vergib Rollen (Manager, Service, Küche) mit passenden Berechtigungen – im Professional-Tarif.",
+    text: "Laden Sie Mitarbeiter ein und vergeben Sie Rollen (Manager, Service, Küche) mit passenden Berechtigungen – im Professional-Tarif.",
   },
   {
     icon: "🧾",
     title: "Tisch-Bestellungen",
-    text: "Nimm Bestellungen pro Tisch auf und verwalte ihren Status von „offen\" über „bestätigt\" bis „erledigt\".",
+    text: "Nehmen Sie Bestellungen pro Tisch auf und verwalten Sie ihren Status von „offen\" über „bestätigt\" bis „erledigt\".",
   },
   {
     icon: "📍",
     title: "Mehrere Standorte",
-    text: "Verwalte Adressen, Öffnungszeiten und Reservierungs-Kontakt – auch für Restaurants mit mehreren Filialen.",
+    text: "Verwalten Sie Adressen, Öffnungszeiten und Reservierungs-Kontakt – auch für Restaurants mit mehreren Filialen.",
   },
 ];
 
@@ -129,10 +129,10 @@ export default function Page() {
         <div className="max-w-3xl mx-auto text-center">
           <Badge className="bg-white/10 text-white border-white/20 mb-5">{"So funktioniert's"}</Badge>
           <h1 className="text-4xl sm:text-5xl font-serif font-bold text-white mb-5 leading-tight">
-            Deine digitale Speisekarte –<br className="hidden sm:block" /> in wenigen Minuten startklar
+            Ihre digitale Speisekarte –<br className="hidden sm:block" /> in wenigen Minuten startklar
           </h1>
           <p className="text-lg text-white/70 mb-8 max-w-xl mx-auto">
-            Mit WhatIsOnMyMenu erstellst du eine digitale Speisekarte, die deine Gäste per QR-Code direkt am Tisch
+            Mit WhatIsOnMyMenu erstellen Sie eine digitale Speisekarte, die Ihre Gäste per QR-Code direkt am Tisch
             öffnen – ohne App, ohne Papier, jederzeit aktuell.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -151,7 +151,7 @@ export default function Page() {
         <SectionHeading
           eyebrow="Für Restaurants"
           title="In 4 Schritten zur eigenen Karte"
-          subtitle="Vom Konto bis zum QR-Code auf dem Tisch – schneller, als du denkst."
+          subtitle="Vom Konto bis zum QR-Code auf dem Tisch – schneller, als Sie denken."
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {STEPS.map((step) => (
@@ -174,7 +174,7 @@ export default function Page() {
         <div className="max-w-6xl mx-auto">
           <SectionHeading
             eyebrow="Funktionen"
-            title="Alles, was deine Speisekarte braucht"
+            title="Alles, was Ihre Speisekarte braucht"
             subtitle="Von der Gestaltung über Allergene bis zur Team-Verwaltung – alles an einem Ort."
           />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -191,12 +191,12 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ─── Für deine Gäste ──────────────────────────────────── */}
+      {/* ─── Für Ihre Gäste ──────────────────────────────────── */}
       <section className="px-4 py-20 max-w-6xl mx-auto">
         <SectionHeading
-          eyebrow="Für deine Gäste"
+          eyebrow="Für Ihre Gäste"
           title="Scannen, sehen, genießen"
-          subtitle="Deine Gäste brauchen nur ihr Smartphone – keine App, kein Konto."
+          subtitle="Ihre Gäste brauchen nur ihr Smartphone – keine App, kein Konto."
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {GUEST_POINTS.map((g) => (
@@ -214,8 +214,8 @@ export default function Page() {
         <div className="max-w-3xl mx-auto text-center">
           <SectionHeading
             eyebrow="Tarife"
-            title="Starte kostenlos – wachse, wenn du bereit bist"
-            subtitle="Im Free-Tarif baust du deine digitale Karte mit QR-Code völlig kostenlos. Mehr Kategorien, Gerichte und Funktionen schaltest du jederzeit mit einem Upgrade frei."
+            title="Starten Sie kostenlos – wachsen Sie, wenn Sie bereit sind"
+            subtitle="Im Free-Tarif bauen Sie Ihre digitale Karte mit QR-Code völlig kostenlos. Mehr Kategorien, Gerichte und Funktionen schalten Sie jederzeit mit einem Upgrade frei."
           />
           <DynamicLinkButton size="lg" href="/pricing" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow">
             Tarife vergleichen
@@ -226,9 +226,9 @@ export default function Page() {
       {/* ─── Abschluss-CTA ────────────────────────────────────── */}
       <section className="bg-red-800 px-4 py-20">
         <div className="max-w-2xl mx-auto text-center text-white">
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold mb-4">Bereit für deine digitale Speisekarte?</h2>
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold mb-4">Bereit für Ihre digitale Speisekarte?</h2>
           <p className="text-red-100 mb-8 text-lg">
-            Erstelle dein Restaurant kostenlos und teile deine Karte noch heute per QR-Code mit deinen Gästen.
+            Erstellen Sie Ihr Restaurant kostenlos und teilen Sie Ihre Karte noch heute per QR-Code mit Ihren Gästen.
           </p>
           <DynamicLinkButton size="lg" href="/ErstelleRestaurantAccount/FreeTier" className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow-lg">
             Jetzt kostenlos starten

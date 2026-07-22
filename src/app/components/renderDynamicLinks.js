@@ -56,11 +56,11 @@ export function LogoutLink() {
   return <Link href="/logout">Logout</Link>;
 }
 
-export default function FreeTierLink() {
+export default function FreeTierLink({ className }) {
   const query = useQueryObject();
   const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
   return (
-    <Button asChild>
+    <Button asChild className={className}>
       <Link href={`/ErstelleRestaurantAccount/FreeTier${queryString}`}>Abo abschließen</Link>
     </Button>
   );

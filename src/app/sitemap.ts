@@ -3,9 +3,6 @@ import { MetadataRoute } from "next";
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Nur öffentlich crawlbare Seiten. Login-pflichtige Formulare
-  // (/ErstelleRestaurantAccount/*) und Seiten ohne öffentlichen Inhalt
-  // gehören NICHT in die Sitemap – sonst meldet Google "Soft 404".
   return [
     {
       url: baseUrl,

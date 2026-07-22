@@ -57,7 +57,7 @@ export default function ExplainCards() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Titelbereich */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Alles was du brauchst</h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Alles, was Sie brauchen</h2>
 
           <p className="mt-4 text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">Von der Erstellung bis zur Veröffentlichung – alle Tools für professionelle digitale Speisekarten.</p>
         </div>

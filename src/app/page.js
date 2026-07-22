@@ -179,15 +179,6 @@ function HomeContent() {
                       >
                         Angebote
                       </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => {
-                          scrollToSection("#examples");
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        Beispiele
-                      </Button>
                       {status === "authenticated" || userID ? null : (
                         <Button
                           variant="outline"
@@ -279,7 +270,7 @@ function HomeContent() {
           <section className="py-20 bg-linear-to-br from-red-800 to-red-950 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
               <h2 className="text-3xl md:text-4xl font-bold mb-6">Bereit für Ihre erste digitale Speisekarte?</h2>
-              <p className="text-xl mb-8 text-red-100">Schließen Sie sich einer wachsenden Gruppe von Restaurants an, die bereits auf digitale Speisekarten setzen</p>
+              <p className="text-xl mb-8 text-red-100">Erstellen Sie noch heute Ihre eigene digitale Speisekarte – schnell, einfach und ohne Verpflichtungen</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 {!userID && (
                   <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-10 py-3 h-auto shadow-lg">
@@ -301,8 +292,8 @@ function HomeContent() {
                 <p className="text-xl text-gray-600">Wähle den Plan, der zu Ihrem Restaurant passt</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-                <Card className="flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+              <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-10 items-stretch">
+                <Card className="flex flex-col h-full min-h-140 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
                     <CardTitle>Starter</CardTitle>
                     <div className="text-3xl font-bold ">Kostenlos</div>
@@ -328,13 +319,11 @@ function HomeContent() {
 
                     {/* Button nach unten drücken */}
                     <div className="mt-auto">
-                      <Button asChild className="w-full">
-                        <FreeTierLink searchParams={userID} />
-                      </Button>
+                      <FreeTierLink className="w-full" searchParams={userID} />
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="flex flex-col h-full border-2 border-amber-400 relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <Card className="flex flex-col h-full min-h-140 border-2 border-amber-400 relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
@@ -365,7 +354,7 @@ function HomeContent() {
                   </CardContent>
                 </Card>
 
-                <Card className="flex flex-col h-full bg-linear-to-b from-red-800 to-red-900 text-white border-2 border-red-600 relative shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+                <Card className="flex flex-col h-full min-h-140 bg-linear-to-b from-red-800 to-red-900 text-white border-2 border-red-600 relative shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Professional</CardTitle>
