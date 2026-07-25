@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import {useNavigation} from ""
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const TYPE_LABELS = { promotion: "Aktion", event: "Event", specialDish: "Tagesgericht" };
@@ -130,7 +132,6 @@ function CalendarContent() {
           </Link>
           <h1 className="text-xl font-bold text-gray-900">Aktionen &amp; Events</h1>
         </div>
-
         {form ? (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
             <input className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Titel" value={form.eventName} onChange={(e) => setForm({ ...form, eventName: e.target.value })} />
@@ -202,6 +203,7 @@ function CalendarContent() {
 
 export default function StaffCalendarPage() {
   const { data: session, status } = useSession();
+  const router = useNavigation()
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center text-gray-400">Laden...</div>;
@@ -209,6 +211,18 @@ export default function StaffCalendarPage() {
 
   if (!session) {
     return <div className="min-h-screen flex items-center justify-center text-gray-500">Kein Zugriff</div>;
+  }
+  if (session.user.subscription !== "Professional") {
+    return (
+      <div>
+        <div>
+          <Button onClick={(router.push("./"))}>Zurrück</Button>
+        </div>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-red-600 font-bold text-2xl">Kein Zugriff</div>
+        </div>
+      </div>
+    );
   }
 
   // Ob das Restaurant (Owner-Abo) Zugriff auf Events hat, prüft die API

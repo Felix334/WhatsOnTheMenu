@@ -41,7 +41,6 @@ function HomeContent() {
   const autherizedUser = userID && status === "authenticated";
   const adminAcc = userID && role === "Admin" && status === "authenticated";
 
-
   useEffect(() => {
     const authError = searchParams.get("error");
     if (!authError) return;
@@ -66,8 +65,8 @@ function HomeContent() {
   };
 
   const checkVercelEnv = () => {
-    console.log("Vercel-Env:", process.env.VERCEL_ENV)
-  }
+    console.log("Vercel-Env:", process.env.VERCEL_ENV);
+  };
 
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
@@ -82,7 +81,6 @@ function HomeContent() {
                 <div className="text-2xl font-bold text-red-800 text-center md:text-left">
                   <Image src={WebsiteIcon} alt="" width={28} height={28} className="inline align-middle mx-1" /> WhatIsOnMyMenu.com
                 </div>
-
               </div>
               <div className="hidden md:flex items-center gap-3">
                 <NavigationMenu>
@@ -348,6 +346,10 @@ function HomeContent() {
                         <span className="text-green-500 mr-2">✓</span>
                         QR-Code
                       </li>
+                      <li className="flex items-center">
+                        <span className="text-green-500 mr-2">✓</span>
+                        Event-Kalender (30 Tage)
+                      </li>
                     </ul>
 
                     {/* Button nach unten drücken */}
@@ -384,7 +386,7 @@ function HomeContent() {
                         <span className="text-green-400 mr-2">✓</span>Gerichtverfügbarkeitsanzeige
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-400 mr-2">✓</span>Event-Kalender
+                        <span className="text-green-400 mr-2">✓</span>Event-Kalender (365 Tage)
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>Eigene Subdomain
