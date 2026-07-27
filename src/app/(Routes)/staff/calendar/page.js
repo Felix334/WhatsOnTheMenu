@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import {useNavigation} from ""
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -203,7 +202,7 @@ function CalendarContent() {
 
 export default function StaffCalendarPage() {
   const { data: session, status } = useSession();
-  const router = useNavigation()
+  const router = useRouter();
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center text-gray-400">Laden...</div>;
@@ -216,7 +215,7 @@ export default function StaffCalendarPage() {
     return (
       <div>
         <div>
-          <Button onClick={(router.push("./"))}>Zurrück</Button>
+          <Button onClick={() => router.push("./")}>Zurück</Button>
         </div>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-red-600 font-bold text-2xl">Kein Zugriff</div>
