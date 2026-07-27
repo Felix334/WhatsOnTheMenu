@@ -2,21 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+
 import Profile from "./Profile";
 import { Button } from "@/components/ui/button";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AdminLink, ProfilLink } from "./renderDynamicLinks"; // Use dynamic links for auth routes
 import { DynamicLinkButton } from "./DynamicLink";
 
 export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOpen, onMobileMenuToggle, navShadow }) {
-  const [renderCookieWin, setRenderCookieWin] = useState(false);
   const [adminAccess, setAdminAccess] = useState(false);
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
@@ -54,41 +50,47 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
           <div className="hidden right-0 md:block">
             <NavigationMenu>
               <NavigationMenuList>
-                <NavigationMenuItem>
-                  <AdminLink asChild><Button variant="ghost">Admin Konsole</Button></AdminLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <DynamicLinkButton href="/UnserePartner" variant="ghost">Unsere Partner</DynamicLinkButton>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Button variant="ghost" onClick={() => scrollToSection("#features")}>
-                    Features
-                  </Button>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Button variant="ghost" onClick={() => scrollToSection("#pricing")}>
-                    Preise
-                  </Button>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Button variant="ghost" onClick={() => scrollToSection("#examples")}>
-                    Beispiele
-                  </Button>
-                </NavigationMenuItem>
-                {!userID && (
-                  <>
-                    <NavigationMenuItem>
-                      <Button variant="" onClick={handleLogin}>
-                        Anmelden
-                      </Button>
-                    </NavigationMenuItem>
-                    <NavigationMenuItem>
-                      <Button asChild>
-                        <a href="/register">Kostenlos starten</a>
-                      </Button>
-                    </NavigationMenuItem>
-                  </>
-                )}
+                <NavigationMenuContent>
+                  <NavigationMenuItem>
+                    <AdminLink asChild>
+                      <Button variant="ghost">Admin Konsole</Button>
+                    </AdminLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <DynamicLinkButton href="/UnserePartner" variant="ghost">
+                      Unsere Partner
+                    </DynamicLinkButton>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => scrollToSection("#features")}>
+                      Features
+                    </Button>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => scrollToSection("#pricing")}>
+                      Preise
+                    </Button>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Button variant="ghost" onClick={() => scrollToSection("#examples")}>
+                      Beispiele
+                    </Button>
+                  </NavigationMenuItem>
+                  {!userID && (
+                    <>
+                      <NavigationMenuItem>
+                        <Button variant="" onClick={handleLogin}>
+                          Anmelden
+                        </Button>
+                      </NavigationMenuItem>
+                      <NavigationMenuItem>
+                        <Button asChild>
+                          <a href="/register">Kostenlos starten</a>
+                        </Button>
+                      </NavigationMenuItem>
+                    </>
+                  )}
+                </NavigationMenuContent>
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -105,38 +107,57 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
                 <div className="space-y-1 top-6 relative">
                   {adminAccess && (
                     <div>
-                      <AdminLink asChild><Button variant="ghost">Admin Konsole</Button></AdminLink>
+                      <AdminLink asChild>
+                        <Button variant="ghost">Admin Konsole</Button>
+                      </AdminLink>
                     </div>
                   )}
                   {autherizedUser && (
                     <div>
-                      <ProfilLink asChild><Button variant="ghost">Profil</Button></ProfilLink>
+                      <ProfilLink asChild>
+                        <Button variant="ghost">Profil</Button>
+                      </ProfilLink>
                     </div>
                   )}
-                  <Button variant="ghost" onClick={() => {
-                    scrollToSection("#features");
-                    toggleMobileMenu();
-                  }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      scrollToSection("#features");
+                      toggleMobileMenu();
+                    }}
+                  >
                     Features
                   </Button>
-                  <Button variant="ghost" onClick={() => {
-                    scrollToSection("#pricing");
-                    toggleMobileMenu();
-                  }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      scrollToSection("#pricing");
+                      toggleMobileMenu();
+                    }}
+                  >
                     Preise
                   </Button>
-                  <Button variant="ghost" onClick={() => {
-                    scrollToSection("#examples");
-                    toggleMobileMenu();
-                  }}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      scrollToSection("#examples");
+                      toggleMobileMenu();
+                    }}
+                  >
                     Beispiele
                   </Button>
-                  <DynamicLinkButton href="/UnserePartner" variant="ghost">Unsere Partner</DynamicLinkButton>
+                  <DynamicLinkButton href="/UnserePartner" variant="ghost">
+                    Unsere Partner
+                  </DynamicLinkButton>
                   {!userID && (
-                    <Button variant="outlined" aria-label="Log in" onClick={() => {
-                      toggleMobileMenu();
-                      handleLogin();
-                    }}>
+                    <Button
+                      variant="outlined"
+                      aria-label="Log in"
+                      onClick={() => {
+                        toggleMobileMenu();
+                        handleLogin();
+                      }}
+                    >
                       Anmelden
                     </Button>
                   )}
@@ -149,4 +170,3 @@ export default function DynamicNav({ onLoginClick, scrollToSection, mobileMenuOp
     </nav>
   );
 }
-

@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { date } from "zod";
 
 export default function Home({ renderRegistrieren }) {
   const form = useForm({
@@ -62,7 +61,7 @@ export default function Home({ renderRegistrieren }) {
   return (
     <div className="relative min-h-screen w-screen bg-gray-600 text-black-900">
       <div className="absolute inset-0 backdrop-blur-lg bg-gray-900 bg-opacity-80"></div>
-      <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-[300px] top-50">
+      <div className="max-w-md mx-auto p-6 bg-red-600 rounded-lg shadow-md relative z-10 flex flex-col justify-center min-h-75 top-50">
         <h1 className=" relative text-2xl font-bold mb-6 text-gray-900 align-center justify-center">Registrieren</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -150,14 +149,13 @@ export default function Home({ renderRegistrieren }) {
                 </FormItem>
               )}
             />
-
             <Button type="submit" className="w-full">
               Anmelden
             </Button>
           </form>
         </Form>
 
-        {submittedData && <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap break-words">{`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}</div>}
+        {submittedData && <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded text-blue-800 font-mono text-sm whitespace-pre-wrap wrap-break-words">{`Submitted Data:\n${JSON.stringify(submittedData, null, 2)}`}</div>}
       </div>
     </div>
   );

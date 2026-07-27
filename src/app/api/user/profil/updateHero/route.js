@@ -66,7 +66,7 @@ export async function POST(req) {
     }
 
     const menuData = Object.fromEntries(
-      Object.entries({ description, heroColor, heroTextColor }).filter(([_, v]) => v !== undefined)
+      Object.entries({ description, heroColor, heroTextColor }).filter(([ , v]) => v !== undefined)
     );
 
     if (Object.keys(menuData).length > 0) {

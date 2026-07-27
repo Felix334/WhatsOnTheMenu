@@ -87,7 +87,6 @@ const HeroSection = ({ restaurantData, menuFont, color }) => {
   );
 };
 
-// ─── Header (Tab-Navigation) ──────────────────────────────────────────────────
 const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
   const router = useRouter();
 
@@ -118,18 +117,21 @@ const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
           >
             Informationen
           </button>
-          {hasEvents && (
-            <button
-              onClick={() => setActivePage("events")}
-              className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
+
+          <button
+            onClick={() => setActivePage("events")}
+            className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
                 ${activePage === "events" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              Aktionen
-              <span className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold leading-none">
-                {eventCount}
-              </span>
-            </button>
-          )}
+          >
+            Aktionen
+            {hasEvents ? (
+              <>
+                <span className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-amber-500 text-white text-[10px] font-bold leading-none">{eventCount}</span>
+              </>
+            ) : (
+              <></>
+            )}
+          </button>
         </nav>
         <div className="flex-1" aria-hidden="true" />
       </div>
@@ -286,8 +288,10 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all
                     ${active ? "bg-yellow-400 border-yellow-400 text-gray-900" : "bg-white border-gray-200 text-gray-600 hover:bg-yellow-50 hover:border-yellow-300"}`}
                 >
-                  <span className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold border shrink-0
-                    ${active ? "bg-white/70 text-gray-900 border-gray-900/20" : "bg-amber-100 text-amber-800 border-amber-300"}`}>
+                  <span
+                    className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold border shrink-0
+                    ${active ? "bg-white/70 text-gray-900 border-gray-900/20" : "bg-amber-100 text-amber-800 border-amber-300"}`}
+                  >
                     {letter}
                   </span>
                   ohne {name}
@@ -382,10 +386,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
   const rowPadDesktop = DENSITY_ROW_DESKTOP[density] ?? "py-4";
   const rowPadMobile = DENSITY_ROW_MOBILE[density] ?? "py-3";
 
-  const visibleItems =
-    excludedAllergens.length > 0
-      ? (menuItems ?? []).filter((item) => !item.ingredients?.some((ing) => excludedAllergens.includes(ing.name)))
-      : menuItems ?? [];
+  const visibleItems = excludedAllergens.length > 0 ? (menuItems ?? []).filter((item) => !item.ingredients?.some((ing) => excludedAllergens.includes(ing.name))) : (menuItems ?? []);
   const hiddenCount = (menuItems?.length ?? 0) - visibleItems.length;
 
   const toggleExpand = (index) => {
@@ -435,11 +436,17 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                     {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
                     {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                   </div>
-                  {item.description && <p style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed mt-1">{item.description}</p>}
+                  {item.description && (
+                    <p style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed mt-1">
+                      {item.description}
+                    </p>
+                  )}
                   <AllergenBadges ingredients={item.ingredients} />
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</span>
+                  <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>
+                    {parseFloat(item.price || 0).toFixed(2)}€
+                  </span>
                   {orderMode && !unavailable && <CartControls item={item} />}
                 </div>
               </div>
@@ -458,8 +465,12 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
         <Table className="w-full table-auto">
           <TableHeader>
             <TableRow>
-              <TableHead style={colorStyle} className="text-left font-semibold">Speisen</TableHead>
-              <TableHead style={colorStyle} className="text-right font-semibold w-28">Preis</TableHead>
+              <TableHead style={colorStyle} className="text-left font-semibold">
+                Speisen
+              </TableHead>
+              <TableHead style={colorStyle} className="text-right font-semibold w-28">
+                Preis
+              </TableHead>
               {orderMode && <TableHead className="w-32" />}
             </TableRow>
           </TableHeader>
@@ -480,11 +491,17 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                           {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
                           {leaderDots && !unavailable && <span aria-hidden className="flex-1 min-w-4 border-b border-dotted border-current opacity-40" style={colorStyle} />}
                         </div>
-                        {item.description && <span style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed">{item.description}</span>}
+                        {item.description && (
+                          <span style={unavailable ? undefined : colorStyle} className="text-sm text-gray-500 leading-relaxed">
+                            {item.description}
+                          </span>
+                        )}
                         <AllergenBadges ingredients={item.ingredients} />
                       </div>
                     </TableCell>
-                    <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle ${rowPadDesktop} w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>{parseFloat(item.price || 0).toFixed(2)}€</TableCell>
+                    <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle ${rowPadDesktop} w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>
+                      {parseFloat(item.price || 0).toFixed(2)}€
+                    </TableCell>
                     {orderMode && (
                       <TableCell className={`align-middle ${rowPadDesktop} w-32`}>
                         <div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div>
@@ -682,12 +699,7 @@ const QRModal = ({ orderId, tableNumber, googleReviewUrl, onClose }) => {
         </div>
         <p className="text-xs text-gray-400">Die Bedienung scannt den Code um deine Bestellung zu sehen</p>
         {googleReviewUrl && (
-          <a
-            href={googleReviewUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full bg-yellow-50 border border-yellow-300 hover:bg-yellow-100 text-gray-900 rounded-xl py-2 text-sm font-semibold transition-colors"
-          >
+          <a href={googleReviewUrl} target="_blank" rel="noopener noreferrer" className="block w-full bg-yellow-50 border border-yellow-300 hover:bg-yellow-100 text-gray-900 rounded-xl py-2 text-sm font-semibold transition-colors">
             ⭐ Gefällt es dir hier? Bewerte uns auf Google
           </a>
         )}

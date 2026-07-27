@@ -64,10 +64,6 @@ function HomeContent() {
     }
   };
 
-  const checkVercelEnv = () => {
-    console.log("Vercel-Env:", process.env.VERCEL_ENV);
-  };
-
   const renderLoginW = () => setRenderLogin((prev) => !prev);
   return (
     <div>

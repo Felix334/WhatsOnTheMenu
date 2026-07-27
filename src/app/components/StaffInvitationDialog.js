@@ -91,7 +91,7 @@ export default function StaffInvitationDialog() {
           {hasElevatedRole && (
             <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-amber-800">
               <p className="font-semibold">
-                ⚠️ Du hast bereits die Rolle „{CURRENT_ROLE_LABELS[currentRole] ?? currentRole}".
+                ⚠️ Du hast bereits die Rolle {CURRENT_ROLE_LABELS[currentRole] ?? currentRole}.
               </p>
               {keepsMainRole ? (
                 <p className="mt-1">
