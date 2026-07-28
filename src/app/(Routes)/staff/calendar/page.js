@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const TYPE_LABELS = { promotion: "Aktion", event: "Event", specialDish: "Tagesgericht" };
-const EMPTY_FORM = { id: null, eventName: "", eventDescription: "", date: "", startTime: "", endTime: "", type: "promotion", dishId: "" };
+const EMPTY_FORM = { id: null, eventName: "", eventDescription: "", date: "", multiDay: false, endDate: "", startTime: "", endTime: "", type: "promotion", dishId: "" };
 
 function CalendarContent() {
   const searchParams = useSearchParams();
@@ -55,14 +55,18 @@ function CalendarContent() {
       eventName: entry.eventName,
       eventDescription: entry.eventDescription,
       date: entry.date?.slice(0, 10) ?? "",
-      startTime: entry.startTime,
-      endTime: entry.endTime,
+      multiDay: !!entry.endDate,
+      endDate: entry.endDate?.slice(0, 10) ?? "",
+      startTime: entry.startTime ?? "",
+      endTime: entry.endTime ?? "",
       type: entry.type,
       dishId: entry.dishId ?? "",
     });
 
   const submit = async () => {
-    if (!form.eventName || !form.eventDescription || !form.date || !form.startTime || !form.endTime) return;
+    if (!form.eventName || !form.eventDescription || !form.date) return;
+    if (form.multiDay && !form.endDate) return;
+    if (!form.multiDay && !!form.startTime !== !!form.endTime) return;
 
     setSaving(true);
     try {
@@ -75,8 +79,9 @@ function CalendarContent() {
           eventName: form.eventName,
           eventDescription: form.eventDescription,
           date: form.date,
-          startTime: form.startTime,
-          endTime: form.endTime,
+          endDate: form.multiDay ? form.endDate : null,
+          startTime: form.multiDay ? null : form.startTime || null,
+          endTime: form.multiDay ? null : form.endTime || null,
           type: form.type,
           dishId: form.type === "specialDish" && form.dishId ? form.dishId : null,
         }),
@@ -135,11 +140,35 @@ function CalendarContent() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
             <input className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Titel" value={form.eventName} onChange={(e) => setForm({ ...form, eventName: e.target.value })} />
             <textarea className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" placeholder="Beschreibung" value={form.eventDescription} onChange={(e) => setForm({ ...form, eventDescription: e.target.value })} />
-            <div className="grid grid-cols-3 gap-2">
-              <input type="date" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              <input type="time" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
-              <input type="time" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
-            </div>
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input
+                type="checkbox"
+                checked={form.multiDay}
+                onChange={(e) => setForm({ ...form, multiDay: e.target.checked, endDate: "", startTime: "", endTime: "" })}
+              />
+              Mehrtägig (Zeitraum über mehrere Tage)
+            </label>
+
+            {form.multiDay ? (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-400">Von</p>
+                  <input type="date" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-400">Bis</p>
+                  <input type="date" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
+                </div>
+              </div>
+            ) : (
+              <>
+                <input type="date" className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                <div className="grid grid-cols-2 gap-2">
+                  <input type="time" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
+                  <input type="time" className="border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+                </div>
+              </>
+            )}
             <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
               {Object.entries(TYPE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -180,7 +209,10 @@ function CalendarContent() {
               <div className="min-w-0">
                 <p className="font-medium text-sm text-gray-800 truncate">{entry.eventName}</p>
                 <p className="text-xs text-gray-400">
-                  {TYPE_LABELS[entry.type]} · {new Date(entry.date).toLocaleDateString("de-DE")} · {entry.startTime}–{entry.endTime}
+                  {TYPE_LABELS[entry.type]} ·{" "}
+                  {entry.endDate
+                    ? `${new Date(entry.date).toLocaleDateString("de-DE")}–${new Date(entry.endDate).toLocaleDateString("de-DE")}`
+                    : `${new Date(entry.date).toLocaleDateString("de-DE")} · ${entry.startTime && entry.endTime ? `${entry.startTime}–${entry.endTime}` : "Ganztägig"}`}
                   {entry.dish ? ` · ${entry.dish.name}` : ""}
                 </p>
               </div>

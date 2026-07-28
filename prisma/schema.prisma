@@ -110,10 +110,11 @@ model Restaurant {
 model Calendar {
   id               String            @id @default(cuid())
   date             DateTime
+  endDate          DateTime?
   eventName        String
   eventDescription String
-  startTime        String
-  endTime          String
+  startTime        String?
+  endTime          String?
   type             CalendarEntryType
   dishId           String?
   restaurantID     String

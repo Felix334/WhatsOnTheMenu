@@ -87,13 +87,18 @@ export async function getRestaurantMenuData(restaurantID) {
         },
       },
       calendar: {
-        where: { date: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
+        // Einträge zeigen, die noch nicht vorbei sind: mehrtägige Events laufen bis
+        // endDate (auch wenn date in der Vergangenheit liegt), eintägige bis date.
+        where: {
+          OR: [{ endDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } }, { endDate: null, date: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } }],
+        },
         orderBy: { date: "asc" },
         select: {
           id: true,
           eventName: true,
           eventDescription: true,
           date: true,
+          endDate: true,
           startTime: true,
           endTime: true,
           type: true,

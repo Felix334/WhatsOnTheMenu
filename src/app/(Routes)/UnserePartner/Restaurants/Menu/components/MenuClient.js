@@ -320,7 +320,9 @@ const EventsBanner = ({ entries }) => {
   return (
     <div className="mb-6 space-y-2">
       {entries.map((entry) => {
-        const isToday = new Date(entry.date).toDateString() === todayStr;
+        const isToday = entry.endDate
+          ? new Date(entry.date) <= new Date() && new Date() <= new Date(entry.endDate)
+          : new Date(entry.date).toDateString() === todayStr;
         return (
           <div key={entry.id} className="flex items-start gap-3 bg-white border border-amber-200 rounded-2xl px-4 py-3 shadow-sm">
             <span className="text-xl shrink-0">{CALENDAR_TYPE_ICON[entry.type] ?? "📅"}</span>
@@ -331,7 +333,11 @@ const EventsBanner = ({ entries }) => {
               </p>
               <p className="text-xs text-gray-500 mt-0.5">{entry.eventDescription}</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                {new Date(entry.date).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" })} · {entry.startTime}–{entry.endTime}
+                {entry.endDate
+                  ? `${new Date(entry.date).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}–${new Date(entry.endDate).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}`
+                  : `${new Date(entry.date).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" })} · ${
+                      entry.startTime && entry.endTime ? `${entry.startTime}–${entry.endTime}` : "Ganztägig"
+                    }`}
               </p>
             </div>
           </div>

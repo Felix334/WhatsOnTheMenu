@@ -70,6 +70,7 @@ export async function POST(req) {
         eventName: data.eventName,
         eventDescription: data.eventDescription,
         date: data.date,
+        endDate: data.endDate || null,
         startTime: data.startTime,
         endTime: data.endTime,
         type: data.type,

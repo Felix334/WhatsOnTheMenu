@@ -6,12 +6,13 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem as SelectOption } from "@/components/ui/select";
 
 const TYPE_LABELS = { promotion: "Aktion", event: "Event", specialDish: "Tagesgericht" };
 
-const EMPTY_FORM = { id: null, eventName: "", eventDescription: "", date: "", startTime: "", endTime: "", type: "promotion", dishId: "" };
+const EMPTY_FORM = { id: null, eventName: "", eventDescription: "", date: "", multiDay: false, endDate: "", startTime: "", endTime: "", type: "promotion", dishId: "" };
 
 const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
   const [entries, setEntries] = useState([]);
@@ -46,15 +47,25 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
       eventName: entry.eventName,
       eventDescription: entry.eventDescription,
       date: entry.date?.slice(0, 10) ?? "",
-      startTime: entry.startTime,
-      endTime: entry.endTime,
+      multiDay: !!entry.endDate,
+      endDate: entry.endDate?.slice(0, 10) ?? "",
+      startTime: entry.startTime ?? "",
+      endTime: entry.endTime ?? "",
       type: entry.type,
       dishId: entry.dishId ?? "",
     });
 
   const submit = async () => {
-    if (!form.eventName || !form.eventDescription || !form.date || !form.startTime || !form.endTime) {
+    if (!form.eventName || !form.eventDescription || !form.date) {
       toast.error("Bitte alle Felder ausfüllen");
+      return;
+    }
+    if (form.multiDay && !form.endDate) {
+      toast.error("Bitte ein Enddatum angeben");
+      return;
+    }
+    if (!form.multiDay && !!form.startTime !== !!form.endTime) {
+      toast.error("Bitte Start- und Endzeit zusammen angeben oder beide leer lassen");
       return;
     }
 
@@ -69,8 +80,9 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
           eventName: form.eventName,
           eventDescription: form.eventDescription,
           date: form.date,
-          startTime: form.startTime,
-          endTime: form.endTime,
+          endDate: form.multiDay ? form.endDate : null,
+          startTime: form.multiDay ? null : form.startTime || null,
+          endTime: form.multiDay ? null : form.endTime || null,
           type: form.type,
           dishId: form.type === "specialDish" && form.dishId ? form.dishId : null,
         }),
@@ -117,11 +129,34 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
             <Input placeholder="Titel" value={form.eventName} onChange={(e) => setForm({ ...form, eventName: e.target.value })} />
             <Textarea placeholder="Beschreibung" value={form.eventDescription} onChange={(e) => setForm({ ...form, eventDescription: e.target.value })} />
 
-            <div className="grid grid-cols-3 gap-2">
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
-              <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
-            </div>
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <Checkbox
+                checked={form.multiDay}
+                onCheckedChange={(checked) => setForm({ ...form, multiDay: !!checked, endDate: "", startTime: "", endTime: "" })}
+              />
+              Mehrtägig (Zeitraum über mehrere Tage)
+            </label>
+
+            {form.multiDay ? (
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-400">Von</p>
+                  <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-400">Bis</p>
+                  <Input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
+                </div>
+              </div>
+            ) : (
+              <>
+                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                <div className="grid grid-cols-2 gap-2">
+                  <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
+                  <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+                </div>
+              </>
+            )}
 
             <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
               <SelectTrigger>
@@ -175,7 +210,10 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{entry.eventName}</p>
                     <p className="text-xs text-gray-400">
-                      {TYPE_LABELS[entry.type]} · {new Date(entry.date).toLocaleDateString("de-DE")} · {entry.startTime}–{entry.endTime}
+                      {TYPE_LABELS[entry.type]} ·{" "}
+                      {entry.endDate
+                        ? `${new Date(entry.date).toLocaleDateString("de-DE")}–${new Date(entry.endDate).toLocaleDateString("de-DE")}`
+                        : `${new Date(entry.date).toLocaleDateString("de-DE")} · ${entry.startTime && entry.endTime ? `${entry.startTime}–${entry.endTime}` : "Ganztägig"}`}
                       {entry.dish ? ` · ${entry.dish.name}` : ""}
                     </p>
                   </div>
