@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { assertCalendarAccess } from "@/lib/calendarAuth";
+import { CALENDAR_DATE_HORIZON_DAYS, getCalendarMaxDate } from "@/lib/calendarLimits";
 import { calendarEntrySchema } from "@/lib/schemas/calendar";
 
 export async function PATCH(req, { params }) {
@@ -22,6 +23,14 @@ export async function PATCH(req, { params }) {
       return NextResponse.json({ message: parsed.error.issues[0]?.message ?? "Ungültige Daten" }, { status: 400 });
     }
     const data = parsed.data;
+
+    const maxDate = getCalendarMaxDate(access.subscription);
+    if (maxDate && data.date > maxDate) {
+      return NextResponse.json({ message: `Im ${access.subscription}-Abo können Events nur bis zu ${CALENDAR_DATE_HORIZON_DAYS[access.subscription]} Tage im Voraus angelegt werden` }, { status: 403 });
+    }
+    if (maxDate && data.endDate && data.endDate > maxDate) {
+      return NextResponse.json({ message: `Das Enddatum liegt außerhalb des im ${access.subscription}-Abo erlaubten Zeitraums` }, { status: 403 });
+    }
 
     if (data.dishId) {
       const dish = await prisma.dish.findFirst({

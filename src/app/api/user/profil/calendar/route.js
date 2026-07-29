@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { assertCalendarAccess, CALENDAR_ENTRY_LIMITS } from "@/lib/calendarAuth";
+import { CALENDAR_DATE_HORIZON_DAYS, getCalendarMaxDate } from "@/lib/calendarLimits";
 import { calendarEntrySchema } from "@/lib/schemas/calendar";
 
 export async function GET(req) {
@@ -53,6 +54,14 @@ export async function POST(req) {
       if (count >= limit) {
         return NextResponse.json({ message: `Maximal ${limit} Kalender-Einträge im ${access.subscription}-Abo erreicht` }, { status: 403 });
       }
+    }
+
+    const maxDate = getCalendarMaxDate(access.subscription);
+    if (maxDate && data.date > maxDate) {
+      return NextResponse.json({ message: `Im ${access.subscription}-Abo können Events nur bis zu ${CALENDAR_DATE_HORIZON_DAYS[access.subscription]} Tage im Voraus angelegt werden` }, { status: 403 });
+    }
+    if (maxDate && data.endDate && data.endDate > maxDate) {
+      return NextResponse.json({ message: `Das Enddatum liegt außerhalb des im ${access.subscription}-Abo erlaubten Zeitraums` }, { status: 403 });
     }
 
     if (data.dishId) {

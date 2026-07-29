@@ -9,7 +9,6 @@ Normaler User kann seinen Account nicht selber löschen
 
 => Es ist möglich auch ein leeres Datenpacket an den Server zu schicken => Kontrolle einfügen
 
-
 => Console Logs am ende entfernen => aber nicht die console.errors => wird alles auf vercel angezeigt
 
 => Jeder Owner bekommt neben der userID noch eine extra OwnerID die bei der Abfrage übereinstimmen muss
@@ -61,7 +60,6 @@ Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => 
 
 => Eine Rechnungsfunktion für User => User können Items auswählen und unten steht der Gesammtpreis (Für eine Rechnung oder führ mehrere Personen)
 
-Docker funktioniert!? => Bei Code änderungen Docker-Befehl verwenden
 PROXMOX => als alternative zu Docker
 
 

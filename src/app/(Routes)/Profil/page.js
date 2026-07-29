@@ -104,6 +104,7 @@ export default function PageBuilder() {
     setUserID(session.user.id);
 
     const sub = session.user.subscription;
+    console.log("Subscription:", sub);
 
     switch (sub) {
       case "FreeTier":
@@ -807,7 +808,7 @@ export default function PageBuilder() {
               )}
               {allowPremiumColor ? (
                 <Button variant="outline" size="sm" onClick={() => setOpenCalendarWin(true)}>
-                  Aktionen
+                  Event-Kalender
                 </Button>
               ) : (
                 <Tooltip>
@@ -866,13 +867,13 @@ export default function PageBuilder() {
           </div>
         </div>
       </header>
-
-      <CalendarWin
-        open={openCalendarWin}
-        onOpenChange={setOpenCalendarWin}
-        restaurantId={restaurantID}
-        dishes={serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []) ?? []}
-      />
+      {session.user.subscription === "Professional" || session.user.subscription === "Business" ? (
+        <>
+          <CalendarWin open={openCalendarWin} onOpenChange={setOpenCalendarWin} restaurantId={restaurantID} dishes={serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []) ?? []} />
+        </>
+      ) : (
+        <div className="line-through">Event-Kalender</div>
+      )}
 
       <div className={`w-full ${heroColor?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center relative`} style={heroColor?.startsWith("#") ? { background: heroColor } : {}}>
         {isEditingHero ? (
@@ -911,7 +912,9 @@ export default function PageBuilder() {
               ))}
               {session.user.subscription === "Professional" ? (
                 <div className="flex items-center justify-between gap-4">
-                  <h1 className="text-sm font-medium" style={{color: "black"}}>Fortgeschrittene Farbauswahl:</h1>
+                  <h1 className="text-sm font-medium" style={{ color: "black" }}>
+                    Fortgeschrittene Farbauswahl:
+                  </h1>
                   <input type="color" title="Eigene Farbe wählen" value={heroColor?.startsWith("#") ? heroColor : "#ffffff"} onChange={(e) => setHeroColor(e.target.value)} className="justify-self-end w-8 h-8 rounded-full border-4 border-white/30 hover:border-white/70 transition-all cursor-pointer bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-none" />
                 </div>
               ) : (
@@ -947,7 +950,9 @@ export default function PageBuilder() {
               ))}
               {session.user.subscription === "Professional" ? (
                 <div className="w-full flex items-center justify-center gap-4">
-                  <h1 className="text-sm font-medium" style={{color: "black"}}>Fortgeschrittene Farbauswahl:</h1>
+                  <h1 className="text-sm font-medium" style={{ color: "black" }}>
+                    Fortgeschrittene Farbauswahl:
+                  </h1>
 
                   <input type="color" title="Eigene Farbe wählen" value={heroTextColor?.startsWith("#") ? heroTextColor : "#ffffff"} onChange={(e) => setHeroTextColor(e.target.value)} className="w-8 h-8 rounded-full border-4 border-white/30 hover:border-white/70 transition-all cursor-pointer bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-none" />
                 </div>
