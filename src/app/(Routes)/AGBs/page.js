@@ -197,7 +197,7 @@ export default function AGBsPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 text-sm text-gray-500 space-y-1">
           <p className="font-semibold text-gray-700">Anbieter</p>
           <p>WhatIsOnMyMenu.com</p>
-          <p>E-Mail: <a href="mailto:" className="text-red-700 hover:underline"></a></p>
+          <p>E-Mail: <a href="mailto:support.whatisonmymenu@gmail.com" className="text-red-700 hover:underline">support.whatisonmymenu@gmail.com</a></p>
         </div>
       </main>
     </div>

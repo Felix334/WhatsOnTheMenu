@@ -46,8 +46,8 @@ export default function ImprintPage() {
           <div className="text-sm text-gray-600 space-y-1">
             <p>
               E-Mail:{" "}
-              <a href="mailto:" className="text-red-700 hover:underline">
-                [DEINE E-MAIL-ADRESSE]
+              <a href="mailto:support.whatisonmymenu@gmail.com" className="text-red-700 hover:underline">
+                support.whatisonmymenu@gmail.com
               </a>
             </p>
           </div>

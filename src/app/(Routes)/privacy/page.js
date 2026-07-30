@@ -133,8 +133,8 @@ export default function PrivacyPage() {
           <p>Felix Mayer</p>
           <p>
             E-Mail:{" "}
-            <a href="mailto:" className="text-amber-600 hover:underline">
-              [DEINE E-MAIL-ADRESSE]
+            <a href="mailto:support.whatisonmymenu@gmail.com" className="text-amber-600 hover:underline">
+              support.whatisonmymenu@gmail.com
             </a>
           </p>
         </div>

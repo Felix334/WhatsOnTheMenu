@@ -23,7 +23,7 @@ export default function Page() {
           <p><strong>Legal Form:</strong> Gesellschaft mit beschränkter Haftung (GmbH)</p>
           <p><strong>Address:</strong> Musterstraße 123, 12345 Musterstadt, Germany</p>
           <p><strong>Phone:</strong> +49 123 4567890</p>
-          <p><strong>Email:</strong> info@example.com</p>
+          <p><strong>Email:</strong> support.whatisonmymenu@gmail.com</p>
           <p><strong>Website:</strong> www.example.com</p>
         </section>
 
