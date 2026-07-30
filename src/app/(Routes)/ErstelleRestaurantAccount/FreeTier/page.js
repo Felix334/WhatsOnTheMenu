@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
+import { hasEqualOrHigherTier } from "@/lib/tierRank";
 
 const restaurantSchema = z.object({
   ownerName: z.string().min(2, "Ein Name ist erforderlich"),
@@ -61,6 +62,20 @@ export default function RestaurantForm() {
 
   if (status === "loading") {
     return <div>Seite wird geladen</div>;
+  }
+
+  if (hasEqualOrHigherTier(session?.user?.subscription, "FreeTier")) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-16">
+        <Card className="max-w-md w-full border-amber-100 shadow-xl text-center">
+          <CardContent className="p-10">
+            <div className="text-5xl mb-4">✅</div>
+            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Du hast bereits ein Abo</h1>
+            <p className="text-gray-500">Du bist bereits registriert und hast ein gültiges Abo. Verwalte dein Restaurant im Profil.</p>
+          </CardContent>
+        </Card>
+      </section>
+    );
   }
 
   const handleChange = (e) => {

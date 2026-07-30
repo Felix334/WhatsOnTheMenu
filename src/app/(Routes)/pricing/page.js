@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { hasEqualOrHigherTier } from "@/lib/tierRank";
 
 // Bezahlte Tarife sind noch "Coming Soon" — UI-Schalter pro Tarif, passend zur
 // serverseitigen Sperre (AVAILABLE_TIERS in src/lib/stripe.ts). Beides zusammen
@@ -18,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 // vorerst gesperrt.
 const TIER_AVAILABLE_UI = {
   Professional: false,
-  Business: false,
+  Business: true,
 };
 
 /* Unternehmer-Bestätigung + Widerrufs-Zustimmung — Pflicht vor jedem Abo-Checkout */
@@ -28,8 +29,14 @@ function LegalConsentCheckbox({ checked, onCheckedChange }) {
       <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="mt-0.5 shrink-0" />
       <span className="text-xs text-gray-600 leading-relaxed">
         Ich bestätige, dass ich als <strong>Unternehmer/Gewerbetreibender</strong> handle. Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die{" "}
-        <Link href="/AGBs" target="_blank" className="text-red-700 underline hover:text-red-800">AGB</Link> und die{" "}
-        <Link href="/Widerruf" target="_blank" className="text-red-700 underline hover:text-red-800">Widerrufsbelehrung</Link>. <span className="text-red-500">*</span>
+        <Link href="/AGBs" target="_blank" className="text-red-700 underline hover:text-red-800">
+          AGB
+        </Link>{" "}
+        und die{" "}
+        <Link href="/Widerruf" target="_blank" className="text-red-700 underline hover:text-red-800">
+          Widerrufsbelehrung
+        </Link>
+        . <span className="text-red-500">*</span>
       </span>
     </label>
   );
@@ -110,7 +117,7 @@ export default function PricingPage() {
 
   const handlePremiumSubmit = (e) => {
     e.preventDefault();
-    startPremiumTransition(() => handleCheckout("premium"));
+    startPremiumTransition(() => handleCheckout("Business"));
   };
 
   return (
@@ -142,7 +149,7 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-gray-900">€0</span>
+                <span className="text-5xl font-bold text-gray-900">0€</span>
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
@@ -153,9 +160,15 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Button variant="outline" className="w-full border-gray-300 hover:border-red-400 hover:text-red-700" onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")}>
-                Jetzt starten
-              </Button>
+              {hasEqualOrHigherTier(currentSub, "FreeTier") ? (
+                <Button variant="outline" disabled className="w-full">
+                  Bereits aktiv
+                </Button>
+              ) : (
+                <Button variant="outline" className="w-full border-gray-300 hover:border-red-400 hover:text-red-700" onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")}>
+                  Jetzt starten
+                </Button>
+              )}
             </CardContent>
           </Card>
 
@@ -164,12 +177,12 @@ export default function PricingPage() {
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-red-800 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>
             <CardHeader className="pb-2 pt-7">
               <p className="text-xs font-semibold uppercase tracking-widest text-red-700 mb-1">Beliebteste Wahl</p>
-              <CardTitle className="text-2xl font-bold">Pro</CardTitle>
+              <CardTitle className="text-2xl font-bold">Professional</CardTitle>
               <CardDescription>Unbegrenzte Möglichkeiten</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-red-800">€14.99</span>
+                <span className="text-5xl font-bold text-red-800">€</span>
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
@@ -201,7 +214,7 @@ export default function PricingPage() {
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl h-[80vh]">
                     <DialogHeader>
-                      <DialogTitle>Restaurant Details für Pro (€14.99/Monat)</DialogTitle>
+                      <DialogTitle>Restaurant Details für Pro (/Monat)</DialogTitle>
                       <DialogDescription>Nach Zahlung wird dein Restaurant automatisch erstellt.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleProSubmit} className="space-y-4 overflow-y-auto">
@@ -271,8 +284,8 @@ export default function PricingPage() {
           {/* Premium Tier */}
           <Card className="border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Enterprise</p>
-              <CardTitle className="text-2xl font-bold">Premium</CardTitle>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Business</p>
+              <CardTitle className="text-2xl font-bold">Business</CardTitle>
               <CardDescription>Maximale Features & Support</CardDescription>
             </CardHeader>
             <CardContent>
@@ -281,7 +294,7 @@ export default function PricingPage() {
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 15 Kategorien", "Bis zu 100 Gerichte", "Basic Templates", "QR-Code"].map((f) => (
+                {["Bis zu 15 Kategorien", "Bis zu 100 Gerichte", "Basic Templates", "QR-Code", "Event-Kalender(Bis zu 30 Tage)"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}

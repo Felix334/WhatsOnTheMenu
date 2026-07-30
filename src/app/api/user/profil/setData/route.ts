@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
-import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup } from "@prisma/client";
+import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup, Dish as PrismaDish } from "@prisma/client";
 import { devLog, devWarn } from "src/lib/logger";
+import { getMenuLimits } from "src/lib/menuLimits";
 
 export const dynamic = "force-dynamic";
 
 // ─── Typen ───────────────────────────────────────────────────────────────────
 
 type CategoryGroupWithRelations = PrismaCategoryGroup & {
-  categories: PrismaCategory[];
+  categories: (PrismaCategory & { dishes: PrismaDish[] })[];
 };
 type MenuWithRelations = PrismaMenu & {
   categoryGroup: CategoryGroupWithRelations[];
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
             include: {
               menu: {
                 include: {
-                  categoryGroup: { include: { categories: true } },
+                  categoryGroup: { include: { categories: { include: { dishes: true } } } },
                 },
               },
             },
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
               font: "Arial",
             },
             include: {
-              categoryGroup: { include: { categories: true } },
+              categoryGroup: { include: { categories: { include: { dishes: true } } } },
             },
           }),
         "menu.create",
@@ -142,6 +143,13 @@ export async function POST(req: NextRequest) {
     }
 
     const menuId = menu.id;
+
+    // ── Abo-Limits serverseitig durchsetzen (nie nur im Client prüfen) ─────
+    // Zählt aus der bereits geladenen menu/categoryGroup-Struktur — keine
+    // zusätzlichen DB-Roundtrips (Pool ist auf 5 Verbindungen begrenzt).
+    const limits = getMenuLimits(user.subscription);
+    let categoryCount = menu.categoryGroup.reduce((n, g) => n + g.categories.length, 0);
+    let dishCount = menu.categoryGroup.reduce((n, g) => n + g.categories.reduce((m, c) => m + c.dishes.length, 0), 0);
 
     // ── Einträge verarbeiten ──────────────────────────────────────────────
     for (const entry of parsedData) {
@@ -186,6 +194,13 @@ export async function POST(req: NextRequest) {
       )) as PrismaCategory | null;
 
       if (!category) {
+        if (categoryCount >= limits.CategoryLimit) {
+          return NextResponse.json(
+            { message: `Maximal ${limits.CategoryLimit} Kategorien im ${user.subscription}-Abo erreicht` },
+            { status: 403 },
+          );
+        }
+
         category = (await safeDb(
           () =>
             prisma.category.create({
@@ -198,6 +213,7 @@ export async function POST(req: NextRequest) {
             }),
           "category.create",
         )) as PrismaCategory;
+        categoryCount++;
       } else {
         category = (await safeDb(
           () =>
@@ -250,6 +266,13 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        if (dishCount >= limits.DishLimit) {
+          return NextResponse.json(
+            { message: `Maximal ${limits.DishLimit} Gerichte im ${user.subscription}-Abo erreicht` },
+            { status: 403 },
+          );
+        }
+
         await safeDb(
           () =>
             prisma.dish.create({
@@ -263,6 +286,7 @@ export async function POST(req: NextRequest) {
             }),
           `dish.create (${item.name})`,
         );
+        dishCount++;
       }
     }
 

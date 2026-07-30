@@ -3,8 +3,8 @@
 // und calendarAuth.js/route.js gemeinsam genutzt. Die eigentliche Prüfung passiert
 // immer serverseitig (route.js), hier dienen die Werte auch der UI-Anzeige.
 export const CALENDAR_ENTRY_LIMITS = {
-  Professional: 50,
-  Business: 15,
+  Professional: 100,
+  Business: 30,
 };
 
 // Wie weit im Voraus ein Event angelegt werden darf: Business nur die nächsten

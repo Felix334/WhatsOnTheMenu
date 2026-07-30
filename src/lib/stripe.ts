@@ -31,14 +31,13 @@ const TIER_ALIAS: Record<string, Tier> = {
   pro: "Professional",
   professional: "Professional",
   business: "Business",
-  premium: "Business",
 };
 
-// Aktuell buchbare Abo-Stufen — Professional und Business sind noch "Coming Soon".
+// Aktuell buchbare Abo-Stufen — Professional ist noch "Coming Soon".
 // Zum Freischalten das Tier hier eintragen (z. B. ["Business"]); das UI-Pendant
 // ist TIER_AVAILABLE_UI in src/app/(Routes)/pricing/page.js. Professional bleibt
 // bewusst auch nach dem Business-Launch vorerst gesperrt.
-export const AVAILABLE_TIERS: readonly Tier[] = [];
+export const AVAILABLE_TIERS: readonly Tier[] = ["Business"];
 
 export function isTierAvailable(tier: string): boolean {
   const key = TIER_ALIAS[tier.toLowerCase()];
@@ -51,6 +50,13 @@ export function getPriceId(tier: string): string | null {
   return PRICE_IDS[key] ?? null;
 }
 
+// Rückwärts-Lookup für Webhook-Events (z. B. customer.subscription.updated),
+// die nur die Stripe-Preis-ID liefern, nicht unseren Tier-Namen.
+export function getTierByPriceId(priceId: string): Tier | null {
+  const entry = (Object.entries(PRICE_IDS) as [Tier, string | undefined][]).find(([, id]) => id === priceId);
+  return entry ? entry[0] : null;
+}
+
 export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" | "Business" {
   const TIER_MAP: Record<string, "FreeTier" | "Professional" | "Business"> = {
     free: "FreeTier",
@@ -58,7 +64,6 @@ export function getSubscriptionTier(tier: string): "FreeTier" | "Professional" |
     pro: "Professional",
     professional: "Professional",
     business: "Business",
-    premium: "Business",
   };
 
   return TIER_MAP[tier.toLowerCase()] ?? "FreeTier";

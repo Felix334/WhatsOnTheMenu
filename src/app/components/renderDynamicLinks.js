@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { hasEqualOrHigherTier } from "@/lib/tierRank";
 
 function useQueryObject() {
   const searchParams = useSearchParams();
@@ -59,6 +60,16 @@ export function LogoutLink() {
 export default function FreeTierLink({ className }) {
   const query = useQueryObject();
   const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
+  const { data: session } = useSession();
+
+  if (hasEqualOrHigherTier(session?.user?.subscription, "FreeTier")) {
+    return (
+      <Button className={className} variant="outline" disabled>
+        Bereits aktiv
+      </Button>
+    );
+  }
+
   return (
     <Button asChild className={className}>
       <Link href={`/ErstelleRestaurantAccount/FreeTier${queryString}`}>Abo abschließen</Link>
@@ -66,9 +77,41 @@ export default function FreeTierLink({ className }) {
   );
 }
 
+export function BusinessTierLink({ className }) {
+  const query = useQueryObject();
+  const { userID } = useAuth();
+  const { data: session } = useSession();
+
+  if (hasEqualOrHigherTier(session?.user?.subscription, "Business")) {
+    return (
+      <Button className={className} variant="outline" disabled>
+        Bereits aktiv
+      </Button>
+    );
+  }
+
+  return (
+    <Button className={className} asChild>
+      <Link href={{ pathname: "/ErstelleRestaurantAccount/Business", query: { ...query, ...(userID ? { userID } : {}) } }} prefetch={false}>
+        Abo abschließen
+      </Link>
+    </Button>
+  );
+}
+
 export function ProfessionalTierLink() {
   const query = useQueryObject();
   const { userID } = useAuth();
+  const { data: session } = useSession();
+
+  if (hasEqualOrHigherTier(session?.user?.subscription, "Professional")) {
+    return (
+      <Button variant="outline" disabled>
+        Bereits aktiv
+      </Button>
+    );
+  }
+
   return (
     <Button className="bg-yellow-400 hover:bg-green-600 text-black" asChild>
       <Link href={{ pathname: "/ErstelleRestaurantAccount/Professional", query: { ...query, ...(userID ? { userID } : {}) } }} prefetch={false}>

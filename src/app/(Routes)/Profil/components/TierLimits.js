@@ -1,17 +1,19 @@
+import { MENU_ENTRY_LIMITS } from "@/lib/menuLimits";
+
 const TierSystem = {
   FreeTier: {
-    DishLimit: 50,
-    CategoryLimit: 7,
+    DishLimit: MENU_ENTRY_LIMITS.FreeTier.DishLimit,
+    CategoryLimit: MENU_ENTRY_LIMITS.FreeTier.CategoryLimit,
     allowedColorPallet: {},
   },
   Professional: {
-    DishLimit: 200,
-    CategoryLimit: 25,
+    DishLimit: MENU_ENTRY_LIMITS.Professional.DishLimit,
+    CategoryLimit: MENU_ENTRY_LIMITS.Professional.CategoryLimit,
     allowedColorPallet: { allAllowed: true },
   },
   Business: {
-    DishLimit: 100,
-    CategoryLimit: 15,
+    DishLimit: MENU_ENTRY_LIMITS.Business.DishLimit,
+    CategoryLimit: MENU_ENTRY_LIMITS.Business.CategoryLimit,
     allowedColorPallet: { allAllowed: true },
   },
 };

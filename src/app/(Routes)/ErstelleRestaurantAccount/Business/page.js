@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { hasEqualOrHigherTier } from "@/lib/tierRank";
 
 // Zod Schema für das Restaurant
 const restaurantSchema = z.object({
@@ -59,6 +60,21 @@ export default function RestaurantForm() {
   if (status === "unauthenticated") {
     return <div>Bitte anmelden</div>;
   }
+
+  if (hasEqualOrHigherTier(session?.user?.subscription, "Business")) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center px-4 py-16">
+        <Card className="max-w-md w-full border-amber-100 shadow-xl text-center">
+          <CardContent className="p-10">
+            <div className="text-5xl mb-4">✅</div>
+            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Du hast bereits ein gleichwertiges oder höheres Abo</h1>
+            <p className="text-gray-500">Ein Business-Abo bringt dir keine zusätzlichen Vorteile. Verwalte dein bestehendes Abo im Profil.</p>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 

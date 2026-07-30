@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,7 +21,7 @@ import RenderUserID from "./components/renderUserID";
 
 import SpeiseKarteHandyNeu from "./components/img/SpeisekarteHandyNeu.png";
 import SpeiseKarteLaptopNeu from "./components/img/SpeisekarteLaptopNeu.png";
-import { AdminLink, FreeTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
+import { AdminLink, FreeTierLink, BusinessTierLink, WieFunktionierts } from "./components/renderDynamicLinks";
 
 import WebsiteIcon from "./icon.svg";
 
@@ -318,7 +317,6 @@ function HomeContent() {
                   </CardContent>
                 </Card>
                 <Card className="flex flex-col h-full min-h-140 border-2 border-amber-400 relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                  <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">Coming Soon</Badge>
                   <CardHeader>
                     <CardTitle>Business</CardTitle>
                     <div className="text-3xl font-bold ">
@@ -349,6 +347,9 @@ function HomeContent() {
                     </ul>
 
                     {/* Button nach unten drücken */}
+                    <div className="mt-auto">
+                      <BusinessTierLink className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900" />
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -395,11 +396,6 @@ function HomeContent() {
           </section>
         </main>
         <FooterPart />
-        <Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4153577229204032" crossOrigin="anonymous" strategy="afterInteractive" />
-        <Script id="adsbygoogle-init" strategy="afterInteractive">
-          {`(adsbygoogle = window.adsbygoogle || []).push({});`}
-        </Script>
-
         <div className="fixed align-top grid z-10 mt-0 top-0">
           {renderLogin && <LoginForm renderLogin={setRenderLogin} />}
           {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}

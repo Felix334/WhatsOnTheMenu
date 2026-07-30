@@ -1,8 +1,9 @@
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
-import { stripe, getPriceId, isTierAvailable } from "@/lib/stripe";
+import { stripe, getPriceId, isTierAvailable, getSubscriptionTier } from "@/lib/stripe";
 import { restaurantCheckoutSchema } from "@/lib/schemas/restaurant";
 import { devLog, devWarn } from "@/lib/logger";
+import { hasEqualOrHigherTier } from "@/lib/tierRank";
 
 export async function POST(request) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
@@ -49,11 +50,15 @@ export async function POST(request) {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: token.id },
-    select: { stripeCustomerId: true, stripeSubscriptionId: true, subscriptionStatus: true },
+    select: { stripeCustomerId: true, stripeSubscriptionId: true, subscriptionStatus: true, subscription: true },
   });
 
-  if (dbUser?.stripeSubscriptionId && dbUser?.subscriptionStatus === "active") {
-    return new Response("Already subscribed", { status: 409 });
+  // Laufendes Abo (aktiv oder gekündigt-aber-noch-im-Zeitraum) blockt einen
+  // erneuten Checkout für ein gleichwertiges oder geringeres Tier — Upgrades
+  // bleiben erlaubt, werden aber über das Stripe-Portal abgewickelt.
+  const hasOngoingSubscription = dbUser?.stripeSubscriptionId && (dbUser?.subscriptionStatus === "active" || dbUser?.subscriptionStatus === "canceling");
+  if (hasOngoingSubscription && hasEqualOrHigherTier(dbUser.subscription, getSubscriptionTier(tier))) {
+    return new Response("Du hast bereits ein gleichwertiges oder höheres Abo", { status: 409 });
   }
 
   let customerId = dbUser?.stripeCustomerId;

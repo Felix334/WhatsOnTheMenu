@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { stripe, webhookSecret, getSubscriptionTier } from "@/lib/stripe";
+import { stripe, webhookSecret, getSubscriptionTier, getTierByPriceId } from "@/lib/stripe";
 import { devLog, devWarn } from "@/lib/logger";
 import { sendRegistrationConfirmation } from "@/lib/registrationMail";
 
@@ -142,6 +142,39 @@ export async function POST(req) {
         await prisma.user.updateMany({
           where: { stripeCustomerId: invoice.customer },
           data: { subscriptionStatus: "past_due" },
+        });
+        break;
+      }
+
+      // Plan-/Status-Änderung (z. B. Tarifwechsel oder Kündigung über das
+      // Stripe-Billing-Portal) — hält subscription/stripePriceId/status in
+      // der DB synchron, statt sich nur auf checkout.session.completed zu verlassen.
+      case "customer.subscription.updated": {
+        const subscription = event.data.object;
+        const priceId = subscription.items.data[0]?.price?.id;
+        const tier = priceId ? getTierByPriceId(priceId) : null;
+
+        let subscriptionStatus;
+        if (subscription.cancel_at_period_end) {
+          // Deckt sich mit dem "canceling"-Status aus /api/payment/cancel,
+          // auch wenn die Kündigung direkt im Stripe-Portal ausgelöst wurde.
+          subscriptionStatus = "canceling";
+        } else if (subscription.status === "active" || subscription.status === "trialing") {
+          subscriptionStatus = "active";
+        } else if (subscription.status === "past_due" || subscription.status === "unpaid") {
+          subscriptionStatus = "past_due";
+        } else if (subscription.status === "canceled" || subscription.status === "incomplete_expired") {
+          subscriptionStatus = "canceled";
+        } else {
+          subscriptionStatus = subscription.status;
+        }
+
+        await prisma.user.updateMany({
+          where: { stripeSubscriptionId: subscription.id },
+          data: {
+            ...(tier ? { subscription: tier, stripePriceId: priceId } : {}),
+            subscriptionStatus,
+          },
         });
         break;
       }

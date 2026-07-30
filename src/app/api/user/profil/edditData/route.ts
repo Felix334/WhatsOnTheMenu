@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "src/lib/auth";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
 import { devLog } from "src/lib/logger";
+import { getMenuLimits } from "src/lib/menuLimits";
 //import { webhookSecret } from "src/lib/stripe";
 
 type MenuWithRelations = Menu & {
@@ -125,6 +126,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Keine Kategoriegruppe gefunden" }, { status: 404 });
     }
 
+    // ── Abo-Limits serverseitig durchsetzen (nie nur im Client prüfen) ─────
+    const limits = getMenuLimits(user.subscription);
+    let categoryCount = categories.length;
+    let dishCount = categories.reduce((n, c) => n + c.dishes.length, 0);
+
     for (const entry of parsedData) {
       if (!entry) continue;
 
@@ -138,6 +144,13 @@ export async function POST(req: NextRequest) {
         let category = categories.find((c) => c.name === title);
 
         if (!category) {
+          if (categoryCount >= limits.CategoryLimit) {
+            return NextResponse.json(
+              { message: `Maximal ${limits.CategoryLimit} Kategorien im ${user.subscription}-Abo erreicht` },
+              { status: 403 },
+            );
+          }
+
           category = (await safeDb(
             () =>
               prisma.category.create({
@@ -154,6 +167,7 @@ export async function POST(req: NextRequest) {
           )) as Category & { dishes: Dish[] };
 
           categories.push(category);
+          categoryCount++;
         } else {
           await safeDb(
             () =>
@@ -178,6 +192,13 @@ export async function POST(req: NextRequest) {
           const existingDish = category.dishes.find((d) => d.id === item.id);
 
           if (!existingDish) {
+            if (dishCount >= limits.DishLimit) {
+              return NextResponse.json(
+                { message: `Maximal ${limits.DishLimit} Gerichte im ${user.subscription}-Abo erreicht` },
+                { status: 403 },
+              );
+            }
+
             const newDish = (await safeDb(
               () =>
                 prisma.dish.create({
@@ -193,6 +214,7 @@ export async function POST(req: NextRequest) {
             )) as Dish;
 
             category.dishes.push(newDish);
+            dishCount++;
           } else {
             await safeDb(
               () =>
