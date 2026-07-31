@@ -11,7 +11,7 @@ const restaurantSchema = z.object({
   ownerName: z.string().min(2, "Ein Name ist erforderlich"),
   restaurantName: z.string().min(1, "Ein Restaurantname ist erforderlich"),
   email: z.string().email("Ungültige Email"),
-  postalCode: z.string().min(4, "Postleitzahl erforderlich"),
+  postalCode: z.string().min(1, "Postleitzahl erforderlich"),
   city: z.string().min(1, "Stadt erforderlich"),
   street: z.string().min(1, "Straße erforderlich"),
   houseNumber: z.string().min(1, "Hausnummer erforderlich"),
