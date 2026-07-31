@@ -18,7 +18,7 @@ const restaurantSchema = z.object({
   phone: z
     .string()
     .min(7, "Die Telefonnummer ist zu kurz")
-    .max(20, "Die Telefonnummer ist zu lang")
+    .max(10, "Die Telefonnummer ist zu lang")
     .regex(/^\+?\d+$/, "Die Telefonnummer ist ungültig"),
   website: z.string().url("Die Website muss eine gültige URL sein").optional().or(z.literal("")),
   category: z.string().min(1, "Kategorie auswählen"),
