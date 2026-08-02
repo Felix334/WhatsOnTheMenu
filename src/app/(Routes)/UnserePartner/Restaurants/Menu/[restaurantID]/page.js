@@ -6,13 +6,21 @@ import MenuClient from "../components/MenuClient";
 
 export const revalidate = 300;
 
-// Alle Speisekarten schon beim Build vorrendern, damit auch der erste
-// Besucher nach einem Deploy keinen kalten Server-Render abwartet.
+// Die neuesten Speisekarten schon beim Build vorrendern, damit zumindest deren
+// erster Besucher nach einem Deploy keinen kalten Server-Render abwartet.
+// Gedeckelt, damit die Build-Zeit nicht mit wachsender Restaurant-Zahl unbegrenzt
+// mitwächst — alle übrigen IDs entstehen ganz normal per On-Demand-ISR beim ersten Aufruf.
 // Nur beim Production-Build relevant — im Dev-Server sonst unnötige DB-Query bei jedem Request.
+const MAX_PRERENDERED_RESTAURANTS = 20;
+
 export async function generateStaticParams() {
   if (process.env.NODE_ENV !== "production") return [];
   try {
-    const restaurants = await prisma.restaurant.findMany({ select: { id: true } });
+    const restaurants = await prisma.restaurant.findMany({
+      select: { id: true },
+      orderBy: { createdAt: "desc" },
+      take: MAX_PRERENDERED_RESTAURANTS,
+    });
     return restaurants.map((r) => ({ restaurantID: r.id }));
   } catch {
     // Ohne DB-Zugriff beim Build: Seiten entstehen beim ersten Aufruf (ISR)

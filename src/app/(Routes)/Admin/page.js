@@ -211,6 +211,7 @@ export default function AdminConsole() {
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
+                  <TableHead>UUID</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -222,6 +223,7 @@ export default function AdminConsole() {
 
                     <TableCell>{u.email}</TableCell>
                     <TableCell>{u.role}</TableCell>
+                    <TableCell>{u.id}</TableCell>
                     <TableCell>
                       <Badge variant={u.status === "active" ? "default" : u.status === "pending" ? "secondary" : "destructive"}>{u.status}</Badge>
                     </TableCell>
