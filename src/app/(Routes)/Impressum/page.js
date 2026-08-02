@@ -18,13 +18,6 @@ export default function ImprintPage() {
         </h1>
         <p className="mt-3 text-white/60 text-sm">Stand: {LAST_UPDATED}</p>
       </div>
-
-      <div className="max-w-3xl mx-auto px-4 pt-8">
-        <div className="bg-red-50 border border-red-200 rounded-xl px-5 py-4 text-sm text-red-800">
-          <strong>Hinweis:</strong> Ersetzen Sie alle Angaben in eckigen Klammern durch Ihre tatsächlichen Daten. Das Impressum ist gesetzlich verpflichtend (§ 5 TMG).
-        </div>
-      </div>
-
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6 pb-16">
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
