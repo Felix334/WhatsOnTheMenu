@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { DynamicLink } from "@/app/components/DynamicLink";
 
 function AvailabilityContent() {
   const searchParams = useSearchParams();
@@ -115,12 +115,12 @@ function AvailabilityContent() {
         <div className="max-w-sm w-full bg-white rounded-2xl border border-red-200 p-6 text-center space-y-4 shadow-sm">
           <p className="text-3xl">⚠️</p>
           <p className="font-semibold text-gray-800">{error}</p>
-          <Link
+          <DynamicLink
             href="/staff"
             className="block w-full bg-gray-900 text-white font-semibold rounded-xl px-4 py-3 hover:bg-gray-700 transition-colors"
           >
             Zurück zum Dashboard
-          </Link>
+          </DynamicLink>
         </div>
       </div>
     );
@@ -138,12 +138,12 @@ function AvailabilityContent() {
 
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Link
-            href={`/staff`}
+          <DynamicLink
+            href="/staff"
             className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500"
           >
             ← Zurück
-          </Link>
+          </DynamicLink>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Verfügbarkeit verwalten</h1>
             <p className="text-sm text-gray-500">

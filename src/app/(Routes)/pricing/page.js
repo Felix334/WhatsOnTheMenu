@@ -182,8 +182,14 @@ export default function PricingPage() {
             </CardHeader>
             <CardContent>
               <div className="mb-6">
-                <span className="text-5xl font-bold text-red-800">€</span>
-                <span className="text-gray-400 ml-1">/Monat</span>
+                {TIER_AVAILABLE_UI.Professional ? (
+                  <>
+                    <span className="text-5xl font-bold text-red-800">€</span>
+                    <span className="text-gray-400 ml-1">/Monat</span>
+                  </>
+                ) : (
+                  <span className="text-2xl font-bold text-gray-400">Bald verfügbar</span>
+                )}
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
                 {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige"].map((f) => (
@@ -199,7 +205,7 @@ export default function PricingPage() {
                 </Button>
               ) : !TIER_AVAILABLE_UI.Professional ? (
                 <Button size="lg" disabled className="w-full bg-yellow-400 text-gray-900 font-semibold shadow">
-                  Coming Soon
+                  Bald verfügbar
                 </Button>
               ) : isSubscribed ? (
                 <Button size="lg" className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow" onClick={handlePortal} disabled={isPendingPortal}>

@@ -91,7 +91,6 @@ export const authOptions: NextAuthOptions = {
               token.subscription = 'FreeTier';
               token.subscriptionStatus = 'canceled';
             } else {
-              // Stripe-ID vorhanden → direkt bei Stripe verifizieren
               try {
                 const stripeSub = await stripe.subscriptions.retrieve(freshUser.stripeSubscriptionId);
                 const isValid = ['active', 'trialing', 'past_due'].includes(stripeSub.status);
@@ -104,7 +103,6 @@ export const authOptions: NextAuthOptions = {
                   token.subscriptionStatus = 'canceled';
                 }
               } catch (err) {
-                // Stripe nicht erreichbar → kein Downgrade, Fehler loggen
                 console.error('Stripe-Verifikation beim Login fehlgeschlagen:', err);
               }
             }
@@ -153,7 +151,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async signIn({ user }) {
-      // Wenn E-Mail einem offenen Staff-Eintrag entspricht → automatisch verknüpfen
       if (user?.email) {
         await prisma.restaurantStaff.updateMany({
           where: { email: user.email, userId: null },

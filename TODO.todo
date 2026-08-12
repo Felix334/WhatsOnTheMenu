@@ -45,13 +45,11 @@ DB ändern => Restauran an die Location binden => User => Restaurant => Location
 
 In jedem Form ein Error handler einbauen mit der ungenutzten "formState : {error}"
 
-=> Ein Email-Postfach einrichten und email Adresse überall einfügen(z.B. in die AGBs)
 => Eine Email-Bestätigung für die erfolgreiche Registrierung(auch bei der Restaurant Registrierung)
 
 Zum Schluss: https://nextjs.org/docs/app/api-reference/file-conventions/metadata/manifest
 => Und den restlichen Zusatz auch (error.js teilweise schon verhanden)
 
-Am Ende ein IP Tracking einfügen für mehr Sicherheit => (Tracking vorhanden => Datenbank anpassen)
 Mit dem Dienst-Email verbinden und anzeigen wenn neue Emails angekommen sind => Wenn chat hinzugefügt dann auch
 
 => Eine Rechnungsfunktion für User => User können Items auswählen und unten steht der Gesammtpreis (Für eine Rechnung oder führ mehrere Personen)
@@ -73,8 +71,6 @@ als "Ein höheres Abbo wird bereits genutzt" angezeigt
 => Packetupgrades einfügen
 
 => Im "Professional"-Abo: Möglichkeit anbieten, eigene Subdomains zu erstellen (z.B. restaurantname.whatisonmymenu.com)
-
-
 
 
 => Email bei google workspace erstellen

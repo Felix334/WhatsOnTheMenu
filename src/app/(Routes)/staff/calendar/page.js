@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { DynamicLink, DynamicLinkButton } from "@/app/components/DynamicLink";
 
 const TYPE_LABELS = { promotion: "Aktion", event: "Event", specialDish: "Tagesgericht" };
 const EMPTY_FORM = { id: null, eventName: "", eventDescription: "", date: "", multiDay: false, endDate: "", startTime: "", endTime: "", type: "promotion", dishId: "" };
@@ -119,9 +118,9 @@ function CalendarContent() {
         <div className="max-w-sm w-full bg-white rounded-2xl border border-red-200 p-6 text-center space-y-4 shadow-sm">
           <p className="text-3xl">⚠️</p>
           <p className="font-semibold text-gray-800">{error ?? "Kein Restaurant angegeben."}</p>
-          <Link href="/staff" className="block w-full bg-gray-900 text-white font-semibold rounded-xl px-4 py-3 hover:bg-gray-700 transition-colors">
+          <DynamicLink href="/staff" className="block w-full bg-gray-900 text-white font-semibold rounded-xl px-4 py-3 hover:bg-gray-700 transition-colors">
             Zurück zum Dashboard
-          </Link>
+          </DynamicLink>
         </div>
       </div>
     );
@@ -131,9 +130,9 @@ function CalendarContent() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <Link href="/staff" className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500">
+          <DynamicLink href="/staff" className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500">
             ← Zurück
-          </Link>
+          </DynamicLink>
           <h1 className="text-xl font-bold text-gray-900">Aktionen &amp; Events</h1>
         </div>
         {form ? (
@@ -234,7 +233,6 @@ function CalendarContent() {
 
 export default function StaffCalendarPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
 
   if (status === "loading") {
     return <div className="min-h-screen flex items-center justify-center text-gray-400">Laden...</div>;
@@ -247,7 +245,7 @@ export default function StaffCalendarPage() {
     return (
       <div>
         <div>
-          <Button onClick={() => router.push("./")}>Zurück</Button>
+          <DynamicLinkButton href="/staff">Zurück</DynamicLinkButton>
         </div>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-red-600 font-bold text-2xl">Kein Zugriff</div>

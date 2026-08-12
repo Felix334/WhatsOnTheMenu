@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { toast } from "sonner";
+import { DynamicLink } from "@/app/components/DynamicLink";
 
 const STATUS_LABEL = { pending: "Neu", confirmed: "In Bearbeitung", done: "Erledigt" };
 const STATUS_COLOR = {
@@ -133,7 +134,12 @@ function BestellungenContent() {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Bestellungen</h1>
+          <div className="flex items-center gap-4">
+            <DynamicLink href="/staff" className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500">
+              ← Zurück
+            </DynamicLink>
+            <h1 className="text-2xl font-bold">Bestellungen</h1>
+          </div>
           <button onClick={fetchOrders} className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 rounded-xl px-3 py-1.5 bg-white transition-colors">
             Aktualisieren
           </button>
