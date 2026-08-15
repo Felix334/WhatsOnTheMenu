@@ -103,6 +103,9 @@ export async function getRestaurantMenuData(restaurantID) {
           endTime: true,
           type: true,
           dishId: true,
+          dish: {
+            select: { name: true, price: true, imageUrl: true },
+          },
         },
       },
     },

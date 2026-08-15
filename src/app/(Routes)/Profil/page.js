@@ -870,7 +870,7 @@ export default function PageBuilder() {
           </div>
         </div>
       </header>
-      {session.user.subscription === "Professional" || session.user.subscription === "Business" ? (
+      {session?.user?.subscription === "Professional" || session?.user?.subscription === "Business" ? (
         <>
           <CalendarWin open={openCalendarWin} onOpenChange={setOpenCalendarWin} restaurantId={restaurantID} dishes={serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.flatMap((cg) => cg.categories?.flatMap((c) => c.dishes || []) || []) ?? []} />
         </>

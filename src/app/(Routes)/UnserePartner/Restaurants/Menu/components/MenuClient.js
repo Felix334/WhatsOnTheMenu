@@ -208,15 +208,129 @@ const InfoPage = ({ restaurantData }) => {
 };
 
 // ─── Aktionen & Events Page ─────────────────────────────────────────────────────
-const EventsPage = ({ entries }) => (
-  <div className="w-full max-w-3xl mx-auto py-10 px-4 space-y-6">
-    <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-      <h2 className="text-2xl font-serif font-semibold mb-2 border-b pb-3">Aktionen &amp; Events</h2>
-      <EventsBanner entries={entries} />
-      {entries.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Aktuell keine Aktionen oder Events.</p>}
+const EVENT_GROUP_ORDER = ["Aktuell laufend", "Heute", "Morgen", "Diese Woche", "Demnächst"];
+
+const startOfDay = (value) => {
+  const d = new Date(value);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+// Errechnet Gruppierungs-Schlüssel und Anzeige-Label ("Heute", "Läuft noch 2 Tage", ...)
+// für einen Kalendereintrag, relativ zu heute.
+function getEventDateInfo(entry) {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const today = startOfDay(new Date());
+  const start = startOfDay(entry.date);
+  const end = entry.endDate ? startOfDay(entry.endDate) : start;
+  const isMultiDay = !!entry.endDate;
+  const isActive = isMultiDay && today >= start && today <= end;
+  const daysUntil = Math.round((start - today) / DAY_MS);
+
+  let label;
+  let groupKey;
+  if (isActive) {
+    const daysLeft = Math.round((end - today) / DAY_MS);
+    label = daysLeft <= 0 ? "Letzter Tag" : `Läuft noch ${daysLeft} Tag${daysLeft === 1 ? "" : "e"}`;
+    groupKey = "Aktuell laufend";
+  } else if (daysUntil <= 0) {
+    label = isMultiDay ? "Startet heute" : "Heute";
+    groupKey = "Heute";
+  } else if (daysUntil === 1) {
+    label = isMultiDay ? "Startet morgen" : "Morgen";
+    groupKey = "Morgen";
+  } else if (daysUntil < 7) {
+    label = isMultiDay ? `Startet ${start.toLocaleDateString("de-DE", { weekday: "long" })}` : start.toLocaleDateString("de-DE", { weekday: "long" });
+    groupKey = "Diese Woche";
+  } else {
+    label = isMultiDay ? `Startet ${start.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}` : start.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+    groupKey = "Demnächst";
+  }
+
+  return { isMultiDay, isActive, label, groupKey };
+}
+
+const CALENDAR_TYPE_STYLE = {
+  promotion: { icon: "🏷️", label: "Aktion", ring: "border-amber-200", chip: "bg-amber-100 text-amber-800 border-amber-300", iconBg: "bg-linear-to-br from-amber-200 to-amber-100", wash: "from-amber-50/80", groupDot: "bg-amber-400" },
+  event: { icon: "🎉", label: "Event", ring: "border-violet-200", chip: "bg-violet-100 text-violet-800 border-violet-300", iconBg: "bg-linear-to-br from-violet-200 to-violet-100", wash: "from-violet-50/80", groupDot: "bg-violet-400" },
+  specialDish: { icon: "🍽️", label: "Tagesgericht", ring: "border-emerald-200", chip: "bg-emerald-100 text-emerald-800 border-emerald-300", iconBg: "bg-linear-to-br from-emerald-200 to-emerald-100", wash: "from-emerald-50/80", groupDot: "bg-emerald-400" },
+};
+
+const EventDateRange = ({ entry }) =>
+  entry.endDate
+    ? `${new Date(entry.date).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })} – ${new Date(entry.endDate).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })}`
+    : `${new Date(entry.date).toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "2-digit" })}${entry.startTime && entry.endTime ? ` · ${entry.startTime}–${entry.endTime} Uhr` : " · Ganztägig"}`;
+
+const EventCard = ({ entry, info }) => {
+  const style = CALENDAR_TYPE_STYLE[entry.type] ?? CALENDAR_TYPE_STYLE.event;
+  return (
+    <div className={`relative overflow-hidden flex flex-col sm:flex-row gap-5 bg-linear-to-br ${style.wash} to-white border ${style.ring} rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-lg transition-shadow duration-300`}>
+      <div className={`shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${style.iconBg} flex items-center justify-center text-3xl sm:text-4xl shadow-inner`}>{style.icon}</div>
+      <div className="min-w-0 flex-1 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border ${style.chip}`}>{style.label}</span>
+          <span className="text-xs sm:text-sm font-semibold text-gray-500">{info.label}</span>
+        </div>
+        <p className="text-xl sm:text-2xl font-serif font-bold text-gray-900 leading-snug">{entry.eventName}</p>
+        {entry.eventDescription && <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{entry.eventDescription}</p>}
+        <p className="text-xs sm:text-sm text-gray-400 font-medium">
+          <EventDateRange entry={entry} />
+        </p>
+
+        {entry.type === "specialDish" && entry.dish && (
+          <div className="mt-3 flex items-center gap-4 bg-white/80 border border-emerald-100 rounded-2xl p-3 shadow-sm">
+            {entry.dish.imageUrl && <Image src={entry.dish.imageUrl} alt={entry.dish.name} width={72} height={72} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" />}
+            <p className="min-w-0 flex-1 text-base font-semibold text-gray-900 truncate">{entry.dish.name}</p>
+            {entry.dish.price != null && <span className="text-base font-mono font-bold text-emerald-700 shrink-0">{parseFloat(entry.dish.price).toFixed(2)}€</span>}
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+const EventsPage = ({ entries }) => {
+  const groups = {};
+  for (const entry of entries) {
+    const info = getEventDateInfo(entry);
+    (groups[info.groupKey] ??= []).push({ entry, info });
+  }
+
+  return (
+    <div className="w-full max-w-4xl mx-auto py-14 px-4 space-y-12">
+      <div className="text-center space-y-3">
+        <p className="text-5xl">📅</p>
+        <h2 className="text-4xl sm:text-5xl font-serif font-bold text-gray-900">Aktionen &amp; Events</h2>
+        <p className="text-base text-gray-500">Alles, was gerade bei uns läuft oder demnächst ansteht.</p>
+      </div>
+
+      {entries.length === 0 ? (
+        <div className="bg-white rounded-3xl shadow-xl p-14 text-center text-gray-400">
+          <p className="text-5xl mb-4">🍃</p>
+          <p className="text-lg">Aktuell keine Aktionen oder Events.</p>
+        </div>
+      ) : (
+        EVENT_GROUP_ORDER.filter((key) => groups[key]?.length).map((key) => {
+          const groupStyle = CALENDAR_TYPE_STYLE[groups[key][0].entry.type] ?? CALENDAR_TYPE_STYLE.event;
+          return (
+            <div key={key} className="space-y-4">
+              <div className="flex items-center gap-3 px-1">
+                <span className={`w-2.5 h-2.5 rounded-full ${groupStyle.groupDot}`} />
+                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500">{key}</h3>
+                <span className="flex-1 h-px bg-gray-200" />
+              </div>
+              <div className="space-y-4">
+                {groups[key].map(({ entry, info }) => (
+                  <EventCard key={entry.id} entry={entry} info={info} />
+                ))}
+              </div>
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+};
 
 // ─── Allergen-Legende ──────────────────────────────────────────────────────────
 const ALLERGEN_LIST = [
@@ -306,43 +420,6 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
           )}
         </div>
       )}
-    </div>
-  );
-};
-
-// ─── Aktionen & Events ──────────────────────────────────────────────────────────
-const CALENDAR_TYPE_ICON = { promotion: "🏷️", event: "🎉", specialDish: "🍽️" };
-
-const EventsBanner = ({ entries }) => {
-  if (!entries || entries.length === 0) return null;
-  const todayStr = new Date().toDateString();
-
-  return (
-    <div className="mb-6 space-y-2">
-      {entries.map((entry) => {
-        const isToday = entry.endDate
-          ? new Date(entry.date) <= new Date() && new Date() <= new Date(entry.endDate)
-          : new Date(entry.date).toDateString() === todayStr;
-        return (
-          <div key={entry.id} className="flex items-start gap-3 bg-white border border-amber-200 rounded-2xl px-4 py-3 shadow-sm">
-            <span className="text-xl shrink-0">{CALENDAR_TYPE_ICON[entry.type] ?? "📅"}</span>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900">
-                {entry.eventName}
-                {isToday && <span className="ml-2 text-xs font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded-full px-2 py-0.5">Heute</span>}
-              </p>
-              <p className="text-xs text-gray-500 mt-0.5">{entry.eventDescription}</p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {entry.endDate
-                  ? `${new Date(entry.date).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}–${new Date(entry.endDate).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}`
-                  : `${new Date(entry.date).toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" })} · ${
-                      entry.startTime && entry.endTime ? `${entry.startTime}–${entry.endTime}` : "Ganztägig"
-                    }`}
-              </p>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 };

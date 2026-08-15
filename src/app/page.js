@@ -270,7 +270,7 @@ function HomeContent() {
                     <a href="/ErstelleRestaurantAccount/FreeTier">Kostenlos loslegen</a>
                   </Button>
                 )}
-                <Button asChild variant="outline" className="border-white/50 text-white hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
+                <Button asChild variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
                   <a href="#pricing">Preise ansehen</a>
                 </Button>
               </div>
