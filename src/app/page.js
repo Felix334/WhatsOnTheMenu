@@ -385,9 +385,6 @@ function HomeContent() {
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>Event-Kalender (365 Tage)
                       </li>
-                      <li className="flex items-center">
-                        <span className="text-green-400 mr-2">✓</span>Eigene Subdomain
-                      </li>
                     </ul>
                   </CardContent>
                 </Card>
