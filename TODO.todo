@@ -73,8 +73,6 @@ als "Ein höheres Abbo wird bereits genutzt" angezeigt
 => Im "Professional"-Abo: Möglichkeit anbieten, eigene Subdomains zu erstellen (z.B. restaurantname.whatisonmymenu.com)
 
 
-=> Email bei google workspace erstellen
-
 => Wiederrufsrecht für Abbos => GANZ WICHTIG
 
 
@@ -87,3 +85,5 @@ auth.ts — refactored JWT callback: now runs a Promise.all to fetch fresh user 
 next-auth.d.ts — added subscriptionStatus?: string to Session.user and JWT interfaces.
 
 One prerequisite for the portal button to work: you need to enable the Stripe Customer Portal in your Stripe dashboard under Billing → Customer portal settings, otherwise the API will throw. It's a one-click activation."
+
+=> SMTP-Relay (z.B. Brevo oder Resend) für support@whatisonmymenu.com einrichten und Sende-Email darauf umlenken (Empfangen über Cloudflare funktioniert bereits)

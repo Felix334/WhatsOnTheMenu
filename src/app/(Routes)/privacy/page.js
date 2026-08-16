@@ -12,7 +12,7 @@ const sections = [
     content: [
       "Verantwortlicher im Sinne der DSGVO ist:",
       "Felix Mayer\nMühlenblick 16\n74372 Sersheim\nDeutschland",
-      "E-Mail: [DEINE E-MAIL-ADRESSE]",
+      "E-Mail: support@whatisonmymenu.com",
     ],
   },
   {
@@ -72,7 +72,7 @@ const sections = [
       "• Einschränkung (Art. 18 DSGVO): Sie können die Einschränkung der Verarbeitung verlangen.",
       "• Datenübertragbarkeit (Art. 20 DSGVO): Sie können Ihre Daten in einem strukturierten Format erhalten.",
       "• Widerspruch (Art. 21 DSGVO): Sie können der Verarbeitung auf Basis berechtigter Interessen widersprechen.",
-      "Zur Ausübung Ihrer Rechte wenden Sie sich bitte per E-Mail an: [DEINE E-MAIL-ADRESSE]",
+      "Zur Ausübung Ihrer Rechte wenden Sie sich bitte per E-Mail an: support@whatisonmymenu.com",
     ],
   },
   {
@@ -133,8 +133,8 @@ export default function PrivacyPage() {
           <p>Felix Mayer</p>
           <p>
             E-Mail:{" "}
-            <a href="mailto:support.whatisonmymenu@gmail.com" className="text-amber-600 hover:underline">
-              support.whatisonmymenu@gmail.com
+            <a href="mailto:support@whatisonmymenu.com" className="text-amber-600 hover:underline">
+              support@whatisonmymenu.com
             </a>
           </p>
         </div>

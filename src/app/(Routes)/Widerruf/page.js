@@ -95,8 +95,8 @@ export default function WiderrufPage() {
           <p>74372 Sersheim, Deutschland</p>
           <p>
             E-Mail:{" "}
-            <a href="mailto:support.whatisonmymenu@gmail.com" className="text-red-700 hover:underline">
-              support.whatisonmymenu@gmail.com
+            <a href="mailto:support@whatisonmymenu.com" className="text-red-700 hover:underline">
+              support@whatisonmymenu.com
             </a>
           </p>
         </div>
