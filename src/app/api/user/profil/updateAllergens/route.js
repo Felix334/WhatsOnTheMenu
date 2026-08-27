@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
+import { isValidAllergenKey } from "@/lib/allergens";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,12 @@ export async function POST(req) {
     }
 
     const allergenList = Array.isArray(allergens) ? allergens : [];
+    if (!allergenList.every(isValidAllergenKey)) {
+      return NextResponse.json(
+        { error: "Ungültiges Allergen übermittelt" },
+        { status: 400 }
+      );
+    }
 
     const dish = await prisma.dish.findFirst({
       where: {
@@ -37,11 +44,6 @@ export async function POST(req) {
           },
         },
       },
-      include: {
-        ingredients: {
-          where: { isAllergen: true },
-        },
-      },
     });
 
     if (!dish) {
@@ -51,32 +53,9 @@ export async function POST(req) {
       );
     }
 
-    const newIngredients = await Promise.all(
-      allergenList.map(async (name) => {
-        let ingredient = await prisma.ingredient.findFirst({
-          where: { name, isAllergen: true },
-        });
-        if (!ingredient) {
-          ingredient = await prisma.ingredient.create({
-            data: { name, isAllergen: true },
-          });
-        }
-        return ingredient;
-      })
-    );
-
-    const toDisconnect = dish.ingredients.filter(
-      (i) => !allergenList.includes(i.name)
-    );
-
     await prisma.dish.update({
       where: { id: dishId },
-      data: {
-        ingredients: {
-          disconnect: toDisconnect.map((i) => ({ id: i.id })),
-          connect: newIngredients.map((i) => ({ id: i.id })),
-        },
-      },
+      data: { allergens: allergenList },
     });
 
     return NextResponse.json({ message: "Allergene erfolgreich aktualisiert" });

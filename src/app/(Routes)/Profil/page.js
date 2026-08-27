@@ -34,6 +34,7 @@ import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 import { CalendarWin } from "./components/calendarWin";
+import { ALLERGENS } from "@/lib/allergens";
 
 const HERO_COLOR_PRESETS = [
   { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
@@ -310,32 +311,18 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  const ALLERGEN_LETTER = {
-    Gluten: "A",
-    Krebstiere: "B",
-    Eier: "C",
-    Fisch: "D",
-    Erdnüsse: "E",
-    Soja: "F",
-    Milch: "G",
-    Schalenfrüchte: "H",
-    Sellerie: "I",
-    Senf: "J",
-    Sesam: "K",
-    Sulfite: "L",
-    Lupinen: "M",
-    Weichtiere: "N",
-  };
-
-  const AllergenBadges = ({ ingredients }) => {
-    if (!ingredients || ingredients.length === 0) return null;
+  const AllergenBadges = ({ allergens }) => {
+    if (!allergens || allergens.length === 0) return null;
     return (
       <div className="flex flex-warp gap-1 mt-1">
-        {ingredients.map((ing) => (
-          <span key={ing.id ?? ing.name} title={ing.name} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
-            {ALLERGEN_LETTER[ing.name] ?? "?"}
-          </span>
-        ))}
+        {allergens.map((key) => {
+          const a = ALLERGENS.find((x) => x.key === key);
+          return (
+            <span key={key} title={a?.name ?? key} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
+              {a?.id ?? "?"}
+            </span>
+          );
+        })}
       </div>
     );
   };
@@ -674,7 +661,7 @@ export default function PageBuilder() {
                           </span>
                         )}
                         {allowAvailability && stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
-                        <AllergenBadges ingredients={item.ingredients} />
+                        <AllergenBadges allergens={item.allergens} />
                       </div>
                     </TableCell>
                     <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>

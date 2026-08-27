@@ -97,7 +97,6 @@ export async function POST(req: NextRequest) {
                   include: {
                     dishes: {
                       include: {
-                        ingredients: true,
                         reviews: true,
                       },
                     },

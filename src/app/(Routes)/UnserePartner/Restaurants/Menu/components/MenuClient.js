@@ -10,6 +10,7 @@ import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@
 import { bgColorClass, bgColorStyle } from "./colorPicker";
 import { GOOGLE_FONTS_URL } from "@/app/(Routes)/Profil/components/fontList";
 import Link from "next/link";
+import { ALLERGENS } from "@/lib/allergens";
 
 // ─── Hero-Farben ──────────────────────────────────────────────────────────────
 const HERO_COLOR_PRESETS = [
@@ -333,23 +334,6 @@ const EventsPage = ({ entries }) => {
 };
 
 // ─── Allergen-Legende ──────────────────────────────────────────────────────────
-const ALLERGEN_LIST = [
-  { letter: "A", name: "Gluten" },
-  { letter: "B", name: "Krebstiere" },
-  { letter: "C", name: "Eier" },
-  { letter: "D", name: "Fisch" },
-  { letter: "E", name: "Erdnüsse" },
-  { letter: "F", name: "Soja" },
-  { letter: "G", name: "Milch" },
-  { letter: "H", name: "Schalenfrüchte" },
-  { letter: "I", name: "Sellerie" },
-  { letter: "J", name: "Senf" },
-  { letter: "K", name: "Sesam" },
-  { letter: "L", name: "Sulfite" },
-  { letter: "M", name: "Lupinen" },
-  { letter: "N", name: "Weichtiere" },
-];
-
 const AllergenLegend = () => {
   const [open, setOpen] = useState(false);
   return (
@@ -361,9 +345,9 @@ const AllergenLegend = () => {
       </button>
       {open && (
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-x-6 gap-y-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-          {ALLERGEN_LIST.map(({ letter, name }) => (
-            <div key={letter} className="flex items-center gap-2 text-sm text-gray-700">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">{letter}</span>
+          {ALLERGENS.map(({ key, id, name }) => (
+            <div key={key} className="flex items-center gap-2 text-sm text-gray-700">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">{id}</span>
               {name}
             </div>
           ))}
@@ -393,12 +377,12 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
         <div className="mt-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
           <p className="text-xs text-gray-500 mb-3">Wähle aus, was du nicht verträgst — Gerichte mit diesen Allergenen werden ausgeblendet:</p>
           <div className="flex flex-wrap gap-2">
-            {ALLERGEN_LIST.map(({ letter, name }) => {
-              const active = excluded.includes(name);
+            {ALLERGENS.map(({ key, id, name }) => {
+              const active = excluded.includes(key);
               return (
                 <button
-                  key={letter}
-                  onClick={() => onToggle(name)}
+                  key={key}
+                  onClick={() => onToggle(key)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all
                     ${active ? "bg-yellow-400 border-yellow-400 text-gray-900" : "bg-white border-gray-200 text-gray-600 hover:bg-yellow-50 hover:border-yellow-300"}`}
                 >
@@ -406,7 +390,7 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
                     className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold border shrink-0
                     ${active ? "bg-white/70 text-gray-900 border-gray-900/20" : "bg-amber-100 text-amber-800 border-amber-300"}`}
                   >
-                    {letter}
+                    {id}
                   </span>
                   ohne {name}
                 </button>
@@ -425,32 +409,18 @@ const AllergenFilterBar = ({ excluded, onToggle, onClear }) => {
 };
 
 // ─── Allergen Badges ───────────────────────────────────────────────────────────
-const ALLERGEN_LETTER = {
-  Gluten: "A",
-  Krebstiere: "B",
-  Eier: "C",
-  Fisch: "D",
-  Erdnüsse: "E",
-  Soja: "F",
-  Milch: "G",
-  Schalenfrüchte: "H",
-  Sellerie: "I",
-  Senf: "J",
-  Sesam: "K",
-  Sulfite: "L",
-  Lupinen: "M",
-  Weichtiere: "N",
-};
-
-const AllergenBadges = ({ ingredients }) => {
-  if (!ingredients || ingredients.length === 0) return null;
+const AllergenBadges = ({ allergens }) => {
+  if (!allergens || allergens.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1 mt-1">
-      {ingredients.map((ing) => (
-        <span key={ing.id ?? ing.name} title={ing.name} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
-          {ALLERGEN_LETTER[ing.name] ?? "?"}
-        </span>
-      ))}
+      {allergens.map((key) => {
+        const a = ALLERGENS.find((x) => x.key === key);
+        return (
+          <span key={key} title={a?.name ?? key} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
+            {a?.id ?? "?"}
+          </span>
+        );
+      })}
     </div>
   );
 };
@@ -469,7 +439,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
   const rowPadDesktop = DENSITY_ROW_DESKTOP[density] ?? "py-4";
   const rowPadMobile = DENSITY_ROW_MOBILE[density] ?? "py-3";
 
-  const visibleItems = excludedAllergens.length > 0 ? (menuItems ?? []).filter((item) => !item.ingredients?.some((ing) => excludedAllergens.includes(ing.name))) : (menuItems ?? []);
+  const visibleItems = excludedAllergens.length > 0 ? (menuItems ?? []).filter((item) => !item.allergens?.some((key) => excludedAllergens.includes(key))) : (menuItems ?? []);
   const hiddenCount = (menuItems?.length ?? 0) - visibleItems.length;
 
   const toggleExpand = (index) => {
@@ -524,7 +494,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                       {item.description}
                     </p>
                   )}
-                  <AllergenBadges ingredients={item.ingredients} />
+                  <AllergenBadges allergens={item.allergens} />
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>
@@ -579,7 +549,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                             {item.description}
                           </span>
                         )}
-                        <AllergenBadges ingredients={item.ingredients} />
+                        <AllergenBadges allergens={item.allergens} />
                       </div>
                     </TableCell>
                     <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle ${rowPadDesktop} w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>

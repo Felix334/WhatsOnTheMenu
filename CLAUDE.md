@@ -28,7 +28,7 @@ Next.js 15 App Router (React 19), überwiegend JavaScript mit einzelnen TS-Datei
 - `src/app/api/` — Route-Handler. Gliederung: `auth/[...nextauth]`, `restaurant/` (Menü lesen, Registrierung, Staff-Einladungen), `orders/` (create, status, Liste je Restaurant), `payment/` (checkout, webhook, portal, cancel, reactivate, subscription), `user/profil/` (viele kleine Endpoints zum Bearbeiten von Menü/Design/Allergenen/Verfügbarkeit), `Admin/`, `deleteAccount/[id]`.
 - `src/app/components/` — geteilte Client-Komponenten (Anmelden, Registrieren, QR-Scanner, Nav …); `src/components/ui/` — shadcn-Komponenten.
 - `src/lib/` — Kernlogik: `auth.ts` (NextAuth-Optionen), `staffAuth.js`, `prisma.ts`, `stripe.ts`, `supabase.js` (Storage), `nodemailer.ts`, `schemas/` (Zod), `allergens.js`.
-- `prisma/schema.prisma` — ~24 Modelle. Kernkette: User → Restaurant → Menu → CategoryGroup/Category → Dish → Ingredient; daneben Order, Reservation, RestaurantStaff, Payment, StripeEvent.
+- `prisma/schema.prisma` — ~23 Modelle. Kernkette: User → Restaurant → Menu → CategoryGroup/Category → Dish; Allergene liegen als `Allergen[]`-Enum-Array direkt auf Dish (kein eigenes Model); daneben Order, Reservation, RestaurantStaff, Payment, StripeEvent.
 
 ### Auth & Rollen (sicherheitskritisch)
 

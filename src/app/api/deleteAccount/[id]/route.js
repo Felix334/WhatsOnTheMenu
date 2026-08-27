@@ -44,9 +44,7 @@ export async function DELETE(request, { params }) {
         // … und den Customer löschen (kündigt sicherheitshalber alles Übrige).
         await stripe.customers.del(user.stripeCustomerId);
       } catch (stripeErr) {
-        // Existiert der Customer bei Stripe nicht (mehr)? Dann ist das Ziel – kein
-        // aktives Abo – bereits erreicht (z. B. in einem früheren, teilweise
-        // erfolgreichen Versuch). Dann weiterlöschen → macht Retries idempotent.
+
         const alreadyGone =
           stripeErr?.code === "resource_missing" || stripeErr?.statusCode === 404;
 

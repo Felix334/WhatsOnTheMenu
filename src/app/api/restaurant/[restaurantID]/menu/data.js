@@ -62,10 +62,7 @@ export async function getRestaurantMenuData(restaurantID) {
                       price: true,
                       imageUrl: true,
                       stock: true,
-                      ingredients: {
-                        where: { isAllergen: true },
-                        select: { name: true },
-                      },
+                      allergens: true,
                     },
                   },
                 },
@@ -87,8 +84,7 @@ export async function getRestaurantMenuData(restaurantID) {
         },
       },
       calendar: {
-        // Einträge zeigen, die noch nicht vorbei sind: mehrtägige Events laufen bis
-        // endDate (auch wenn date in der Vergangenheit liegt), eintägige bis date.
+
         where: {
           OR: [{ endDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } }, { endDate: null, date: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } }],
         },

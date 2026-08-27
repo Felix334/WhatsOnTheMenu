@@ -49,10 +49,7 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
       });
 
       // Vorhandene Allergene aus dem Item laden
-      const existing = (selectedItem.ingredients ?? [])
-        .filter((i) => i.isAllergen)
-        .map((i) => i.name);
-      setSelectedAllergens(existing);
+      setSelectedAllergens(selectedItem.allergens ?? []);
     }
     setEditName(false);
     setEditDescription(false);
@@ -148,9 +145,9 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
     }
   };
 
-  const toggleAllergen = (name) => {
+  const toggleAllergen = (key) => {
     setSelectedAllergens((prev) =>
-      prev.includes(name) ? prev.filter((a) => a !== name) : [...prev, name]
+      prev.includes(key) ? prev.filter((a) => a !== key) : [...prev, key]
     );
   };
 
@@ -273,11 +270,11 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
                 {/* Ausgewählte Allergene als Badges anzeigen */}
                 {selectedAllergens.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {selectedAllergens.map((name) => {
-                      const a = ALLERGENS.find((x) => x.name === name);
+                    {selectedAllergens.map((key) => {
+                      const a = ALLERGENS.find((x) => x.key === key);
                       return (
-                        <Badge key={name} variant="secondary" className="text-xs">
-                          {a ? `(${a.id}) ` : ""}{name}
+                        <Badge key={key} variant="secondary" className="text-xs">
+                          {a ? `(${a.id}) ${a.name}` : key}
                         </Badge>
                       );
                     })}
@@ -286,15 +283,15 @@ const SelectItem = ({ open, onOpenChange, selectedItem, setChangedItem, userID, 
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                   {ALLERGENS.map((allergen) => (
-                    <div key={allergen.id} className="flex items-start gap-2">
+                    <div key={allergen.key} className="flex items-start gap-2">
                       <Checkbox
-                        id={`allergen-${allergen.id}`}
-                        checked={selectedAllergens.includes(allergen.name)}
-                        onCheckedChange={() => toggleAllergen(allergen.name)}
+                        id={`allergen-${allergen.key}`}
+                        checked={selectedAllergens.includes(allergen.key)}
+                        onCheckedChange={() => toggleAllergen(allergen.key)}
                         className="mt-0.5"
                       />
                       <label
-                        htmlFor={`allergen-${allergen.id}`}
+                        htmlFor={`allergen-${allergen.key}`}
                         className="text-xs cursor-pointer leading-tight"
                       >
                         <span className="font-medium">({allergen.id}) {allergen.name}</span>

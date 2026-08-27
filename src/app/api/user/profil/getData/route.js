@@ -111,7 +111,7 @@ async function main(userId) {
                             createdAt: true,
                             updatedAt: true,
                             stock: true,
-                            ingredients: true,
+                            allergens: true,
                             reviews: true,
                           },
                         },

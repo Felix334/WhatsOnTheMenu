@@ -207,11 +207,29 @@ model Dish {
   category        Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   reports         Report[]
   reviews         Review[]       @relation("DishReviews")
-  ingredients     Ingredient[]   @relation("DishIngredients")
+  allergens       Allergen[]     @default([])
   stock           DishAvailable?
   calendarEntries Calendar[]
 
   @@index([categoryId])
+}
+
+/// Die 14 EU-Hauptallergene nach Verordnung (EU) Nr. 1169/2011
+enum Allergen {
+  GLUTEN
+  KREBSTIERE
+  EIER
+  FISCH
+  ERDNUESSE
+  SOJA
+  MILCH
+  SCHALENFRUECHTE
+  SELLERIE
+  SENF
+  SESAM
+  SULFITE
+  LUPINEN
+  WEICHTIERE
 }
 
 enum DishAvailable {
@@ -237,13 +255,6 @@ enum OrderStatus {
   pending
   confirmed
   done
-}
-
-model Ingredient {
-  id         String  @id @default(cuid())
-  name       String
-  isAllergen Boolean @default(false)
-  dishes     Dish[]  @relation("DishIngredients")
 }
 
 model Review {
