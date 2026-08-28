@@ -87,3 +87,5 @@ next-auth.d.ts — added subscriptionStatus?: string to Session.user and JWT int
 One prerequisite for the portal button to work: you need to enable the Stripe Customer Portal in your Stripe dashboard under Billing → Customer portal settings, otherwise the API will throw. It's a one-click activation."
 
 => SMTP-Relay (z.B. Brevo oder Resend) für support@whatisonmymenu.com einrichten und Sende-Email darauf umlenken (Empfangen über Cloudflare funktioniert bereits)
+
+=> Auf Product Hunt eintragen (Draft ist vorbereitet: Tagline/Description/First-Comment) => noch Screenshots ziehen (Karte am Handy, Editor, QR-Builder, Allergen-Filter, 1270x760) und Launch-Tag Di-Do wählen

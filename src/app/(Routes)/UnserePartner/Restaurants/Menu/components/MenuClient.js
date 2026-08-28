@@ -764,6 +764,27 @@ const QRModal = ({ orderId, tableNumber, googleReviewUrl, onClose }) => {
   );
 };
 
+// ─── Footer / Attribution ─────────────────────────────────────────────────────
+// Erscheint auf jeder öffentlichen Speisekarte. Bewusst ein echter, crawlbarer
+// <a> ohne rel="nofollow": Wenn Restaurants ihre Karten-URL von der eigenen
+// Website / Google Business / Social verlinken, wird das hier zum Backlink auf
+// die Marketing-Domain. Absolute URL (kein "/"), damit der Link auch auf
+// Kunden-Subdomains (restaurantname.whatisonmymenu.com) aufs Hauptportal zeigt.
+const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu.com";
+
+const MenuFooter = ({ orderMode }) => (
+  <footer className={`mt-auto w-full border-t border-black/5 bg-white/70 backdrop-blur-sm ${orderMode ? "mb-20" : ""}`}>
+    <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col items-center gap-1.5 text-center">
+      <a href={SITE_URL} rel="noopener" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        Digitale Speisekarte per QR-Code – erstellt mit <span className="font-semibold">WhatsOnTheMenu</span>
+      </a>
+      <a href={`${SITE_URL}/pricing`} rel="noopener" className="text-xs text-gray-400 underline hover:text-gray-600 transition-colors">
+        Kostenlose digitale Speisekarte für dein Restaurant
+      </a>
+    </div>
+  </footer>
+);
+
 // ─── Main Content ──────────────────────────────────────────────────────────────
 // Daten kommen als Prop von der Server-Seite (ISR) — hier kein Fetch mehr
 const MenuClient = ({ serverData }) => {
@@ -864,6 +885,8 @@ const MenuClient = ({ serverData }) => {
           <AllergenLegend />
         </>
       )}
+
+      <MenuFooter orderMode={orderMode} />
 
       {orderMode && <CartBar cart={cart} onOrder={() => setOrderStep("confirm")} />}
 
