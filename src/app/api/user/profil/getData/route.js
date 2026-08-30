@@ -78,7 +78,11 @@ async function main(userId) {
                 heroTextColor: true,
                 createdAt: true,
                 updatedAt: true,
+                // Sortierung auf allen drei Ebenen serverseitig — der Editor
+                // rendert die Listen unverändert durch, und die Gastansicht
+                // (api/restaurant/[restaurantID]/menu/data.js) sortiert gleich.
                 categoryGroup: {
+                  orderBy: { position: "asc" },
                   select: {
                     id: true,
                     name: true,
@@ -88,6 +92,7 @@ async function main(userId) {
                     borderRadius: true,
                     titleAlign: true,
                     categories: {
+                      orderBy: [{ position: "asc" }, { name: "asc" }],
                       select: {
                         id: true,
                         name: true,
@@ -102,12 +107,14 @@ async function main(userId) {
                         titleAlign: true,
                         titleUppercase: true,
                         dishes: {
+                          orderBy: [{ position: "asc" }, { createdAt: "asc" }],
                           select: {
                             id: true,
                             name: true,
                             description: true,
                             price: true,
                             imageUrl: true,
+                            position: true,
                             createdAt: true,
                             updatedAt: true,
                             stock: true,

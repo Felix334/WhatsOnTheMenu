@@ -19,38 +19,56 @@ export async function PATCH(req) {
       return NextResponse.json({ error: "Unauthorized- Kein Restaurant gefunden" }, { status: 401 });
     }
 
-    const { groups, categories } = await req.json();
+    const body = await req.json();
+    // Alle drei Ebenen sind optional — der Client schickt nur, was verschoben wurde.
+    const groups = Array.isArray(body?.groups) ? body.groups : [];
+    const categories = Array.isArray(body?.categories) ? body.categories : [];
+    const dishes = Array.isArray(body?.dishes) ? body.dishes : [];
 
-    const groupIds = groups.map((g) => g.id);
-    const validGroups = await prisma.categoryGroup.findMany({
-      where: {
-        id: { in: groupIds },
-        Menu: {
-          restaurantId: restaurant.id,
-        },
-      },
-      select: { id: true },
-    });
+    // Positionen müssen ganzzahlig und nicht-negativ sein — sonst schreibt ein
+    // manipulierter Request beliebige Werte in die Sortierspalten.
+    const isValidEntry = (e) => typeof e?.id === "string" && Number.isInteger(e?.position) && e.position >= 0;
+    if (![...groups, ...categories, ...dishes].every(isValidEntry)) {
+      return NextResponse.json({ error: "Ungültige Sortierdaten" }, { status: 400 });
+    }
 
-    const categoryIds = categories.map((c) => c.id);
-    const validCategories = await prisma.category.findMany({
-      where: {
-        id: { in: categoryIds },
-        categoryGroup: {
-          Menu: {
-            restaurantId: restaurant.id,
-          },
-        },
-      },
-      select: { id: true },
-    });
+    const [validGroups, validCategories, validDishes] = await Promise.all([
+      groups.length
+        ? prisma.categoryGroup.findMany({
+            where: {
+              id: { in: groups.map((g) => g.id) },
+              Menu: { restaurantId: restaurant.id },
+            },
+            select: { id: true },
+          })
+        : [],
+      categories.length
+        ? prisma.category.findMany({
+            where: {
+              id: { in: categories.map((c) => c.id) },
+              categoryGroup: { Menu: { restaurantId: restaurant.id } },
+            },
+            select: { id: true },
+          })
+        : [],
+      dishes.length
+        ? prisma.dish.findMany({
+            where: {
+              id: { in: dishes.map((d) => d.id) },
+              category: { categoryGroup: { Menu: { restaurantId: restaurant.id } } },
+            },
+            select: { id: true },
+          })
+        : [],
+    ]);
 
-    if (validGroups.length === 0 && validCategories.length === 0) {
+    if (validGroups.length === 0 && validCategories.length === 0 && validDishes.length === 0) {
       return NextResponse.json({ error: "No valid items found" }, { status: 400 });
     }
 
     const validGroupIds = new Set(validGroups.map((g) => g.id));
     const validCategoryIds = new Set(validCategories.map((c) => c.id));
+    const validDishIds = new Set(validDishes.map((d) => d.id));
 
     await prisma.$transaction([
       ...groups
@@ -67,6 +85,14 @@ export async function PATCH(req) {
           prisma.category.update({
             where: { id: c.id },
             data: { position: c.position },
+          })
+        ),
+      ...dishes
+        .filter((d) => validDishIds.has(d.id))
+        .map((d) =>
+          prisma.dish.update({
+            where: { id: d.id },
+            data: { position: d.position },
           })
         ),
     ]);

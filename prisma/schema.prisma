@@ -201,6 +201,11 @@ model Dish {
   description     String?
   price           Decimal        @db.Decimal(10, 2)
   imageUrl        String?
+  /// Reihenfolge innerhalb der Kategorie (0-basiert). Optional, weil
+  /// Bestandsgerichte vor Einführung des Feldes keine Position haben —
+  /// Postgres sortiert NULL bei ASC ans Ende, sortierte Gerichte stehen
+  /// also vor den noch nie sortierten.
+  position        Int?
   categoryId      String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

@@ -31,7 +31,10 @@ export async function getRestaurantMenuData(restaurantID) {
           heroTextColor: true,
           createdAt: true,
           updatedAt: true,
+          // Reihenfolge kommt aus der DB (identisch zu api/user/profil/getData),
+          // damit die Gastansicht exakt die im Editor gesetzte Sortierung zeigt.
           categoryGroup: {
+            orderBy: { position: "asc" },
             select: {
               id: true,
               name: true,
@@ -41,6 +44,7 @@ export async function getRestaurantMenuData(restaurantID) {
               borderRadius: true,
               titleAlign: true,
               categories: {
+                orderBy: [{ position: "asc" }, { name: "asc" }],
                 select: {
                   id: true,
                   name: true,
@@ -55,6 +59,7 @@ export async function getRestaurantMenuData(restaurantID) {
                   titleAlign: true,
                   titleUppercase: true,
                   dishes: {
+                    orderBy: [{ position: "asc" }, { createdAt: "asc" }],
                     select: {
                       id: true,
                       name: true,
@@ -109,10 +114,8 @@ export async function getRestaurantMenuData(restaurantID) {
 
   if (!restaurant) return null;
 
+  // Sortierung erledigt jetzt die Query (orderBy oben) — kein Nachsortieren nötig.
   const menu = restaurant.menu ?? [];
-  for (const entry of menu) {
-    entry.categoryGroup?.sort((a, b) => Number(a.position) - Number(b.position));
-  }
 
   const response = {
     id: restaurant.id,

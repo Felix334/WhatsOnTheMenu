@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef, Fragment } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { DynamicLink } from "@/app/components/DynamicLink";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableHead, TableRow, TableCell, TableHeader } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
@@ -18,23 +16,26 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { toast } from "sonner";
-import { FaPen, FaTrash } from "react-icons/fa";
-import { CheckCircle, XCircle, ArrowLeft, ClipboardList, Eye, Save } from "lucide-react";
+import { FaPen } from "react-icons/fa";
+import { ArrowLeft, ClipboardList, ClipboardPaste, Eye, Percent, Printer, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import { menuSchema } from "./components/menuSchema";
-import { SelectItem } from "./components/selectItem";
 import { OptionMenu } from "./components/optionMenu";
-import { EdditCategoryMenu } from "./components/edditCategoryWin";
 import { TierSystem } from "./components/TierLimits";
 import { useRestaurantData, markUserAnsichtNavigation } from "./components/fetchData";
 import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 import { CalendarWin } from "./components/calendarWin";
-import { ALLERGENS } from "@/lib/allergens";
+import { MenuSection } from "./components/menuSection";
+import { BulkImport } from "./components/bulkImport";
+import { BulkPriceDialog } from "./components/bulkPrice";
+import { MoveDishDialog } from "./components/moveDish";
+import { clearDraft, formatDraftAge, loadDraft, saveDraft } from "./components/draftStorage";
+import { applyPriceChange } from "@/lib/priceRules";
 
 const HERO_COLOR_PRESETS = [
   { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
@@ -64,7 +65,7 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, setServerData, isLoading, restaurantID, bgColor, fontColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
+  const { serverData, setServerData, refetch, isLoading, restaurantID, bgColor, fontColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -95,6 +96,24 @@ export default function PageBuilder() {
   const [groupFontColorMap, setGroupFontColorMap] = useState({});
   const [groupAlignMap, setGroupAlignMap] = useState({});
 
+  // Schnellerfassung, Preis-Massenänderung, Gericht verschieben
+  const [openBulkImport, setOpenBulkImport] = useState(false);
+  const [openBulkPrice, setOpenBulkPrice] = useState(false);
+  const [moveTarget, setMoveTarget] = useState(null); // { dish, categoryId } | null
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+
+  // Entwurf: erst nach dem Laden schreiben, sonst überschreibt der leere
+  // Anfangszustand einen vorhandenen Entwurf, bevor er wiederhergestellt wurde.
+  const [draftRestored, setDraftRestored] = useState(null); // savedAt | null
+  const draftReadyRef = useRef(false);
+  // Zwischen "Entwurf geladen" und "Entwurf im State angekommen" liegt ein
+  // Render. Liefe der Schreib-Effekt in diesem Fenster, würde er den gerade
+  // geladenen Entwurf mit dem noch leeren State überschreiben. Gemerkt wird
+  // deshalb das geladene Array selbst — erst wenn es identisch im State steht,
+  // darf wieder geschrieben werden (robust auch bei mehrfachen Effekt-Läufen
+  // wie im StrictMode).
+  const pendingRestoreRef = useRef(null);
+
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -105,7 +124,6 @@ export default function PageBuilder() {
     setUserID(session.user.id);
 
     const sub = session.user.subscription;
-    console.log("Subscription:", sub);
 
     switch (sub) {
       case "FreeTier":
@@ -246,6 +264,212 @@ export default function PageBuilder() {
     setOpenEditor(false);
   };
 
+  // ── Entwurf (localStorage) ────────────────────────────────────────────────
+  // Wiederherstellen, sobald das Restaurant bekannt ist. Läuft genau einmal —
+  // danach übernimmt der Schreib-Effekt unten.
+  useEffect(() => {
+    if (!restaurantID || draftReadyRef.current) return;
+
+    const draft = loadDraft(restaurantID);
+    if (draft) {
+      setComponents(draft.components);
+      setDeletedDishes(draft.deletedDishes);
+      setDeletedCategories(draft.deletedCategories);
+      setDeleteCategoryGroups(draft.deletedCategoryGroups);
+      // Die Refs füttern submitData/deleteData — ohne sie würden die
+      // wiederhergestellten Löschungen beim Speichern verschluckt.
+      deletedDishesRef.current = draft.deletedDishes;
+      deletedCategoriesRef.current = draft.deletedCategories;
+      deletedCategoryGroupRef.current = draft.deletedCategoryGroups;
+      setDraftRestored(draft.savedAt);
+      pendingRestoreRef.current = draft;
+    }
+
+    draftReadyRef.current = true;
+  }, [restaurantID]);
+
+  // Jede Änderung an den vorgemerkten Daten sichern.
+  useEffect(() => {
+    if (!restaurantID || !draftReadyRef.current) return;
+
+    if (pendingRestoreRef.current) {
+      // Referenz-Vergleich: setComponents hat genau dieses Array gespeichert.
+      if (components !== pendingRestoreRef.current.components) return;
+      pendingRestoreRef.current = null;
+    }
+
+    saveDraft(restaurantID, {
+      components,
+      deletedDishes,
+      deletedCategories,
+      deletedCategoryGroups: deleteCategoryGroups,
+    });
+  }, [restaurantID, components, deletedDishes, deletedCategories, deleteCategoryGroups]);
+
+  // Setzt alle vorgemerkten Änderungen zurück — von "Verwerfen" und nach
+  // erfolgreichem Speichern genutzt.
+  const resetPendingChanges = () => {
+    setComponents([]);
+    setDeletedDishes([]);
+    setDeletedCategories([]);
+    setDeleteCategoryGroups([]);
+    deletedDishesRef.current = [];
+    deletedCategoriesRef.current = [];
+    deletedCategoryGroupRef.current = [];
+    pendingRestoreRef.current = null;
+    clearDraft(restaurantID);
+    setDraftRestored(null);
+  };
+
+  const discardDraft = () => {
+    resetPendingChanges();
+    toast.success("Änderungen verworfen");
+  };
+
+  // ── Duplizieren ───────────────────────────────────────────────────────────
+  // Kopien laufen über denselben Weg wie jede Neuanlage: als menuSection in
+  // `components` vorgemerkt und beim Speichern von setData angelegt. Sie sind
+  // deshalb erst nach dem Speichern in der Karte sichtbar.
+  const uniqueCopyName = (baseName, existingNames) => {
+    let candidate = `${baseName} (Kopie)`;
+    let counter = 2;
+    while (existingNames.includes(candidate)) {
+      candidate = `${baseName} (Kopie ${counter})`;
+      counter += 1;
+    }
+    return candidate;
+  };
+
+  const duplicateDish = ({ dish, categoryName, groupName }) => {
+    if (exeedDishLimit) {
+      toast.error(`Gericht-Limit (${Limit.DishLimit}) erreicht`);
+      return;
+    }
+    // Ohne id → setData legt ein neues Gericht an, statt das bestehende zu ändern.
+    setComponents((prev) => [
+      ...prev,
+      {
+        type: "menuSection",
+        section: {
+          categoryGroup: groupName,
+          title: categoryName,
+          items: [
+            {
+              name: `${dish.name} (Kopie)`,
+              description: dish.description ?? "",
+              price: Number(dish.price ?? 0).toFixed(2),
+            },
+          ],
+        },
+      },
+    ]);
+    toast.success("Kopie vorgemerkt — erscheint nach dem Speichern");
+  };
+
+  const duplicateCategory = ({ categoryName, groupName, dishes }) => {
+    if (exeedCatLimit) {
+      toast.error(`Kategorie-Limit (${Limit.CategoryLimit}) erreicht`);
+      return;
+    }
+
+    const freeDishSlots = Math.max(0, (Limit.DishLimit ?? 0) - dishCount);
+    const items = (dishes ?? []).slice(0, freeDishSlots).map((d) => ({
+      name: d.name,
+      description: d.description ?? "",
+      price: Number(d.price ?? 0).toFixed(2),
+    }));
+
+    // Der Name muss neu sein: setData ordnet Kategorien innerhalb einer Gruppe
+    // über den Namen zu — ein identischer Name würde das Original befüllen.
+    const newName = uniqueCopyName(categoryName, categoryNames);
+
+    setComponents((prev) => [...prev, { type: "menuSection", section: { categoryGroup: groupName, title: newName, items } }]);
+
+    const skipped = (dishes?.length ?? 0) - items.length;
+    toast.success(`„${newName}“ vorgemerkt${skipped > 0 ? ` — ${skipped} Gerichte wegen Limit ausgelassen` : ""}`);
+  };
+
+  const handleBulkImport = (section) => {
+    setComponents((prev) => [...prev, section]);
+  };
+
+  // ── Verschobenes Gericht lokal nachziehen ─────────────────────────────────
+  // Die API hat bereits gespeichert; hier wird nur der geladene Datenstand
+  // angeglichen, damit kein kompletter Reload nötig ist.
+  const handleDishMoved = (dishId, fromCategoryId, toCategoryId) => {
+    setServerData((prev) => {
+      const menu = prev?.userData?.restaurant?.menu?.[0];
+      if (!menu) return prev;
+
+      let movedDish = null;
+      const groupsWithout = menu.categoryGroup.map((group) => ({
+        ...group,
+        categories: (group.categories ?? []).map((cat) => {
+          if (cat.id !== fromCategoryId) return cat;
+          const remaining = [];
+          for (const dish of cat.dishes ?? []) {
+            if (dish.id === dishId) movedDish = dish;
+            else remaining.push(dish);
+          }
+          return { ...cat, dishes: remaining };
+        }),
+      }));
+
+      if (!movedDish) return prev;
+
+      const groupsWithDish = groupsWithout.map((group) => ({
+        ...group,
+        categories: group.categories.map((cat) => (cat.id === toCategoryId ? { ...cat, dishes: [...(cat.dishes ?? []), movedDish] } : cat)),
+      }));
+
+      return {
+        ...prev,
+        userData: {
+          ...prev.userData,
+          restaurant: {
+            ...prev.userData.restaurant,
+            menu: [{ ...menu, categoryGroup: groupsWithDish }, ...prev.userData.restaurant.menu.slice(1)],
+          },
+        },
+      };
+    });
+  };
+
+  // ── Preis-Massenänderung lokal nachziehen ─────────────────────────────────
+  // Dieselbe Formel wie die API (src/lib/priceRules.js) — die angezeigten
+  // Preise stimmen daher mit den gespeicherten überein.
+  const handleBulkPriceApplied = ({ scope, categoryId, mode, value, rounding }) => {
+    setServerData((prev) => {
+      const menu = prev?.userData?.restaurant?.menu?.[0];
+      if (!menu) return prev;
+
+      const updatedGroups = menu.categoryGroup.map((group) => ({
+        ...group,
+        categories: (group.categories ?? []).map((cat) => {
+          if (scope === "category" && cat.id !== categoryId) return cat;
+          return {
+            ...cat,
+            dishes: (cat.dishes ?? []).map((dish) => {
+              const next = applyPriceChange(Number(dish.price), mode, value, rounding);
+              return next === null ? dish : { ...dish, price: next };
+            }),
+          };
+        }),
+      }));
+
+      return {
+        ...prev,
+        userData: {
+          ...prev.userData,
+          restaurant: {
+            ...prev.userData.restaurant,
+            menu: [{ ...menu, categoryGroup: updatedGroups }, ...prev.userData.restaurant.menu.slice(1)],
+          },
+        },
+      };
+    });
+  };
+
   const submitData = async () => {
     const restaurantID = serverData.userData.restaurant.id;
     setIsSaving(true);
@@ -272,7 +496,7 @@ export default function PageBuilder() {
         throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
       }
 
-      if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0) {
+      if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0 || deletedCategoryGroupRef.current.length > 0) {
         const deleteResponse = await fetch("/api/user/profil/deleteData", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -289,13 +513,16 @@ export default function PageBuilder() {
         if (!deleteResponse.ok) {
           throw new Error(`Delete error! status: ${deleteResponse.status}, Message: ${deleteResData.message || "N/A"}, Error: ${deleteResData.error || "N/A"}`);
         }
-
-        // Clear the deleted lists after successful deletion
-        setDeletedDishes([]);
-        setDeletedCategories([]);
-      } else {
-        if (process.env.NODE_ENV === "development") console.log("No deletions to process");
       }
+
+      // Alle vorgemerkten Änderungen sind jetzt in der DB. Zurücksetzen ist
+      // Pflicht, nicht Kosmetik: ohne das würde ein zweiter Klick auf
+      // "Speichern" dieselben Gerichte ein zweites Mal anlegen (die
+      // vorgemerkten Einträge haben keine id, setData legt sie also neu an).
+      resetPendingChanges();
+
+      // Frisch laden, damit die neuen Einträge (inkl. ihrer Server-IDs) sichtbar werden.
+      await refetch();
 
       toast.success("Daten erfolgreich gespeichert!");
     } catch (err) {
@@ -311,34 +538,15 @@ export default function PageBuilder() {
     router.push("../");
   };
 
-  const AllergenBadges = ({ allergens }) => {
-    if (!allergens || allergens.length === 0) return null;
-    return (
-      <div className="flex flex-warp gap-1 mt-1">
-        {allergens.map((key) => {
-          const a = ALLERGENS.find((x) => x.key === key);
-          return (
-            <span key={key} title={a?.name ?? key} className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
-              {a?.id ?? "?"}
-            </span>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const categoryGroups = serverData?.userData?.restaurant?.menu[0]?.categoryGroup ?? [];
-  if (process.env.NODE_ENV === "development") {
-    console.log("Group-Test z342:", serverData?.userData?.restaurant?.menu[0].categoryGroup);
-    console.log("Groups-Test z43", categoryGroups);
-  }
-  const categoryGroupNames = [...(categoryGroups?.map((group) => group.name) ?? []), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"].filter((name) => name && name.trim());
-
-  // Kategorien-Namen (korrigiert)
+  const categoryGroups = serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup ?? [];
+  const categoryGroupNames = [...new Set([...categoryGroups.map((group) => group.name), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"])].filter((name) => name && name.trim());
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
-  if (process.env.NODE_ENV === "development") {
-    console.log("CategorieNames", categoryNames);
-  }
+
+  // Bezahlte Tarife — Preis-Massenänderung und Druckansicht. Die eigentliche
+  // Durchsetzung passiert serverseitig (api/user/profil/bulkPrice); hier geht
+  // es nur darum, keine Buttons zu zeigen, die ohnehin abgelehnt würden.
+  const isPaidTier = ["Professional", "Business"].includes(session?.user?.subscription);
+  const remainingDishes = Math.max(0, (Limit.DishLimit ?? 0) - dishCount);
 
   const MenuEditor = ({ categoryGroupNames }) => (
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
@@ -502,242 +710,6 @@ export default function PageBuilder() {
   }
 
   const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
-  const DENSITY_CLASS = { compact: "text-sm", normal: "", airy: "text-lg" };
-
-  const MenuSection = ({ title, menuItems, categoryId, bgColor, fontColor, borderRadius, elevated, leaderDots, titleAlign, titleUppercase }) => {
-    const [localBorderRadius, setLocalBorderRadius] = useState(borderRadius);
-    const [localElevated, setLocalElevated] = useState(elevated ?? true);
-    const [localBgColor, setLocalBgColor] = useState(bgColor);
-    const [localFontColor, setLocalFontColor] = useState(fontColor ?? "");
-    const [localLeaderDots, setLocalLeaderDots] = useState(leaderDots ?? false);
-    const [localTitleAlign, setLocalTitleAlign] = useState(titleAlign || "center");
-    const [localTitleUppercase, setLocalTitleUppercase] = useState(titleUppercase ?? false);
-    const [expandedIndex, setExpandedIndex] = useState(null);
-    const [openItem, setOpenItem] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
-
-    const [stockMap, setStockMap] = useState(() => Object.fromEntries((menuItems ?? []).map((d) => [d.id, d.stock ?? "isAvailable"])));
-
-    const toggleAvailability = async (e, dishId) => {
-      e.stopPropagation();
-      const current = stockMap[dishId] ?? "isAvailable";
-      const next = current === "isAvailable" ? "outOfStock" : "isAvailable";
-
-      setStockMap((prev) => ({ ...prev, [dishId]: next }));
-      try {
-        const resp = await fetch("/api/user/profil/updateDishAvailability", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            dishId,
-            restaurantId: serverData?.userData?.restaurant?.id,
-            stock: next,
-          }),
-        });
-        if (!resp.ok) throw new Error("Fehler");
-        toast.success(next === "isAvailable" ? "Gericht als verfügbar markiert" : "Gericht als nicht verfügbar markiert");
-      } catch {
-        setStockMap((prev) => ({ ...prev, [dishId]: current }));
-        toast.error("Status konnte nicht geändert werden");
-      }
-    };
-    const [changedItems, setChangedItems] = useState({});
-    const displayItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
-    const [, setChangedCategories] = useState([]);
-    const toggleExpand = (index) => setExpandedIndex(expandedIndex === index ? null : index);
-    const [pendingDeleteDishId, setPendingDeleteDishId] = useState(null);
-    const [confirmDeleteCategory, setConfirmDeleteCategory] = useState(false);
-
-    const openMenuItemEddit = (item) => {
-      setSelectedItem(item);
-      setOpenItem(true);
-    };
-
-    const openCategoryMenu_ = () => {
-      setOpenCategoryMenu(!openCategoryMenu);
-    };
-
-    const deleteDish = (dishId) => {
-      setPendingDeleteDishId(dishId);
-    };
-
-    const deleteCategory = () => {
-      setConfirmDeleteCategory(true);
-    };
-
-    const fontStyle = !deletedCategories.includes(categoryId) && localFontColor ? { color: localFontColor } : {};
-
-    return (
-      <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-        <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-          <h3 className={`w-full text-2xl sm:text-3xl md:text-4xl font-semibold ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${deletedCategories.includes(categoryId) ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
-            {title}
-          </h3>
-
-          <div className="absolute left-2 sm:left-4 flex gap-2">
-            <Button onClick={openCategoryMenu_} size="icon" variant="outline">
-              <FaPen />
-            </Button>
-
-            <Button variant="destructive" size="icon" onClick={deleteCategory}>
-              <FaTrash />
-            </Button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <Table className="w-full `min-w-175` table-fixed" style={{ fontFamily: font }}>
-            <colgroup>
-              <col className="w-24" />
-              <col className="w-full" />
-              <col className="w-24" />
-            </colgroup>
-            <TableHeader>
-              <TableRow className={`hover:bg-gray-100 w-full ${bgColorClass(localBgColor)}}`} style={bgColorStyle(localBgColor)}>
-                <TableHead className="text-left" style={fontStyle}>
-                  Aktionen
-                </TableHead>
-                <TableHead className="text-left" style={fontStyle}>
-                  Speisen
-                </TableHead>
-                <TableHead className="text-right right-1 absolute" style={fontStyle}>
-                  Preis:
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody className="">
-              {displayItems.map((item, index) => (
-                <Fragment key={index}>
-                  <TableRow
-                    className={`
-                      ${deletedDishes.includes(item.id) ? "bg-red-100 hover:bg-red-200" : "hover:bg-gray-50"} 
-                      transition-colors duration-200 cursor-pointer border-b
-                    `}
-                    onClick={() => toggleExpand(index)}
-                  >
-                    <TableCell className="align-middle">
-                      <div className="flex gap-1 flex-wrap">
-                        <Button
-                          size="icon"
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openMenuItemEddit(item);
-                          }}
-                        >
-                          <FaPen />
-                        </Button>
-
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteDish(item.id);
-                          }}
-                        >
-                          <FaTrash />
-                        </Button>
-
-                        {/* Verfügbarkeits-Toggle */}
-                        {allowAvailability && (
-                          <Button size="icon" variant="outline" title={stockMap[item.id] === "outOfStock" ? "Nicht verfügbar – klicken zum Aktivieren" : "Verfügbar – klicken zum Deaktivieren"} onClick={(e) => toggleAvailability(e, item.id)} className={stockMap[item.id] === "outOfStock" ? "border-red-400 text-red-500 hover:bg-red-50" : "border-green-400 text-green-600 hover:bg-green-50"}>
-                            {stockMap[item.id] === "outOfStock" ? <XCircle className="size-4" /> : <CheckCircle className="size-4" />}
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell className={`align-middle ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-900"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>
-                      <div className="flex flex-col">
-                        <div className="flex items-baseline gap-2">
-                          <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
-                          {localLeaderDots && <span aria-hidden className="flex-1 min-w-6 border-b border-dotted border-current opacity-40" />}
-                        </div>
-                        {item.description && (
-                          <span className="text-sm text-gray-500" style={deletedDishes.includes(item.id) ? {} : fontStyle}>
-                            {item.description}
-                          </span>
-                        )}
-                        {allowAvailability && stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
-                        <AllergenBadges allergens={item.allergens} />
-                      </div>
-                    </TableCell>
-                    <TableCell className={`text-right font-mono right-1 absolute ${deletedDishes.includes(item.id) ? "text-red-600 line-through" : "text-gray-800"}`} style={deletedDishes.includes(item.id) ? {} : fontStyle}>
-                      {Number(item.price).toFixed(2)}€
-                    </TableCell>
-                  </TableRow>
-                </Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={(item) => setChangedItems((prev) => ({ ...prev, [item.id]: item }))} category={title} restaurantId={serverData?.userData?.restaurant?.id} userID={userID} />
-
-        {/* Bestätigungs-Dialog: Gericht löschen */}
-        <ConfirmDialog
-          open={pendingDeleteDishId !== null}
-          onOpenChange={(open) => !open && setPendingDeleteDishId(null)}
-          title="Gericht löschen?"
-          description="Das Gericht wird beim nächsten Speichern entfernt."
-          confirmLabel="Löschen"
-          onConfirm={() => {
-            updateDeletedDishes(pendingDeleteDishId);
-            setPendingDeleteDishId(null);
-          }}
-        />
-
-        {/* Bestätigungs-Dialog: Kategorie löschen */}
-        <ConfirmDialog
-          open={confirmDeleteCategory}
-          onOpenChange={setConfirmDeleteCategory}
-          title="Kategorie löschen?"
-          description="Die gesamte Kategorie und alle Gerichte darin werden entfernt."
-          confirmLabel="Kategorie löschen"
-          onConfirm={() => {
-            updateDeletedCategories(categoryId);
-            setConfirmDeleteCategory(false);
-          }}
-        />
-
-        <EdditCategoryMenu
-          open={openCategoryMenu}
-          onOpenChange={setOpenCategoryMenu}
-          selectedCategory={{
-            name: title,
-            position: 0,
-            color: localBgColor,
-            fontColor: localFontColor,
-            borderRadius: localBorderRadius,
-            elevated: localElevated,
-            leaderDots: localLeaderDots,
-            titleAlign: localTitleAlign,
-            titleUppercase: localTitleUppercase,
-            id: categoryId,
-          }}
-          setChangedCategory={setChangedCategories}
-          onBorderRadiusChange={setLocalBorderRadius}
-          onElevatedChange={setLocalElevated}
-          onColorChange={setLocalBgColor}
-          onFontColorChange={setLocalFontColor}
-          onLeaderDotsChange={setLocalLeaderDots}
-          onTitleAlignChange={setLocalTitleAlign}
-          onTitleUppercaseChange={setLocalTitleUppercase}
-          category={title}
-          restaurantId={serverData?.userData?.restaurant?.id}
-          userID={userID}
-          categoryId={categoryId}
-          position={positionNum}
-          allowPremiumColor={allowPremiumColor}
-        />
-      </div>
-    );
-  };
-
-  const local = navigator.language.split("-")[0];
-  console.log("Lokale Sprache:",local)
 
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: font }}>
@@ -756,6 +728,31 @@ export default function PageBuilder() {
           </div>
 
           <div className="flex items-center gap-2">
+            {isPaidTier ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href="/Profil/Drucken">
+                  <Printer className="size-4" />
+                  <span className="hidden sm:inline">Drucken</span>
+                </Link>
+              </Button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button variant="outline" size="sm" disabled>
+                      <Printer className="size-4" />
+                      <span className="hidden sm:inline">Drucken</span>
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  Druck-/PDF-Ansicht ist ein Premium-Feature —{" "}
+                  <DynamicLink href="/pricing" className="underline font-medium">
+                    Upgrade
+                  </DynamicLink>
+                </TooltipContent>
+              </Tooltip>
+            )}
             <Button asChild variant="outline" size="sm" onClick={markUserAnsichtNavigation}>
               <Link href={`/Profil/Bestellungen?restaurantID=${restaurantID}`}>
                 <ClipboardList className="size-4" />
@@ -796,6 +793,55 @@ export default function PageBuilder() {
               ) : (
                 <MenuEditor categoryGroupNames={categoryGroupNames} />
               )}
+
+              {exeedDishLimit ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" size="sm" disabled>
+                        <ClipboardPaste className="size-4" />
+                        Schnellerfassung
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Gericht-Limit ({Limit.DishLimit}) erreicht —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => setOpenBulkImport(true)}>
+                  <ClipboardPaste className="size-4" />
+                  Schnellerfassung
+                </Button>
+              )}
+
+              {isPaidTier ? (
+                <Button variant="outline" size="sm" onClick={() => setOpenBulkPrice(true)}>
+                  <Percent className="size-4" />
+                  Preise
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" size="sm" disabled>
+                        <Percent className="size-4" />
+                        Preise
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Preis-Massenänderung ist ein Premium-Feature —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
               {allowPremiumColor ? (
                 <Button variant="outline" size="sm" onClick={() => setOpenCalendarWin(true)}>
                   Event-Kalender
@@ -1026,7 +1072,35 @@ export default function PageBuilder() {
                   </h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
-                      <MenuSection key={category.id} title={category.name} menuItems={category.dishes} categoryId={category.id} groupId={group.id} groupName={group.name} bgColor={category.bgColor} fontColor={category.fontColor} borderRadius={category.borderRadius} elevated={category.elevated} leaderDots={category.leaderDots} titleAlign={category.titleAlign} titleUppercase={category.titleUppercase} />
+                      <MenuSection
+                        key={category.id}
+                        title={category.name}
+                        menuItems={category.dishes}
+                        categoryId={category.id}
+                        groupName={group.name}
+                        bgColor={category.bgColor}
+                        fontColor={category.fontColor}
+                        borderRadius={category.borderRadius}
+                        elevated={category.elevated}
+                        leaderDots={category.leaderDots}
+                        titleAlign={category.titleAlign}
+                        titleUppercase={category.titleUppercase}
+                        density={density}
+                        font={font}
+                        headingFont={headingFont}
+                        deletedDishes={deletedDishes}
+                        deletedCategories={deletedCategories}
+                        onDeleteDish={updateDeletedDishes}
+                        onDeleteCategory={updateDeletedCategories}
+                        onDuplicateDish={duplicateDish}
+                        onDuplicateCategory={duplicateCategory}
+                        onRequestMoveDish={setMoveTarget}
+                        restaurantId={restaurantID}
+                        userID={userID}
+                        positionNum={positionNum}
+                        allowPremiumColor={allowPremiumColor}
+                        allowAvailability={allowAvailability}
+                      />
                     ))}
                   </div>
                 </div>
@@ -1038,19 +1112,47 @@ export default function PageBuilder() {
         </main>
       </div>
 
+      {/* Schnellerfassung */}
+      <BulkImport open={openBulkImport} onOpenChange={setOpenBulkImport} categoryGroupNames={categoryGroupNames} categoryNames={categoryNames} remainingDishes={remainingDishes} onImport={handleBulkImport} />
+
+      {/* Preis-Massenänderung (Premium) */}
+      {isPaidTier && <BulkPriceDialog open={openBulkPrice} onOpenChange={setOpenBulkPrice} categoryGroups={categoryGroups} onApplied={handleBulkPriceApplied} />}
+
+      {/* Gericht in andere Kategorie verschieben */}
+      <MoveDishDialog open={moveTarget !== null} onOpenChange={(open) => !open && setMoveTarget(null)} dish={moveTarget?.dish} currentCategoryId={moveTarget?.categoryId} categoryGroups={categoryGroups} onMoved={handleDishMoved} />
+
+      {/* Ungespeicherte Änderungen verwerfen — unwiderruflich, deshalb mit Rückfrage */}
+      <ConfirmDialog
+        open={confirmDiscard}
+        onOpenChange={setConfirmDiscard}
+        title="Änderungen verwerfen?"
+        description="Alle vorgemerkten Neuanlagen und Löschungen gehen verloren. Bereits gespeicherte Daten bleiben unberührt."
+        confirmLabel="Verwerfen"
+        onConfirm={() => {
+          discardDraft();
+          setConfirmDiscard(false);
+        }}
+      />
+
       {/* Speichern-Leiste — erscheint nur bei ungespeicherten Änderungen */}
       {(components.length > 0 || deletedDishes.length > 0 || deletedCategories.length > 0 || deleteCategoryGroups.length > 0) && (
         <div className="fixed bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
-          <div className="pointer-events-auto flex items-center gap-3 bg-white border border-gray-200 shadow-lg rounded-full pl-5 pr-2 py-2">
-            <span className="text-sm text-gray-600">
-              Ungespeicherte Änderungen
-              {components.length > 0 && ` · ${components.length} neu`}
-              {deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length > 0 && ` · ${deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length} gelöscht`}
-            </span>
-            <Button onClick={() => submitData()} disabled={isSaving} className="rounded-full">
-              <Save className="size-4" />
-              {isSaving ? "Speichert…" : "Speichern"}
-            </Button>
+          <div className="pointer-events-auto flex flex-col items-center gap-1 bg-white border border-gray-200 shadow-lg rounded-2xl px-4 py-2">
+            {draftRestored && <span className="text-xs text-amber-700">Entwurf von {formatDraftAge(draftRestored)} wiederhergestellt</span>}
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600">
+                Ungespeicherte Änderungen
+                {components.length > 0 && ` · ${components.length} neu`}
+                {deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length > 0 && ` · ${deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length} gelöscht`}
+              </span>
+              <Button variant="ghost" size="sm" onClick={() => setConfirmDiscard(true)} disabled={isSaving} className="rounded-full text-gray-500">
+                Verwerfen
+              </Button>
+              <Button onClick={() => submitData()} disabled={isSaving} className="rounded-full">
+                <Save className="size-4" />
+                {isSaving ? "Speichert…" : "Speichern"}
+              </Button>
+            </div>
           </div>
         </div>
       )}

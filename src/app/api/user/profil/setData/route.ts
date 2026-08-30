@@ -229,6 +229,15 @@ export async function POST(req: NextRequest) {
       }
 
       // ── Dishes verarbeiten ────────────────────────────────────────────
+      // Neue Gerichte hinten anhängen, damit eine im Editor gesetzte
+      // Sortierung durch einen Import nicht durcheinandergerät. Ein
+      // aggregate pro Kategorie (nicht pro Gericht) — der pg-Pool ist klein.
+      const posAgg = await safeDb(
+        () => prisma.dish.aggregate({ where: { categoryId: category!.id }, _max: { position: true } }),
+        "dish.aggregate (position)",
+      );
+      let nextPosition = (posAgg._max.position ?? -1) + 1;
+
       for (const item of items) {
         if (!item?.name) continue;
 
@@ -281,6 +290,7 @@ export async function POST(req: NextRequest) {
                 description: item.description ?? null,
                 price,
                 imageUrl: item.image ?? "",
+                position: nextPosition++,
                 categoryId: category!.id,
               },
             }),

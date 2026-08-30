@@ -56,6 +56,19 @@ export const useRestaurantData = (userID) => {
     });
   }, []);
 
+  // Nach dem Speichern neu laden: neu angelegte Kategorien/Gerichte haben erst
+  // serverseitig eine id, ohne Refetch bliebe die Karte bis zum Reload veraltet.
+  const refetch = useCallback(async () => {
+    if (!userID) return;
+    try {
+      const data = await fetchRestaurantData(userID);
+      cachedData = data;
+      setServerDataState(data);
+    } catch (err) {
+      if (err.name !== "AbortError") console.error("Refetch failed:", err);
+    }
+  }, [userID]);
+
   useEffect(() => {
     if (!userID) return;
 
@@ -93,5 +106,5 @@ export const useRestaurantData = (userID) => {
     return () => controller.abort();
   }, [userID]);
 
-  return { serverData, setServerData, isLoading, setIsLoading, ...extractMenuData(serverData) };
+  return { serverData, setServerData, refetch, isLoading, setIsLoading, ...extractMenuData(serverData) };
 };

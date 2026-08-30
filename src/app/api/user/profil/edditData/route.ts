@@ -198,6 +198,10 @@ export async function POST(req: NextRequest) {
               );
             }
 
+            // Hinten anhängen — category.dishes wird unten mitgepflegt, die
+            // Position bleibt daher auch über mehrere Items hinweg korrekt.
+            const nextPosition = category.dishes.reduce((max, d) => Math.max(max, d.position ?? -1), -1) + 1;
+
             const newDish = (await safeDb(
               () =>
                 prisma.dish.create({
@@ -206,6 +210,7 @@ export async function POST(req: NextRequest) {
                     description: item.description ?? null,
                     price,
                     imageUrl: item.image ?? "",
+                    position: nextPosition,
                     categoryId: category!.id,
                   },
                 }),
