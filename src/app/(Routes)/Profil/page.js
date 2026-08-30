@@ -16,7 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { toast } from "sonner";
-import { FaPen } from "react-icons/fa";
+import { FaPen, FaTrash } from "react-icons/fa";
 import { ArrowLeft, ClipboardList, ClipboardPaste, Eye, Percent, Printer, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -101,6 +101,7 @@ export default function PageBuilder() {
   const [openBulkPrice, setOpenBulkPrice] = useState(false);
   const [moveTarget, setMoveTarget] = useState(null); // { dish, categoryId } | null
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(null); // Gruppe | null
 
   // Entwurf: erst nach dem Laden schreiben, sonst überschreibt der leere
   // Anfangszustand einen vorhandenen Entwurf, bevor er wiederhergestellt wurde.
@@ -475,25 +476,32 @@ export default function PageBuilder() {
     setIsSaving(true);
 
     try {
-      const payload = JSON.stringify({
-        restaurantId: restaurantID,
-        data: components,
-      });
+      // setData nur aufrufen, wenn es wirklich etwas anzulegen gibt. Die Route
+      // antwortet auf eine leere Liste mit 400 ("Keine menuSection-Einträge
+      // gefunden") — ein reiner Löschvorgang (Gericht/Kategorie/Gruppe
+      // entfernen, ohne etwas Neues) wäre daher schon hier abgebrochen und die
+      // Löschung nie ausgeführt worden.
+      if (components.length > 0) {
+        const payload = JSON.stringify({
+          restaurantId: restaurantID,
+          data: components,
+        });
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("Size:", new TextEncoder().encode(payload).length, "Bytes");
-      }
+        if (process.env.NODE_ENV === "development") {
+          console.log("Size:", new TextEncoder().encode(payload).length, "Bytes");
+        }
 
-      const response = await fetch("/api/user/profil/setData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-      });
+        const response = await fetch("/api/user/profil/setData", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        });
 
-      const resData = await response.json();
+        const resData = await response.json();
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}, Message: ${resData.message || "N/A"}, Error: ${resData.error || "N/A"}`);
+        }
       }
 
       if (deletedDishesRef.current.length > 0 || deletedCategoriesRef.current.length > 0 || deletedCategoryGroupRef.current.length > 0) {
@@ -1043,9 +1051,13 @@ export default function PageBuilder() {
             {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
               serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
                 <div key={group.id} className={`${RADIUS_CLASS[groupBorderMap[group.id] ?? group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(groupColorMap[group.id] ?? group.color) || "bg-white"}`} style={bgColorStyle(groupColorMap[group.id] ?? group.color)}>
-                  <div>
-                    <Button onClick={() => renderCategoryGroupEdit(group.id)}>
+                  {/* Gleiche Anordnung wie in der Kategorie-Kopfzeile: gestalten, löschen */}
+                  <div className="flex gap-2">
+                    <Button onClick={() => renderCategoryGroupEdit(group.id)} size="icon" variant="outline" title="Gruppe gestalten">
                       <FaPen />
+                    </Button>
+                    <Button variant="destructive" size="icon" onClick={() => setConfirmDeleteGroup(group)} title="Gruppe löschen">
+                      <FaTrash />
                     </Button>
                   </div>
                   {renderCatGroupMenu === group.id && (
@@ -1067,8 +1079,18 @@ export default function PageBuilder() {
                       onTitleAlignChange={(val) => setGroupAlignMap((prev) => ({ ...prev, [group.id]: val }))}
                     />
                   )}
-                  <h2 className="text-2xl font-semibold mb-6 border-b pb-4" style={{ ...((groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}), textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left", ...(headingFont ? { fontFamily: headingFont } : {}) }}>
+                  {/* Zum Löschen vorgemerkte Gruppen bekommen bewusst keinen
+                      Inline-Farbstil, damit rot/durchgestrichen sichtbar bleibt */}
+                  <h2
+                    className={`text-2xl font-semibold mb-6 border-b pb-4 ${deleteCategoryGroups.includes(group.id) ? "text-red-600 line-through" : ""}`}
+                    style={{
+                      ...(!deleteCategoryGroups.includes(group.id) && (groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}),
+                      textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left",
+                      ...(headingFont ? { fontFamily: headingFont } : {}),
+                    }}
+                  >
                     {group.name}
+                    {deleteCategoryGroups.includes(group.id) && <span className="ml-3 text-sm font-normal no-underline">wird beim Speichern gelöscht</span>}
                   </h2>
                   <div className="space-y-8">
                     {group.categories?.map((category) => (
@@ -1120,6 +1142,24 @@ export default function PageBuilder() {
 
       {/* Gericht in andere Kategorie verschieben */}
       <MoveDishDialog open={moveTarget !== null} onOpenChange={(open) => !open && setMoveTarget(null)} dish={moveTarget?.dish} currentCategoryId={moveTarget?.categoryId} categoryGroups={categoryGroups} onMoved={handleDishMoved} />
+
+      {/* Kategorie-Gruppe löschen — nimmt alle Kategorien und Gerichte darin mit,
+          deshalb beziffert die Rückfrage, was verschwindet */}
+      <ConfirmDialog
+        open={confirmDeleteGroup !== null}
+        onOpenChange={(open) => !open && setConfirmDeleteGroup(null)}
+        title="Kategorie-Gruppe löschen?"
+        description={
+          (confirmDeleteGroup?.categories?.length ?? 0) > 0
+            ? `Die Gruppe „${confirmDeleteGroup?.name}“ wird mit ${confirmDeleteGroup.categories.length} ${confirmDeleteGroup.categories.length === 1 ? "Kategorie" : "Kategorien"} und ${confirmDeleteGroup.categories.reduce((n, c) => n + (c.dishes?.length ?? 0), 0)} Gerichten beim nächsten Speichern entfernt.`
+            : `Die leere Gruppe „${confirmDeleteGroup?.name}“ wird beim nächsten Speichern entfernt.`
+        }
+        confirmLabel="Gruppe löschen"
+        onConfirm={() => {
+          updateDeleteCategorieGroups(confirmDeleteGroup.id);
+          setConfirmDeleteGroup(null);
+        }}
+      />
 
       {/* Ungespeicherte Änderungen verwerfen — unwiderruflich, deshalb mit Rückfrage */}
       <ConfirmDialog

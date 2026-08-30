@@ -18,7 +18,7 @@ export async function POST(req) {
     const body = await req.json();
     logger.info(`Request received: ${req.method} ${req.url}`);
 
-    const { restaurantId, dishes, categories } = body;
+    const { restaurantId, dishes, categories, categoryGroups } = body;
 
     if (!restaurantId) {
       return NextResponse.json({ error: "restaurantId fehlt" }, { status: 400 });
@@ -62,6 +62,39 @@ export async function POST(req) {
             categoryGroup: {
               Menu: { restaurantId },
             },
+          },
+        });
+      });
+    }
+
+    // Kategorie-Gruppen: Kinder bewusst explizit löschen statt auf ON DELETE
+    // CASCADE zu vertrauen — die Migrations-Historie hat Drift, es ist nicht
+    // garantiert, dass die FK-Constraints in der DB wirklich kaskadieren.
+    // Gleiches Vorgehen wie oben bei den Kategorien.
+    if (categoryGroups && Array.isArray(categoryGroups) && categoryGroups.length > 0) {
+      await prisma.$transaction(async (tx) => {
+        await tx.dish.deleteMany({
+          where: {
+            category: {
+              categoryGroup: {
+                id: { in: categoryGroups },
+                Menu: { restaurantId },
+              },
+            },
+          },
+        });
+        await tx.category.deleteMany({
+          where: {
+            categoryGroup: {
+              id: { in: categoryGroups },
+              Menu: { restaurantId },
+            },
+          },
+        });
+        await tx.categoryGroup.deleteMany({
+          where: {
+            id: { in: categoryGroups },
+            Menu: { restaurantId },
           },
         });
       });
