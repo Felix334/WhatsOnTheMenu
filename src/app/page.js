@@ -207,9 +207,9 @@ function HomeContent() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                   <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Digitale Speisekarten in <span className="text-red-300">wenigen Minuten</span> erstellen
+                    Digitale Speisekarten in <span className="text-red-300">wenigen Minuten</span> erstellen- ganz ohne KI
                   </h1>
-                  <p className="text-xl mb-8 text-white/70">Erstellen Sie professionelle, interaktive Speisekarten für Ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung.</p>
+                  <p className="text-xl mb-8 text-white/70">Erstellen Sie professionelle, interaktive Speisekarten für Ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung - Ganz ohne KI-Slop.</p>
                   <div className="flex flex-col sm:flex-row gap-4">
                     {!userID && (
                       <Button asChild className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold text-base px-8 py-3 h-auto shadow-lg">
