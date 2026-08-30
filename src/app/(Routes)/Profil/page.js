@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
-import { ArrowLeft, ClipboardList, ClipboardPaste, Eye, Percent, Printer, Save } from "lucide-react";
+import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Percent, Plus, Printer, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -560,7 +560,10 @@ export default function PageBuilder() {
     <Sheet open={openEditor} onOpenChange={setOpenEditor}>
       <div></div>
       <SheetTrigger asChild>
-        <Button variant="outline">Hinzufügen</Button>
+        <Button variant="outline" size="sm">
+          <Plus className="size-4" />
+          <span className="hidden md:inline">Hinzufügen</span>
+        </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full max-w-3xl">
         <SheetHeader>
@@ -786,8 +789,9 @@ export default function PageBuilder() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span>
-                      <Button variant="outline" disabled>
-                        Hinzufügen
+                      <Button variant="outline" size="sm" disabled>
+                        <Plus className="size-4" />
+                        <span className="hidden md:inline">Hinzufügen</span>
                       </Button>
                     </span>
                   </TooltipTrigger>
@@ -808,7 +812,7 @@ export default function PageBuilder() {
                     <span>
                       <Button variant="outline" size="sm" disabled>
                         <ClipboardPaste className="size-4" />
-                        Schnellerfassung
+                        <span className="hidden md:inline">Schnellerfassung</span>
                       </Button>
                     </span>
                   </TooltipTrigger>
@@ -822,14 +826,14 @@ export default function PageBuilder() {
               ) : (
                 <Button variant="outline" size="sm" onClick={() => setOpenBulkImport(true)}>
                   <ClipboardPaste className="size-4" />
-                  Schnellerfassung
+                  <span className="hidden md:inline">Schnellerfassung</span>
                 </Button>
               )}
 
               {isPaidTier ? (
                 <Button variant="outline" size="sm" onClick={() => setOpenBulkPrice(true)}>
                   <Percent className="size-4" />
-                  Preise
+                  <span className="hidden md:inline">Preise</span>
                 </Button>
               ) : (
                 <Tooltip>
@@ -837,7 +841,7 @@ export default function PageBuilder() {
                     <span>
                       <Button variant="outline" size="sm" disabled>
                         <Percent className="size-4" />
-                        Preise
+                        <span className="hidden md:inline">Preise</span>
                       </Button>
                     </span>
                   </TooltipTrigger>
@@ -852,14 +856,16 @@ export default function PageBuilder() {
 
               {allowPremiumColor ? (
                 <Button variant="outline" size="sm" onClick={() => setOpenCalendarWin(true)}>
-                  Event-Kalender
+                  <CalendarDays className="size-4" />
+                  <span className="hidden md:inline">Event-Kalender</span>
                 </Button>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span>
                       <Button variant="outline" size="sm" disabled>
-                        Aktionen
+                        <CalendarDays className="size-4" />
+                        <span className="hidden md:inline">Aktionen</span>
                       </Button>
                     </span>
                   </TooltipTrigger>
@@ -1047,10 +1053,10 @@ export default function PageBuilder() {
 
       <div className={`flex-1 font-sans ${!bgColor ? "bg-amber-50" : ""} ${!fontColor ? "text-gray-900" : ""}`} style={{ ...(bgColor ? { backgroundColor: bgColor } : {}), ...(fontColor ? { color: fontColor } : {}) }}>
         <main className="w-full">
-          <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8 space-y-8 sm:space-y-12">
             {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
               serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
-                <div key={group.id} className={`${RADIUS_CLASS[groupBorderMap[group.id] ?? group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(groupColorMap[group.id] ?? group.color) || "bg-white"}`} style={bgColorStyle(groupColorMap[group.id] ?? group.color)}>
+                <div key={group.id} className={`${RADIUS_CLASS[groupBorderMap[group.id] ?? group.borderRadius] ?? "rounded-2xl"} shadow-sm p-3 sm:p-6 border border-amber-100 ${bgColorClass(groupColorMap[group.id] ?? group.color) || "bg-white"}`} style={bgColorStyle(groupColorMap[group.id] ?? group.color)}>
                   {/* Gleiche Anordnung wie in der Kategorie-Kopfzeile: gestalten, löschen */}
                   <div className="flex gap-2">
                     <Button onClick={() => renderCategoryGroupEdit(group.id)} size="icon" variant="outline" title="Gruppe gestalten">
@@ -1082,7 +1088,7 @@ export default function PageBuilder() {
                   {/* Zum Löschen vorgemerkte Gruppen bekommen bewusst keinen
                       Inline-Farbstil, damit rot/durchgestrichen sichtbar bleibt */}
                   <h2
-                    className={`text-2xl font-semibold mb-6 border-b pb-4 ${deleteCategoryGroups.includes(group.id) ? "text-red-600 line-through" : ""}`}
+                    className={`text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 border-b pb-3 sm:pb-4 break-words ${deleteCategoryGroups.includes(group.id) ? "text-red-600 line-through" : ""}`}
                     style={{
                       ...(!deleteCategoryGroups.includes(group.id) && (groupFontColorMap[group.id] ?? group.fontColor) ? { color: groupFontColorMap[group.id] ?? group.fontColor } : {}),
                       textAlign: groupAlignMap[group.id] ?? group.titleAlign ?? "left",
@@ -1179,8 +1185,8 @@ export default function PageBuilder() {
         <div className="fixed bottom-4 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
           <div className="pointer-events-auto flex flex-col items-center gap-1 bg-white border border-gray-200 shadow-lg rounded-2xl px-4 py-2">
             {draftRestored && <span className="text-xs text-amber-700">Entwurf von {formatDraftAge(draftRestored)} wiederhergestellt</span>}
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              <span className="text-sm text-gray-600 text-center">
                 Ungespeicherte Änderungen
                 {components.length > 0 && ` · ${components.length} neu`}
                 {deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length > 0 && ` · ${deletedDishes.length + deletedCategories.length + deleteCategoryGroups.length} gelöscht`}

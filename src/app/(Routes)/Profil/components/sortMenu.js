@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useRef, useEffect } from "react";
+import { ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 
 // Reihenfolge auf drei Ebenen: Gruppen, Kategorien innerhalb einer Gruppe und
@@ -128,9 +129,12 @@ function SortComponents({ componentList, onSave }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Sortieren</Button>
+        <Button variant="outline" size="sm">
+          <ArrowUpDown className="size-4" />
+          <span className="hidden md:inline">Sortieren</span>
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:w-full max-w-xl">
         <DialogHeader>
           <DialogTitle>Sortieren</DialogTitle>
           <DialogDescription>Gruppen, Kategorien und Gerichte per Drag &amp; Drop umsortieren. Verschoben wird jeweils innerhalb der eigenen Ebene.</DialogDescription>

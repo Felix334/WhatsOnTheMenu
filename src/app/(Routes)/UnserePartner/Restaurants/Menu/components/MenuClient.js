@@ -57,7 +57,7 @@ const HeroSection = ({ restaurantData, menuFont, color }) => {
   return (
     <div className={`w-full ${color?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[color] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center`} style={color?.startsWith("#") ? { background: color } : {}}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
-      <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow">
+      <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow break-words">
         {restaurantData?.name || "Restaurant"}
       </h1>
       {restaurantData?.description && (
@@ -106,14 +106,14 @@ const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
         <nav className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0">
           <button
             onClick={() => setActivePage("menu")}
-            className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
+            className={`px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200
               ${activePage === "menu" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
             Speisekarte
           </button>
           <button
             onClick={() => setActivePage("info")}
-            className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
+            className={`px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200
               ${activePage === "info" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
             Informationen
@@ -121,7 +121,7 @@ const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
 
           <button
             onClick={() => setActivePage("events")}
-            className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200
+            className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200
                 ${activePage === "events" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
           >
             Aktionen
@@ -466,9 +466,9 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
   };
 
   return (
-    <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} ${DENSITY_TEXT[density] ?? ""} w-full py-8 px-4 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
+    <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} ${DENSITY_TEXT[density] ?? ""} w-full py-6 sm:py-8 px-3 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
       <div className="mb-8 pb-6">
-        <h3 style={{ ...headingStyle, ...colorStyle, textAlign: titleAlign || "center" }} className={`text-3xl sm:text-3xl md:text-4xl font-semibold ${titleUppercase ? "uppercase tracking-widest" : "tracking-wide"}`}>
+        <h3 style={{ ...headingStyle, ...colorStyle, textAlign: titleAlign || "center" }} className={`text-2xl sm:text-3xl md:text-4xl font-semibold break-words ${titleUppercase ? "uppercase tracking-widest" : "tracking-wide"}`}>
           {title}
         </h3>
       </div>
@@ -625,14 +625,14 @@ const CategoryNav = ({ categories, activeId }) => {
           ))}
         </ul>
 
-        <div className="sm:hidden py-3" ref={dropdownRef}>
+        <div className="relative sm:hidden py-3" ref={dropdownRef}>
           <button onClick={() => setIsOpen((o) => !o)} className="w-full flex items-center justify-between px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700">
             <span>{categories.find((c) => c.id === activeId)?.name ?? "Kategorie wählen"}</span>
             <span className={`ml-2 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>▾</span>
           </button>
 
           {isOpen && (
-            <ul className="absolute left-4 right-4 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+            <ul className="absolute left-0 right-0 mt-1 max-h-72 overflow-y-auto bg-white border border-gray-200 rounded-xl shadow-lg z-50">
               {categories.map((cat) => (
                 <li key={cat.id}>
                   <button
@@ -658,7 +658,7 @@ const CartBar = ({ cart, onOrder }) => {
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   if (items.length === 0) return null;
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-xl px-4 py-3 flex items-center justify-between gap-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-xl px-3 sm:px-4 py-3 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
       <div className="text-sm text-gray-700">
         <span className="font-semibold">{items.reduce((s, i) => s + i.quantity, 0)} Artikel</span>
         <span className="mx-2 text-gray-300">|</span>
@@ -853,7 +853,7 @@ const MenuClient = ({ serverData }) => {
         <EventsPage entries={calendarEntries} />
       ) : (
         <>
-          <main className={`w-full max-w-7xl mx-auto px-4 py-8 ${orderMode ? "pb-28" : ""}`}>
+          <main className={`w-full max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8 ${orderMode ? "pb-28" : ""}`}>
             {orderMode && (
               <div className="mb-6 flex items-center gap-2 text-sm text-gray-500 bg-white border border-gray-200 rounded-xl px-4 py-2 w-fit shadow-sm">
                 <span>🪑</span>
@@ -864,10 +864,10 @@ const MenuClient = ({ serverData }) => {
             )}
             <AllergenFilterBar excluded={excludedAllergens} onToggle={toggleAllergen} onClear={() => setExcludedAllergens([])} />
             {categoryGroups.length > 0 ? (
-              <div className="space-y-12">
+              <div className="space-y-8 sm:space-y-12">
                 {categoryGroups.map((group) => (
-                  <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
-                    <h2 style={{ ...(headingFont || menuFont ? { fontFamily: headingFont || menuFont } : {}), ...(group.fontColor ? { color: group.fontColor } : {}), textAlign: group.titleAlign ?? "left" }} className="text-2xl font-semibold mb-6 pb-2">
+                  <div key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-3 sm:p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
+                    <h2 style={{ ...(headingFont || menuFont ? { fontFamily: headingFont || menuFont } : {}), ...(group.fontColor ? { color: group.fontColor } : {}), textAlign: group.titleAlign ?? "left" }} className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 pb-2 break-words">
                       {group.name}
                     </h2>
                     <div className="space-y-8">

@@ -1,10 +1,5 @@
 import { prisma } from "@/lib/prisma";
 
-// Einzige Stelle mit dem Prisma-Select für die öffentliche Speisekarte —
-// genutzt von route.js (GET-Handler) UND direkt (ohne HTTP-Umweg) von
-// Menu/[restaurantID]/page.js. Ausnahme von der "DB-Zugriffe immer über API"-
-// Regel: die Seite wird per generateStaticParams beim Build vorgerendert,
-// ein Selbst-Fetch auf die eigene API würde dabei fehlschlagen.
 export async function getRestaurantMenuData(restaurantID) {
   const restaurant = await prisma.restaurant.findUnique({
     where: { id: restaurantID },
@@ -31,8 +26,6 @@ export async function getRestaurantMenuData(restaurantID) {
           heroTextColor: true,
           createdAt: true,
           updatedAt: true,
-          // Reihenfolge kommt aus der DB (identisch zu api/user/profil/getData),
-          // damit die Gastansicht exakt die im Editor gesetzte Sortierung zeigt.
           categoryGroup: {
             orderBy: { position: "asc" },
             select: {
@@ -114,7 +107,6 @@ export async function getRestaurantMenuData(restaurantID) {
 
   if (!restaurant) return null;
 
-  // Sortierung erledigt jetzt die Query (orderBy oben) — kein Nachsortieren nötig.
   const menu = restaurant.menu ?? [];
 
   const response = {
@@ -132,7 +124,5 @@ export async function getRestaurantMenuData(restaurantID) {
     createdAt: restaurant.createdAt,
   };
 
-  // Dates/Decimals in JSON-kompatible Werte wandeln — sowohl Route-Handler
-  // (NextResponse.json) als auch Server-Component-Render brauchen reines JSON.
   return JSON.parse(JSON.stringify(response));
 }

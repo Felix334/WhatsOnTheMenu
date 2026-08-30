@@ -196,12 +196,14 @@ const MenuSection = ({
 
   return (
     <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-      <div className={`relative flex items-center justify-center py-6 px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-        <h3 className={`w-full text-2xl sm:text-3xl md:text-4xl font-semibold ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${isCategoryDeleted ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
+      {/* Mobil stehen die Knoepfe ueber dem Titel; ab sm liegen sie wie bisher
+          links darueber, damit der Titel mittig bleibt */}
+      <div className={`relative flex flex-col-reverse sm:flex-row sm:items-center sm:justify-center gap-3 py-4 sm:py-6 px-3 sm:px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
+        <h3 className={`w-full text-xl sm:text-3xl md:text-4xl font-semibold break-words ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${isCategoryDeleted ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
           {title}
         </h3>
 
-        <div className="absolute left-2 sm:left-4 flex gap-2">
+        <div className="flex gap-2 sm:absolute sm:left-4 sm:top-1/2 sm:-translate-y-1/2">
           <Button onClick={() => setOpenCategoryMenu((o) => !o)} size="icon" variant="outline" title="Kategorie gestalten">
             <FaPen />
           </Button>
@@ -221,10 +223,45 @@ const MenuSection = ({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Mobil: Karten statt Tabelle. Die Aktionsspalte allein ist breiter als
+          ein Telefon — als Tabelle bliebe nur seitliches Scrollen. Gleiches
+          Muster wie in der Gaesteansicht (MenuClient.js). */}
+      <div className="sm:hidden divide-y">
+        {displayItems.length === 0 ? (
+          <p className="text-center text-sm text-gray-400 py-6">Noch keine Gerichte in dieser Kategorie</p>
+        ) : (
+          displayItems.map((item, index) => {
+            const isDeleted = deletedDishes.includes(item.id);
+            return (
+              <div key={item.id ?? index} className={`px-3 py-3 ${isDeleted ? "bg-red-100" : ""}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`min-w-0 flex-1 ${isDeleted ? "text-red-600 line-through" : "text-gray-900"}`} style={isDeleted ? {} : fontStyle}>
+                    <p className={`font-serif break-words ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</p>
+                    {item.description && (
+                      <p className="text-sm text-gray-500 break-words" style={isDeleted ? {} : fontStyle}>
+                        {item.description}
+                      </p>
+                    )}
+                    {allowAvailability && stockMap[item.id] === "outOfStock" && <p className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</p>}
+                    <AllergenBadges allergens={item.allergens} />
+                  </div>
+                  <span className={`shrink-0 font-mono text-sm ${isDeleted ? "text-red-600 line-through" : "text-gray-800"}`} style={isDeleted ? {} : fontStyle}>
+                    {Number(item.price).toFixed(2)}€
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <DishActions item={item} />
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="hidden sm:block overflow-x-auto">
         <Table className="w-full table-fixed" style={{ fontFamily: font }}>
           <colgroup>
-            <col className="w-56" />
+            <col className="w-48 lg:w-56" />
             <col className="w-full" />
             <col className="w-24" />
           </colgroup>
