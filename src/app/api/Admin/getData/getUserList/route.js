@@ -42,6 +42,7 @@ async function handleUserRequest(role, searchData) {
           name: true,
           email: true,
           role: true,
+          subscriptionStatus: true
         },
       });
       devLog("User List:", userList);

@@ -17,7 +17,7 @@ import { Menu, Users, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, U
 export default function AdminConsole() {
   /* ---------------- State ---------------- */
 
-  const [search, setSearch ] = useState("");
+  const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [userList, setUserList] = useState([]);
   const [activePage, setActivePage] = useState("users");
@@ -65,7 +65,6 @@ export default function AdminConsole() {
         (json.data || []).forEach((u) => {
           map[u.id] = u.role;
         });
-
       } catch (err) {
         console.error(err);
       }
@@ -81,7 +80,6 @@ export default function AdminConsole() {
   /* ---------------- Helpers ---------------- */
 
   const filtered = userList.filter((u) => (filter === "all" || u.role === filter) && u.name?.toLowerCase().includes(search.toLowerCase()));
-
 
   /* ---------------- Render ---------------- */
 
@@ -214,7 +212,7 @@ export default function AdminConsole() {
                     <TableCell>{u.role}</TableCell>
                     <TableCell>{u.id}</TableCell>
                     <TableCell>
-                      <Badge variant={u.status === "active" ? "default" : u.status === "pending" ? "secondary" : "destructive"}>{u.status}</Badge>
+                      <Badge variant={u.subscriptionStatus === "active" ? "active" : "secondary"}></Badge>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -227,7 +225,7 @@ export default function AdminConsole() {
   }
 
   function renderAbboRequests() {
-    return <div>Abbo-Anfrage</div>
+    return <div>Abbo-Anfrage</div>;
   }
 
   function renderSettings() {
@@ -256,4 +254,3 @@ Telefonnummmer
 Öffnungszeiten
 Kategorie
 */
-
