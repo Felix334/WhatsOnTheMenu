@@ -84,25 +84,27 @@ model VerificationToken {
 }
 
 model Restaurant {
-  id            String            @id @default(cuid())
-  name          String
-  description   String?
-  parentCompany String
-  ownerId       String            @unique
-  ownerName     String
-  category      String            @default("NONE")
-  openingHours  Json?
-  socialLinks   Json?
-  contactEmail  String?
-  contactPhone  String?
-  website       String?
-  createdAt     DateTime          @default(now())
-  calendar      Calendar[]
-  locations     Location[]
-  menu          Menu[]
-  orders        Order[]
-  staff         RestaurantStaff[]
-  owner         User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  id             String            @id @default(cuid())
+  name           String
+  description    String?
+  parentCompany  String
+  ownerId        String            @unique
+  ownerName      String
+  category       String            @default("NONE")
+  openingHours   Json?
+  socialLinks    Json?
+  contactEmail   String?
+  contactPhone   String?
+  website        String?
+  createdAt      DateTime          @default(now())
+  calendar       Calendar[]
+  locations      Location[]
+  menu           Menu[]
+  orders         Order[]
+  staff          RestaurantStaff[]
+  owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  inventoryItems InventoryItem[]
+  suppliers      Supplier[]
 
   @@index([ownerId])
 }
@@ -129,6 +131,45 @@ enum CalendarEntryType {
   promotion
   event
   specialDish
+}
+
+model Supplier {
+  id           String          @id @default(cuid())
+  name         String
+  contactName  String?
+  phone        String?
+  email        String?
+  website      String?
+  street       String?
+  houseNumber  String?
+  postalCode   String?
+  city         String?
+  country      String?
+  monthlyCost  Decimal?        @db.Decimal(10, 2)
+  notes        String?
+  restaurantID String
+  restaurant   Restaurant      @relation(fields: [restaurantID], references: [id], onDelete: Cascade)
+  items        InventoryItem[]
+
+  @@index([restaurantID])
+}
+
+model InventoryItem {
+  id           String     @id @default(cuid())
+  name         String
+  unit         String
+  currentStock Decimal    @db.Decimal(10, 2)
+  minStock     Decimal    @db.Decimal(10, 2)
+  costPerUnit  Decimal    @db.Decimal(10, 2)
+  supplierId   String?
+  restaurantID String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantID], references: [id], onDelete: Cascade)
+  supplier     Supplier?  @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantID])
+  @@index([supplierId])
 }
 
 model Location {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation"; // Removed useSearchParams
+import { useRouter, usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { Menu, Users, UserPlus, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, User, Store, HandCoinsIcon } from "lucide-react";
+import { Menu, Users, Settings, Mail, Landmark, Plus, Calendar, Phone, MapPin, User, Store, HandCoinsIcon } from "lucide-react";
 
 export default function AdminConsole() {
   /* ---------------- State ---------------- */
@@ -20,8 +20,6 @@ export default function AdminConsole() {
   const [search, setSearch ] = useState("");
   const [filter, setFilter] = useState("all");
   const [userList, setUserList] = useState([]);
-
-  const [requestList, setRequestList] = useState([]);
   const [activePage, setActivePage] = useState("users");
 
   const { data: session, status } = useSession();
@@ -29,14 +27,10 @@ export default function AdminConsole() {
   const router = useRouter();
   const pathname = usePathname();
 
-  /* ---------------- Auth ---------------- */
-
   const userID = session?.user?.id || "";
   const role = session?.user?.role || "";
 
   const authorizedUser = userID && role === "Admin";
-
-  /* ---------------- URL Sync ---------------- */
 
   useEffect(() => {
     if (!userID) return;
@@ -48,8 +42,6 @@ export default function AdminConsole() {
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [userID, pathname, router]);
-
-  /* ---------------- Fetch Users ---------------- */
 
   useEffect(() => {
     if (status !== "authenticated" || !authorizedUser) return;
@@ -81,8 +73,6 @@ export default function AdminConsole() {
 
     fetchUsers();
   }, [status, search, authorizedUser]);
-
-  /* ---------------- Guards ---------------- */
 
   if (status === "loading") return <div>Lade...</div>;
   if (!session) return <div>Bitte anmelden</div>;
@@ -179,7 +169,6 @@ export default function AdminConsole() {
           ))}
         </div>
 
-        {/* Table */}
         <Card>
           <CardHeader className="flex flex-col md:flex-row gap-3">
             <CardTitle>Users</CardTitle>
@@ -233,93 +222,6 @@ export default function AdminConsole() {
             </Table>
           </CardContent>
         </Card>
-      </div>
-    );
-  }
-
-  function renderRequests(requests) {
-    const confirmRequest = async () => {
-      if (process.env.NODE_ENV === "development") console.log("Sende:", requests);
-      const resp = await fetch("/api/restaurant/Admin/postRequests", {
-        method: "POST",
-        body: JSON.stringify({ requests }),
-      });
-      if (!resp.ok) {
-        window.alert("Ein Fehler ist aufgetreten:", resp);
-      }
-    };
-
-    if (process.env.NODE_ENV === "development") console.log("Render Reuests", requests);
-    const requestArray = Array.isArray(requests) ? requests : [];
-
-    return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <h1 className="text-3xl font-bold mb-6">Restaurant Anfragen</h1>
-
-        {requestArray.length === 0 && <p className="text-gray-500">Keine Anfragen vorhanden</p>}
-
-        <ScrollArea className="h-[85vh] pr-4">
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {requestArray.map((req) => (
-              <Card key={req.id} className="rounded-2xl shadow-sm hover:shadow-md transition">
-                <CardHeader className="flex flex-row justify-between items-center">
-                  <h2 className="text-xl font-semibold truncate">{req.restaurantName}</h2>
-
-                  <Badge variant={req.status === "pending" ? "secondary" : req.status === "approved" ? "default" : "destructive"}>{req.status || "unknown"}</Badge>
-                </CardHeader>
-
-                <CardContent className="space-y-3 text-sm text-gray-700">
-                  <p className="text-gray-600 line-clamp-2">{req.description || "Keine Beschreibung"}</p>
-
-                  <div className="flex items-center gap-2">
-                    <User size={16} />
-                    {req.owner?.name || req.name || "Unbekannt"}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Mail size={16} />
-                    {req.email}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Phone size={16} />
-                    {req.phoneNumber}
-                  </div>
-
-                  <div className="flex items-start gap-2">
-                    <MapPin size={16} className="mt-1" />
-
-                    <div>
-                      {req.street} {req.houseNumber}
-                      <br />
-                      {req.postalCode} {req.city}
-                      <br />
-                      {req.country}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Store size={16} />
-                    Kategorie: {req.category}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Store size={16} />
-                    Subscription: {req.subscription}
-                  </div>
-
-                  <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t">
-                    <Calendar size={14} />
-                    {req.createdAt && new Date(req.createdAt).toLocaleDateString("de-DE")}
-                  </div>
-                  <div className="grid gap-1">
-                    <Button onClick={() => confirmRequest(req)}>Bestätigen</Button>
-                    <Button variant="destructive">Löschen</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </ScrollArea>
       </div>
     );
   }

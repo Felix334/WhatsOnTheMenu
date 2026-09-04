@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
-import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Percent, Plus, Printer, Save } from "lucide-react";
+import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Package, Percent, Plus, Printer, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -30,6 +30,7 @@ import { EdditCategoryGroup } from "./components/edditCategoryGroup";
 import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 import { CalendarWin } from "./components/calendarWin";
+import { InventoryWin } from "./components/inventoryWin";
 import { MenuSection } from "./components/menuSection";
 import { BulkImport } from "./components/bulkImport";
 import { BulkPriceDialog } from "./components/bulkPrice";
@@ -73,6 +74,7 @@ export default function PageBuilder() {
   const [openEditor, setOpenEditor] = useState(false);
   const [openOptions, setOpenOptions] = useState(false);
   const [openCalendarWin, setOpenCalendarWin] = useState(false);
+  const [openInventoryWin, setOpenInventoryWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
 
   // Hero editing
@@ -877,6 +879,30 @@ export default function PageBuilder() {
                   </TooltipContent>
                 </Tooltip>
               )}
+
+              {session?.user?.subscription === "Professional" ? (
+                <Button variant="outline" size="sm" onClick={() => setOpenInventoryWin(true)}>
+                  <Package className="size-4" />
+                  <span className="hidden md:inline">Inventar</span>
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" size="sm" disabled>
+                        <Package className="size-4" />
+                        <span className="hidden md:inline">Inventar</span>
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Inventar &amp; Lieferanten sind ein Professional-Feature —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <SortComponents
                 componentList={categoryGroups}
                 onSave={(newGroups) =>
@@ -924,6 +950,8 @@ export default function PageBuilder() {
       ) : (
         <div className="line-through">Event-Kalender</div>
       )}
+
+      {session?.user?.subscription === "Professional" && <InventoryWin open={openInventoryWin} onOpenChange={setOpenInventoryWin} restaurantId={restaurantID} />}
 
       <div className={`w-full ${heroColor?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center relative`} style={heroColor?.startsWith("#") ? { background: heroColor } : {}}>
         {isEditingHero ? (

@@ -30,7 +30,7 @@ const TIERS = [
     price: "",
     period: "/Monat",
     description: "Unbegrenzte Möglichkeiten",
-    features: ["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "QR-Code", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige, Event-Kalender"],
+    features: ["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "QR-Code", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht"],
     href: "/ErstelleRestaurantAccount/Professional",
     cta: "Pro abonnieren",
     featured: true,

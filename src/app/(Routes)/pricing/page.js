@@ -192,7 +192,7 @@ export default function PricingPage() {
                 )}
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige"].map((f) => (
+                {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Inventar & Lieferanten"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
