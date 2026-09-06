@@ -1,6 +1,4 @@
-// Kategorie-/Gerichte-Limits pro Abo-Tarif. Client-sicheres Modul ohne
-// Server-Imports (getToken/prisma) — von TierLimits.js (UI-Anzeige) und
-// setData/edditData (route.ts, serverseitige Durchsetzung) gemeinsam genutzt.
+
 export const MENU_ENTRY_LIMITS = {
   FreeTier: { CategoryLimit: 10, DishLimit: 80 },
   Business: { CategoryLimit: 25, DishLimit: 150 },

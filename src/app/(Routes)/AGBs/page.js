@@ -167,10 +167,10 @@ export default function AGBsPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="w-full bg-linear-to-br from-red-900 to-gray-950 text-white py-12 px-4 text-center">
-        <p className="text-white/60 uppercase tracking-widest text-xs font-semibold mb-2">
+        <p className="text-white/60 uppercase tracking-widest text-[0.7rem] sm:text-xs font-semibold mb-2 wrap-anywhere">
           WhatIsOnMyMenu.com
         </p>
-        <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-wide drop-shadow">
+        <h1 className="mx-auto max-w-full text-[clamp(1.5rem,6.5vw,3rem)] leading-tight font-serif font-bold tracking-tight sm:tracking-wide drop-shadow wrap-anywhere hyphens-auto">
           Allgemeine Geschäftsbedingungen
         </h1>
         <p className="mt-3 text-white/60 text-sm">Stand: {LAST_UPDATED}</p>
@@ -180,12 +180,12 @@ export default function AGBsPage() {
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6 pb-16">
         {sections.map((section) => (
           <div key={section.title} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 wrap-anywhere hyphens-auto">
               {section.title}
             </h2>
             <div className="space-y-3">
               {section.content.map((paragraph, i) => (
-                <p key={i} className="text-gray-600 text-sm leading-relaxed">
+                <p key={i} className="text-gray-600 text-sm leading-relaxed wrap-anywhere hyphens-auto">
                   {paragraph}
                 </p>
               ))}
@@ -194,7 +194,7 @@ export default function AGBsPage() {
         ))}
 
         {/* Footer-Info */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 text-sm text-gray-500 space-y-1">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 text-sm text-gray-500 space-y-1 wrap-anywhere">
           <p className="font-semibold text-gray-700">Anbieter</p>
           <p>WhatIsOnMyMenu.com</p>
           <p>E-Mail: <a href="mailto:support@whatisonmymenu.com" className="text-red-700 hover:underline">support@whatisonmymenu.com</a></p>
