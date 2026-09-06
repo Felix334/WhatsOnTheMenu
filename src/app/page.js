@@ -295,10 +295,10 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 7 Kategorien
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 10 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 30 Gerichte
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 80 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
@@ -327,10 +327,10 @@ function HomeContent() {
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 15 Kategorien
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 25 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-500 mr-2">✓</span>Bis zu 100 Gerichte
+                        <span className="text-green-500 mr-2">✓</span>Bis zu 150 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-500 mr-2">✓</span>
@@ -365,10 +365,10 @@ function HomeContent() {
                     <ul className="space-y-3 mb-8">
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>
-                        Bis zu 25 Kategorien
+                        Bis zu 50 Kategorien
                       </li>
                       <li className="flex items-center">
-                        <span className="text-green-400 mr-2">✓</span>Bis zu 200 Gerichte
+                        <span className="text-green-400 mr-2">✓</span>Bis zu 300 Gerichte
                       </li>
                       <li className="flex items-center">
                         <span className="text-green-400 mr-2">✓</span>Premium Templates
