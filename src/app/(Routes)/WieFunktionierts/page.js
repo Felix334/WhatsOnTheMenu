@@ -5,6 +5,7 @@ import { DynamicLinkButton } from "@/app/components/DynamicLink";
 export const dynamic = "force-static";
 
 export const metadata = {
+  alternates: { canonical: "/WieFunktionierts" },
   title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code | WhatIsOnMyMenu",
   description:
     "In wenigen Minuten zur digitalen Speisekarte: Restaurant anlegen, Menü gestalten, QR-Code drucken. Ihre Gäste scannen und sehen Gerichte, Preise, Allergene und Verfügbarkeit – ganz ohne App.",

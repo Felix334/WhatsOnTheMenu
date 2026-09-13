@@ -21,6 +21,12 @@ export const metadata = {
 
   metadataBase: new URL("https://www.whatisonmymenu.com/"),
 
+  // Canonical verhindert, dass Google www-/non-www-Varianten als eigene
+  // Seiten behandelt und die Weiterleitung dauerhaft im Bericht meldet.
+  alternates: {
+    canonical: "/",
+  },
+
   openGraph: {
     title: "Online Speisekarte erstellen",
     description: "Erstelle digitale und Speisekarten für dein Restaurant.",

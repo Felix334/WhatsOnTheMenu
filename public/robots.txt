@@ -11,5 +11,17 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /protecting/
 Disallow: /Admin/
+Disallow: /Profil/
+Disallow: /staff/
+Disallow: /settings/
+Disallow: /Konto/
+Disallow: /orders/
+Disallow: /ErstelleRestaurantAccount/
+Disallow: /pricing/success
+Disallow: /pricing/cancel
+
+# Die Alt-URL /UnserePartner/Restaurants/Menu?restaurantID=... ist absichtlich
+# NICHT gesperrt: Google muss den 308 sehen, um die Alt-URL aus dem Index zu
+# nehmen. Ein Disallow wuerde sie dort auf Dauer festhalten.
 
 Sitemap: https://www.whatisonmymenu.com/sitemap.xml

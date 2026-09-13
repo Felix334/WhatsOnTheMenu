@@ -1,6 +1,7 @@
 const LAST_UPDATED = "05. Juli 2026";
 
 export const metadata = {
+  alternates: { canonical: "/Widerruf" },
   title: "Widerrufsrecht | WhatIsOnMyMenu.com",
   description:
     "Informationen zum gesetzlichen Widerrufsrecht bei Verträgen mit WhatIsOnMyMenu.com sowie Muster-Widerrufsformular für Verbraucher.",

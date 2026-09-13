@@ -37,10 +37,14 @@ const getRestaurantData = cache(getRestaurantMenuData);
 export async function generateMetadata({ params }) {
   const { restaurantID } = await params;
   const data = await getRestaurantData(restaurantID);
-  if (!data) return { title: "Speisekarte" };
+  const canonical = `/UnserePartner/Restaurants/Menu/${encodeURIComponent(restaurantID)}`;
+  // Eigenes canonical ist Pflicht: ohne würde die Seite das "/" aus dem
+  // Root-Layout erben und Google die Speisekarte nicht indexieren.
+  if (!data) return { title: "Speisekarte", robots: { index: false, follow: false } };
   return {
     title: `${data.name} – Speisekarte`,
     description: data.description || `Digitale Speisekarte von ${data.name} — jetzt ansehen und bestellen.`,
+    alternates: { canonical },
   };
 }
 

@@ -1,6 +1,9 @@
 import { MetadataRoute } from "next";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu.com";
+// Trailing Slash abschneiden: sonst entstehen URLs wie ".../<double-slash>pricing",
+// die weiterleiten — und genau solche Sitemap-Eintraege meldet die Search
+// Console als "Seite mit Weiterleitung".
+const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu.com").replace(/\/+$/, "");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
