@@ -20,6 +20,12 @@ if (!webhookSecret) {
   throw new Error("Missing Stripe webhook secret");
 }
 
+// Stripe Tax berechnet USt und Reverse-Charge automatisch, setzt aber einen im
+// Dashboard aktivierten Stripe-Tax-Account voraus. Ist er das nicht, schlägt
+// JEDE Checkout-Erstellung mit automatic_tax fehl. Deshalb per Env-Flag
+// zuschaltbar (STRIPE_AUTOMATIC_TAX="true"), statt hart aktiviert.
+export const AUTOMATIC_TAX_ENABLED = process.env.STRIPE_AUTOMATIC_TAX === "true";
+
 export const PRICE_IDS = {
   Professional: process.env.STRIPE_PROFESSIONAL_PRICE_ID,
   Business: process.env.STRIPE_BUSINESS_PRICE_ID,
@@ -35,7 +41,7 @@ const TIER_ALIAS: Record<string, Tier> = {
 
 // Aktuell buchbare Abo-Stufen — Professional ist noch "Coming Soon".
 // Zum Freischalten das Tier hier eintragen (z. B. ["Business"]); das UI-Pendant
-// ist TIER_AVAILABLE_UI in src/app/(Routes)/pricing/page.js. Professional bleibt
+// ist UI_AVAILABLE_TIERS in src/lib/tierAvailability.js. Professional bleibt
 // bewusst auch nach dem Business-Launch vorerst gesperrt.
 export const AVAILABLE_TIERS: readonly Tier[] = ["Business"];
 

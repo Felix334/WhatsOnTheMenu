@@ -64,7 +64,11 @@ export async function POST(req) {
               houseNumber: data.houseNumber,
               city: data.city,
               postalCode: data.postalCode,
-              country: "DE",
+              // War fest auf "DE" verdrahtet — damit lag jedes ausländische
+              // Restaurant in der Datenbank in Deutschland. Der Wert kommt jetzt
+              // aus dem Formular und ist über countrySchema (Whitelist) geprüft;
+              // "DE" bleibt nur der Rückfall für Altaufrufe ohne Feld.
+              country: data.country || "DE",
             },
           },
         },

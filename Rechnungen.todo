@@ -1,0 +1,13 @@
+1. Stripe Profil Updaten => In "Unternehmensdaten" muss eine "Umsatzsteuer-Identifikationsnummer (USt-IdNr.)" ausgefüllt
+sein Antowort KI => "Vorsicht — hier lauert ein Missverständnis. Die USt-IdNr. musst du nicht angeben, aber das 
+Feld darf nicht leer bleiben.
+§ 14 Abs. 4 Nr. 2 UStG verlangt auf jeder Rechnung:
+die dem leistenden Unternehmer vom Finanzamt erteilte Steuernummer oder die ihm vom Bundeszentralamt für Steuern 
+erteilte Umsatzsteuer-Identifikationsnummer
+Das ist ein Entweder-oder, aber eines von beiden ist Pflicht. Meine vorige Antwort bezog sich darauf, dass du dir 
+keine USt-IdNr. beantragen musst — nicht darauf, dass die Rechnung ganz ohne Steuer-ID auskommt."
+
+
+=> Dann auch in Impressum angeben => Ist Pflicht
+
+=> Dann die Rechnung Richtig bauen und checken ob sie dann auch versendet wird (Im Sandbox-Modus)

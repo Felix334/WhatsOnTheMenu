@@ -10,6 +10,7 @@ WhatsOnTheMenu — SaaS-Plattform für Restaurants: digitale Speisekarten per QR
 
 ```bash
 npm run dev          # Dev-Server (next dev)
+NEXT_DIST_DIR=.next-verify npx next build   # Build, waehrend dev laeuft (sonst zerschiessen sich beide .next)
 npm run build        # prisma generate && next build
 npm run lint         # next lint
 npm run prismaseed   # DB seeden (node prisma/seedPrisma)
@@ -24,11 +25,23 @@ Next.js 15 App Router (React 19), überwiegend JavaScript mit einzelnen TS-Datei
 
 ### Schichten
 
-- `src/app/(Routes)/` — Seiten. Owner-Bereich unter `Profil/` (inkl. `QRBuilder`, `Bestellungen`), Personal unter `staff/`, Kunden-Bestellstatus unter `orders/[orderID]`, außerdem `Admin`, `Konto`, `Reservierung`, `pricing`, `settings` und statische Rechtsseiten.
+- `src/app/(de)/(Routes)/` — deutsche Seiten. Owner-Bereich unter `Profil/` (inkl. `QRBuilder`, `Bestellungen`), Personal unter `staff/`, Kunden-Bestellstatus unter `orders/[orderID]`, außerdem `Admin`, `Konto`, `Reservierung`, `pricing`, `settings` und statische Rechtsseiten.
+- `src/app/(intl)/[locale]/` — übersetzte öffentliche Seiten (`/en/...`). Ein geteilter Seitenbaum für **alle** Fremdsprachen.
 - `src/app/api/` — Route-Handler. Gliederung: `auth/[...nextauth]`, `restaurant/` (Menü lesen, Registrierung, Staff-Einladungen), `orders/` (create, status, Liste je Restaurant), `payment/` (checkout, webhook, portal, cancel, reactivate, subscription), `user/profil/` (viele kleine Endpoints zum Bearbeiten von Menü/Design/Allergenen/Verfügbarkeit), `Admin/`, `deleteAccount/[id]`.
 - `src/app/components/` — geteilte Client-Komponenten (Anmelden, Registrieren, QR-Scanner, Nav …); `src/components/ui/` — shadcn-Komponenten.
 - `src/lib/` — Kernlogik: `auth.ts` (NextAuth-Optionen), `staffAuth.js`, `prisma.ts`, `stripe.ts`, `supabase.js` (Storage), `nodemailer.ts`, `schemas/` (Zod), `allergens.js`.
 - `prisma/schema.prisma` — ~23 Modelle. Kernkette: User → Restaurant → Menu → CategoryGroup/Category → Dish; Allergene liegen als `Allergen[]`-Enum-Array direkt auf Dish (kein eigenes Model); daneben Order, Reservation, RestaurantStaff, Payment, StripeEvent.
+
+### Mehrsprachigkeit & SEO
+
+- Deutsch läuft **ohne** Präfix auf den indexierten URLs (`/pricing`); jede weitere Sprache bekommt ein Präfix (`/en/pricing`). `(de)` und `(intl)` sind Route-Gruppen — sie erzeugen kein URL-Segment, existieren nur, damit beide ein eigenes Root-Layout mit korrektem `<html lang>` haben. Deshalb gibt es **kein** `src/app/layout.js`.
+- Neue Sprache: Eintrag in `src/i18n/config.js` (`locales`) + `src/i18n/<code>.js`. Keine Seite duplizieren — der Baum unter `(intl)/[locale]/` wird geteilt.
+- Jede öffentliche Seite braucht `alternates: buildAlternates("<pfad>", locale)` aus `src/i18n` — ohne hreflang konkurrieren die Sprachfassungen gegeneinander. Neue übersetzte Seiten zusätzlich in `TRANSLATED_PAGES` in `src/app/sitemap.js` eintragen.
+- **Falle:** `useSearchParams()` in einer Client-Komponente lässt die umschließende Suspense-Grenze beim Prerendering auf den Fallback zurückfallen. Umschließt diese Grenze die ganze Seite, liefert Next nur eine leere Hülle aus und Google sieht keinen Text. Solche Hooks gehören in eine eigene, kleine Suspense-Grenze (siehe `AuthErrorToast` in `src/app/components/HomePage.js`). Nach Änderungen an öffentlichen Seiten mit `grep -c "<h1" .next/server/app/<seite>.html` gegenprüfen.
+- Übersetzt: Startseite, `/pricing`, `/WieFunktionierts`, `/UnserTeam`, Tarif-Auswahl und die Registrierungsformulare FreeTier + Business (letztere `noindex`, aber von den englischen CTAs erreichbar).
+- Nicht übersetzt (bewusst): Rechtsseiten (deutsches Recht), Dashboards (in robots.txt gesperrt), Gerichtnamen in den Speisekarten (Restaurant-Daten aus der DB), sowie `ErstelleRestaurantAccount/Professional` (in Produktion per Middleware gesperrt) und `.../Individuell` (verwaist, nichts verlinkt darauf).
+- **Anbieterkennzeichnung steht ausschließlich in `/Impressum`.** `/UnserTeam` ist eine reine Über-uns-Seite und verlinkt nur dorthin — sie hatte früher eine zweite, widersprüchliche Fassung mit erfundener Rechtsform und Handelsregisternummer. Pflichtangaben nie an zwei Stellen pflegen.
+- Formular-Bausteine: `RestaurantSignupForm` (FreeTier, legt Konto an) und `RestaurantCheckoutForm` (Business, geht in den Stripe-Checkout) sind absichtlich getrennt, obwohl die Felder gleich sind — am Bezahlpfad soll keine Änderung am kostenlosen Pfad mitwirken. Kategorien liegen als Wert-plus-Label-Paare in `src/i18n/categories.js`, Länder als Whitelist (`SUPPORTED_COUNTRIES`) in `src/lib/schemas/restaurant.js`.
 
 ### Auth & Rollen (sicherheitskritisch)
 

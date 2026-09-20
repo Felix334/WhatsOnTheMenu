@@ -15,6 +15,11 @@ model User {
   password             String?
   role                 Role              @default(User)
   subscription         Subscription      @default(NoSubscription)
+  // Oberflaechensprache dieses Nutzers (ISO 639-1, siehe src/i18n/config.js).
+  // Bewusst String statt Enum: eine neue Sprache soll keine Migration kosten.
+  // Gilt nur fuer eingeloggte Bereiche (Profil, staff) — die oeffentlichen
+  // Seiten steuern die Sprache ueber die URL, weil Google die braucht.
+  language             String            @default("de")
   companyId            String?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt

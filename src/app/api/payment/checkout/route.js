@@ -1,6 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { prisma } from "@/lib/prisma";
-import { stripe, getPriceId, isTierAvailable, getSubscriptionTier } from "@/lib/stripe";
+import { stripe, getPriceId, isTierAvailable, getSubscriptionTier, AUTOMATIC_TAX_ENABLED } from "@/lib/stripe";
 import { restaurantCheckoutSchema } from "@/lib/schemas/restaurant";
 import { devLog, devWarn } from "@/lib/logger";
 import { hasEqualOrHigherTier } from "@/lib/tierRank";
@@ -85,6 +85,9 @@ export async function POST(request) {
     try {
       const customer = await stripe.customers.create({
         email: token.email,
+        // Name des Leistungsempfängers ist Rechnungs-Pflichtangabe (§ 14 Abs. 4 Nr. 1
+        // UStG). Im Checkout kann er noch korrigiert werden (customer_update.name).
+        name: token.name || undefined,
         metadata: { userId: token.id },
       });
 
@@ -113,6 +116,25 @@ export async function POST(request) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
+
+      // Rechnungs-Pflichtangaben (§ 14 Abs. 4 UStG): Stripe erzeugt für jedes Abo
+      // automatisch eine Rechnung — ohne Anschrift des Leistungsempfängers wäre
+      // sie unvollständig.
+      billing_address_collection: "required",
+      // USt-IdNr. des Kunden — Grundlage für Reverse Charge bei EU-Firmenkunden.
+      tax_id_collection: { enabled: true },
+      // Im Checkout eingegebene Adresse/Name auf den Customer zurückschreiben,
+      // damit sie auch auf allen Folgerechnungen des Abos steht.
+      customer_update: { address: "auto", name: "auto" },
+      // Nur zuschalten, wenn Stripe Tax im Dashboard aktiv ist — sonst schlägt
+      // die Session-Erstellung fehl. Siehe AUTOMATIC_TAX_ENABLED in src/lib/stripe.ts.
+      ...(AUTOMATIC_TAX_ENABLED ? { automatic_tax: { enabled: true } } : {}),
+
+      subscription_data: {
+        // Erscheint als Positionsbeschreibung auf der Rechnung.
+        description: `WhatIsOnMyMenu.com – Abo ${getSubscriptionTier(tier)}`,
+      },
+
       metadata: {
         userId: token.id,
         tier,

@@ -18,10 +18,6 @@ function DynamicButton({ href, children, className, variant, size }) {
   );
 }
 
-// Button-Link, der den Query-String beibehält. In Suspense gewickelt, damit
-// er auch in Server-Komponenten (z. B. Seiten mit metadata-Export) nutzbar ist,
-// ohne die ganze Seite ins Client-Rendering zu zwingen. Der Fallback rendert
-// denselben Link ohne Query-String (greift nur ganz kurz vor der Hydration).
 export function DynamicLinkButton({ href, children, className, variant, size }) {
   return (
     <Suspense

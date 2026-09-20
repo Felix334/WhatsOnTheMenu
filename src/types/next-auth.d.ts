@@ -9,6 +9,8 @@ declare module "next-auth" {
       subscriptionStatus?: string;
       staffMemberships: { restaurantId: string; role: string }[];
       restaurantId?: string;
+      /** Oberflaechensprache der eingeloggten Bereiche (ISO 639-1), Default "de". */
+      language: string;
     } & DefaultSession["user"];
   }
 
@@ -24,5 +26,6 @@ declare module "next-auth/jwt" {
     staffMemberships?: { restaurantId: string; role: string }[];
     restaurantId?: string;
     subscriptionStatus?: string;
+    language?: string;
   }
 }

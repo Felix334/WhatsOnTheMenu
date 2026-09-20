@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
         const [freshUser, memberships] = await Promise.all([
           prisma.user.findUnique({
             where: { id: userId },
-            select: { role: true, subscription: true, subscriptionStatus: true, stripeSubscriptionId: true },
+            select: { role: true, subscription: true, subscriptionStatus: true, stripeSubscriptionId: true, language: true },
           }),
           prisma.restaurantStaff.findMany({
             where: { userId, approved: true },
@@ -79,6 +79,9 @@ export const authOptions: NextAuthOptions = {
           token.role = freshUser.role;
           token.subscription = freshUser.subscription;
           token.subscriptionStatus = freshUser.subscriptionStatus ?? undefined;
+          // Oberflaechensprache der eingeloggten Bereiche. Rein kosmetisch —
+          // eine manipulierte Sprache aendert keine Berechtigung.
+          token.language = freshUser.language ?? 'de';
 
           // Sicherheitscheck: Owner mit bezahltem Plan → Stripe-Abo verifizieren (nur in Prod)
           if (process.env.NODE_ENV !== 'development' && freshUser.role === 'Owner' && freshUser.subscription !== 'FreeTier') {
@@ -146,6 +149,7 @@ export const authOptions: NextAuthOptions = {
         session.user.subscriptionStatus = token.subscriptionStatus as string | undefined;
         session.user.staffMemberships = (token.staffMemberships ?? []) as any;
         session.user.restaurantId = token.restaurantId;
+        session.user.language = (token.language as string) ?? 'de';
       }
       return session;
     },

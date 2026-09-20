@@ -30,6 +30,11 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  // Erlaubt einen Produktions-Build, waehrend `next dev` laeuft: beide
+  // schreiben sonst in .next und zerschiessen sich gegenseitig die
+  // Ausgabe ("Cannot find module for page: ..." bei wechselnden Seiten).
+  // Ohne die Variable bleibt es beim Standard .next — Vercel ist nicht betroffen.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   eslint: {
     ignoreDuringBuilds: true,
   },
