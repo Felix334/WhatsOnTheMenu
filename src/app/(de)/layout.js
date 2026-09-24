@@ -28,9 +28,11 @@ const geistMono = Geist_Mono({
 // nur, was fuer alle gilt.
 export const metadata = {
   metadataBase: new URL("https://www.whatisonmymenu.com"),
-  icons: {
-    icon: "/icon.svg",
-  },
+  // Favicon, Apple-Icon und SVG-Icon kommen aus den Dateien in src/app/
+  // (favicon.ico, icon.svg, apple-icon.png). Hier bewusst kein icons-Feld:
+  // ein explizites icons-Objekt ueberschreibt die Datei-Konvention und
+  // erzeugt nur einen einzigen <link> ohne type und sizes.
+  manifest: "/manifest.json",
   robots: {
     index: true,
     follow: true,
