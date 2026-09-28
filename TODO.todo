@@ -65,9 +65,6 @@ PROXMOX => als alternative zu Docker
 => Schutz gegen erneute Datenkorruption => Anmeldung mit HauptGmail nicht möglich => Wenn login bei felixmayer02@gmail.com probieren wurde ich statdessen bei fm.trashmail@gmail.com angemeldet
 
 
-=> Wenn der Kunde bereits ein höheres(oder gleichwertiges Abbo hat) wird dieses Abbo als entweder "In Nutzung" oder
-als "Ein höheres Abbo wird bereits genutzt" angezeigt
-
 => Packetupgrades einfügen
 
 => Im "Professional"-Abo: Möglichkeit anbieten, eigene Subdomains zu erstellen (z.B. restaurantname.whatisonmymenu.com)
@@ -91,3 +88,7 @@ One prerequisite for the portal button to work: you need to enable the Stripe Cu
 => Auf Product Hunt eintragen (Draft ist vorbereitet: Tagline/Description/First-Comment) => noch Screenshots ziehen (Karte am Handy, Editor, QR-Builder, Allergen-Filter, 1270x760) und Launch-Tag Di-Do wählen
 
 => Inventar-Funktion für Restaurants: Bestand führen (was vorhanden ist), Einkaufsliste (was nachbestellt werden muss + Kosten), Lieferanten-Liste mit Kontakt/Infos => Als "Professional"-Feature (höchster Tarif, tierRank.js) einordnen, nicht Business
+
+=> Regelmäßig kontrollieren, ob das Favicon in der Google-Suche erscheint => Prüfen: https://www.whatisonmymenu.com/favicon.ico muss eine echte ICO-Datei laden (kein SVG-Text!), und im <head> der Startseite müssen die 4 Links stehen (manifest, favicon.ico, icon.svg, apple-icon.png). Google liest nur das Favicon der STARTSEITE und aktualisiert es sehr träge (Tage bis Wochen). Achtung: /favicon.ico hat kein Cache-Busting, Änderungen schlagen dort verzögert durch. (Gefixt am 24.09.2026, Commit 8d8c171)
+
+=> Domain umstellen

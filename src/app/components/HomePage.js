@@ -259,7 +259,7 @@ function HomeContent({ t, locale }) {
                       </Button>
                     )}
                     {!userID && (
-                      <Button variant="outline" className="border-white/50 text-white hover:bg-white/10 font-medium text-base px-8 py-3 h-auto" onClick={renderLoginW}>
+                      <Button variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-8 py-3 h-auto" onClick={renderLoginW}>
                         {t.home.hero.ctaSecondary}
                       </Button>
                     )}
