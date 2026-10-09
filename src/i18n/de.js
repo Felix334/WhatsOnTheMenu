@@ -25,9 +25,6 @@ const de = {
     },
   },
 
-  // Sprachhinweis-Banner. Diese Texte werden in der ZIELsprache angezeigt —
-  // ein Besucher, der die aktuelle Sprache nicht liest, soll den Hinweis
-  // verstehen. "banner" aus de.js erscheint also auf der englischen Seite.
   banner: {
     message: "Diese Seite gibt es auch auf Deutsch.",
     action: "Auf Deutsch ansehen",
@@ -145,9 +142,6 @@ const de = {
     },
   },
 
-  // Wird auf den deutschen Seiten nicht verwendet — /pricing hat dort die
-  // vollstaendige Checkout-Strecke. Steht hier nur, damit beide Woerterbuecher
-  // dieselbe Form haben.
   pricingOverview: {
     title: "Preise",
     subtitle: "Kostenlos starten und upgraden, wenn die Karte wächst. Monatlich kündbar.",
@@ -232,7 +226,7 @@ const de = {
         label: "Kostenlos",
         price: "€0",
         description: "Perfekt zum Ausprobieren",
-        features: ["Bis zu 7 Kategorien", "Digitale Speisekarte", "30 Gerichte Limit", "QR-Code Generator"],
+        features: ["Bis zu 7 Kategorien", "Digitale Speisekarte", "30 Gerichte Limit", "QR-Code Generator, Werbefrei"],
         cta: "Kostenlos starten",
       },
       professional: {
@@ -240,7 +234,7 @@ const de = {
         label: "Beliebteste Wahl",
         price: "",
         description: "Unbegrenzte Möglichkeiten",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht"],
+        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht, Werbefrei"],
         cta: "Pro abonnieren",
       },
       business: {

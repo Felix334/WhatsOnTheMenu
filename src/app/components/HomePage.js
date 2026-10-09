@@ -27,16 +27,6 @@ import { AdminLink, FreeTierLink, BusinessTierLink, WieFunktionierts } from "./r
 import WebsiteIcon from "../icon.svg";
 import { localizedPath } from "@/i18n/config";
 
-/**
- * Liest den ?error=-Parameter aus der URL und zeigt die passende Meldung.
- *
- * Bewusst als eigene, winzige Komponente: useSearchParams() zwingt die
- * umschliessende Suspense-Grenze beim statischen Prerendering auf den Fallback
- * zurueck. Solange dieser Hook in der grossen Seitenkomponente sass, bestand
- * das ausgelieferte HTML der Startseite nur aus dem Lade-Platzhalter — Google
- * bekam eine leere Huelle ohne <h1>, ohne Fliesstext. Isoliert betrifft das
- * jetzt nur noch diesen einen Knoten, der ohnehin nichts rendert.
- */
 function AuthErrorToast({ t, locale, onAuthError }) {
   const router = useRouter();
   const searchParams = useSearchParams();
