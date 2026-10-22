@@ -7,9 +7,9 @@ const de = {
   meta: {
     home: {
       title: "Online Speisekarte erstellen | QR Menü Generator",
-      description: "Erstelle digitale und kostenlose Speisekarten für dein Restaurant. Einfach, schnell und mobil per QR-Code nutzbar. Direkt im Browser ohne Extra Software",
+      description: "Erstelle digitale und kostenlose Speisekarten für dein Restaurant. Zeige deinen Kunden mit dem Event-Kalender was ansteht. Einfach, schnell und mobil per QR-Code nutzbar. Direkt im Browser ohne Extra Software",
       ogTitle: "Online Speisekarte erstellen",
-      ogDescription: "Erstelle digitale Speisekarten für dein Restaurant.",
+      ogDescription: "Erstelle digitale Speisekarten und Eventkalender für dein Restaurant.",
     },
     pricing: {
       title: "Preise & Tarife | WhatIsOnMyMenu",
@@ -133,11 +133,11 @@ const de = {
       },
       business: {
         name: "Business",
-        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Event-Kalender (30 Tage)"],
+        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender (30 Tage)"],
       },
       professional: {
         name: "Professional",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Premium Templates", "QR-Code", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender (365 Tage)", "Inventar & Lieferanten-Übersicht"],
+        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Premium Templates", "QR-Code", "Eigene Subdomain", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender (365 Tage)", "Inventar & Lieferanten-Übersicht"],
       },
     },
   },
@@ -226,7 +226,7 @@ const de = {
         label: "Kostenlos",
         price: "€0",
         description: "Perfekt zum Ausprobieren",
-        features: ["Bis zu 7 Kategorien", "Digitale Speisekarte", "30 Gerichte Limit", "QR-Code Generator, Werbefrei"],
+        features: ["Bis zu 10 Kategorien", "Digitale Speisekarte", "80 Gerichte Limit", "QR-Code Generator, Werbefrei"],
         cta: "Kostenlos starten",
       },
       professional: {
@@ -234,7 +234,7 @@ const de = {
         label: "Beliebteste Wahl",
         price: "",
         description: "Unbegrenzte Möglichkeiten",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht, Werbefrei"],
+        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht, Werbefrei"],
         cta: "Pro abonnieren",
       },
       business: {
@@ -242,7 +242,7 @@ const de = {
         label: "Business",
         price: "€7.99",
         description: "Maximale Features & Support",
-        features: ["Bis zu 20 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code"],
+        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain"],
         cta: "Business abonnieren",
       },
     },
@@ -255,8 +255,6 @@ const de = {
     loading: "Seite wird geladen",
     signInFirst: "Bitte Anmelden",
     submit: "FreeTier registrieren",
-    // Preis unveraendert aus der alten Seite uebernommen — siehe Hinweis an Felix:
-    // widerspricht der pricing-Seite, wo Professional "Coming Soon" ohne Preis ist.
     proUpgrade: "💳 Zu Pro upgrade (€14.99/Monat)",
     successAlert: "Restaurant erfolgreich registriert! \nHerzlichen Glückwunsch!",
     successInline: "Restaurant erfolgreich registriert!",

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { SUBDOMAIN_SUBSCRIPTIONS } from "@/lib/schemas/subdomain";
 
 export async function getRestaurantMenuData(restaurantID) {
   const restaurant = await prisma.restaurant.findUnique({
@@ -125,4 +126,16 @@ export async function getRestaurantMenuData(restaurantID) {
   };
 
   return JSON.parse(JSON.stringify(response));
+}
+
+// Auflösung der Subdomain (<subdomain>.whatisonmymenu.com) auf die Speisekarte.
+// Nach einem Downgrade unter Professional/Business löst die Subdomain nicht mehr auf.
+// Die Subdomain wird vorher in der Middleware auf [a-z0-9-] geprüft.
+export async function getRestaurantMenuDataBySubdomain(subdomain) {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { subdomain },
+    select: { id: true, owner: { select: { subscription: true } } },
+  });
+  if (!restaurant || !SUBDOMAIN_SUBSCRIPTIONS.includes(restaurant.owner.subscription)) return null;
+  return getRestaurantMenuData(restaurant.id);
 }

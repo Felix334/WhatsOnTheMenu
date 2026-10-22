@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
-import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Package, Percent, Plus, Printer, Save } from "lucide-react";
+import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Globe, Package, Percent, Plus, Printer, Save } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -31,6 +31,7 @@ import { SortComponents } from "./components/sortMenu";
 import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 import { CalendarWin } from "./components/calendarWin";
 import { InventoryWin } from "./components/inventoryWin";
+import { SubdomainWin, buildSubdomainUrl } from "./components/subdomainWin";
 import { MenuSection } from "./components/menuSection";
 import { BulkImport } from "./components/bulkImport";
 import { BulkPriceDialog } from "./components/bulkPrice";
@@ -75,6 +76,7 @@ export default function PageBuilder() {
   const [openOptions, setOpenOptions] = useState(false);
   const [openCalendarWin, setOpenCalendarWin] = useState(false);
   const [openInventoryWin, setOpenInventoryWin] = useState(false);
+  const [openSubdomainWin, setOpenSubdomainWin] = useState(false);
   const [autherized, setIsAutherizedUser] = useState(false);
 
   // Hero editing
@@ -109,12 +111,7 @@ export default function PageBuilder() {
   // Anfangszustand einen vorhandenen Entwurf, bevor er wiederhergestellt wurde.
   const [draftRestored, setDraftRestored] = useState(null); // savedAt | null
   const draftReadyRef = useRef(false);
-  // Zwischen "Entwurf geladen" und "Entwurf im State angekommen" liegt ein
-  // Render. Liefe der Schreib-Effekt in diesem Fenster, würde er den gerade
-  // geladenen Entwurf mit dem noch leeren State überschreiben. Gemerkt wird
-  // deshalb das geladene Array selbst — erst wenn es identisch im State steht,
-  // darf wieder geschrieben werden (robust auch bei mehrfachen Effekt-Läufen
-  // wie im StrictMode).
+
   const pendingRestoreRef = useRef(null);
 
   const { data: session, status } = useSession();
@@ -556,6 +553,7 @@ export default function PageBuilder() {
   // Durchsetzung passiert serverseitig (api/user/profil/bulkPrice); hier geht
   // es nur darum, keine Buttons zu zeigen, die ohnehin abgelehnt würden.
   const isPaidTier = ["Professional", "Business"].includes(session?.user?.subscription);
+  const restaurantSubdomain = serverData?.userData?.restaurant?.subdomain ?? null;
   const remainingDishes = Math.max(0, (Limit.DishLimit ?? 0) - dishCount);
 
   const MenuEditor = ({ categoryGroupNames }) => (
@@ -772,12 +770,22 @@ export default function PageBuilder() {
                 <span className="hidden sm:inline">Bestellungen</span>
               </Link>
             </Button>
-            <Button asChild size="sm" onClick={markUserAnsichtNavigation}>
-              <Link href={`/UnserePartner/Restaurants/Menu/${restaurantID}`}>
-                <Eye className="size-4" />
-                <span className="hidden sm:inline">User-Ansicht</span>
-              </Link>
-            </Button>
+            {isPaidTier && restaurantSubdomain ? (
+              // Mit eigener Subdomain: Speisekarte so zeigen, wie Gäste sie aufrufen (neuer Tab, Profil bleibt offen)
+              <Button asChild size="sm">
+                <a href={buildSubdomainUrl(restaurantSubdomain)} target="_blank" rel="noopener noreferrer" title={`${restaurantSubdomain}.whatisonmymenu.com`}>
+                  <Eye className="size-4" />
+                  <span className="hidden sm:inline">User-Ansicht</span>
+                </a>
+              </Button>
+            ) : (
+              <Button asChild size="sm" onClick={markUserAnsichtNavigation}>
+                <Link href={`/UnserePartner/Restaurants/Menu/${restaurantID}`}>
+                  <Eye className="size-4" />
+                  <span className="hidden sm:inline">User-Ansicht</span>
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -903,6 +911,29 @@ export default function PageBuilder() {
                   </TooltipContent>
                 </Tooltip>
               )}
+              {isPaidTier ? (
+                <Button variant="outline" size="sm" onClick={() => setOpenSubdomainWin(true)}>
+                  <Globe className="size-4" />
+                  <span className="hidden md:inline">Subdomain</span>
+                </Button>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button variant="outline" size="sm" disabled>
+                        <Globe className="size-4" />
+                        <span className="hidden md:inline">Subdomain</span>
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    Eine eigene Subdomain ist ein Premium-Feature —{" "}
+                    <DynamicLink href="/pricing" className="underline font-medium">
+                      Upgrade
+                    </DynamicLink>
+                  </TooltipContent>
+                </Tooltip>
+              )}
               <SortComponents
                 componentList={categoryGroups}
                 onSave={(newGroups) =>
@@ -949,6 +980,17 @@ export default function PageBuilder() {
         </>
       ) : (
         <div className="line-through">Event-Kalender</div>
+      )}
+
+      {isPaidTier && (
+        <SubdomainWin
+          open={openSubdomainWin}
+          onOpenChange={setOpenSubdomainWin}
+          restaurantId={restaurantID}
+          onSaved={(subdomain) =>
+            setServerData((prev) => (prev?.userData?.restaurant ? { ...prev, userData: { ...prev.userData, restaurant: { ...prev.userData.restaurant, subdomain } } } : prev))
+          }
+        />
       )}
 
       {session?.user?.subscription === "Professional" && <InventoryWin open={openInventoryWin} onOpenChange={setOpenInventoryWin} restaurantId={restaurantID} />}

@@ -49,13 +49,18 @@ Regel für dieses Projekt: **Sicherheit vor Effizienz** — jede rollen- oder ab
 
 - NextAuth 4 mit JWT-Strategie und PrismaAdapter (`src/lib/auth.ts`); Provider: E-Mail (nur wenn `EMAIL_SERVER_HOST` gesetzt), Google, Facebook, Credentials.
 - Globale Rollen (`User.role`): `User`, `Staff`, `Admin`, `Owner`, `Manager`, `Executive`. Abo-Stufen (`User.subscription`): `NoSubscription`, `FreeTier`, `Professional`, `Business`.
-- `src/middleware.js` schützt Routen-Präfixe per Token-Rolle: `/Admin` + `/api/Admin` → Admin, `/Profil` → Owner, `/staff` + `/settings` → Owner/Staff. Neue geschützte Präfixe müssen in den `matcher` eingetragen werden.
+- `src/middleware.js` schützt Routen-Präfixe per Token-Rolle: `/Admin` + `/api/Admin` + `/api/restaurant/Admin` → Admin, `/Profil` → Owner, `/staff` + `/settings` → Owner/Staff. Der `matcher` deckt alle Pfade außer statischen Dateien ab; neue geschützte Präfixe brauchen nur eine Prüfung im Code. Punkte im `matcher`-String immer als `\\.` schreiben, `\.` wird im JS-String zu `.`.
 - Restaurant-Personal hat zusätzlich eine eigene Ebene: `RestaurantStaff` mit `StaffRole` (`manager`/`waiter`/`kitchen`) und `approved`-Flag; Berechtigungs-Mapping in `src/lib/staffAuth.js` (`getStaffAccess`) — API-Routen für Staff-Funktionen prüfen darüber, nicht nur über die globale Rolle.
 
 ### Datenbank & Stripe
 
 - `src/lib/prisma.ts`: PrismaClient über `@prisma/adapter-pg` mit pg-Pool als Singleton (max 5 Connections — Supabase Free Tier); Pool-Konfiguration nicht ohne Grund ändern.
 - Stripe-Webhooks unter `api/payment/webhook`; verarbeitete Events werden in `StripeEvent` dedupliziert. Abo-Status landet auf `User.subscription`.
+
+### Restaurant-Subdomains
+
+- `<subdomain>.whatisonmymenu.com` (lokal `<subdomain>.localhost:3000`) zeigt die Speisekarte, nur für Professional/Business. Die Middleware macht **keinen** DB-Zugriff (Edge-Runtime), sondern schreibt `/` auf `src/app/(de)/(Routes)/sub/[subdomain]` um; andere Seitenpfade gehen per Redirect auf www, `/api` läuft durch die normalen Rollenprüfungen.
+- Regeln (Format, reservierte Namen, erlaubte Abos) liegen in `src/lib/schemas/subdomain.js` und werden von Middleware, API (`api/user/profil/subdomain`) und Profil-Dialog gemeinsam genutzt. Abo wird beim Setzen **und** beim Auflösen aus der DB geprüft.
 
 ### Sonstiges
 

@@ -1,10 +1,5 @@
 import HomePage from "@/app/components/HomePage";
 import { getDictionary, buildAlternates } from "@/i18n";
-
-// Deutsche Startseite auf "/" — die URL bleibt unveraendert, damit die
-// bestehende Indexierung nicht verloren geht. Das Markup liegt in
-// components/HomePage.js und wird mit der englischen Fassung geteilt.
-
 export async function generateMetadata() {
   const t = getDictionary("de");
   return {

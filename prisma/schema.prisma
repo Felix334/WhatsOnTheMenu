@@ -91,6 +91,8 @@ model VerificationToken {
 model Restaurant {
   id             String            @id @default(cuid())
   name           String
+  /// Subdomain der Speisekarte (<subdomain>.whatisonmymenu.com); nur a-z, 0-9 und Bindestrich
+  subdomain      String?           @unique
   description    String?
   parentCompany  String
   ownerId        String            @unique

@@ -29,9 +29,6 @@ export default function sitemap() {
   const lastModified = new Date();
 
   const translated = TRANSLATED_PAGES.flatMap(({ path, changeFrequency, priority }) => {
-    // hreflang-Block: fuer jede Sprache die passende URL, plus x-default auf
-    // die englische Fassung (Auffang fuer alle uebrigen Sprachen). Identisch
-    // fuer alle Sprachvarianten einer Seite — genau so erwartet Google es.
     const languages = Object.fromEntries(locales.map((l) => [l, `${baseUrl}${localizedPath(path, l)}`]));
 
     return locales.map((locale) => ({

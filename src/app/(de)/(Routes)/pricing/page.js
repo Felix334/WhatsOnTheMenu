@@ -175,7 +175,7 @@ export default function PricingPage() {
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["1 Restaurant", "Digitale Speisekarte", "50 Gerichte Limit", "QR-Code Generator"].map((f) => (
+                {["1 Restaurant", "Digitale Speisekarte", "80 Gerichte Limit", "QR-Code Generator"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -214,7 +214,7 @@ export default function PricingPage() {
                 )}
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 25 Kategorien", "Bis zu 200 Gerichte", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Inventar & Lieferanten"].map((f) => (
+                {["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Inventar & Lieferanten"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -338,7 +338,7 @@ export default function PricingPage() {
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 15 Kategorien", "Bis zu 100 Gerichte", "Basic Templates", "QR-Code", "Event-Kalender(Bis zu 30 Tage)"].map((f) => (
+                {["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basic Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender(Bis zu 30 Tage)"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}

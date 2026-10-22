@@ -139,11 +139,11 @@ const en = {
       },
       business: {
         name: "Business",
-        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Event calendar (30 days)"],
+        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain", "Event calendar (30 days)"],
       },
       professional: {
         name: "Professional",
-        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview"],
+        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview"],
       },
     },
   },
@@ -239,7 +239,7 @@ const en = {
         label: "Free",
         price: "€0",
         description: "Ideal for trying things out",
-        features: ["Up to 7 categories", "Digital menu", "30 dish limit", "QR code generator"],
+        features: ["Up to 10 categories", "Digital menu", "80 dish limit", "QR code generator"],
         cta: "Start for free",
       },
       professional: {
@@ -247,7 +247,7 @@ const en = {
         label: "Most popular",
         price: "",
         description: "Everything, without limits",
-        features: ["Up to 50 categories", "Up to 300 dishes", "QR code", "Premium colours & fonts", "Staff management", "Sold-out indicators", "Event calendar", "Inventory & supplier overview"],
+        features: ["Up to 50 categories", "Up to 300 dishes", "QR code", "Custom subdomain", "Premium colours & fonts", "Staff management", "Sold-out indicators", "Event calendar", "Inventory & supplier overview"],
         cta: "Subscribe to Pro",
       },
       business: {
@@ -255,7 +255,7 @@ const en = {
         label: "Business",
         price: "€7.99",
         description: "Maximum features & support",
-        features: ["Up to 20 categories", "Up to 150 dishes", "Basic templates", "QR code"],
+        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain"],
         cta: "Subscribe to Business",
       },
     },

@@ -62,6 +62,7 @@ async function main(userId) {
             category: true,
             openingHours: true,
             socialLinks: true,
+            subdomain: true,
             createdAt: true,
             locations: true,
             menu: {
