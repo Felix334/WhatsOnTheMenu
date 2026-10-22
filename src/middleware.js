@@ -9,8 +9,7 @@ const MAIN_HOST = process.env.NODE_ENV === "production" ? `www.${ROOT_DOMAIN}` :
 
 function getSubdomain(req) {
   // Port abschneiden und klein schreiben ("Pizza.localhost:3000" -> "pizza.localhost")
-  const hostname = (req.headers.get("host") ?? "").split(":")[0].toLowerCase();
-
+  const hostname = (req.headers.get("x-original-host") ?? req.headers.get("host") ?? "").split(":")[0].toLowerCase();
   // Nur echte Subdomains der eigenen Domain. Vercel-Preview-Hosts o. Ä. fallen hier raus.
   if (!hostname.endsWith(`.${ROOT_DOMAIN}`)) return null;
 
@@ -40,12 +39,9 @@ export async function middleware(req) {
       return NextResponse.rewrite(new URL(`/sub/${subdomain}`, req.url));
     }
 
-    // Alles andere (Login, Dashboard, Bestellstatus …) gehört auf die Hauptdomain,
-    // dort liegen auch die Auth-Cookies.
     return NextResponse.redirect(rootUrl(req, pathname + req.nextUrl.search));
   }
 
-  // Interne Rewrite-Route nicht direkt über die Hauptdomain erreichbar machen
   if (!subdomain && pathname.startsWith("/sub/")) {
     const sub = pathname.slice("/sub/".length).split("/")[0].toLowerCase();
     if (SUBDOMAIN_PATTERN.test(sub) && !RESERVED_SUBDOMAINS.has(sub)) {
@@ -56,7 +52,6 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // ── Geschützte Bereiche auf der Hauptdomain ──────────────────────────────
   if (process.env.NODE_ENV === "production" && pathname.startsWith("/ErstelleRestaurantAccount/Professional")) {
     return NextResponse.redirect(new URL("/", req.url));
   }

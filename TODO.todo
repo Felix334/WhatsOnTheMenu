@@ -68,6 +68,11 @@ PROXMOX => als alternative zu Docker
 => Packetupgrades einfügen
 
 => Im "Professional"-Abo: Möglichkeit anbieten, eigene Subdomains zu erstellen (z.B. restaurantname.whatisonmymenu.com)
+=> Gebaut am 22.10.2026 für Professional UND Business (Profil-Button "Subdomain", Middleware-Weiche, /sub/[subdomain]) => läuft live (bestätigt 22.10.2026)
+=> ERLEDIGT: Migration für das neue Feld Restaurant.subdomain ausgeführt
+=> ERLEDIGT: Wildcard-Domain *.whatisonmymenu.com in Vercel + DNS-Eintrag in Cloudflare
+=> Noch offen: Subdomain schon bei der Registrierung (Business/Professional) abfragen
+=> ERLEDIGT: Im Browser getestet, funktioniert
 
 
 => Wiederrufsrecht für Abbos => GANZ WICHTIG
