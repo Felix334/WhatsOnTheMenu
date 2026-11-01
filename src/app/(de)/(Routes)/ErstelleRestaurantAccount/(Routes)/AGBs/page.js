@@ -32,7 +32,7 @@ export default function TermsPage() {
                 title: "Einleitung und Geltungsbereich",
                 content: [
                   "Diese Allgemeinen Geschäftsbedingungen (AGB) regeln die Nutzung der Plattform <strong>RestaurantRegister.de</strong> (im Folgenden „Plattform“) durch Unternehmer, die ein Restaurant oder eine Gaststätte registrieren möchten (im Folgenden „Nutzer“ oder „Restaurantbetreiber“).",
-                  "Die Plattform wird von <strong>Plattform GmbH</strong>, mit Sitz in <strong>Musterstraße 1, 10115 Berlin</strong>, vertreten durch <strong>Max Mustermann (Geschäftsführer)</strong>, betrieben (im Folgenden „Anbieter“).",
+                  "Die Plattform wird von <strong>Plattform GmbH</strong>, mit Sitz in <strong>Mühlenblick 16, 74372 Sersheimn</strong>, vertreten durch <strong>Felix Mayer (Geschäftsführer)</strong>, betrieben (im Folgenden „Anbieter“).",
                   "Die AGB gelten für alle Verträge zwischen dem Anbieter und dem Nutzer. Abweichende oder ergänzende Bedingungen des Nutzers bedürfen der schriftlichen Zustimmung des Anbieters.",
                   "Durch die Registrierung und Akzeptanz dieser AGB schließt der Nutzer einen verbindlichen Vertrag mit dem Anbieter ab.",
                 ],
@@ -109,9 +109,9 @@ export default function TermsPage() {
             <div className="flex items-center justify-center space-x-2 text-gray-600">
               <Mail className="h-5 w-5" />
               <p className="text-sm">
-                Diese AGB wurden zuletzt am <strong>01.10.2024</strong> aktualisiert. Bei Fragen kontaktieren Sie uns unter{" "}
-                <a href="mailto:info@restaurantregister.de" className="text-primary underline hover:text-primary/80 font-medium">
-                  info@restaurantregister.de
+                Diese AGB wurden zuletzt am <strong>01.11.2026</strong> aktualisiert. Bei Fragen kontaktieren Sie uns unter{"support@whatisonmymenu.com"}
+                <a href="mailto:support@whatisonmymenu.com" className="text-primary underline hover:text-primary/80 font-medium">
+                  support@whatisonmymenu.com
                 </a>
                 .
               </p>

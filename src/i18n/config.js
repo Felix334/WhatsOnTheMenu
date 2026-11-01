@@ -7,6 +7,11 @@
 // Neue Sprache hinzufuegen: hier eintragen + src/i18n/<code>.js anlegen.
 // Der Seitenbaum unter src/app/(intl)/[locale]/ wird geteilt, es muss also
 // keine einzige Seite dupliziert werden.
+//
+// Uebersetzte Pfad-Namen (/en/how-it-works statt /en/WieFunktionierts)
+// stehen in ./slugs.mjs.
+
+import { LOCALIZED_PATHS } from "./slugs.mjs";
 
 export const defaultLocale = "de";
 
@@ -43,19 +48,22 @@ export function isLocale(value) {
 
 /**
  * Baut aus einem sprachneutralen Pfad die URL fuer eine Sprache.
- * localizedPath("/pricing", "de") -> "/pricing"
- * localizedPath("/pricing", "en") -> "/en/pricing"
- * localizedPath("/", "en")        -> "/en"
+ * localizedPath("/pricing", "de")          -> "/pricing"
+ * localizedPath("/pricing", "en")          -> "/en/pricing"
+ * localizedPath("/", "en")                 -> "/en"
+ * localizedPath("/WieFunktionierts", "en") -> "/en/how-it-works"  (siehe slugs.mjs)
  */
 export function localizedPath(path, locale) {
   const clean = path === "/" ? "" : `/${String(path).replace(/^\/+|\/+$/g, "")}`;
   if (locale === defaultLocale) return clean || "/";
-  return `/${locale}${clean}`;
+  return `/${locale}${LOCALIZED_PATHS[locale]?.[clean] ?? clean}`;
 }
 
 /**
- * Entfernt ein vorhandenes Sprach-Praefix aus einem Pfad.
+ * Entfernt ein vorhandenes Sprach-Praefix aus einem Pfad und macht einen
+ * uebersetzten Pfad wieder sprachneutral.
  * "/en/pricing" -> "/pricing"   "/pricing" -> "/pricing"   "/en" -> "/"
+ * "/en/how-it-works" -> "/WieFunktionierts"
  *
  * Gegenstueck zu localizedPath: erst hiermit den sprachneutralen Pfad
  * gewinnen, dann in die Zielsprache uebersetzen.
@@ -64,10 +72,13 @@ export function stripLocale(pathname) {
   const segments = String(pathname || "/")
     .split("/")
     .filter(Boolean);
+  let locale = defaultLocale;
   if (segments.length && locales.includes(segments[0]) && segments[0] !== defaultLocale) {
-    segments.shift();
+    locale = segments.shift();
   }
-  return `/${segments.join("/")}`;
+  const path = `/${segments.join("/")}`;
+  const neutral = Object.entries(LOCALIZED_PATHS[locale] || {}).find(([, localized]) => localized === path);
+  return neutral ? neutral[0] : path;
 }
 
 /**

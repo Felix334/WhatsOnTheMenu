@@ -1,11 +1,9 @@
 import HowItWorksPage from "@/app/components/HowItWorksPage";
 import { getDictionary, buildAlternates } from "@/i18n";
 
-// Der Pfad bleibt bewusst "/WieFunktionierts", auch auf Englisch (/en/WieFunktionierts).
-// Ein uebersetzter Pfad waere schoener zu lesen, wuerde aber bedeuten, dass
-// hreflang zwischen zwei unterschiedlichen Pfaden verweist — das ist erlaubt,
-// macht die Sitemap und den Sprachumschalter aber deutlich fehleranfaelliger.
-// Google bewertet den Pfad-Namen ohnehin kaum; entscheidend ist der Inhalt.
+// Der Ordner heisst "WieFunktionierts", die englische URL ist aber
+// /en/how-it-works — Zuordnung, Rewrite und Weiterleitung kommen aus
+// src/i18n/slugs.mjs. Hier immer den sprachneutralen Pfad verwenden.
 
 export const dynamic = "force-static";
 
