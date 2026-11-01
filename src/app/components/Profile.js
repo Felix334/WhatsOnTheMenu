@@ -9,14 +9,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { UserRound, LayoutDashboard, Settings, Store, LogOut } from "lucide-react";
+import de from "@/i18n/de";
+import { localizedPath } from "@/i18n/config";
 
+// Beschriftungen stehen im Woerterbuch unter profileMenu.roles
 const ROLE_BADGES = {
-  Admin: { label: "Admin", className: "bg-red-500/10 text-red-700 border-red-200" },
-  Owner: { label: "Restaurant-Besitzer", className: "bg-blue-500/10 text-blue-700 border-blue-200" },
-  Staff: { label: "Angestellter", className: "bg-green-500/10 text-green-700 border-green-200" },
+  Admin: "bg-red-500/10 text-red-700 border-red-200",
+  Owner: "bg-blue-500/10 text-blue-700 border-blue-200",
+  Staff: "bg-green-500/10 text-green-700 border-green-200",
 };
 
-const Profile = () => {
+// Sprache kommt von der oeffentlichen Seite (URL), auf der das Menue sitzt.
+const Profile = ({ t = de.profileMenu, locale = "de" }) => {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
 
@@ -31,7 +35,7 @@ const Profile = () => {
     .toUpperCase();
 
   const logout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/" });
+    await signOut({ redirect: true, callbackUrl: localizedPath("/", locale) });
   };
 
   // Query bauen
@@ -45,16 +49,16 @@ const Profile = () => {
 
   const queryString = params.toString();
 
-  const roleBadge = ROLE_BADGES[role];
+  const roleBadge = ROLE_BADGES[role] && { label: t.roles[role], className: ROLE_BADGES[role] };
   const isTeamMember = role === "Owner" || role === "Admin" || role === "Staff";
   const isStaffish = role === "Owner" || role === "Staff" || ["manager", "waiter", "kitchen"].includes(staffMembershipsRole);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button type="button" aria-label="Profilmenü öffnen" className="rounded-full ring-2 ring-transparent transition-all hover:ring-red-200 focus-visible:outline-none focus-visible:ring-red-300 cursor-pointer">
+        <button type="button" aria-label={t.open} className="rounded-full ring-2 ring-transparent transition-all hover:ring-red-200 focus-visible:outline-none focus-visible:ring-red-300 cursor-pointer">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={googleImg || profileImage.src} alt="Profilbild" />
+            <AvatarImage src={googleImg || profileImage.src} alt={t.avatarAlt} />
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>
         </button>
@@ -65,7 +69,7 @@ const Profile = () => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex items-center gap-3 py-1">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={googleImg || profileImage.src} alt="Profilbild" />
+              <AvatarImage src={googleImg || profileImage.src} alt={t.avatarAlt} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             <div className="min-w-0">
@@ -86,7 +90,7 @@ const Profile = () => {
           <DropdownMenuItem asChild>
             <Link href={`/Konto?${queryString}`}>
               <UserRound className="size-4" />
-              Mein Konto
+              {t.account}
             </Link>
           </DropdownMenuItem>
 
@@ -94,16 +98,16 @@ const Profile = () => {
             <DropdownMenuItem asChild>
               <Link href={`/Profil?${queryString}`} prefetch={false}>
                 <LayoutDashboard className="size-4" />
-                Profil
+                {t.dashboard}
               </Link>
             </DropdownMenuItem>
           )}
 
           {!isTeamMember && (
             <DropdownMenuItem asChild>
-              <Link href={`/ErstelleRestaurantAccount?${queryString}`} prefetch={false}>
+              <Link href={`${localizedPath("/ErstelleRestaurantAccount", locale)}?${queryString}`} prefetch={false}>
                 <Store className="size-4" />
-                Unser Partnerprogramm
+                {t.partnerProgram}
               </Link>
             </DropdownMenuItem>
           )}
@@ -112,7 +116,7 @@ const Profile = () => {
             <DropdownMenuItem asChild>
               <Link href={`/staff?${queryString}`} prefetch={false}>
                 <Settings className="size-4" />
-                Einstellungen
+                {t.settings}
               </Link>
             </DropdownMenuItem>
           )}
@@ -122,7 +126,7 @@ const Profile = () => {
 
         <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600 focus:bg-red-50">
           <LogOut className="size-4 text-red-600" />
-          Abmelden
+          {t.logout}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -57,6 +57,18 @@ const de = {
     cancel: "Abbrechen",
   },
 
+  // Profil-Menue oben rechts (Profile.js)
+  profileMenu: {
+    open: "Profilmenü öffnen",
+    avatarAlt: "Profilbild",
+    account: "Mein Konto",
+    dashboard: "Profil",
+    partnerProgram: "Unser Partnerprogramm",
+    settings: "Einstellungen",
+    logout: "Abmelden",
+    roles: { Admin: "Admin", Owner: "Restaurant-Besitzer", Staff: "Angestellter" },
+  },
+
   nav: {
     features: "Features",
     howItWorks: "Wie funktioniert's",

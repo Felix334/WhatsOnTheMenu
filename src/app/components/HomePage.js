@@ -139,7 +139,7 @@ function HomeContent({ t, locale }) {
                 <LanguageSwitcher locale={locale} label={t.nav.language} />
                 {autherizedUser && (
                   <Suspense fallback={null}>
-                    <Profile />
+                    <Profile t={t.profileMenu} locale={locale} />
                   </Suspense>
                 )}
               </div>
@@ -220,7 +220,7 @@ function HomeContent({ t, locale }) {
               </div>
               {autherizedUser && (
                 <div className="absolute right-0 inset-y-0 flex items-center md:hidden">
-                  <Profile />
+                  <Profile t={t.profileMenu} locale={locale} />
                 </div>
               )}
             </div>

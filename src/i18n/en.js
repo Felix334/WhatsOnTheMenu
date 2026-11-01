@@ -63,6 +63,18 @@ const en = {
     cancel: "Cancel",
   },
 
+  // Profil-Menue oben rechts (Profile.js)
+  profileMenu: {
+    open: "Open profile menu",
+    avatarAlt: "Profile picture",
+    account: "My account",
+    dashboard: "Dashboard",
+    partnerProgram: "Partner programme",
+    settings: "Settings",
+    logout: "Log out",
+    roles: { Admin: "Admin", Owner: "Restaurant owner", Staff: "Staff member" },
+  },
+
   nav: {
     features: "Features",
     howItWorks: "How it works",
