@@ -73,6 +73,7 @@ const de = {
     features: "Features",
     howItWorks: "Wie funktioniert's",
     pricing: "Angebote",
+    faq: "FAQ",
     login: "Anmelden",
     profile: "Profil",
     adminConsole: "Admin Konsole",
@@ -84,8 +85,8 @@ const de = {
     hero: {
       titleBefore: "Digitale Speisekarten in ",
       titleHighlight: "wenigen Minuten",
-      titleAfter: " erstellen- ganz ohne KI",
-      subtitle: "Erstellen Sie professionelle, interaktive Speisekarten für Ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung - Ganz ohne KI-Slop.",
+      titleAfter: " erstellen – ganz ohne KI",
+      subtitle: "Erstellen Sie professionelle, interaktive Speisekarten für Ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung – ganz ohne KI-Slop.",
       ctaPrimary: "Jetzt kostenlos starten",
       ctaSecondary: "Anmelden",
       bullet1: "Kostenlose Standardversion verfügbar",
@@ -94,7 +95,7 @@ const de = {
     },
     responsive: {
       title: "Passt sich einfach Ihren Geräten an",
-      subtitle: "Optimiert für Smartphone, Tablet und Desktop - ohne Kompromisse im Design.",
+      subtitle: "Optimiert für Smartphone, Tablet und Desktop – ohne Kompromisse im Design.",
       laptopAlt: "Speisekarte Laptop",
       phoneAlt: "Speisekarte Handy",
     },
@@ -120,18 +121,50 @@ const de = {
         {
           icon: "⚡",
           title: "Verfügbarkeits-Updates",
-          description: "Zeigen sie Ihren Kunden ob ein Gericht verfügbar ist oder nicht, kein unnöties Fragen mehr nötig.",
+          description: "Zeigen Sie Ihren Gästen, ob ein Gericht verfügbar ist – kein unnötiges Nachfragen mehr.",
         },
         {
           icon: "📊",
           title: "Management-System",
-          description: "Verteilen Sie Ihre Aufgaben und Möglichkeiten zwischen den Mitarbeitern. \nJeder bekommt seine Aufgaben und Rechte",
+          description: "Verteilen Sie Aufgaben auf Ihr Team – jeder Mitarbeiter bekommt genau die Rechte, die er braucht.",
         },
         {
           icon: "🎯",
           title: "Anpassbare Designs",
           description: "Professionelle Design-Vorlagen, die perfekt zu Ihrem Restaurant-Branding passen.",
         },
+      ],
+    },
+    steps: {
+      title: "In drei Schritten zur digitalen Speisekarte",
+      subtitle: "Kein Software-Download, keine Einrichtung durch Techniker — alles läuft im Browser.",
+      items: [
+        { title: "Kostenloses Konto anlegen", description: "Restaurant-Name und Adresse eintragen, mit Google anmelden — fertig. Keine Kreditkarte nötig." },
+        { title: "Gerichte eintragen", description: "Kategorien anlegen, Gerichte mit Preis, Beschreibung und Allergenen hinzufügen. Änderungen sind jederzeit möglich." },
+        { title: "QR-Code drucken", description: "Ihr QR-Code wird automatisch erstellt. Ausdrucken, auf den Tisch stellen — Ihre Gäste scannen und sehen sofort die Karte." },
+      ],
+      more: "Ausführliche Anleitung ansehen",
+    },
+    benefits: {
+      title: "Warum eine digitale Speisekarte?",
+      subtitle: "Was sich im Alltag gegenüber der gedruckten Karte ändert.",
+      items: [
+        { icon: "💶", title: "Preise ändern ohne Neudruck", description: "Neuer Preis, neues Gericht, Tippfehler? In wenigen Klicks geändert — statt jedes Mal neue Karten drucken zu lassen." },
+        { icon: "🥜", title: "Allergene sauber gekennzeichnet", description: "Alle 14 Hauptallergene nach EU-Verordnung 1169/2011 pro Gericht auswählbar. Ihre Gäste sehen sie direkt in der Karte." },
+        { icon: "📲", title: "Keine App für Ihre Gäste", description: "Die Handykamera genügt: QR-Code scannen, die Karte öffnet sich im Browser. Nichts installieren, kein Konto." },
+        { icon: "🧼", title: "Immer sauber, immer aktuell", description: "Keine abgegriffenen oder fleckigen Karten mehr — und keine veralteten Exemplare, die noch irgendwo herumliegen." },
+      ],
+    },
+    faq: {
+      title: "Häufige Fragen",
+      subtitle: "Kurz beantwortet — bei weiteren Fragen schreiben Sie uns an support@whatisonmymenu.com.",
+      items: [
+        { q: "Was kostet WhatIsOnMyMenu?", a: "Die Starter-Version ist kostenlos. Das Business-Abo kostet 7,99 € im Monat und ist monatlich kündbar." },
+        { q: "Brauchen meine Gäste eine App?", a: "Nein. Ihre Gäste scannen den QR-Code mit der normalen Handykamera, die Speisekarte öffnet sich direkt im Browser." },
+        { q: "Brauche ich technische Kenntnisse?", a: "Nein. Gerichte, Preise und Kategorien tragen Sie in einfache Formulare ein — so wie Sie es von jeder Website kennen." },
+        { q: "Kann ich Allergene angeben?", a: "Ja. Für jedes Gericht können Sie die 14 Hauptallergene nach EU-Verordnung 1169/2011 auswählen. Sie erscheinen in der Speisekarte bei dem jeweiligen Gericht." },
+        { q: "Wie schnell sind Änderungen sichtbar?", a: "Kurz nach dem Speichern. Der QR-Code bleibt dabei immer derselbe — Sie müssen nichts neu drucken." },
+        { q: "Kann ich das Abo jederzeit kündigen?", a: "Ja, monatlich über Ihr Konto. Ihre Speisekarte bleibt danach in der kostenlosen Starter-Version erhalten." },
       ],
     },
     cta: {
@@ -142,7 +175,7 @@ const de = {
     },
     pricing: {
       title: "Transparente Preise",
-      subtitle: "Wähle den Plan, der zu Ihrem Restaurant passt",
+      subtitle: "Wählen Sie den Plan, der zu Ihrem Restaurant passt",
       perMonth: "/Monat",
       free: "Kostenlos",
       comingSoon: "Coming Soon",

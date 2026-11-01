@@ -16,6 +16,7 @@ import LoginForm from "./Anmelden";
 import Registrieren from "./Registrieren";
 import Profile from "./Profile";
 import ExplainCards from "./explainCards";
+import { StepsSection, BenefitsSection, FaqSection } from "./HomeSections";
 import FooterPart from "./footerPart";
 import RenderUserID from "./renderUserID";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -126,6 +127,11 @@ function HomeContent({ t, locale }) {
                         {t.nav.pricing}
                       </Button>
                     </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Button variant="ghost" onClick={() => scrollToSection("#faq")}>
+                        {t.nav.faq}
+                      </Button>
+                    </NavigationMenuItem>
 
                     {!userID && (
                       <NavigationMenuItem>
@@ -198,6 +204,15 @@ function HomeContent({ t, locale }) {
                         }}
                       >
                         {t.nav.pricing}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          scrollToSection("#faq");
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        {t.nav.faq}
                       </Button>
                       {status === "authenticated" || userID ? null : (
                         <Button
@@ -290,7 +305,9 @@ function HomeContent({ t, locale }) {
               </div>
             </div>
           </section>
+          <StepsSection t={t.home.steps} locale={locale} />
           <ExplainCards t={t.home.features} />
+          <BenefitsSection t={t.home.benefits} />
           {/* CTA Section */}
           <section className="py-20 bg-linear-to-br from-red-800 to-red-950 text-white">
             <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -373,9 +390,8 @@ function HomeContent({ t, locale }) {
                   <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900">{t.home.pricing.comingSoon}</Badge>
                   <CardHeader>
                     <CardTitle>{t.home.pricing.professional.name}</CardTitle>
-                    <div className="text-3xl font-bold">
-                      <span className="text-lg font-normal">{t.home.pricing.perMonth}</span>
-                    </div>
+                    {/* Noch kein Preis festgelegt — statt eines einsamen "/Monat" */}
+                    <div className="text-3xl font-bold">{t.home.pricing.comingSoon}</div>
                   </CardHeader>
                   <CardContent className="flex flex-col flex-1">
                     <ul className="space-y-3 mb-8">
@@ -391,6 +407,7 @@ function HomeContent({ t, locale }) {
               </div>
             </div>
           </section>
+          <FaqSection t={t.home.faq} />
         </main>
         <Suspense fallback={null}>
           <FooterPart t={t.footer} locale={locale} />

@@ -79,6 +79,7 @@ const en = {
     features: "Features",
     howItWorks: "How it works",
     pricing: "Pricing",
+    faq: "FAQ",
     login: "Sign in",
     profile: "Profile",
     adminConsole: "Admin console",
@@ -138,6 +139,38 @@ const en = {
           title: "Designs you can adapt",
           description: "Professional templates that you can match to your restaurant's own branding.",
         },
+      ],
+    },
+    steps: {
+      title: "Your digital menu in three steps",
+      subtitle: "Nothing to download, no technician to book — everything runs in the browser.",
+      items: [
+        { title: "Create a free account", description: "Enter your restaurant's name and address, sign in with Google — done. No credit card needed." },
+        { title: "Add your dishes", description: "Set up categories and add dishes with price, description and allergens. Change anything, any time." },
+        { title: "Print your QR code", description: "Your QR code is generated automatically. Print it, put it on the table — guests scan and see your menu instantly." },
+      ],
+      more: "Read the full guide",
+    },
+    benefits: {
+      title: "Why go digital?",
+      subtitle: "What changes day to day compared with a printed menu.",
+      items: [
+        { icon: "💶", title: "Change prices without reprinting", description: "New price, new dish, a typo? Fixed in a few clicks — instead of paying for a fresh print run every time." },
+        { icon: "🥜", title: "Allergens clearly labelled", description: "All 14 major allergens defined by EU Regulation 1169/2011, selectable per dish. Guests see them right in the menu." },
+        { icon: "📲", title: "No app for your guests", description: "A phone camera is all it takes: scan the QR code and the menu opens in the browser. Nothing to install, no account." },
+        { icon: "🧼", title: "Always clean, always current", description: "No more worn or stained menus — and no outdated copies lying around." },
+      ],
+    },
+    faq: {
+      title: "Frequently asked questions",
+      subtitle: "The short answers — anything else, email us at support@whatisonmymenu.com.",
+      items: [
+        { q: "How much does WhatIsOnMyMenu cost?", a: "The Starter plan is free. The Business plan costs €7.99 per month and can be cancelled monthly." },
+        { q: "Do my guests need an app?", a: "No. Guests scan the QR code with their normal phone camera and the menu opens straight in the browser." },
+        { q: "Do I need technical skills?", a: "No. You enter dishes, prices and categories in simple forms — just like on any website." },
+        { q: "Can I list allergens?", a: "Yes. For every dish you can select the 14 major allergens defined by EU Regulation 1169/2011. They appear next to that dish in the menu." },
+        { q: "How quickly do changes show up?", a: "Shortly after you save. Your QR code always stays the same — there's nothing to reprint." },
+        { q: "Can I cancel at any time?", a: "Yes, monthly from your account. Your menu stays available on the free Starter plan afterwards." },
       ],
     },
     cta: {
