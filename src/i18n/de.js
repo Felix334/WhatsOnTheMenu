@@ -89,6 +89,7 @@ const de = {
       subtitle: "Erstellen Sie professionelle, interaktive Speisekarten für Ihr Restaurant. Mit QR-Codes, mehrsprachiger Unterstützung und einfacher Bearbeitung – ganz ohne KI-Slop.",
       ctaPrimary: "Jetzt kostenlos starten",
       ctaSecondary: "Anmelden",
+      ctaDemo: "Beispiel-Speisekarte ansehen",
       bullet1: "Kostenlose Standardversion verfügbar",
       bullet2: "Übersichtliche Gestaltung für Ihre Kunden",
       phoneAlt: "Digitale Speisekarte auf dem Smartphone",

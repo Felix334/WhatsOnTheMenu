@@ -16,7 +16,7 @@ import LoginForm from "./Anmelden";
 import Registrieren from "./Registrieren";
 import Profile from "./Profile";
 import ExplainCards from "./explainCards";
-import { StepsSection, BenefitsSection, FaqSection } from "./HomeSections";
+import { StepsSection, BenefitsSection, FaqSection, DEMO_MENU_URL } from "./HomeSections";
 import FooterPart from "./footerPart";
 import RenderUserID from "./renderUserID";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -269,6 +269,9 @@ function HomeContent({ t, locale }) {
                       </Button>
                     )}
                   </div>
+                  <a href={DEMO_MENU_URL} target="_blank" rel="noopener" className="mt-5 inline-flex items-center gap-2 text-yellow-300 font-medium underline underline-offset-4 hover:text-yellow-200">
+                    {t.home.hero.ctaDemo} →
+                  </a>
                   <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm text-white/70">
                     <div className="flex items-center">
                       <span className="text-green-400 mr-2">✓</span>
@@ -319,6 +322,11 @@ function HomeContent({ t, locale }) {
                     <a href={localizedPath("/ErstelleRestaurantAccount/FreeTier", locale)}>{t.home.cta.primary}</a>
                   </Button>
                 )}
+                <Button asChild variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
+                  <a href={DEMO_MENU_URL} target="_blank" rel="noopener">
+                    {t.home.hero.ctaDemo}
+                  </a>
+                </Button>
                 <Button asChild variant="outline" className="border-white/50 text-black hover:bg-white/10 font-medium text-base px-10 py-3 h-auto">
                   <a href="#pricing">{t.home.cta.secondary}</a>
                 </Button>

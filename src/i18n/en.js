@@ -95,6 +95,7 @@ const en = {
       subtitle: "Create a professional digital menu for your restaurant. Guests scan a QR code at the table and see your dishes instantly — update prices any time, no reprinting.",
       ctaPrimary: "Start for free",
       ctaSecondary: "Sign in",
+      ctaDemo: "See an example menu",
       bullet1: "Free plan available",
       bullet2: "Clean, readable layout for your guests",
       phoneAlt: "Digital restaurant menu on a smartphone",

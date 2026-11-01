@@ -8,6 +8,10 @@ import { localizedPath } from "@/i18n/config";
 // Bewusst ohne Hooks und ohne useSearchParams: alles landet als fertiges HTML
 // im Prerender, damit Google den Text sieht (siehe CLAUDE.md, Suspense-Falle).
 
+// Echte Beispiel-Speisekarte (Demo-Restaurant mit Premium-Abo) fuer die
+// "Beispiel ansehen"-Buttons. Restaurant-Daten sind nicht uebersetzt.
+export const DEMO_MENU_URL = "https://meinpremiumrestaurant.whatisonmymenu.com/";
+
 export function StepsSection({ t, locale }) {
   return (
     <section id="steps" className="py-16 sm:py-20 bg-gray-50">
