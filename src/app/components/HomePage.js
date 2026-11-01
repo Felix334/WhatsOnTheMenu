@@ -337,7 +337,7 @@ function HomeContent({ t, locale }) {
                     {/* Button nach unten drücken */}
                     <div className="mt-auto">
                       <Suspense fallback={null}>
-                        <FreeTierLink className="w-full" labels={t.links} />
+                        <FreeTierLink className="w-full" labels={t.links} locale={locale} />
                       </Suspense>
                     </div>
                   </CardContent>
@@ -363,7 +363,7 @@ function HomeContent({ t, locale }) {
                     {/* Button nach unten drücken */}
                     <div className="mt-auto">
                       <Suspense fallback={null}>
-                        <BusinessTierLink className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900" labels={t.links} />
+                        <BusinessTierLink className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900" labels={t.links} locale={locale} />
                       </Suspense>
                     </div>
                   </CardContent>
@@ -396,7 +396,7 @@ function HomeContent({ t, locale }) {
           <FooterPart t={t.footer} locale={locale} />
         </Suspense>
         <div className="fixed align-top grid z-10 mt-0 top-0">
-          {renderLogin && <LoginForm renderLogin={setRenderLogin} />}
+          {renderLogin && <LoginForm renderLogin={setRenderLogin} t={t.auth} locale={locale} />}
           {renderRegister && <Registrieren renderRegistrieren={setRenderRegister} />}
         </div>
       </div>

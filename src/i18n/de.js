@@ -48,6 +48,13 @@ const de = {
   auth: {
     accountNotLinked: "Diese E-Mail ist bereits mit einer anderen Anmeldemethode verknüpft.",
     signInFailed: "Anmeldung abgebrochen oder fehlgeschlagen. Bitte versuche es erneut.",
+    // Login-Fenster (Anmelden.js)
+    welcomeBack: "Willkommen zurück",
+    loginHint: "Melde dich mit deinem Google-Konto an, um fortzufahren.",
+    googleButton: "Mit Google anmelden",
+    googleRedirect: "Weiterleitung zu Google…",
+    googleFailed: "Google Login fehlgeschlagen. Bitte versuche es erneut.",
+    cancel: "Abbrechen",
   },
 
   nav: {

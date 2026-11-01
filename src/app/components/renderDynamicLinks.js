@@ -64,7 +64,7 @@ export function LogoutLink({ labels = fallback }) {
   return <Link href="/logout">{labels.logout}</Link>;
 }
 
-export default function FreeTierLink({ className, labels = fallback }) {
+export default function FreeTierLink({ className, labels = fallback, locale = "de" }) {
   const query = useQueryObject();
   const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : "";
   const { data: session } = useSession();
@@ -79,12 +79,12 @@ export default function FreeTierLink({ className, labels = fallback }) {
 
   return (
     <Button asChild className={className}>
-      <Link href={`/ErstelleRestaurantAccount/FreeTier${queryString}`}>{labels.subscribe}</Link>
+      <Link href={`${localizedPath("/ErstelleRestaurantAccount/FreeTier", locale)}${queryString}`}>{labels.subscribe}</Link>
     </Button>
   );
 }
 
-export function BusinessTierLink({ className, labels = fallback }) {
+export function BusinessTierLink({ className, labels = fallback, locale = "de" }) {
   const query = useQueryObject();
   const { userID } = useAuth();
   const { data: session } = useSession();
@@ -99,7 +99,7 @@ export function BusinessTierLink({ className, labels = fallback }) {
 
   return (
     <Button className={className} asChild>
-      <Link href={{ pathname: "/ErstelleRestaurantAccount/Business", query: { ...query, ...(userID ? { userID } : {}) } }} prefetch={false}>
+      <Link href={{ pathname: localizedPath("/ErstelleRestaurantAccount/Business", locale), query: { ...query, ...(userID ? { userID } : {}) } }} prefetch={false}>
         {labels.subscribe}
       </Link>
     </Button>

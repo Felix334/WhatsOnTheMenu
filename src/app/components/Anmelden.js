@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import de from "@/i18n/de";
 
-export default function LoginForm({ renderLogin }) {
+export default function LoginForm({ renderLogin, t = de.auth, locale = "de" }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -11,13 +12,14 @@ export default function LoginForm({ renderLogin }) {
     setIsLoading(true);
     setError("");
     try {
-      const result = await signIn("google", { redirect: false });
+      // hl = Sprache von Googles eigener Anmeldeseite; sonst entscheidet das Google-Konto bzw. der Browser.
+      const result = await signIn("google", { redirect: false }, { hl: locale });
       if (result?.url) {
         window.location.replace(result.url);
       }
     } catch (err) {
       console.error("Google SignIn error:", err);
-      setError("Google Login fehlgeschlagen. Bitte versuche es erneut.");
+      setError(t.googleFailed);
     } finally {
       setIsLoading(false);
     }
@@ -28,7 +30,7 @@ export default function LoginForm({ renderLogin }) {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
         <div className="bg-white rounded-2xl p-10 flex flex-col items-center gap-4 shadow-2xl">
           <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-500 font-medium">Weiterleitung zu Google…</p>
+          <p className="text-sm text-gray-500 font-medium">{t.googleRedirect}</p>
         </div>
       </div>
     );
@@ -51,14 +53,14 @@ export default function LoginForm({ renderLogin }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-wide">Willkommen zurück</h1>
+          <h1 className="text-xl font-bold text-white tracking-wide">{t.welcomeBack}</h1>
           <p className="text-amber-100 text-sm mt-1">WhatIsOnMyMenu.com</p>
         </div>
 
         {/* Body */}
         <div className="px-8 py-8">
           <p className="text-gray-500 text-sm text-center mb-6">
-            Melde dich mit deinem Google-Konto an, um fortzufahren.
+            {t.loginHint}
           </p>
 
           {error && (
@@ -82,7 +84,7 @@ export default function LoginForm({ renderLogin }) {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            Mit Google anmelden
+            {t.googleButton}
           </button>
 
           {/* Close */}
@@ -90,7 +92,7 @@ export default function LoginForm({ renderLogin }) {
             onClick={() => renderLogin(false)}
             className="w-full mt-4 py-2.5 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
-            Abbrechen
+            {t.cancel}
           </button>
         </div>
       </div>

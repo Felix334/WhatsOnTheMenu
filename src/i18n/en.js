@@ -54,6 +54,13 @@ const en = {
   auth: {
     accountNotLinked: "This email is already linked to a different sign-in method.",
     signInFailed: "Sign-in was cancelled or failed. Please try again.",
+    // Login-Fenster (Anmelden.js)
+    welcomeBack: "Welcome back",
+    loginHint: "Sign in with your Google account to continue.",
+    googleButton: "Sign in with Google",
+    googleRedirect: "Redirecting to Google…",
+    googleFailed: "Google sign-in failed. Please try again.",
+    cancel: "Cancel",
   },
 
   nav: {
