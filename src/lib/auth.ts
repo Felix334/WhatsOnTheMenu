@@ -95,8 +95,18 @@ export const authOptions: NextAuthOptions = {
               token.subscriptionStatus = 'canceled';
             } else {
               try {
-                const stripeSub = await stripe.subscriptions.retrieve(freshUser.stripeSubscriptionId);
-                const isValid = ['active', 'trialing', 'past_due'].includes(stripeSub.status);
+                let isValid = false;
+                try {
+                  const stripeSub = await stripe.subscriptions.retrieve(freshUser.stripeSubscriptionId);
+                  isValid = ['active', 'trialing', 'past_due'].includes(stripeSub.status);
+                } catch (err: any) {
+                  // Abo-ID existiert bei Stripe nicht (z. B. von Hand eingetragen oder
+                  // Test-ID im Live-Modus) → definitiv kein Abo. Andere Fehler (Netzwerk,
+                  // Stripe down) weiterwerfen: dann bleibt das Abo, statt zahlende
+                  // Kunden wegen einer Stoerung herabzustufen.
+                  if (err?.code !== 'resource_missing') throw err;
+                  console.warn('Stripe-Abo nicht gefunden, User wird auf FreeTier gesetzt:', userId);
+                }
                 if (!isValid) {
                   await prisma.user.update({
                     where: { id: userId },
