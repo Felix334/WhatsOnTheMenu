@@ -171,7 +171,8 @@ const en = {
         { q: "Do I need technical skills?", a: "No. You enter dishes, prices and categories in simple forms — just like on any website." },
         { q: "Can I list allergens?", a: "Yes. For every dish you can select the 14 major allergens defined by EU Regulation 1169/2011. They appear next to that dish in the menu." },
         { q: "How quickly do changes show up?", a: "Shortly after you save. Your QR code always stays the same — there's nothing to reprint." },
-        { q: "Can I cancel at any time?", a: "Yes, monthly from your account. Your menu stays available on the free Starter plan afterwards." },
+        { q: "Can I cancel at any time?", a: "Yes, monthly from your account or in the menu Edditor." },
+        { q: "Can i do more then just create Menus", a: "Yes, of course! We have role based management system, shopping lists and an event-calender and so much more." },
       ],
     },
     cta: {

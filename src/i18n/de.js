@@ -165,7 +165,8 @@ const de = {
         { q: "Brauche ich technische Kenntnisse?", a: "Nein. Gerichte, Preise und Kategorien tragen Sie in einfache Formulare ein — so wie Sie es von jeder Website kennen." },
         { q: "Kann ich Allergene angeben?", a: "Ja. Für jedes Gericht können Sie die 14 Hauptallergene nach EU-Verordnung 1169/2011 auswählen. Sie erscheinen in der Speisekarte bei dem jeweiligen Gericht." },
         { q: "Wie schnell sind Änderungen sichtbar?", a: "Kurz nach dem Speichern. Der QR-Code bleibt dabei immer derselbe — Sie müssen nichts neu drucken." },
-        { q: "Kann ich das Abo jederzeit kündigen?", a: "Ja, monatlich über Ihr Konto. Ihre Speisekarte bleibt danach in der kostenlosen Starter-Version erhalten." },
+        { q: "Kann ich das Abo jederzeit kündigen?", a: "Ja, monatlich über Ihr Konto oder im Edditor." },
+        { q: "Gibt es weitere Funktionen?", a: "Ja, natürlich! Da hätten wir zum Beispiel den Eventkalender, die Management-Funktionen oder die Inventar-Funktion und noch so viel mehr." },
       ],
     },
     cta: {
