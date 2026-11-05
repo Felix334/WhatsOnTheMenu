@@ -96,7 +96,7 @@ const Header = ({ name, activePage, setActivePage, hasEvents, eventCount }) => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 md:px-8 py-2 flex items-center h-12 gap-1">
         {/* Linke Seite: gleiche flex-1 wie rechts, damit die Tabs exakt zentriert bleiben */}
         <div className="flex-1 flex justify-start min-w-0">
-          <Link href={{ pathname: "/", query: { ...router.query } }} prefetch={false} className="inline-flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900" aria-label="Zur Homepage">
+          <Link href={{ pathname: "https://www.whatisonmymenu.com", query: { ...router.query } }} prefetch={false} className="inline-flex items-center gap-2 px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900" aria-label="Zur Homepage">
             <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>

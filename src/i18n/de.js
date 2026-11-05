@@ -288,7 +288,7 @@ const de = {
         label: "Beliebteste Wahl",
         price: "",
         description: "Unbegrenzte Möglichkeiten",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht, Werbefrei"],
+        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht", "Werbefrei", "Bestellsystem"],
         cta: "Pro abonnieren",
       },
       business: {

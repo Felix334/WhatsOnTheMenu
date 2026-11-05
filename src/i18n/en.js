@@ -197,7 +197,7 @@ const en = {
       },
       professional: {
         name: "Professional",
-        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview"],
+        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview", "Ordering System"],
       },
     },
   },
