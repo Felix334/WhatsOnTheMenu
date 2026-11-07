@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
           {children}
           <Analytics />
           <SpeedInsights />
-          <CookieBanner />
+          <CookieBanner locale="de" />
         </Providers>
       </body>
     </html>

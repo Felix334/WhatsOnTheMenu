@@ -66,7 +66,7 @@ export default async function IntlRootLayout({ children, params }) {
           {children}
           <Analytics />
           <SpeedInsights />
-          <CookieBanner />
+          <CookieBanner locale={locale} />
         </Providers>
       </body>
     </html>

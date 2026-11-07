@@ -504,6 +504,14 @@ const en = {
     withdrawal: "Right of withdrawal",
     imprint: "Legal notice",
   },
+
+  // Cookie notice (cookieWin.js). The linked privacy policy stays German.
+  cookieBanner: {
+    title: "Cookies",
+    message: "We only use strictly necessary cookies: for signing in, for security (Cloudflare) and for payments (Stripe).",
+    privacy: "Privacy policy (German)",
+    accept: "Got it",
+  },
 };
 
 export default en;

@@ -485,6 +485,16 @@ const de = {
     withdrawal: "Widerruf",
     imprint: "Impressum",
   },
+
+  // Cookie-Hinweis (cookieWin.js). Nur ein Hinweis, keine Einwilligung: es
+  // gibt ausschliesslich technisch notwendige Cookies (§ 25 Abs. 2 TDDDG).
+  // Inhaltlich mit Abschnitt "5. Cookies" in /privacy abgleichen.
+  cookieBanner: {
+    title: "Cookies",
+    message: "Wir nutzen nur technisch notwendige Cookies: für die Anmeldung, für Sicherheit (Cloudflare) und für Zahlungen (Stripe).",
+    privacy: "Datenschutzerklärung",
+    accept: "Verstanden",
+  },
 };
 
 export default de;
