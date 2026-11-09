@@ -183,15 +183,15 @@ const de = {
       comingSoon: "Coming Soon",
       starter: {
         name: "Starter",
-        features: ["Bis zu 10 Kategorien", "Bis zu 80 Gerichte", "Basis Templates", "QR-Code"],
+        features: ["Bis zu 10 Kategorien", "Bis zu 80 Gerichte", "Basis Templates", "QR-Code", "Allergene-Kennzeichnung"],
       },
       business: {
         name: "Business",
-        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender (30 Tage)"],
+        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender (30 Tage)", "Allergene-Kennzeichnung"],
       },
       professional: {
         name: "Professional",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Premium Templates", "QR-Code", "Eigene Subdomain", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender (365 Tage)", "Inventar & Lieferanten-Übersicht"],
+        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Premium Templates", "QR-Code", "Eigene Subdomain", "Personalverwaltung mit Rollen", "Gerichtverfügbarkeitsanzeige", "Event-Kalender (365 Tage)", "Inventar & Lieferanten-Übersicht", "Allergene-Kennzeichnung"],
       },
     },
   },

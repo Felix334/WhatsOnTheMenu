@@ -189,15 +189,15 @@ const en = {
       comingSoon: "Coming soon",
       starter: {
         name: "Starter",
-        features: ["Up to 10 categories", "Up to 80 dishes", "Basic templates", "QR code"],
+        features: ["Up to 10 categories", "Up to 80 dishes", "Basic templates", "QR code", "Allergen labeling"],
       },
       business: {
         name: "Business",
-        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain", "Event calendar (30 days)"],
+        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain", "Event calendar (30 days)", "Allergen labeling"],
       },
       professional: {
         name: "Professional",
-        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview", "Ordering System"],
+        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview", "Ordering System", "Allergen labeling"],
       },
     },
   },
