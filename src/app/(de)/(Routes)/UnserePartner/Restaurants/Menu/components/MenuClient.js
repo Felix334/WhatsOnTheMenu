@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
@@ -788,11 +787,18 @@ const MenuFooter = ({ orderMode }) => (
 // ─── Main Content ──────────────────────────────────────────────────────────────
 // Daten kommen als Prop von der Server-Seite (ISR) — hier kein Fetch mehr
 const MenuClient = ({ serverData }) => {
-  const searchParams = useSearchParams();
   const [activeId, setActiveId] = useState(null);
   const [activePage, setActivePage] = useState("menu");
 
-  const tableNumber = searchParams.get("tableNumber");
+  // tableNumber bewusst NICHT per useSearchParams(): das liesse das ISR-
+  // Prerendering auf den Suspense-Fallback zurueckfallen, und das gecachte HTML
+  // enthielte nur "Loading..." statt der Speisekarte (schlecht fuer SEO und LCP).
+  // Erst nach dem Hydrieren aus der URL lesen — das HTML bleibt fuer alle
+  // Besucher identisch, der Server merkt davon nichts.
+  const [tableNumber, setTableNumber] = useState(null);
+  useEffect(() => {
+    setTableNumber(new URLSearchParams(window.location.search).get("tableNumber"));
+  }, []);
   // Bestellmodus nur für Professional-Restaurants — gleiche Regel wie serverseitig
   // in getStaffAccess (api/orders/create), sonst zeigt die UI Buttons, die beim
   // Abschicken ohnehin mit 401 abgelehnt würden.
