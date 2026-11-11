@@ -15,15 +15,15 @@ const en = {
       ogDescription: "Build a digital menu your guests open by scanning a QR code.",
     },
     pricing: {
-      title: "Pricing & Plans | WhatIsOnMyMenu",
+      title: "Pricing & Plans",
       description: "Every plan at a glance: a free tier, Business at €7.99/month. QR code menus for restaurants, cancel any month.",
     },
     howItWorks: {
-      title: "How It Works | Build a QR Code Menu in Minutes",
+      title: "How It Works – Build a QR Code Menu in Minutes",
       description: "Three steps to a digital menu: create an account, add your dishes, print the QR code. Nothing to install.",
     },
     team: {
-      title: "Our Team | WhatIsOnMyMenu",
+      title: "Our Team",
       description: "WhatIsOnMyMenu is built and run by founder Felix Mayer – no corporation, no call centre. Questions about plans or your digital menu go straight to him.",
     },
   },

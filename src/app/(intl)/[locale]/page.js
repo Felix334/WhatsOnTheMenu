@@ -9,16 +9,17 @@ export async function generateMetadata({ params }) {
   const t = getDictionary(locale);
 
   return {
-    title: t.meta.home.title,
+    // absolute: Keyword-Titel bewusst ohne angehaengte Marke (sonst > 60 Zeichen)
+    title: { absolute: t.meta.home.title },
     description: t.meta.home.description,
     alternates: buildAlternates("/", locale),
+    // Bild kommt aus src/app/(intl)/[locale]/opengraph-image.js
     openGraph: {
       title: t.meta.home.ogTitle,
       description: t.meta.home.ogDescription,
       url: `/${locale}`,
       siteName: "WhatIsOnMyMenu",
       locale: ogLocales[locale],
-      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
       type: "website",
     },
   };

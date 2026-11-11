@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Providers from "../../components/Providers.js";
 import LanguageSuggestionBanner from "../../components/LanguageSuggestionBanner";
-import { prefixedLocales } from "@/i18n/config";
+import { prefixedLocales, ogLocales } from "@/i18n/config";
 
 // Root-Layout aller uebersetzten Sprachen.
 //
@@ -38,17 +38,35 @@ export function generateStaticParams() {
 // dynamischen [locale]-Segment eingefangen zu werden.
 export const dynamicParams = false;
 
-export const metadata = {
-  metadataBase: new URL("https://www.whatisonmymenu.com"),
-  manifest: "/manifest.json",
-  robots: {
-    index: true,
-    follow: true,
-  },
-  other: {
-    "google-adsense-account": "ca-pub-4153577229204032",
-  },
-};
+// Gegenstueck zu den Basis-Metadaten in src/app/(de)/layout.js — Titel-Template,
+// Standard-Vorschau (Bild aus opengraph-image.js hier im Ordner) und Twitter-Karte.
+export async function generateMetadata({ params }) {
+  const { locale } = await params;
+
+  return {
+    metadataBase: new URL("https://www.whatisonmymenu.com"),
+    title: {
+      default: "WhatIsOnMyMenu – QR Code Menus for Restaurants",
+      template: "%s | WhatIsOnMyMenu",
+    },
+    openGraph: {
+      siteName: "WhatIsOnMyMenu",
+      locale: ogLocales[locale],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+    manifest: "/manifest.json",
+    robots: {
+      index: true,
+      follow: true,
+    },
+    other: {
+      "google-adsense-account": "ca-pub-4153577229204032",
+    },
+  };
+}
 
 export const viewport = {
   width: "device-width",

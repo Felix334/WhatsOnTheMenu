@@ -3,7 +3,7 @@ import PublicHeader from "@/app/components/PublicHeader";
 
 export const metadata = {
   alternates: buildAlternates("/pricing", "de"),
-  title: "Preise & Tarife | WhatIsOnMyMenu.com",
+  title: "Preise & Tarife",
   description: "Vergleiche die Tarife von WhatIsOnMyMenu.com – kostenlos starten und jederzeit upgraden für mehr Funktionen bei deiner digitalen Speisekarte per QR-Code.",
 };
 

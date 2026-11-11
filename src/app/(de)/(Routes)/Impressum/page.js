@@ -1,10 +1,10 @@
-const LAST_UPDATED = "31. Mai 2026";
+const LAST_UPDATED = "11. November 2026";
 
 export const metadata = {
   alternates: { canonical: "/Impressum" },
-  title: "Impressum | WhatIsOnMyMenu.com",
+  title: "Impressum",
   description:
-    "Impressum und Anbieterkennzeichnung gemäß § 5 TMG von WhatIsOnMyMenu.com – der Plattform für digitale Speisekarten per QR-Code.",
+    "Impressum und Anbieterkennzeichnung gemäß § 5 DDG von WhatIsOnMyMenu.com – der Plattform für digitale Speisekarten per QR-Code.",
 };
 
 export default function ImprintPage() {
@@ -23,7 +23,7 @@ export default function ImprintPage() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 wrap-anywhere hyphens-auto">
-            Angaben gemäß § 5 TMG
+            Angaben gemäß § 5 DDG
           </h2>
           <div className="text-sm text-gray-600 space-y-1 leading-relaxed wrap-anywhere">
             <p className="font-medium text-gray-800">Felix Mayer</p>
@@ -49,10 +49,10 @@ export default function ImprintPage() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 wrap-anywhere hyphens-auto">
-            Umsatzsteuer-ID
+            Umsatzsteuer
           </h2>
           <p className="text-sm text-gray-600 wrap-anywhere hyphens-auto">
-            Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: [UST-ID ODER &quot;nicht vorhanden, da Kleinunternehmer gemäß § 19 UStG&quot;]
+            Kleinunternehmer im Sinne von § 19 UStG. Es wird keine Umsatzsteuer berechnet.
           </p>
         </div>
 
@@ -71,18 +71,8 @@ export default function ImprintPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 wrap-anywhere hyphens-auto">
             Streitschlichtung
           </h2>
+          {/* Kein Link zur EU-OS-Plattform mehr: die wurde zum 20.07.2025 abgeschaltet. */}
           <div className="text-sm text-gray-600 space-y-3 wrap-anywhere">
-            <p>
-              Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
-              <a
-                href="https://ec.europa.eu/consumers/odr/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-red-700 hover:underline"
-              >
-                https://ec.europa.eu/consumers/odr/
-              </a>
-            </p>
             <p>
               Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
             </p>
@@ -94,7 +84,7 @@ export default function ImprintPage() {
             Haftung für Inhalte
           </h2>
           <p className="text-sm text-gray-600 leading-relaxed wrap-anywhere hyphens-auto">
-            Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+            Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
           </p>
         </div>
 

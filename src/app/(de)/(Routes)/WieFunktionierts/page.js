@@ -4,7 +4,7 @@ import { getDictionary, buildAlternates } from "@/i18n";
 export const dynamic = "force-static";
 
 export const metadata = {
-  title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code | WhatIsOnMyMenu",
+  title: "Wie funktioniert's? – Digitale Speisekarte per QR-Code",
   description: "In wenigen Minuten zur digitalen Speisekarte: Restaurant anlegen, Menü gestalten, QR-Code drucken. Ihre Gäste scannen und sehen Gerichte, Preise, Allergene und Verfügbarkeit – ganz ohne App.",
   alternates: buildAlternates("/WieFunktionierts", "de"),
 };

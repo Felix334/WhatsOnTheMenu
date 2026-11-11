@@ -14,7 +14,8 @@ export async function generateMetadata({ params }) {
   const data = await getRestaurantData(subdomain);
   if (!data) return { title: "Speisekarte", robots: { index: false, follow: false } };
   return {
-    title: `${data.name} – Speisekarte`,
+    // absolute: auf der eigenen Subdomain des Restaurants keine Plattform-Marke anhaengen
+    title: { absolute: `${data.name} – Speisekarte` },
     description: data.description || `Digitale Speisekarte von ${data.name} — jetzt ansehen und bestellen.`,
     // Kanonisch bleibt die Speisekarte auf der Hauptdomain (metadataBase), sonst doppelter Inhalt.
     alternates: {

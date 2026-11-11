@@ -27,7 +27,7 @@ const TRANSLATED_PAGES = [
 const GERMAN_ONLY_PAGES = [
   { path: "/AGBs", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
   { path: "/privacy", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/Impressum", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/Impressum", lastModified: "2026-11-11", changeFrequency: "yearly", priority: 0.3 },
   { path: "/Widerruf", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
 ];
 

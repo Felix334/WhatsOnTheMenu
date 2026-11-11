@@ -12,15 +12,15 @@ const de = {
       ogDescription: "Erstelle digitale Speisekarten und Eventkalender für dein Restaurant.",
     },
     pricing: {
-      title: "Preise & Tarife | WhatIsOnMyMenu",
+      title: "Preise & Tarife",
       description: "Alle Tarife im Überblick: kostenlose Standardversion, Business für 7,99 €/Monat. Digitale Speisekarten per QR-Code, monatlich kündbar.",
     },
     howItWorks: {
-      title: "Wie funktioniert's? | Digitale Speisekarte in Minuten",
+      title: "Wie funktioniert's? – Digitale Speisekarte in Minuten",
       description: "In wenigen Schritten zur digitalen Speisekarte: Konto anlegen, Gerichte eintragen, QR-Code drucken. Ohne Software-Installation.",
     },
     team: {
-      title: "Unser Team | WhatIsOnMyMenu",
+      title: "Unser Team",
       description: "Hinter WhatIsOnMyMenu steht Gründer Felix Mayer – kein Konzern, keine Hotline. Fragen zu Tarifen oder Ihrer digitalen Speisekarte landen direkt bei ihm.",
     },
   },

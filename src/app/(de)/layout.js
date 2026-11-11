@@ -28,6 +28,24 @@ const geistMono = Geist_Mono({
 // nur, was fuer alle gilt.
 export const metadata = {
   metadataBase: new URL("https://www.whatisonmymenu.com"),
+  // Seiten setzen nur noch ihren eigenen Teil ("Preise & Tarife"), die Marke
+  // haengt das Template an. Wer den Titel komplett selbst bestimmen will
+  // (Startseite: Keyword-Titel ohne Marke), nutzt title: { absolute: ... }.
+  title: {
+    default: "WhatIsOnMyMenu – Digitale Speisekarte per QR-Code",
+    template: "%s | WhatIsOnMyMenu",
+  },
+  // Standard-Vorschau fuer alle Seiten ohne eigenes openGraph. Das Bild kommt
+  // aus opengraph-image.js in diesem Ordner. Ohne openGraph.title nehmen
+  // Facebook, LinkedIn & Co. den <title> der Seite.
+  openGraph: {
+    siteName: "WhatIsOnMyMenu",
+    locale: "de_DE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
   // Favicon, Apple-Icon und SVG-Icon kommen aus den Dateien in src/app/
   // (favicon.ico, icon.svg, apple-icon.png). Hier bewusst kein icons-Feld:
   // ein explizites icons-Objekt ueberschreibt die Datei-Konvention und
