@@ -1,7 +1,7 @@
 {
-  "name": "What's On The Menu",
-  "short_name": "WOTM",
-  "description": "Discover and explore restaurant menus easily",
+  "name": "WhatIsOnMyMenu",
+  "short_name": "WhatIsOnMyMenu",
+  "description": "Digitale Speisekarten per QR-Code für Restaurants – erstellen, aktualisieren und teilen, ohne App.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

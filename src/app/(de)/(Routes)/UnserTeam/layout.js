@@ -1,9 +1,14 @@
-import { buildAlternates } from "@/i18n";
+import { buildAlternates, getDictionary } from "@/i18n";
+
+// Titel und Beschreibung aus dem Woerterbuch — dieselbe Quelle wie die
+// uebersetzte Fassung unter (intl)/[locale]/UnserTeam, damit beide nicht
+// auseinanderlaufen.
+const t = getDictionary("de");
 
 export const metadata = {
   alternates: buildAlternates("/UnserTeam", "de"),
-  title: "Unser Team | WhatIsOnMyMenu.com",
-  description: "Lerne das Team hinter WhatIsOnMyMenu.com kennen.",
+  title: t.meta.team.title,
+  description: t.meta.team.description,
 };
 
 export default function UnserTeamLayout({ children }) {

@@ -24,7 +24,7 @@ const en = {
     },
     team: {
       title: "Our Team | WhatIsOnMyMenu",
-      description: "The people behind WhatIsOnMyMenu — digital menus for restaurants.",
+      description: "WhatIsOnMyMenu is built and run by founder Felix Mayer – no corporation, no call centre. Questions about plans or your digital menu go straight to him.",
     },
   },
 

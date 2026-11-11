@@ -8,27 +8,31 @@ const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || "https://www.whatisonmymenu
 // Seiten, die es in allen Sprachen gibt. Sie bekommen pro Sprache einen eigenen
 // Eintrag samt alternates — so findet Google die uebersetzten Fassungen, ohne
 // erst dem Sprachumschalter folgen zu muessen.
+//
+// lastModified: Datum der letzten INHALTLICHEN Aenderung, von Hand gepflegt.
+// Nicht new Date() — sonst traegt jeder Deploy ueberall "heute" ein, Google
+// merkt, dass das Feld nicht stimmt, und ignoriert es dann fuer die ganze
+// Domain. Beim Aendern von Seitentext hier das Datum mitziehen; reine
+// Code-Umbauten ohne sichtbare Aenderung zaehlen nicht.
 const TRANSLATED_PAGES = [
-  { path: "/", changeFrequency: "weekly", priority: 1 },
-  { path: "/pricing", changeFrequency: "monthly", priority: 0.9 },
-  { path: "/WieFunktionierts", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/UnserTeam", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/", lastModified: "2026-11-09", changeFrequency: "weekly", priority: 1 },
+  { path: "/pricing", lastModified: "2026-10-22", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/WieFunktionierts", lastModified: "2026-09-20", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/UnserTeam", lastModified: "2026-11-11", changeFrequency: "monthly", priority: 0.5 },
 ];
 
-// Nur auf Deutsch vorhanden: Rechtsseiten (Dokumente nach deutschem Recht) und
-// die Team-Seite. Diese bekommen bewusst kein hreflang — es gibt keine
-// uebersetzte Entsprechung, auf die es zeigen koennte.
+// Nur auf Deutsch vorhanden: Rechtsseiten (Dokumente nach deutschem Recht).
+// Diese bekommen bewusst kein hreflang — es gibt keine uebersetzte
+// Entsprechung, auf die es zeigen koennte.
 const GERMAN_ONLY_PAGES = [
-  { path: "/AGBs", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/Impressum", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/Widerruf", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/AGBs", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/privacy", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/Impressum", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/Widerruf", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
 ];
 
 export default function sitemap() {
-  const lastModified = new Date();
-
-  const translated = TRANSLATED_PAGES.flatMap(({ path, changeFrequency, priority }) => {
+  const translated = TRANSLATED_PAGES.flatMap(({ path, lastModified, changeFrequency, priority }) => {
     const languages = Object.fromEntries(locales.map((l) => [l, `${baseUrl}${localizedPath(path, l)}`]));
 
     return locales.map((locale) => ({
@@ -42,7 +46,7 @@ export default function sitemap() {
     }));
   });
 
-  const germanOnly = GERMAN_ONLY_PAGES.map(({ path, changeFrequency, priority }) => ({
+  const germanOnly = GERMAN_ONLY_PAGES.map(({ path, lastModified, changeFrequency, priority }) => ({
     url: `${baseUrl}${path}`,
     lastModified,
     changeFrequency,

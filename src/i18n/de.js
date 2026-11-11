@@ -21,7 +21,7 @@ const de = {
     },
     team: {
       title: "Unser Team | WhatIsOnMyMenu",
-      description: "Die Menschen hinter WhatIsOnMyMenu — digitale Speisekarten für Restaurants.",
+      description: "Hinter WhatIsOnMyMenu steht Gründer Felix Mayer – kein Konzern, keine Hotline. Fragen zu Tarifen oder Ihrer digitalen Speisekarte landen direkt bei ihm.",
     },
   },
 
