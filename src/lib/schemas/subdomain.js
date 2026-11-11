@@ -16,6 +16,27 @@ export const RESERVED_SUBDOMAINS = new Set([
   "dashboard", "login", "auth", "account", "konto", "profil", "staff", "pricing", "sub",
 ]);
 
+// Hauptdomain ohne "www". Lokal funktionieren Subdomains über <subdomain>.localhost:3000.
+export const ROOT_DOMAIN = process.env.NODE_ENV === "production" ? "whatisonmymenu.com" : "localhost";
+
+/**
+ * Restaurant-Subdomain aus einem Hostnamen, sonst null.
+ * "pizza.whatisonmymenu.com" -> "pizza"   "www.whatisonmymenu.com" -> null
+ * Genutzt von der Middleware (Rewrite) und von Providers.js im Browser
+ * (dort ohne Session-Abfrage für Gäste) — beide müssen dieselbe Regel haben.
+ */
+export function subdomainFromHostname(rawHostname) {
+  // Port abschneiden und klein schreiben ("Pizza.localhost:3000" -> "pizza.localhost")
+  const hostname = String(rawHostname ?? "").split(":")[0].toLowerCase();
+  // Nur echte Subdomains der eigenen Domain. Vercel-Preview-Hosts o. Ä. fallen hier raus.
+  if (!hostname.endsWith(`.${ROOT_DOMAIN}`)) return null;
+
+  const sub = hostname.slice(0, -(ROOT_DOMAIN.length + 1));
+  // Mehrstufige Subdomains (a.b.whatisonmymenu.com) und reservierte Namen ignorieren
+  if (sub.includes(".") || RESERVED_SUBDOMAINS.has(sub) || !SUBDOMAIN_PATTERN.test(sub)) return null;
+  return sub;
+}
+
 export const subdomainSchema = z
   .string()
   .trim()
