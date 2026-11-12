@@ -12,24 +12,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DynamicLink } from "@/app/components/DynamicLink";
 
 import { useRestaurantData, markUserAnsichtNavigation } from "../components/fetchData";
-import { formatPrice } from "@/lib/priceRules";
+import { GOOGLE_FONTS_URL } from "../components/fontList";
+import { bgColorClass, bgColorStyle } from "../components/ColorPicker";
+import { AllergenBadges } from "../components/menuSection";
+import { DENSITY_CLASS, RADIUS_CLASS, heroClass, heroStyle } from "../components/menuStyle";
+import { ALLERGENS } from "@/lib/allergens";
 
-// Druckbare Version der Speisekarte — dieselben Daten wie der Editor, in ein
-// A4-Layout gegossen. Kein PDF-Generator nötig: der Druckdialog des Browsers
-// kann "Als PDF speichern", das erspart eine zusätzliche Abhängigkeit.
+// Druckbare Version der Speisekarte — dieselben Daten UND dieselbe Gestaltung
+// wie der Editor (Kopfbereich, Farben, Schriften, Rundungen, Ausrichtung,
+// Führungspunkte je Kategorie), nur ohne Bearbeitungs-Knöpfe. Die
+// Stil-Konstanten kommen aus components/menuStyle.js, damit Editor und Druck
+// nicht auseinanderlaufen. Kein PDF-Generator nötig: der Druckdialog des
+// Browsers kann "Als PDF speichern".
 //
 // Hinweis: Die Abo-Prüfung hier ist reine UI-Führung. Die Seite rendert
 // ausschließlich Daten, die dem Besitzer ohnehin gehören und die er im Editor
 // sieht — es gibt also nichts serverseitig zu schützen.
 const PAID_TIERS = ["Professional", "Business"];
 
+// print-color-adjust: ohne das lassen Browser beim Drucken alle
+// Hintergrundfarben weg, und die Karte sähe wieder anders aus als im Editor.
 const PRINT_CSS = `
-@page { size: A4 portrait; margin: 16mm 14mm; }
+@page { size: A4 portrait; margin: 10mm; }
+.print-sheet, .print-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 @media print {
   .no-print { display: none !important; }
   body { background: #fff !important; }
-  .print-sheet { box-shadow: none !important; margin: 0 !important; padding: 0 !important; max-width: none !important; }
-  .print-group { break-inside: auto; }
+  .print-sheet { box-shadow: none !important; margin: 0 !important; max-width: none !important; }
   .print-category { break-inside: avoid; }
   .print-dish { break-inside: avoid; }
 }
@@ -38,11 +47,10 @@ const PRINT_CSS = `
 export default function DruckenPage() {
   const { data: session, status } = useSession();
   const [userID, setUserID] = useState("");
-  const { serverData, isLoading, font, headingFont } = useRestaurantData(userID);
+  const { serverData, isLoading, bgColor, fontColor, font, headingFont, density } = useRestaurantData(userID);
 
   const [showDescriptions, setShowDescriptions] = useState(true);
   const [showAllergens, setShowAllergens] = useState(true);
-  const [leaderDots, setLeaderDots] = useState(true);
   const [columns, setColumns] = useState("1");
 
   useEffect(() => {
@@ -63,7 +71,7 @@ export default function DruckenPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
         <p className="text-5xl">🖨️</p>
-        <h1 className="text-2xl font-semibold text-gray-900">Druckansicht ist ein Premium-Feature</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">Druckansicht gibt es ab dem Plus-Tarif</h1>
         <p className="text-gray-500 max-w-md">Erstelle aus deiner digitalen Karte mit einem Klick eine gedruckte Speisekarte — immer auf demselben Stand wie der QR-Code.</p>
         <div className="flex gap-2">
           <Button asChild variant="outline">
@@ -81,10 +89,17 @@ export default function DruckenPage() {
   const menu = restaurant?.menu?.[0];
   const categoryGroups = menu?.categoryGroup ?? [];
   const location = restaurant?.locations?.[0];
+  const heroColor = menu?.heroColor || null;
+  const heroTextColor = menu?.heroTextColor || "#ffffff";
+
+  // Legende nur für Allergene, die auf dieser Karte tatsächlich vorkommen.
+  const usedAllergenKeys = new Set(categoryGroups.flatMap((g) => (g.categories ?? []).flatMap((c) => (c.dishes ?? []).flatMap((d) => d.allergens ?? []))));
+  const allergenLegend = ALLERGENS.filter((a) => usedAllergenKeys.has(a.key));
 
   return (
     <div className="min-h-screen bg-gray-100">
       <style>{PRINT_CSS}</style>
+      <link href={GOOGLE_FONTS_URL} rel="stylesheet" />
 
       {/* Steuerleiste — wird nicht mitgedruckt */}
       <header className="no-print sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
@@ -106,10 +121,6 @@ export default function DruckenPage() {
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox checked={showAllergens} onCheckedChange={(v) => setShowAllergens(!!v)} />
               Allergene
-            </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={leaderDots} onCheckedChange={(v) => setLeaderDots(!!v)} />
-              Führungspunkte
             </label>
 
             <div className="flex items-center gap-2">
@@ -135,58 +146,100 @@ export default function DruckenPage() {
         </div>
       </header>
 
-      <main className="print-sheet max-w-3xl mx-auto my-8 bg-white shadow-lg px-10 py-12" style={{ fontFamily: font || undefined }}>
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold tracking-wide" style={{ fontFamily: headingFont || font || undefined }}>
-            {restaurant?.name ?? "Speisekarte"}
+      <div className="print-sheet max-w-4xl mx-auto my-8 shadow-lg overflow-hidden" style={{ fontFamily: font || undefined }}>
+        {/* Kopfbereich — wie im Editor */}
+        <div className={`w-full ${heroClass(heroColor)} text-white py-10 px-4 text-center`} style={heroStyle(heroColor)}>
+          <h1 className="text-4xl sm:text-5xl font-serif font-bold tracking-wide drop-shadow" style={{ color: heroTextColor }}>
+            {restaurant?.name || "Restaurant"}
           </h1>
-          {restaurant?.description && <p className="mt-2 text-gray-500">{restaurant.description}</p>}
+          {menu?.description && (
+            <p className="mt-3 text-sm max-w-md mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>
+              {menu.description}
+            </p>
+          )}
           {location && (
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs" style={{ color: heroTextColor, opacity: 0.7 }}>
               {location.street} {location.houseNumber}, {location.postalCode} {location.city}
             </p>
           )}
         </div>
 
-        {categoryGroups.length === 0 ? (
-          <p className="text-center text-gray-400 py-10">Keine Kategorien vorhanden.</p>
-        ) : (
-          <div className="space-y-10">
-            {categoryGroups.map((group) => (
-              <section key={group.id} className="print-group">
-                <h2 className="text-2xl font-semibold border-b pb-2 mb-5" style={{ fontFamily: headingFont || font || undefined }}>
-                  {group.name}
-                </h2>
+        {/* Karte — Hintergrund und Schriftfarbe wie im Editor */}
+        <div className={`font-sans ${!bgColor ? "bg-amber-50" : ""} ${!fontColor ? "text-gray-900" : ""}`} style={{ ...(bgColor ? { backgroundColor: bgColor } : {}), ...(fontColor ? { color: fontColor } : {}) }}>
+          <main className="px-4 sm:px-6 py-8 space-y-8">
+            {categoryGroups.length === 0 ? (
+              <p className="text-center text-gray-400 py-10">Keine Kategorien vorhanden.</p>
+            ) : (
+              categoryGroups.map((group) => (
+                <section key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-4 sm:p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
+                  <h2
+                    className="text-2xl font-semibold mb-6 border-b pb-4 break-words"
+                    style={{
+                      ...(group.fontColor ? { color: group.fontColor } : {}),
+                      textAlign: group.titleAlign ?? "left",
+                      ...(headingFont ? { fontFamily: headingFont } : {}),
+                    }}
+                  >
+                    {group.name}
+                  </h2>
 
-                <div className={`space-y-6 ${columns === "2" ? "sm:columns-2 sm:gap-8 sm:space-y-0" : ""}`}>
-                  {(group.categories ?? []).map((category) => (
-                    <div key={category.id} className={`print-category ${columns === "2" ? "break-inside-avoid mb-6" : ""}`}>
-                      <h3 className="text-lg font-semibold uppercase tracking-wider text-gray-700 mb-2">{category.name}</h3>
-                      {category.description && <p className="text-xs text-gray-400 mb-2">{category.description}</p>}
+                  <div className={columns === "2" ? "sm:columns-2 sm:gap-6" : "space-y-8"}>
+                    {(group.categories ?? []).map((category) => (
+                      <PrintCategory key={category.id} category={category} density={density} font={font} headingFont={headingFont} showDescriptions={showDescriptions} showAllergens={showAllergens} twoColumns={columns === "2"} />
+                    ))}
+                  </div>
+                </section>
+              ))
+            )}
 
-                      <ul className="space-y-1.5">
-                        {(category.dishes ?? []).map((dish) => (
-                          <li key={dish.id} className="print-dish">
-                            <div className="flex items-baseline gap-2">
-                              <span className="font-medium">{dish.name}</span>
-                              {leaderDots && <span aria-hidden className="flex-1 border-b border-dotted border-gray-300 translate-y-[-3px]" />}
-                              <span className="font-mono whitespace-nowrap">{formatPrice(dish.price)}</span>
-                            </div>
-                            {showDescriptions && dish.description && <p className="text-sm text-gray-500 pr-16">{dish.description}</p>}
-                            {showAllergens && dish.allergens?.length > 0 && <p className="text-[10px] text-gray-400">Allergene: {dish.allergens.join(", ")}</p>}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+            {showAllergens && allergenLegend.length > 0 && (
+              <div className="text-xs opacity-70 pt-2">
+                <p className="font-semibold mb-1">Allergene</p>
+                <p>{allergenLegend.map((a) => `${a.id} = ${a.name}`).join(" · ")}</p>
+              </div>
+            )}
+            <p className="pt-4 border-t text-center text-[10px] opacity-60">Allergenangaben ohne Gewähr — im Zweifel bitte beim Personal nachfragen.</p>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Eine Kategorie wie MenuSection im Editor, ohne Aktionsspalte und Knöpfe.
+function PrintCategory({ category, density, font, headingFont, showDescriptions, showAllergens, twoColumns }) {
+  const fontStyle = category.fontColor ? { color: category.fontColor } : {};
+  const elevated = category.elevated ?? true;
+
+  return (
+    <div className={`print-category ${twoColumns ? "break-inside-avoid mb-6" : ""} ${RADIUS_CLASS[category.borderRadius] ?? "rounded-xl"} ${elevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} w-full overflow-hidden ${bgColorClass(category.bgColor)}`} style={bgColorStyle(category.bgColor)}>
+      <div className="py-5 px-4 border-b">
+        <h3 className={`w-full text-2xl sm:text-3xl font-semibold break-words ${category.titleUppercase ? "uppercase tracking-widest" : ""}`} style={{ ...fontStyle, textAlign: category.titleAlign || "center", ...(headingFont ? { fontFamily: headingFont } : {}) }}>
+          {category.name}
+        </h3>
+      </div>
+
+      <ul className="divide-y" style={{ fontFamily: font || undefined }}>
+        {(category.dishes ?? []).map((dish) => (
+          <li key={dish.id} className="print-dish px-4 py-3">
+            <div className="flex items-start justify-between gap-3" style={fontStyle}>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-serif break-words">{dish.name}</span>
+                  {category.leaderDots && <span aria-hidden className="flex-1 min-w-6 border-b border-dotted border-current opacity-40" />}
                 </div>
-              </section>
-            ))}
-          </div>
-        )}
-
-        <p className="mt-12 pt-4 border-t text-center text-[10px] text-gray-400">Allergenangaben ohne Gewähr — im Zweifel bitte beim Personal nachfragen.</p>
-      </main>
+                {showDescriptions && dish.description && (
+                  <p className="text-sm text-gray-500 break-words" style={fontStyle}>
+                    {dish.description}
+                  </p>
+                )}
+                {showAllergens && <AllergenBadges allergens={dish.allergens} />}
+              </div>
+              <span className="shrink-0 font-mono">{Number(dish.price).toFixed(2)}€</span>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

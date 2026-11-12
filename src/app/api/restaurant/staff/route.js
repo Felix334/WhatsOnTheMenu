@@ -6,7 +6,7 @@ async function getOwnerRestaurant(token) {
   if (!token || token.role !== "Owner") return null;
   return prisma.restaurant.findUnique({
     where: { ownerId: token.id },
-    select: { id: true },
+    select: { id: true, owner: { select: { subscription: true } } },
   });
 }
 
@@ -28,6 +28,14 @@ export async function POST(req) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const restaurant = await getOwnerRestaurant(token);
   if (!restaurant) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  // Personalverwaltung ist ein Premium-Feature. Ohne diese Prüfung konnte jeder
+  // Owner einladen, und die Annahme der Einladung hob den Eingeladenen
+  // global auf die Rolle "Staff" — obwohl getStaffAccess ihm danach ohnehin
+  // nichts erlaubt. Abo frisch aus der DB, nicht aus dem JWT.
+  if (restaurant.owner.subscription !== "Professional") {
+    return NextResponse.json({ message: "Personalverwaltung gibt es nur im Premium-Tarif" }, { status: 403 });
+  }
 
   const { email, role } = await req.json();
 

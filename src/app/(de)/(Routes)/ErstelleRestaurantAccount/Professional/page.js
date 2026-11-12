@@ -168,7 +168,7 @@ function RestaurantForm() {
         <CardContent className="p-8 sm:p-10">
           <div className="text-center mb-8">
             <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
-              Professional · €14.99/Monat
+              Premium · €14.99/Monat
             </span>
             <h1 className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-3">Dein Restaurant registrieren</h1>
             <p className="text-gray-500 max-w-md mx-auto">Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.</p>
@@ -373,10 +373,10 @@ function LockedNotice() {
         <CardContent className="p-10">
           <div className="text-5xl mb-4">🚧</div>
           <span className="inline-block bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full mb-4 shadow">
-            Professional
+            Premium
           </span>
           <h1 className="text-2xl font-serif font-bold text-gray-900 mb-3">Bald verfügbar</h1>
-          <p className="text-gray-500 mb-6">Die Professional-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
+          <p className="text-gray-500 mb-6">Die Premium-Registrierung wird gerade fertiggestellt und ist vorübergehend nicht verfügbar.</p>
           <Button asChild variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
             <Link href={`/ErstelleRestaurantAccount${queryString ? `?${queryString}` : ""}`}>Zurück zur Tarifübersicht</Link>
           </Button>

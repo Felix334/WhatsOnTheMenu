@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { hasEqualOrHigherTier } from "@/lib/tierRank";
 import { SUPPORTED_COUNTRIES } from "@/lib/schemas/restaurant";
 import { isTierAvailableUI } from "@/lib/tierAvailability";
+import { TIER_LABELS, tierLabel } from "@/lib/tierLabels";
+import de from "@/i18n/de";
 
 // Anzeige-Schalter pro Tarif. Die Liste steht jetzt zentral in
 // src/lib/tierAvailability.js, damit Registrierungsformular und Tarifseite
@@ -166,7 +168,7 @@ export default function PricingPage() {
           <Card className="border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Kostenlos</p>
-              <CardTitle className="text-2xl font-bold">Free</CardTitle>
+              <CardTitle className="text-2xl font-bold">{TIER_LABELS.FreeTier}</CardTitle>
               <CardDescription>Perfekt zum Ausprobieren</CardDescription>
             </CardHeader>
             <CardContent>
@@ -175,7 +177,7 @@ export default function PricingPage() {
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["1 Restaurant", "Digitale Speisekarte", "80 Gerichte Limit", "QR-Code Generator"].map((f) => (
+                {de.home.pricing.starter.features.map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -199,8 +201,8 @@ export default function PricingPage() {
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-red-800 text-white px-5 py-1 rounded-full text-xs font-bold tracking-wide shadow">⭐ Empfohlen</div>
             <CardHeader className="pb-2 pt-7">
               <p className="text-xs font-semibold uppercase tracking-widest text-red-700 mb-1">Beliebteste Wahl</p>
-              <CardTitle className="text-2xl font-bold">Professional</CardTitle>
-              <CardDescription>Unbegrenzte Möglichkeiten</CardDescription>
+              <CardTitle className="text-2xl font-bold">{TIER_LABELS.Professional}</CardTitle>
+              <CardDescription>Alle Funktionen für Ihren Betrieb</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
@@ -214,7 +216,7 @@ export default function PricingPage() {
                 )}
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Inventar & Lieferanten"].map((f) => (
+                {de.home.pricing.professional.features.map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -237,12 +239,12 @@ export default function PricingPage() {
                 <Dialog open={showProForm} onOpenChange={setShowProForm}>
                   <DialogTrigger asChild>
                     <Button size="lg" className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-300 font-semibold shadow">
-                      Jetzt Pro abonnieren
+                      Jetzt {TIER_LABELS.Professional} abonnieren
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl h-[80vh]">
                     <DialogHeader>
-                      <DialogTitle>Restaurant Details für Pro (/Monat)</DialogTitle>
+                      <DialogTitle>Restaurant Details für {TIER_LABELS.Professional} (/Monat)</DialogTitle>
                       <DialogDescription>Nach Zahlung wird dein Restaurant automatisch erstellt.</DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleProSubmit} className="space-y-4 overflow-y-auto">
@@ -328,9 +330,9 @@ export default function PricingPage() {
           {/* Premium Tier */}
           <Card className="border border-gray-200 bg-white hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Business</p>
-              <CardTitle className="text-2xl font-bold">Business</CardTitle>
-              <CardDescription>Maximale Features & Support</CardDescription>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Für wachsende Karten</p>
+              <CardTitle className="text-2xl font-bold">{TIER_LABELS.Business}</CardTitle>
+              <CardDescription>Mehr Kategorien, Gerichte und eigene Subdomain</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mb-6">
@@ -338,7 +340,7 @@ export default function PricingPage() {
                 <span className="text-gray-400 ml-1">/Monat</span>
               </div>
               <ul className="space-y-3 mb-8 text-sm text-gray-600">
-                {["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basic Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender(Bis zu 30 Tage)"].map((f) => (
+                {de.home.pricing.business.features.map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-[10px] font-bold shrink-0">✓</span>
                     {f}
@@ -454,7 +456,7 @@ export default function PricingPage() {
         {session && (
           <div className="mt-16 text-center">
             <p>
-              Aktueller Tarif: <span className="font-semibold">{session.user.subscription || "Free"}</span>
+              Aktueller Tarif: <span className="font-semibold">{tierLabel(session.user.subscription || "FreeTier")}</span>
             </p>
           </div>
         )}

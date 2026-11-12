@@ -201,7 +201,7 @@ export default function Bestellungen() {
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 max-w-md w-full text-center space-y-4">
           <p className="text-4xl">🔒</p>
           <h2 className="text-xl font-bold text-gray-900">{tc.proRequired}</h2>
-          <p className="text-gray-500 text-sm">Die Bestellfunktion ist ausschließlich für Professional-Abonnenten verfügbar.</p>
+          <p className="text-gray-500 text-sm">Die Bestellfunktion ist ausschließlich für Premium-Abonnenten verfügbar.</p>
           <a href="/pricing" className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
             {tc.upgradeNow}
           </a>

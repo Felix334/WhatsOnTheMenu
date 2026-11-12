@@ -51,7 +51,7 @@ const sections = [
   {
     title: "§ 5 Tarife und Preise",
     content: [
-      "Der Anbieter bietet verschiedene Tarife an (Starter, Business, Professional, Enterprise).",
+      "Der Anbieter bietet verschiedene Tarife an (Free, Plus, Premium).",
       "Die jeweiligen Leistungsumfänge ergeben sich aus der Tarifbeschreibung auf der Website.",
       "Alle Preise verstehen sich inklusive der gesetzlichen Mehrwertsteuer.",
       "Der Anbieter behält sich Preisanpassungen mit einer Ankündigungsfrist von 30 Tagen vor.",

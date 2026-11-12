@@ -5,6 +5,8 @@ import { authOptions } from "src/lib/auth";
 import { Restaurant, Menu, Category, Dish } from "@prisma/client";
 import { devLog } from "src/lib/logger";
 import { getMenuLimits } from "src/lib/menuLimits";
+import { tierLabel } from "src/lib/tierLabels";
+import { isSectionBgColorAllowed } from "src/lib/schemas/colorPresets";
 //import { webhookSecret } from "src/lib/stripe";
 
 type MenuWithRelations = Menu & {
@@ -130,6 +132,19 @@ export async function POST(req: NextRequest) {
     let categoryCount = categories.length;
     let dishCount = categories.reduce((n, c) => n + c.dishes.length, 0);
 
+    // Freie Hex-Farben für Kategorien/Gruppen erst ab Plus. Vor der Schleife
+    // prüfen, damit ein abgelehnter Request nichts halb gespeichert hinterlässt.
+    // Die Editoren schicken nur geänderte Felder, unveränderte Altwerte nach
+    // einem Downgrade stören daher nicht.
+    const forbiddenColor = parsedData.some((entry) => {
+      if (entry?.type === "categoryUpdate") return !isSectionBgColorAllowed(entry.category?.color, user.subscription);
+      if (entry?.type === "categoryGroupUpdate") return !isSectionBgColorAllowed(entry.categoryGroup?.color, user.subscription);
+      return false;
+    });
+    if (forbiddenColor) {
+      return NextResponse.json({ message: "Eigene Farben gibt es ab dem Plus-Tarif" }, { status: 403 });
+    }
+
     for (const entry of parsedData) {
       if (!entry) continue;
 
@@ -145,7 +160,7 @@ export async function POST(req: NextRequest) {
         if (!category) {
           if (categoryCount >= limits.CategoryLimit) {
             return NextResponse.json(
-              { message: `Maximal ${limits.CategoryLimit} Kategorien im ${user.subscription}-Abo erreicht` },
+              { message: `Maximal ${limits.CategoryLimit} Kategorien im ${tierLabel(user.subscription)}-Abo erreicht` },
               { status: 403 },
             );
           }
@@ -193,7 +208,7 @@ export async function POST(req: NextRequest) {
           if (!existingDish) {
             if (dishCount >= limits.DishLimit) {
               return NextResponse.json(
-                { message: `Maximal ${limits.DishLimit} Gerichte im ${user.subscription}-Abo erreicht` },
+                { message: `Maximal ${limits.DishLimit} Gerichte im ${tierLabel(user.subscription)}-Abo erreicht` },
                 { status: 403 },
               );
             }

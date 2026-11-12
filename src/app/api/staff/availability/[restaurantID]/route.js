@@ -10,7 +10,7 @@ export async function GET(req, { params }) {
   const access = await getStaffAccess(req, restaurantID);
   if (!access) {
     return NextResponse.json(
-      { error: "Kein Zugriff. Stelle sicher, dass das Restaurant ein Professional-Abonnement hat." },
+      { error: "Kein Zugriff. Stelle sicher, dass das Restaurant ein Premium-Abonnement hat." },
       { status: 403 }
     );
   }

@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { localizedPath } from "@/i18n/config";
+import { tierLabel } from "@/lib/tierLabels";
 
 // Tarif-Auswahl, geteilt zwischen allen Sprachen.
 //
@@ -117,7 +118,7 @@ function TierGrid({ t, locale }) {
         {session && sub && (
           <div className="mt-16 text-center">
             <p className="text-gray-500">
-              {t.currentPlan} <span className="font-semibold text-gray-900">{sub}</span>
+              {t.currentPlan} <span className="font-semibold text-gray-900">{tierLabel(sub)}</span>
             </p>
           </div>
         )}

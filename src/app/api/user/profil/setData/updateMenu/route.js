@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
+import { isMenuBgColorAllowed } from "@/lib/schemas/colorPresets";
 
 export async function GET(req, { params }) {
   try {
@@ -58,7 +59,7 @@ export async function POST(req) {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
-      select: { ownerId: true },
+      select: { ownerId: true, owner: { select: { subscription: true } } },
     });
 
     if (!restaurant) {
@@ -67,6 +68,11 @@ export async function POST(req) {
 
     if (restaurant.ownerId !== token.id) {
       return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    }
+
+    // Freie Farbwahl erst ab Plus — gleiche Regel wie api/user/profil/updateMenu.
+    if (!isMenuBgColorAllowed(bgColor, restaurant.owner.subscription)) {
+      return NextResponse.json({ message: "Eigene Farben gibt es ab dem Plus-Tarif" }, { status: 403 });
     }
 
     const updateData = Object.fromEntries(

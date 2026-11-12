@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import { isMenuBgColorAllowed, isMenuFontColorAllowed } from "@/lib/schemas/colorPresets";
 
 export async function POST(req) {
   try {
@@ -22,7 +23,11 @@ export async function POST(req) {
 
     const restaurant = await prisma.restaurant.findUnique({
       where: { id: restaurantID },
-      select: { ownerId: true },
+      select: {
+        ownerId: true,
+        owner: { select: { subscription: true } },
+        menu: { select: { bgColor: true, fontColor: true }, orderBy: { createdAt: "desc" }, take: 1 },
+      },
     });
 
     if (!restaurant) {
@@ -31,6 +36,18 @@ export async function POST(req) {
 
     if (restaurant.ownerId !== token.id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    // Freie Farbwahl erst ab Plus — Abo frisch aus der DB, nicht aus dem JWT.
+    // Unveränderte Werte bleiben erlaubt, sonst könnte ein Nutzer nach einem
+    // Downgrade seine Schrift nicht mehr speichern, weil der Editor die alte
+    // Hex-Farbe mitschickt.
+    const subscription = restaurant.owner.subscription;
+    const current = restaurant.menu[0] ?? {};
+    const bgChanged = bgColor && bgColor !== current.bgColor;
+    const fontColorChanged = fontColor !== undefined && (fontColor || null) !== (current.fontColor ?? null);
+    if ((bgChanged && !isMenuBgColorAllowed(bgColor, subscription)) || (fontColorChanged && !isMenuFontColorAllowed(fontColor, subscription))) {
+      return NextResponse.json({ message: "Eigene Farben gibt es ab dem Plus-Tarif" }, { status: 403 });
     }
 
     const updatedMenu = await prisma.$transaction(async (tx) => {

@@ -6,6 +6,14 @@
 // "QR code menu", "digital menu for restaurants", "restaurant menu maker".
 // Translating word for word would miss those phrases entirely.
 
+// Features per plan — ONE list for the home page, /pricing and the plan chooser.
+// Must match the server-side checks (see the comment in de.js).
+const PLAN_FEATURES = {
+  free: ["Up to 10 categories", "Up to 80 dishes", "QR code & QR designer", "Allergen labeling", "Colour presets & all fonts"],
+  plus: ["Up to 25 categories", "Up to 150 dishes", "Everything in Free", "Custom subdomain", "Custom colours & design templates", "Event calendar (30 entries, 30 days ahead)", "Bulk price changes", "Printable menu"],
+  premium: ["Up to 50 categories", "Up to 300 dishes", "Everything in Plus", "Event calendar (100 entries, 1 year ahead)", "Staff management with roles", "Table ordering", "Sold-out indicators", "Inventory & suppliers", "Custom colours for the header too"],
+};
+
 const en = {
   meta: {
     home: {
@@ -16,7 +24,7 @@ const en = {
     },
     pricing: {
       title: "Pricing & Plans",
-      description: "Every plan at a glance: a free tier, Business at €7.99/month. QR code menus for restaurants, cancel any month.",
+      description: "Every plan at a glance: a free tier, Plus at €7.99/month. QR code menus for restaurants, cancel any month.",
     },
     howItWorks: {
       title: "How It Works – Build a QR Code Menu in Minutes",
@@ -166,7 +174,7 @@ const en = {
       title: "Frequently asked questions",
       subtitle: "The short answers — anything else, email us at support@whatisonmymenu.com.",
       items: [
-        { q: "How much does WhatIsOnMyMenu cost?", a: "The Starter plan is free. The Business plan costs €7.99 per month and can be cancelled monthly." },
+        { q: "How much does WhatIsOnMyMenu cost?", a: "The Free plan costs nothing. The Plus plan costs €7.99 per month and can be cancelled monthly." },
         { q: "Do my guests need an app?", a: "No. Guests scan the QR code with their normal phone camera and the menu opens straight in the browser." },
         { q: "Do I need technical skills?", a: "No. You enter dishes, prices and categories in simple forms — just like on any website." },
         { q: "Can I list allergens?", a: "Yes. For every dish you can select the 14 major allergens defined by EU Regulation 1169/2011. They appear next to that dish in the menu." },
@@ -188,16 +196,16 @@ const en = {
       free: "Free",
       comingSoon: "Coming soon",
       starter: {
-        name: "Starter",
-        features: ["Up to 10 categories", "Up to 80 dishes", "Basic templates", "QR code", "Allergen labeling"],
+        name: "Free",
+        features: PLAN_FEATURES.free,
       },
       business: {
-        name: "Business",
-        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain", "Event calendar (30 days)", "Allergen labeling"],
+        name: "Plus",
+        features: PLAN_FEATURES.plus,
       },
       professional: {
-        name: "Professional",
-        features: ["Up to 50 categories", "Up to 300 dishes", "Premium templates", "QR code", "Custom subdomain", "Staff management", "Sold-out indicators", "Event calendar (365 days)", "Inventory & supplier overview", "Ordering System", "Allergen labeling"],
+        name: "Premium",
+        features: PLAN_FEATURES.premium,
       },
     },
   },
@@ -244,12 +252,12 @@ const en = {
       items: [
         { icon: "📋", title: "Digital menu", text: "Organise what you serve into groups, categories and dishes, each with prices and descriptions." },
         { icon: "🔳", title: "QR code generator", text: "Every restaurant gets its own QR code. Print it once — edits go live immediately, so it never goes stale." },
-        { icon: "🎨", title: "Your own design", text: "Background colours, fonts and per-category accents. The Professional plan adds premium colours and fonts." },
+        { icon: "🎨", title: "Your own design", text: "Background colours, fonts and per-category accents. From the Plus plan on you can pick any colour and use ready-made design templates." },
         { icon: "⚠️", title: "Allergens & ingredients", text: "Record allergens per dish so guests can see what's in their food at a glance — clear and compliant." },
-        { icon: "🟢", title: "Live availability", text: "Mark a dish sold out with one click and guests see it right away." },
-        { icon: "⭐", title: "Ratings", text: "Guests can rate dishes. The average score and number of ratings show up on the menu itself." },
-        { icon: "👥", title: "Staff management", text: "Invite your team and assign roles (manager, front of house, kitchen) with the permissions each role needs — on the Professional plan." },
-        { icon: "🧾", title: "Table orders", text: "Take orders per table and track them from open to confirmed to done." },
+        { icon: "🟢", title: "Live availability", text: "Mark a dish sold out with one click and guests see it right away — on the Premium plan." },
+        { icon: "⭐", title: "Google reviews", text: "Add your Google review link and guests find it right on your menu." },
+        { icon: "👥", title: "Staff management", text: "Invite your team and assign roles (manager, front of house, kitchen) with the permissions each role needs — on the Premium plan." },
+        { icon: "🧾", title: "Table orders", text: "Take orders per table and track them from open to confirmed to done — on the Premium plan." },
         { icon: "📍", title: "Multiple locations", text: "Manage addresses, opening hours and booking contacts — including restaurants with several sites." },
       ],
     },
@@ -293,24 +301,24 @@ const en = {
         label: "Free",
         price: "€0",
         description: "Ideal for trying things out",
-        features: ["Up to 10 categories", "Digital menu", "80 dish limit", "QR code generator"],
+        features: PLAN_FEATURES.free,
         cta: "Start for free",
       },
       professional: {
-        name: "Professional",
+        name: "Premium",
         label: "Most popular",
         price: "",
-        description: "Everything, without limits",
-        features: ["Up to 50 categories", "Up to 300 dishes", "QR code", "Custom subdomain", "Premium colours & fonts", "Staff management", "Sold-out indicators", "Event calendar", "Inventory & supplier overview"],
-        cta: "Subscribe to Pro",
+        description: "Every feature for your business",
+        features: PLAN_FEATURES.premium,
+        cta: "Subscribe to Premium",
       },
       business: {
-        name: "Business",
-        label: "Business",
+        name: "Plus",
+        label: "Plus",
         price: "€7.99",
-        description: "Maximum features & support",
-        features: ["Up to 25 categories", "Up to 150 dishes", "Basic templates", "QR code", "Custom subdomain"],
-        cta: "Subscribe to Business",
+        description: "More room for a growing menu",
+        features: PLAN_FEATURES.plus,
+        cta: "Subscribe to Plus",
       },
     },
   },
@@ -322,7 +330,7 @@ const en = {
     loading: "Loading…",
     signInFirst: "Please sign in first",
     submit: "Create free account",
-    proUpgrade: "💳 Upgrade to Pro (€14.99/month)",
+    proUpgrade: "💳 Upgrade to Premium (€14.99/month)",
     successAlert: "Restaurant registered successfully!",
     successInline: "Restaurant registered successfully!",
     saveError: "Could not save your restaurant",
@@ -350,7 +358,7 @@ const en = {
     consent: {
       business: "I confirm that I am acting as a business and will use this platform for commercial purposes only.",
       businessStrong: "acting as a business",
-      withdrawalPrefix: "For the Pro upgrade only: I expressly request that the service begins immediately and acknowledge that any right of withdrawal expires once the contract has been fully performed. This is subject to the",
+      withdrawalPrefix: "For the Premium upgrade only: I expressly request that the service begins immediately and acknowledge that any right of withdrawal expires once the contract has been fully performed. This is subject to the",
       terms: "Terms",
       and: "and the",
       withdrawal: "withdrawal policy",
@@ -379,13 +387,13 @@ const en = {
 
   // Business registration (paid, goes straight into the Stripe checkout).
   signupCheckout: {
-    badge: "Business · €7.99/month",
+    badge: "Plus · €7.99/month",
     title: "Register your restaurant",
     subtitle: "Fill in the details below so we can list your restaurant on the platform.",
     ownerName: "Name (full legal name)",
     restaurantName: "Restaurant name",
     shortDescription: "Short description",
-    submit: "💳 Activate Business plan (€7.99/month)",
+    submit: "💳 Activate Plus plan (€7.99/month)",
     checkoutError: "Checkout failed",
     checkoutStartError: "Could not start the checkout.",
     businessConsent: "I confirm that I am acting as a business and will use this platform for commercial purposes only.",
@@ -422,7 +430,7 @@ const en = {
       noAccess: "No access",
       noRestaurantId: "No restaurant ID",
       noRestaurantGiven: "No restaurant selected.",
-      proRequired: "Professional plan required",
+      proRequired: "Premium plan required",
       loadError: "Could not load",
       saveError: "Could not save",
       deleteError: "Could not delete",
@@ -469,7 +477,7 @@ const en = {
       title: "Manage availability",
       available: "Available",
       soldOut: "Sold out",
-      proHint: "Managing availability is available on the Professional plan only.",
+      proHint: "Managing availability is available on the Premium plan only.",
       allAvailable: "All available",
       allSoldOut: "All sold out",
       noDishes: "No dishes found on the menu.",

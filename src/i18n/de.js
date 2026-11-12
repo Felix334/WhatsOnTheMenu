@@ -3,6 +3,17 @@
 // Struktur bewusst flach nach Seite/Abschnitt — damit beim Uebersetzen
 // sofort sichtbar ist, welcher Block in en.js noch fehlt.
 
+// Leistungen je Tarif — EINE Liste für Startseite, /pricing und Tarif-Wähler.
+// Abgeglichen mit den serverseitigen Prüfungen (Stand 2026-11-12):
+// menuLimits.js, calendarLimits.js, staffAuth.js, inventoryAuth.js,
+// schemas/colorPresets.js, schemas/subdomain.js, applyTheme, bulkPrice.
+// Nur eintragen, was der Server für den Tarif wirklich freigibt.
+const PLAN_FEATURES = {
+  free: ["Bis zu 10 Kategorien", "Bis zu 80 Gerichte", "QR-Code & QR-Designer", "Allergene-Kennzeichnung", "Farb-Presets & alle Schriftarten"],
+  plus: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Alles aus Free", "Eigene Subdomain", "Freie Farbwahl & Design-Vorlagen", "Event-Kalender (30 Einträge, 30 Tage im Voraus)", "Preise gesammelt anpassen", "Druckversion der Karte"],
+  premium: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Alles aus Plus", "Event-Kalender (100 Einträge, 1 Jahr im Voraus)", "Personalverwaltung mit Rollen", "Bestellsystem für Tische", "Verfügbarkeit von Gerichten (ausverkauft)", "Inventar & Lieferanten", "Freie Farbwahl auch im Kopfbereich"],
+};
+
 const de = {
   meta: {
     home: {
@@ -13,7 +24,7 @@ const de = {
     },
     pricing: {
       title: "Preise & Tarife",
-      description: "Alle Tarife im Überblick: kostenlose Standardversion, Business für 7,99 €/Monat. Digitale Speisekarten per QR-Code, monatlich kündbar.",
+      description: "Alle Tarife im Überblick: kostenlose Standardversion, Plus für 7,99 €/Monat. Digitale Speisekarten per QR-Code, monatlich kündbar.",
     },
     howItWorks: {
       title: "Wie funktioniert's? – Digitale Speisekarte in Minuten",
@@ -160,7 +171,7 @@ const de = {
       title: "Häufige Fragen",
       subtitle: "Kurz beantwortet — bei weiteren Fragen schreiben Sie uns an support@whatisonmymenu.com.",
       items: [
-        { q: "Was kostet WhatIsOnMyMenu?", a: "Die Starter-Version ist kostenlos. Das Business-Abo kostet 7,99 € im Monat und ist monatlich kündbar." },
+        { q: "Was kostet WhatIsOnMyMenu?", a: "Der Free-Tarif ist kostenlos. Das Plus-Abo kostet 7,99 € im Monat und ist monatlich kündbar." },
         { q: "Brauchen meine Gäste eine App?", a: "Nein. Ihre Gäste scannen den QR-Code mit der normalen Handykamera, die Speisekarte öffnet sich direkt im Browser." },
         { q: "Brauche ich technische Kenntnisse?", a: "Nein. Gerichte, Preise und Kategorien tragen Sie in einfache Formulare ein — so wie Sie es von jeder Website kennen." },
         { q: "Kann ich Allergene angeben?", a: "Ja. Für jedes Gericht können Sie die 14 Hauptallergene nach EU-Verordnung 1169/2011 auswählen. Sie erscheinen in der Speisekarte bei dem jeweiligen Gericht." },
@@ -182,16 +193,16 @@ const de = {
       free: "Kostenlos",
       comingSoon: "Coming Soon",
       starter: {
-        name: "Starter",
-        features: ["Bis zu 10 Kategorien", "Bis zu 80 Gerichte", "Basis Templates", "QR-Code", "Allergene-Kennzeichnung"],
+        name: "Free",
+        features: PLAN_FEATURES.free,
       },
       business: {
-        name: "Business",
-        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain", "Event-Kalender (30 Tage)", "Allergene-Kennzeichnung"],
+        name: "Plus",
+        features: PLAN_FEATURES.plus,
       },
       professional: {
-        name: "Professional",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Premium Templates", "QR-Code", "Eigene Subdomain", "Personalverwaltung mit Rollen", "Gerichtverfügbarkeitsanzeige", "Event-Kalender (365 Tage)", "Inventar & Lieferanten-Übersicht", "Allergene-Kennzeichnung"],
+        name: "Premium",
+        features: PLAN_FEATURES.premium,
       },
     },
   },
@@ -231,12 +242,12 @@ const de = {
       items: [
         { icon: "📋", title: "Digitale Speisekarte", text: "Strukturieren Sie Ihr Angebot in Gruppen, Kategorien und Gerichten – mit Preisen und Beschreibungen." },
         { icon: "🔳", title: "QR-Code Generator", text: "Jedes Restaurant bekommt einen eigenen QR-Code. Einmal drucken, immer aktuell – Änderungen sind sofort live." },
-        { icon: "🎨", title: "Eigenes Design", text: "Hintergrundfarben, Schriftarten und Farbakzente pro Kategorie. Im Professional-Tarif zusätzlich Premium-Farben & -Fonts." },
+        { icon: "🎨", title: "Eigenes Design", text: "Hintergrundfarben, Schriftarten und Farbakzente pro Kategorie. Ab dem Plus-Tarif mit freier Farbwahl und fertigen Design-Vorlagen." },
         { icon: "⚠️", title: "Allergene & Zutaten", text: "Hinterlegen Sie Allergene pro Gericht. Ihre Gäste sehen auf einen Blick, was drin ist – rechtssicher und transparent." },
-        { icon: "🟢", title: "Echtzeit-Verfügbarkeit", text: "Markieren Sie Gerichte mit einem Klick als „ausverkauft“. Gäste sehen sofort, was gerade verfügbar ist." },
-        { icon: "⭐", title: "Bewertungen", text: "Gäste können Gerichte bewerten. Durchschnittsbewertung und Anzahl werden direkt an der Speisekarte angezeigt." },
-        { icon: "👥", title: "Team-Verwaltung", text: "Laden Sie Mitarbeiter ein und vergeben Sie Rollen (Manager, Service, Küche) mit passenden Berechtigungen – im Professional-Tarif." },
-        { icon: "🧾", title: "Tisch-Bestellungen", text: "Nehmen Sie Bestellungen pro Tisch auf und verwalten Sie ihren Status von „offen“ über „bestätigt“ bis „erledigt“." },
+        { icon: "🟢", title: "Echtzeit-Verfügbarkeit", text: "Markieren Sie Gerichte mit einem Klick als „ausverkauft“. Gäste sehen sofort, was gerade verfügbar ist – im Premium-Tarif." },
+        { icon: "⭐", title: "Google-Bewertungen", text: "Hinterlegen Sie Ihren Google-Bewertungslink – Gäste finden ihn direkt in der Speisekarte." },
+        { icon: "👥", title: "Team-Verwaltung", text: "Laden Sie Mitarbeiter ein und vergeben Sie Rollen (Manager, Service, Küche) mit passenden Berechtigungen – im Premium-Tarif." },
+        { icon: "🧾", title: "Tisch-Bestellungen", text: "Nehmen Sie Bestellungen pro Tisch auf und verwalten Sie ihren Status von „offen“ über „bestätigt“ bis „erledigt“ – im Premium-Tarif." },
         { icon: "📍", title: "Mehrere Standorte", text: "Verwalten Sie Adressen, Öffnungszeiten und Reservierungs-Kontakt – auch für Restaurants mit mehreren Filialen." },
       ],
     },
@@ -280,24 +291,24 @@ const de = {
         label: "Kostenlos",
         price: "€0",
         description: "Perfekt zum Ausprobieren",
-        features: ["Bis zu 10 Kategorien", "Digitale Speisekarte", "80 Gerichte Limit", "QR-Code Generator, Werbefrei"],
+        features: PLAN_FEATURES.free,
         cta: "Kostenlos starten",
       },
       professional: {
-        name: "Professional",
+        name: "Premium",
         label: "Beliebteste Wahl",
         price: "",
-        description: "Unbegrenzte Möglichkeiten",
-        features: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "QR-Code", "Eigene Subdomain", "Premium Farben & Fonts", "Management-System", "Gerichtverfügbarkeitsanzeige", "Event-Kalender", "Inventar & Lieferanten-Übersicht", "Werbefrei", "Bestellsystem"],
-        cta: "Pro abonnieren",
+        description: "Alle Funktionen für Ihren Betrieb",
+        features: PLAN_FEATURES.premium,
+        cta: "Premium abonnieren",
       },
       business: {
-        name: "Business",
-        label: "Business",
+        name: "Plus",
+        label: "Plus",
         price: "€7.99",
-        description: "Maximale Features & Support",
-        features: ["Bis zu 25 Kategorien", "Bis zu 150 Gerichte", "Basis Templates", "QR-Code", "Eigene Subdomain"],
-        cta: "Business abonnieren",
+        description: "Mehr Platz für wachsende Karten",
+        features: PLAN_FEATURES.plus,
+        cta: "Plus abonnieren",
       },
     },
   },
@@ -309,7 +320,7 @@ const de = {
     loading: "Seite wird geladen",
     signInFirst: "Bitte Anmelden",
     submit: "FreeTier registrieren",
-    proUpgrade: "💳 Zu Pro upgrade (€14.99/Monat)",
+    proUpgrade: "💳 Zu Premium upgraden (€14.99/Monat)",
     successAlert: "Restaurant erfolgreich registriert! \nHerzlichen Glückwunsch!",
     successInline: "Restaurant erfolgreich registriert!",
     saveError: "Fehler beim Speichern",
@@ -337,7 +348,7 @@ const de = {
     consent: {
       business: "Ich bestätige, dass ich als Unternehmer / Gewerbetreibender handle und diese Plattform ausschließlich im geschäftlichen Rahmen nutze.",
       businessStrong: "Unternehmer / Gewerbetreibender",
-      withdrawalPrefix: "Nur für das Pro-Upgrade: Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die",
+      withdrawalPrefix: "Nur für das Premium-Upgrade: Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die",
       terms: "AGB",
       and: "und die",
       withdrawal: "Widerrufsbelehrung",
@@ -365,14 +376,14 @@ const de = {
 
   // Business-Registrierung (kostenpflichtig, fuehrt direkt in den Stripe-Checkout).
   signupCheckout: {
-    badge: "Business · €7.99/Monat",
+    badge: "Plus · €7.99/Monat",
     title: "Dein Restaurant registrieren",
     subtitle: "Fülle alle relevanten Informationen aus, damit wir dein Restaurant auf unserer Plattform anzeigen können.",
     ownerName: "Name (Voller legaler Name)",
     restaurantName: "Name des Restaurants",
     shortDescription: "Kurze Beschreibung",
     // Im Original stand hier "Buisness" — Tippfehler auf einem Bezahl-Button.
-    submit: "💳 Business-Abo aktivieren (€7.99/Monat)",
+    submit: "💳 Plus-Abo aktivieren (€7.99/Monat)",
     checkoutError: "Fehler beim Checkout",
     checkoutStartError: "Fehler beim Starten des Checkout.",
     businessConsent: "Ich bestätige, dass ich als Unternehmer / Gewerbetreibender handle und diese Plattform ausschließlich im geschäftlichen Rahmen nutze.",
@@ -406,7 +417,7 @@ const de = {
       noAccess: "Kein Zugriff",
       noRestaurantId: "Keine Restaurant-ID",
       noRestaurantGiven: "Kein Restaurant angegeben.",
-      proRequired: "Professional-Abo erforderlich",
+      proRequired: "Premium-Abo erforderlich",
       loadError: "Fehler beim Laden",
       saveError: "Fehler beim Speichern",
       deleteError: "Fehler beim Löschen",
@@ -453,7 +464,7 @@ const de = {
       title: "Verfügbarkeit verwalten",
       available: "Verfügbar",
       soldOut: "Ausverkauft",
-      proHint: "Die Verfügbarkeitsverwaltung ist ausschließlich für Professional-Abonnenten verfügbar.",
+      proHint: "Die Verfügbarkeitsverwaltung ist ausschließlich für Premium-Abonnenten verfügbar.",
       allAvailable: "Alle verfügbar",
       allSoldOut: "Alle ausverkauft",
       noDishes: "Keine Gerichte im Menü gefunden.",
@@ -486,9 +497,6 @@ const de = {
     imprint: "Impressum",
   },
 
-  // Cookie-Hinweis (cookieWin.js). Nur ein Hinweis, keine Einwilligung: es
-  // gibt ausschliesslich technisch notwendige Cookies (§ 25 Abs. 2 TDDDG).
-  // Inhaltlich mit Abschnitt "5. Cookies" in /privacy abgleichen.
   cookieBanner: {
     title: "Cookies",
     message: "Wir nutzen nur technisch notwendige Cookies: für die Anmeldung, für Sicherheit (Cloudflare) und für Zahlungen (Stripe).",

@@ -16,6 +16,7 @@ import addressSchema from "./Schema/adressSchema";
 import FontSelector from "./fontList";
 import { OpeningHoursEditor } from "./openingHours";
 import { MENU_THEMES } from "@/lib/menuThemes";
+import { MENU_BG_PRESETS, MENU_FONT_PRESETS } from "@/lib/schemas/colorPresets";
 
 const DENSITY_OPTIONS = [
   { value: "compact", label: "Kompakt" },
@@ -137,136 +138,11 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
               <>
                 <select value={isEditingMenu ? editedBgColor : bgColor} disabled={!isEditingMenu} onChange={(e) => setEditedBgColor(e.target.value)} className="border rounded px-2 py-1">
                   <option value="">Farbe wählen</option>
-
-                  <option value="#FFFFFF">Weiß</option>
-                  <option className="bg-gray-50" value="#F8F9FA">
-                    Grau 50
-                  </option>
-                  <option className="bg-gray-100" value="#F1F3F5">
-                    Grau 100
-                  </option>
-                  <option className="bg-gray-200" value="#E9ECEF">
-                    Grau 200
-                  </option>
-                  <option className="bg-gray-300" value="#DEE2E6">
-                    Grau 300
-                  </option>
-                  <option className="bg-gray-400" value="#CED4DA">
-                    Grau 400
-                  </option>
-                  <option className="bg-gray-500" value="#ADB5BD">
-                    Grau 500
-                  </option>
-                  <option className="bg-gray-600 text-white" value="#6C757D">
-                    Grau 600
-                  </option>
-                  <option className="bg-gray-700 text-white" value="#495057">
-                    Grau 700
-                  </option>
-                  <option className="bg-gray-800 text-white" value="#343A40">
-                    Grau 800
-                  </option>
-                  <option className="bg-gray-900 text-white" value="#212529">
-                    Grau 900
-                  </option>
-
-                  {/* Rottöne */}
-                  <option className="bg-red-100" value="#FFCDD2">
-                    Hellrot
-                  </option>
-                  <option className="bg-red-300" value="#EF9A9A">
-                    Rot 300
-                  </option>
-                  <option className="bg-red-500 text-white" value="#F44336">
-                    Rot 500
-                  </option>
-                  <option className="bg-red-700 text-white" value="#D32F2F">
-                    Dunkelrot
-                  </option>
-
-                  {/* Orangetöne */}
-                  <option className="bg-orange-100" value="#FFE0B2">
-                    Hellorange
-                  </option>
-                  <option className="bg-orange-300" value="#FFB74D">
-                    Orange 300
-                  </option>
-                  <option className="bg-orange-500 text-white" value="#FF9800">
-                    Orange 500
-                  </option>
-                  <option className="bg-orange-700 text-white" value="#F57C00">
-                    Dunkelorange
-                  </option>
-
-                  <option className="bg-yellow-100" value="#FFF9C4">
-                    Hellgelb
-                  </option>
-                  <option className="bg-yellow-300" value="#FFF176">
-                    Gelb 300
-                  </option>
-                  <option className="bg-yellow-500" value="#FFC107">
-                    Gelb 500
-                  </option>
-                  <option className="bg-yellow-700" value="#FFA000">
-                    Dunkelgelb
-                  </option>
-                  <option className="bg-yellow-400" value="#FFD700">
-                    Gold
-                  </option>
-                  <option className="bg-green-100" value="#C8E6C9">
-                    Hellgrün
-                  </option>
-                  <option className="bg-green-300" value="#81C784">
-                    Grün 300
-                  </option>
-                  <option className="bg-green-500 text-white" value="#4CAF50">
-                    Grün 500
-                  </option>
-                  <option className="bg-green-700 text-white" value="#388E3C">
-                    Dunkelgrün
-                  </option>
-                  <option className="bg-blue-100" value="#BBDEFB">
-                    Hellblau
-                  </option>
-                  <option className="bg-blue-300" value="#64B5F6">
-                    Blau 300
-                  </option>
-                  <option className="bg-blue-500 text-white" value="#2196F3">
-                    Blau 500
-                  </option>
-                  <option className="bg-blue-700 text-white" value="#1976D2">
-                    Dunkelblau
-                  </option>
-                  <option className="bg-cyan-400 text-white" value="#17A2B8">
-                    Cyan
-                  </option>
-                  <option className="bg-cyan-700 text-white" value="#138496">
-                    Dunkelcyan
-                  </option>
-                  <option className="bg-purple-200" value="#E1BEE7">
-                    Helllila
-                  </option>
-                  <option className="bg-purple-300" value="#BA68C8">
-                    Lila 300
-                  </option>
-                  <option className="bg-purple-500 text-white" value="#6F42C1">
-                    Lila 500
-                  </option>
-                  <option className="bg-purple-700 text-white" value="#6610F2">
-                    Dunkellila
-                  </option>
-                  <option className="bg-pink-300" value="#EC407A">
-                    Pink 300
-                  </option>
-                  <option className="bg-pink-500 text-white" value="#E83E8C">
-                    Pink 500
-                  </option>
-                  <option value="#343A40" className="text-white bg-gray-800">
-                    Schwarzgrau
-                  </option>
-                  <option value="#000000" className="text-white bg-black">
-                    Schwarz
-                  </option>
+                  {MENU_BG_PRESETS.map((p) => (
+                    <option key={p.value} className={p.className} value={p.value}>
+                      {p.label}
+                    </option>
+                  ))}
                 </select>
               </>
             )}
@@ -284,15 +160,11 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
             ) : (
               <select value={isEditingMenu ? editedFontColor : fontColor || ""} disabled={!isEditingMenu} onChange={(e) => setEditedFontColor(e.target.value)} className="border rounded px-2 py-1">
                 <option value="">Standard</option>
-                <option className="text-white bg-black" value="#000000">Schwarz</option>
-                <option value="#212529">Dunkelgrau</option>
-                <option value="#495057">Grau</option>
-                <option className="text-white bg-gray-500" value="#6C757D">Mittelgrau</option>
-                <option className="text-white bg-blue-700" value="#1976D2">Blau</option>
-                <option className="text-white bg-green-700" value="#388E3C">Grün</option>
-                <option className="text-white bg-red-700" value="#D32F2F">Rot</option>
-                <option className="text-white bg-purple-700" value="#6610F2">Lila</option>
-                <option value="#FFFFFF">Weiß</option>
+                {MENU_FONT_PRESETS.map((p) => (
+                  <option key={p.value} className={p.className} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
               </select>
             )}
 

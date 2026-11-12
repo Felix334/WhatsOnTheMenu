@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem as SelectOption } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
 import { CALENDAR_ENTRY_LIMITS, CALENDAR_DATE_HORIZON_DAYS, getCalendarMaxDate } from "@/lib/calendarLimits";
+import { tierLabel } from "@/lib/tierLabels";
 
 const TYPE_LABELS = { promotion: "Aktion", event: "Event", specialDish: "Tagesgericht" };
 
@@ -85,11 +86,11 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
 
     const isEdit = !!form.id;
     if (!isEdit && limitReached) {
-      toast.error(`Maximal ${limit} Kalender-Einträge im ${subscription}-Abo erreicht`);
+      toast.error(`Maximal ${limit} Kalender-Einträge im ${tierLabel(subscription)}-Abo erreicht`);
       return;
     }
     if (maxDateStr && (form.date > maxDateStr || (form.multiDay && form.endDate > maxDateStr))) {
-      toast.error(`Im ${subscription}-Abo können Events nur bis zu ${horizonDays} Tage im Voraus angelegt werden`);
+      toast.error(`Im ${tierLabel(subscription)}-Abo können Events nur bis zu ${horizonDays} Tage im Voraus angelegt werden`);
       return;
     }
 
@@ -187,7 +188,7 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
                 </div>
               </>
             )}
-            {!!maxDateStr && <p className="text-xs text-gray-400">Im {subscription}-Abo bis zu {horizonDays} Tage im Voraus planbar (bis {new Date(maxDateStr).toLocaleDateString("de-DE")})</p>}
+            {!!maxDateStr && <p className="text-xs text-gray-400">Im {tierLabel(subscription)}-Abo bis zu {horizonDays} Tage im Voraus planbar (bis {new Date(maxDateStr).toLocaleDateString("de-DE")})</p>}
 
             <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
               <SelectTrigger>
@@ -231,7 +232,7 @@ const CalendarWin = ({ open, onOpenChange, restaurantId, dishes = [] }) => {
             </Button>
             {!!limit && (
               <p className="text-xs text-gray-400 text-center">
-                {entries.length}/{limit} Einträge im {subscription}-Abo genutzt
+                {entries.length}/{limit} Einträge im {tierLabel(subscription)}-Abo genutzt
                 {limitReached ? " · Limit erreicht" : ""}
               </p>
             )}

@@ -38,18 +38,8 @@ import { BulkPriceDialog } from "./components/bulkPrice";
 import { MoveDishDialog } from "./components/moveDish";
 import { clearDraft, formatDraftAge, loadDraft, saveDraft } from "./components/draftStorage";
 import { applyPriceChange } from "@/lib/priceRules";
-
-const HERO_COLOR_PRESETS = [
-  { key: "amber", label: "Amber", gradient: "from-amber-700 via-orange-600 to-amber-600" },
-  { key: "green", label: "Grün", gradient: "from-emerald-700 via-green-600 to-teal-600" },
-  { key: "blue", label: "Blau", gradient: "from-blue-700 via-indigo-600 to-blue-600" },
-  { key: "red", label: "Rot", gradient: "from-red-700 via-rose-600 to-red-500" },
-  { key: "purple", label: "Lila", gradient: "from-purple-700 via-violet-600 to-purple-500" },
-  { key: "dark", label: "Dunkel", gradient: "from-gray-900 via-gray-800 to-gray-700" },
-  { key: "white", label: "Weiß", gradient: "white" },
-];
-
-const HERO_GRADIENT_MAP = Object.fromEntries(HERO_COLOR_PRESETS.map(({ key, gradient }) => [key, gradient]));
+import { tierLabel } from "@/lib/tierLabels";
+import { HERO_COLOR_PRESETS, RADIUS_CLASS, heroClass, heroStyle } from "./components/menuStyle";
 
 export default function PageBuilder() {
   const router = useRouter();
@@ -720,7 +710,6 @@ export default function PageBuilder() {
     );
   }
 
-  const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: font }}>
@@ -904,7 +893,7 @@ export default function PageBuilder() {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    Inventar &amp; Lieferanten sind ein Professional-Feature —{" "}
+                    Inventar &amp; Lieferanten sind ein Premium-Feature —{" "}
                     <DynamicLink href="/pricing" className="underline font-medium">
                       Upgrade
                     </DynamicLink>
@@ -954,7 +943,7 @@ export default function PageBuilder() {
             {/* Abo-Status mit Live-Zähler — auch mobil sichtbar */}
             <div className="flex items-center gap-2 text-xs shrink-0">
               <Badge variant="outline" className={session?.user?.subscription === "Professional" ? "border-amber-300 text-amber-600" : session?.user?.subscription === "Business" ? "border-orange-300 text-orange-500" : "text-gray-500"}>
-                {session?.user?.subscription === "NoSubscription" ? "Kein Abo" : (session?.user?.subscription ?? "Kein Abo")}
+                {tierLabel(session?.user?.subscription)}
               </Badge>
               <span className={catCount >= Limit.CategoryLimit ? "text-red-500 font-medium" : "text-gray-500"}>
                 {catCount}/{Limit.CategoryLimit ?? "?"} <span className="hidden sm:inline">Kategorien</span>
@@ -995,7 +984,7 @@ export default function PageBuilder() {
 
       {session?.user?.subscription === "Professional" && <InventoryWin open={openInventoryWin} onOpenChange={setOpenInventoryWin} restaurantId={restaurantID} />}
 
-      <div className={`w-full ${heroColor?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[heroColor] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center relative`} style={heroColor?.startsWith("#") ? { background: heroColor } : {}}>
+      <div className={`w-full ${heroClass(heroColor)} text-white py-10 px-4 text-center relative`} style={heroStyle(heroColor)}>
         {isEditingHero ? (
           <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
             <input value={heroName} onChange={(e) => setHeroName(e.target.value)} style={{ color: heroTextColor }} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder="Restaurant Name" />

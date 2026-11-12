@@ -42,7 +42,7 @@ export async function POST(req) {
       });
 
       if (!user || user.subscription !== "Professional") {
-        return NextResponse.json({ message: "Eigene Farbwahl ist ein Professional-Feature" }, { status: 403 });
+        return NextResponse.json({ message: "Eigene Farbwahl ist ein Premium-Feature" }, { status: 403 });
       }
     }
 

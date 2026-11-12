@@ -16,7 +16,7 @@ async function assertOwner(req, restaurantId) {
   if (!restaurant) return { ok: false, status: 404, message: "Restaurant not found" };
   if (restaurant.ownerId !== token.id) return { ok: false, status: 401, message: "Unauthorized" };
   if (!SUBDOMAIN_SUBSCRIPTIONS.includes(restaurant.owner.subscription)) {
-    return { ok: false, status: 403, message: "Eine eigene Subdomain gibt es nur im Professional- oder Business-Abo" };
+    return { ok: false, status: 403, message: "Eine eigene Subdomain gibt es nur im Plus- oder Premium-Abo" };
   }
 
   return { ok: true, restaurant };

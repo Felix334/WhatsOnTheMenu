@@ -15,9 +15,8 @@ import { SelectItem } from "./selectItem";
 import { EdditCategoryMenu } from "./edditCategoryWin";
 import { bgColorClass, bgColorStyle } from "./ColorPicker";
 import { ALLERGENS } from "@/lib/allergens";
+import { RADIUS_CLASS, DENSITY_CLASS } from "./menuStyle";
 
-const RADIUS_CLASS = { none: "rounded-none", sm: "rounded-lg", md: "rounded-xl", xl: "rounded-3xl" };
-const DENSITY_CLASS = { compact: "text-sm", normal: "", airy: "text-lg" };
 
 const AllergenBadges = ({ allergens }) => {
   if (!allergens || allergens.length === 0) return null;

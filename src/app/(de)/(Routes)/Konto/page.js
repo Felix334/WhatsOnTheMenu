@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { tierLabel } from "@/lib/tierLabels";
 
 const ROLE_LABELS = {
   Admin: "Administrator",
@@ -18,13 +19,6 @@ const ROLE_LABELS = {
   Manager: "Manager",
   Executive: "Executive",
   User: "Nutzer",
-};
-
-const SUBSCRIPTION_LABELS = {
-  NoSubscription: "Kein Abo",
-  FreeTier: "Free",
-  Professional: "Professional",
-  Business: "Business",
 };
 
 function Centered({ children }) {
@@ -65,7 +59,7 @@ export default function KontoPage() {
   const hasRestaurant = !!account?.restaurant;
 
   const roleLabel = ROLE_LABELS[user.role] ?? user.role ?? "Nutzer";
-  const subscriptionLabel = SUBSCRIPTION_LABELS[user.subscription] ?? user.subscription ?? "Kein Abo";
+  const subscriptionLabel = tierLabel(user.subscription);
   const memberSince = account?.createdAt ? new Date(account.createdAt).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" }) : null;
 
   const handleDelete = async () => {

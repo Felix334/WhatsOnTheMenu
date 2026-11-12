@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { TIER_LABELS } from "@/lib/tierLabels";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +45,7 @@ function StaffCard({ entry, onRemove }) {
 
 // ─── Mitarbeiter-Verwaltung ───────────────────────────────────────────────────
 function StaffSection() {
+  const { data: session } = useSession();
   const [staff, setStaff] = useState([]);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("waiter");
@@ -87,6 +90,23 @@ function StaffSection() {
 
   const pending  = staff.filter((s) => !s.approved);
   const approved = staff.filter((s) => s.approved);
+
+  // Nur Anzeige — die verbindliche Prüfung steht in POST /api/restaurant/staff.
+  if (session?.user?.subscription !== "Professional") {
+    return (
+      <Card>
+        <CardHeader>
+          <h2 className="text-base font-semibold">Mitarbeiter</h2>
+          <p className="text-sm text-gray-500">
+            Die Personalverwaltung mit Rollen gibt es im {TIER_LABELS.Professional}-Tarif.{" "}
+            <Link href="/pricing" className="underline font-medium">
+              Tarife ansehen
+            </Link>
+          </p>
+        </CardHeader>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -165,7 +185,6 @@ function StaffSection() {
 }
 
 // ─── Abonnement-Verwaltung ────────────────────────────────────────────────────
-const TIER_LABELS = { FreeTier: "Free", Professional: "Professional", Business: "Business", Individuell: "Business" };
 const TIER_COLORS = {
   FreeTier: "bg-gray-100 text-gray-700",
   Professional: "bg-amber-100 text-amber-800",
@@ -226,7 +245,7 @@ function SubscriptionSection() {
       <Card>
         <CardContent className="pt-6">
           <p className="text-sm text-gray-500 mb-4">Du hast noch kein aktives Abonnement.</p>
-          <Button asChild><a href="/pricing">Tarife ansehen</a></Button>
+          <Button asChild><Link href="/pricing">Tarife ansehen</Link></Button>
         </CardContent>
       </Card>
     );

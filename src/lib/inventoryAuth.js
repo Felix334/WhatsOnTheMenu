@@ -21,7 +21,7 @@ export async function assertInventoryAccess(req, restaurantId) {
       return { ok: false, status: 401, message: "Unauthorized" };
     }
     if (restaurant.owner.subscription !== "Professional") {
-      return { ok: false, status: 403, message: "Inventar ist ein Professional-Feature" };
+      return { ok: false, status: 403, message: "Inventar ist ein Premium-Feature" };
     }
 
     return { ok: true, token, subscription: restaurant.owner.subscription };

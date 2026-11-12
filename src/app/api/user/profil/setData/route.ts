@@ -5,6 +5,7 @@ import { authOptions } from "src/lib/auth";
 import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, CategoryGroup as PrismaCategoryGroup, Dish as PrismaDish } from "@prisma/client";
 import { devLog, devWarn } from "src/lib/logger";
 import { getMenuLimits } from "src/lib/menuLimits";
+import { tierLabel } from "src/lib/tierLabels";
 
 export const dynamic = "force-dynamic";
 
@@ -196,7 +197,7 @@ export async function POST(req: NextRequest) {
       if (!category) {
         if (categoryCount >= limits.CategoryLimit) {
           return NextResponse.json(
-            { message: `Maximal ${limits.CategoryLimit} Kategorien im ${user.subscription}-Abo erreicht` },
+            { message: `Maximal ${limits.CategoryLimit} Kategorien im ${tierLabel(user.subscription)}-Abo erreicht` },
             { status: 403 },
           );
         }
@@ -277,7 +278,7 @@ export async function POST(req: NextRequest) {
 
         if (dishCount >= limits.DishLimit) {
           return NextResponse.json(
-            { message: `Maximal ${limits.DishLimit} Gerichte im ${user.subscription}-Abo erreicht` },
+            { message: `Maximal ${limits.DishLimit} Gerichte im ${tierLabel(user.subscription)}-Abo erreicht` },
             { status: 403 },
           );
         }
