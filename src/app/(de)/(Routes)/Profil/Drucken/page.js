@@ -146,6 +146,12 @@ export default function DruckenPage() {
         </div>
       </header>
 
+      {/* Firefox richtet sich nicht nach print-color-adjust, wenn der Nutzer
+          Hintergründe im Druckdialog ausgeschaltet hat — dann hilft nur dieser Hinweis. */}
+      <p className="no-print max-w-4xl mx-auto mt-4 px-4 text-xs text-gray-500">
+        Tipp: Fehlen im Ausdruck die Farben, aktiviere im Druckdialog unter „Weitere Einstellungen“ die Option „Hintergrundgrafiken“ (Chrome, Edge) bzw. „Hintergründe drucken“ (Firefox).
+      </p>
+
       <div className="print-sheet max-w-4xl mx-auto my-8 shadow-lg overflow-hidden" style={{ fontFamily: font || undefined }}>
         {/* Kopfbereich — wie im Editor */}
         <div className={`w-full ${heroClass(heroColor)} text-white py-10 px-4 text-center`} style={heroStyle(heroColor)}>
