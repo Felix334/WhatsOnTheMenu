@@ -71,7 +71,7 @@ export async function POST(req) {
 
     const dishes = await prisma.dish.findMany({
       where,
-      select: { id: true, price: true },
+      select: { id: true, price: true, variants: { select: { id: true, price: true } } },
     });
 
     if (dishes.length === 0) {
@@ -79,13 +79,35 @@ export async function POST(req) {
     }
 
     const updates = [];
+    let changedPrices = 0; // für die Meldung: geänderte Einzelpreise inkl. Varianten
     for (const dish of dishes) {
+      // Mit Varianten: jede Variante einzeln ändern, das Gericht behält als
+      // Preis den kleinsten Variantenpreis ("ab"-Preis, siehe updateDish).
+      if (dish.variants.length > 0) {
+        const newVariantPrices = dish.variants.map((v) => {
+          const old = Number(v.price);
+          const next = applyPriceChange(old, mode, value, rounding);
+          return { id: v.id, old, next: next ?? old };
+        });
+        if (newVariantPrices.every((v) => v.next === v.old)) continue;
+
+        for (const v of newVariantPrices) {
+          if (v.next === v.old) continue;
+          changedPrices++;
+          updates.push(prisma.dishVariant.update({ where: { id: v.id }, data: { price: v.next.toFixed(2) } }));
+        }
+        const minPrice = Math.min(...newVariantPrices.map((v) => v.next));
+        updates.push(prisma.dish.update({ where: { id: dish.id }, data: { price: minPrice.toFixed(2) } }));
+        continue;
+      }
+
       const oldPrice = Number(dish.price);
       if (!Number.isFinite(oldPrice)) continue;
 
       const newPrice = applyPriceChange(oldPrice, mode, value, rounding);
       if (newPrice === null || newPrice === oldPrice) continue;
 
+      changedPrices++;
       updates.push(
         prisma.dish.update({
           where: { id: dish.id },
@@ -100,7 +122,7 @@ export async function POST(req) {
 
     await prisma.$transaction(updates);
 
-    return NextResponse.json({ success: true, updated: updates.length }, { status: 200 });
+    return NextResponse.json({ success: true, updated: changedPrices }, { status: 200 });
   } catch (error) {
     console.error("bulkPrice API Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
-import { MENU_THEMES } from "@/lib/menuThemes";
+import { MENU_THEMES, THEME_FIELDS, pickThemeFields } from "@/lib/menuThemes";
 
 // Wendet ein Theme-Preset auf das ganze Menü an (Menü + alle Gruppen + alle Kategorien).
 // Premium-Feature: Abo wird serverseitig aus der DB geprüft, nicht aus dem Token.
@@ -53,20 +53,27 @@ export async function POST(req) {
 
     const preset = MENU_THEMES[theme];
 
-    await prisma.$transaction([
-      prisma.menu.update({
-        where: { id: menu.id },
-        data: preset.menu,
-      }),
-      prisma.categoryGroup.updateMany({
-        where: { menuID: menu.id },
-        data: preset.group,
-      }),
-      prisma.category.updateMany({
-        where: { categoryGroup: { menuID: menu.id } },
-        data: preset.category,
-      }),
-    ]);
+    // Booleans in select-Objekte für die Theme-Felder verwandeln
+    const selectOf = (level) => Object.fromEntries(THEME_FIELDS[level].map((k) => [k, true]));
+
+    await prisma.$transaction(async (tx) => {
+      // Alten Stand sichern, damit sich das Theme zurücknehmen lässt (undoTheme).
+      // Nur eine Stufe: ein weiteres Theme überschreibt den Schnappschuss.
+      // Nacheinander: eine interaktive Transaktion hat genau eine Verbindung.
+      const currentMenu = await tx.menu.findUnique({ where: { id: menu.id }, select: selectOf("menu") });
+      const groups = await tx.categoryGroup.findMany({ where: { menuID: menu.id }, select: { id: true, ...selectOf("group") } });
+      const categories = await tx.category.findMany({ where: { categoryGroup: { menuID: menu.id } }, select: { id: true, ...selectOf("category") } });
+
+      const themeSnapshot = {
+        menu: pickThemeFields(currentMenu, "menu"),
+        groups: groups.map((g) => ({ id: g.id, ...pickThemeFields(g, "group") })),
+        categories: categories.map((c) => ({ id: c.id, ...pickThemeFields(c, "category") })),
+      };
+
+      await tx.menu.update({ where: { id: menu.id }, data: { ...preset.menu, themeSnapshot } });
+      await tx.categoryGroup.updateMany({ where: { menuID: menu.id }, data: preset.group });
+      await tx.category.updateMany({ where: { categoryGroup: { menuID: menu.id } }, data: preset.category });
+    });
 
     return NextResponse.json({ message: "Theme angewendet", theme });
   } catch (err) {

@@ -27,44 +27,67 @@ export async function POST(req) {
       return NextResponse.json({ message: "Restaurant nicht gefunden" }, { status: 404 });
     }
 
-    // Nur dishId + Menge aus dem Request übernehmen. Preis und Name kommen
-    // ausschließlich aus der DB – sonst könnte der Client beliebige Preise senden.
-    const quantities = new Map();
+    if (!Array.isArray(items) || items.length > 100) {
+      return NextResponse.json({ message: "Ungültige Bestellung" }, { status: 400 });
+    }
+
+    // Nur dishId, variantId + Menge aus dem Request übernehmen. Preis und Name
+    // kommen ausschließlich aus der DB – sonst könnte der Client beliebige Preise senden.
+    const positions = new Map(); // "dishId|variantId" → { dishId, variantId, quantity }
     for (const it of items) {
       const dishId = it?.dishId;
+      const variantId = it?.variantId ?? null;
       const qty = Number(it?.quantity);
-      if (!dishId || !Number.isInteger(qty) || qty <= 0 || qty > 99) {
+      if (typeof dishId !== "string" || !dishId || (variantId !== null && typeof variantId !== "string") || !Number.isInteger(qty) || qty <= 0 || qty > 99) {
         return NextResponse.json({ message: "Ungültige Bestellposition" }, { status: 400 });
       }
-      quantities.set(dishId, (quantities.get(dishId) ?? 0) + qty);
+      const key = `${dishId}|${variantId ?? ""}`;
+      const prev = positions.get(key);
+      positions.set(key, { dishId, variantId, quantity: (prev?.quantity ?? 0) + qty });
     }
+
+    const dishIds = [...new Set([...positions.values()].map((p) => p.dishId))];
 
     // Alle Gerichte laden, die wirklich zu diesem Restaurant gehören.
     const dishes = await prisma.dish.findMany({
       where: {
-        id: { in: [...quantities.keys()] },
+        id: { in: dishIds },
         category: {
           categoryGroup: {
             Menu: { restaurantId },
           },
         },
       },
-      select: { id: true, name: true, price: true },
+      select: { id: true, name: true, price: true, variants: { select: { id: true, label: true, price: true } } },
     });
 
-    if (dishes.length !== quantities.size) {
+    if (dishes.length !== dishIds.length) {
       return NextResponse.json(
         { message: "Ein oder mehrere Gerichte gehören nicht zu diesem Restaurant" },
         { status: 400 }
       );
     }
 
-    const orderItems = dishes.map((d) => ({
-      dishId: d.id,
-      name: d.name,
-      price: Number(d.price),
-      quantity: quantities.get(d.id),
-    }));
+    const dishById = new Map(dishes.map((d) => [d.id, d]));
+    const orderItems = [];
+    for (const { dishId, variantId, quantity } of positions.values()) {
+      const dish = dishById.get(dishId);
+
+      // Hat ein Gericht Varianten, muss genau eine davon gewählt sein — sonst
+      // wäre unklar, welche Größe (und welcher Preis) gemeint ist.
+      if (dish.variants.length > 0) {
+        const variant = dish.variants.find((v) => v.id === variantId);
+        if (!variant) {
+          return NextResponse.json({ message: `Bitte eine Größe für „${dish.name}“ wählen` }, { status: 400 });
+        }
+        orderItems.push({ dishId, variantId, name: `${dish.name} (${variant.label})`, price: Number(variant.price), quantity });
+      } else {
+        if (variantId !== null) {
+          return NextResponse.json({ message: "Ungültige Bestellposition" }, { status: 400 });
+        }
+        orderItems.push({ dishId, name: dish.name, price: Number(dish.price), quantity });
+      }
+    }
 
     const order = await prisma.order.create({
       data: {

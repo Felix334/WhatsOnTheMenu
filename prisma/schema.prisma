@@ -112,8 +112,22 @@ model Restaurant {
   owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   inventoryItems InventoryItem[]
   suppliers      Supplier[]
+  claim          RestaurantClaim?
 
   @@index([ownerId])
+}
+
+/// Übernahme-Link für ein vorbereitetes Restaurant (siehe src/lib/schemas/claim.js).
+/// Gespeichert wird nur der SHA-256-Hash des Tokens; Zeile wird beim Einlösen gelöscht.
+model RestaurantClaim {
+  id           String     @id @default(cuid())
+  restaurantId String     @unique
+  tokenHash    String     @unique
+  /// Optional: nur dieses Google-Konto darf einlösen (kleingeschrieben)
+  email        String?
+  expiresAt    DateTime
+  createdAt    DateTime   @default(now())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 }
 
 model Calendar {
@@ -215,6 +229,9 @@ model Menu {
   density       String?
   heroColor     String?
   heroTextColor String?
+  /// Gestaltung vor dem zuletzt angewendeten Theme (Menü, Gruppen, Kategorien),
+  /// damit sich das Theme rückgängig machen lässt. null = nichts rückgängig zu machen.
+  themeSnapshot Json?
   categoryGroup CategoryGroup[]
   restaurant    Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
@@ -261,10 +278,54 @@ model Dish {
   reports         Report[]
   reviews         Review[]       @relation("DishReviews")
   allergens       Allergen[]     @default([])
+  /// Kennzeichnungspflichtige Zusatzstoffe (ZZulV / LMIV), Legende in src/lib/dishInfo.js
+  additives       Additive[]     @default([])
+  /// Merkmale für Gäste (vegan, neu, Empfehlung …)
+  tags            DishTag[]      @default([])
+  /// Schärfegrad 0 (nicht scharf) bis 3
+  spiceLevel      Int            @default(0)
+  /// Größen/Preisvarianten (0,3 l / 0,5 l …). Gibt es welche, ist `price` der
+  /// kleinste Variantenpreis ("ab"-Preis) und wird von updateDish mitgepflegt.
+  variants        DishVariant[]
   stock           DishAvailable?
   calendarEntries Calendar[]
 
   @@index([categoryId])
+}
+
+model DishVariant {
+  id       String  @id @default(cuid())
+  dishId   String
+  label    String
+  price    Decimal @db.Decimal(10, 2)
+  position Int     @default(0)
+  dish     Dish    @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@index([dishId])
+}
+
+/// Kennzeichnungspflichtige Zusatzstoffe in der Gastronomie
+enum Additive {
+  FARBSTOFF
+  KONSERVIERUNGSSTOFF
+  ANTIOXIDATIONSMITTEL
+  GESCHMACKSVERSTAERKER
+  GESCHWEFELT
+  GESCHWAERZT
+  GEWACHST
+  PHOSPHAT
+  SUESSUNGSMITTEL
+  PHENYLALANIN
+  KOFFEIN
+  CHININ
+}
+
+enum DishTag {
+  VEGAN
+  VEGETARISCH
+  NEU
+  EMPFEHLUNG
+  HAUSGEMACHT
 }
 
 /// Die 14 EU-Hauptallergene nach Verordnung (EU) Nr. 1169/2011

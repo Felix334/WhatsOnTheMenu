@@ -17,6 +17,7 @@ import { bgColorClass, bgColorStyle } from "../components/ColorPicker";
 import { AllergenBadges } from "../components/menuSection";
 import { DENSITY_CLASS, RADIUS_CLASS, heroClass, heroStyle } from "../components/menuStyle";
 import { ALLERGENS } from "@/lib/allergens";
+import { AdditiveLegend, AdditiveMarks, DishTagBadges, VariantPriceList, dishPriceLabel } from "@/app/components/DishDetails";
 
 // Druckbare Version der Speisekarte — dieselben Daten UND dieselbe Gestaltung
 // wie der Editor (Kopfbereich, Farben, Schriften, Rundungen, Ausrichtung,
@@ -179,7 +180,7 @@ export default function DruckenPage() {
               categoryGroups.map((group) => (
                 <section key={group.id} className={`${RADIUS_CLASS[group.borderRadius] ?? "rounded-2xl"} shadow-sm p-4 sm:p-6 border border-amber-100 ${bgColorClass(group.color) || "bg-white"}`} style={bgColorStyle(group.color)}>
                   <h2
-                    className="text-2xl font-semibold mb-6 border-b pb-4 break-words"
+                    className="text-2xl font-semibold mb-6 border-b pb-4 wrap-break-words"
                     style={{
                       ...(group.fontColor ? { color: group.fontColor } : {}),
                       textAlign: group.titleAlign ?? "left",
@@ -204,6 +205,8 @@ export default function DruckenPage() {
                 <p>{allergenLegend.map((a) => `${a.id} = ${a.name}`).join(" · ")}</p>
               </div>
             )}
+            {/* Zusatzstoffe sind kennzeichnungspflichtig — Legende immer drucken, wenn welche vorkommen */}
+            <AdditiveLegend dishes={categoryGroups.flatMap((g) => (g.categories ?? []).flatMap((c) => c.dishes ?? []))} className="text-xs opacity-70" />
             <p className="pt-4 border-t text-center text-[10px] opacity-60">Allergenangaben ohne Gewähr — im Zweifel bitte beim Personal nachfragen.</p>
           </main>
         </div>
@@ -220,7 +223,7 @@ function PrintCategory({ category, density, font, headingFont, showDescriptions,
   return (
     <div className={`print-category ${twoColumns ? "break-inside-avoid mb-6" : ""} ${RADIUS_CLASS[category.borderRadius] ?? "rounded-xl"} ${elevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} w-full overflow-hidden ${bgColorClass(category.bgColor)}`} style={bgColorStyle(category.bgColor)}>
       <div className="py-5 px-4 border-b">
-        <h3 className={`w-full text-2xl sm:text-3xl font-semibold break-words ${category.titleUppercase ? "uppercase tracking-widest" : ""}`} style={{ ...fontStyle, textAlign: category.titleAlign || "center", ...(headingFont ? { fontFamily: headingFont } : {}) }}>
+        <h3 className={`w-full text-2xl sm:text-3xl font-semibold wrap-break-words ${category.titleUppercase ? "uppercase tracking-widest" : ""}`} style={{ ...fontStyle, textAlign: category.titleAlign || "center", ...(headingFont ? { fontFamily: headingFont } : {}) }}>
           {category.name}
         </h3>
       </div>
@@ -231,17 +234,22 @@ function PrintCategory({ category, density, font, headingFont, showDescriptions,
             <div className="flex items-start justify-between gap-3" style={fontStyle}>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-serif break-words">{dish.name}</span>
+                  <span className="font-serif wrap-break-words">
+                    {dish.name}
+                    <AdditiveMarks additives={dish.additives} />
+                  </span>
                   {category.leaderDots && <span aria-hidden className="flex-1 min-w-6 border-b border-dotted border-current opacity-40" />}
                 </div>
                 {showDescriptions && dish.description && (
-                  <p className="text-sm text-gray-500 break-words" style={fontStyle}>
+                  <p className="text-sm text-gray-500 wrap-break-words" style={fontStyle}>
                     {dish.description}
                   </p>
                 )}
+                <DishTagBadges tags={dish.tags} spiceLevel={dish.spiceLevel} />
                 {showAllergens && <AllergenBadges allergens={dish.allergens} />}
+                <VariantPriceList variants={dish.variants} className="max-w-xs" />
               </div>
-              <span className="shrink-0 font-mono">{Number(dish.price).toFixed(2)}€</span>
+              {!dish.variants?.length && <span className="shrink-0 font-mono">{dishPriceLabel(dish)}</span>}
             </div>
           </li>
         ))}

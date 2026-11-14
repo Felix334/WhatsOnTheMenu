@@ -10,6 +10,11 @@ import { bgColorClass, bgColorStyle } from "./colorPicker";
 import { GOOGLE_FONTS_URL } from "@/app/(de)/(Routes)/Profil/components/fontList";
 import Link from "next/link";
 import { ALLERGENS } from "@/lib/allergens";
+import { AdditiveLegend, AdditiveMarks, DishTagBadges, VariantPriceList, dishPriceLabel } from "@/app/components/DishDetails";
+
+// Warenkorb-Schlüssel: Gericht + gewählte Größe (eine Cola 0,3 l und eine
+// Cola 0,5 l sind zwei Positionen)
+const cartKey = (dishId, variantId) => `${dishId}|${variantId ?? ""}`;
 
 // ─── Hero-Farben ──────────────────────────────────────────────────────────────
 const HERO_COLOR_PRESETS = [
@@ -56,7 +61,7 @@ const HeroSection = ({ restaurantData, menuFont, color }) => {
   return (
     <div className={`w-full ${color?.startsWith("#") ? "" : `bg-linear-to-r ${HERO_GRADIENT_MAP[color] ?? HERO_GRADIENT_MAP.amber}`} text-white py-10 px-4 text-center`} style={color?.startsWith("#") ? { background: color } : {}}>
       <p className="text-amber-200 uppercase tracking-widest text-xs font-semibold mb-2">Speisekarte</p>
-      <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow break-words">
+      <h1 style={{ fontFamily: menuFont || undefined, color: restaurantData?.menu?.[0]?.heroTextColor }} className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-wide drop-shadow wrap-break-words">
         {restaurantData?.name || "Restaurant"}
       </h1>
       {restaurantData?.description && (
@@ -333,23 +338,26 @@ const EventsPage = ({ entries }) => {
 };
 
 // ─── Allergen-Legende ──────────────────────────────────────────────────────────
-const AllergenLegend = () => {
+const AllergenLegend = ({ dishes }) => {
   const [open, setOpen] = useState(false);
   return (
     <div className="max-w-7xl mx-auto px-4 pt-4 pb-10">
       <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors">
         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold border border-amber-300">A</span>
-        Allergen-Legende
+        Allergene &amp; Zusatzstoffe
         <span className={`text-xs transition-transform duration-200 ${open ? "rotate-180" : ""}`}>▾</span>
       </button>
       {open && (
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-x-6 gap-y-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-          {ALLERGENS.map(({ key, id, name }) => (
-            <div key={key} className="flex items-center gap-2 text-sm text-gray-700">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">{id}</span>
-              {name}
-            </div>
-          ))}
+        <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-x-6 gap-y-2">
+            {ALLERGENS.map(({ key, id, name }) => (
+              <div key={key} className="flex items-center gap-2 text-sm text-gray-700">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-800 text-xs font-bold border border-amber-300 shrink-0">{id}</span>
+                {name}
+              </div>
+            ))}
+          </div>
+          <AdditiveLegend dishes={dishes} className="text-sm text-gray-700 border-t border-amber-100 pt-3" />
         </div>
       )}
     </div>
@@ -445,24 +453,31 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const CartControls = ({ item }) => {
-    const qty = cart[item.id]?.quantity ?? 0;
+  // `variant` gesetzt = Knöpfe für genau diese Größe
+  const CartControls = ({ item, variant }) => {
+    const key = cartKey(item.id, variant?.id);
+    const qty = cart[key]?.quantity ?? 0;
+    const label = variant ? `${item.name} (${variant.label})` : item.name;
     return (
       <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
         {qty > 0 && (
           <>
-            <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center transition-colors">
+            <button onClick={() => removeFromCart(key)} aria-label={`${label} entfernen`} className="w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-sm flex items-center justify-center transition-colors">
               −
             </button>
             <span className="w-5 text-center text-sm font-semibold">{qty}</span>
           </>
         )}
-        <button onClick={() => addToCart(item)} className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-700 text-white font-bold text-sm flex items-center justify-center transition-colors">
+        <button onClick={() => addToCart(item, variant)} aria-label={`${label} hinzufügen`} className="w-7 h-7 rounded-full bg-gray-900 hover:bg-gray-700 text-white font-bold text-sm flex items-center justify-center transition-colors">
           +
         </button>
       </div>
     );
   };
+
+  // Größen unter dem Gericht — im Bestellmodus mit eigenen Warenkorb-Knöpfen
+  const Variants = ({ item, unavailable }) => <VariantPriceList variants={item.variants} style={unavailable ? undefined : colorStyle} className={`max-w-sm ${unavailable ? "text-gray-400 line-through" : ""}`} renderAction={orderMode && !unavailable ? (v) => <CartControls item={item} variant={v} /> : undefined} />;
+  const hasVariants = (item) => (item.variants?.length ?? 0) > 0;
 
   return (
     <div id={id} className={`${bgColorClass(bgColor)} ${RADIUS_CLASS[borderRadius] ?? "rounded-2xl"} ${elevated === false ? "border border-gray-200" : "shadow-xl"} ${DENSITY_TEXT[density] ?? ""} w-full py-6 sm:py-8 px-3 sm:px-6 md:px-10 transition-all scroll-mt-24`} style={bgColorStyle(bgColor)}>
@@ -483,6 +498,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                   <div className="flex items-center gap-2">
                     <p style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                       {item.name}
+                      <AdditiveMarks additives={item.additives} />
                     </p>
                     {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full">Nicht verfügbar</span>}
                     {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
@@ -493,13 +509,17 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                       {item.description}
                     </p>
                   )}
+                  <DishTagBadges tags={item.tags} spiceLevel={item.spiceLevel} />
                   <AllergenBadges allergens={item.allergens} />
+                  <Variants item={item} unavailable={unavailable} />
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>
-                    {parseFloat(item.price || 0).toFixed(2)}€
-                  </span>
-                  {orderMode && !unavailable && <CartControls item={item} />}
+                  {!hasVariants(item) && (
+                    <span style={unavailable ? undefined : colorStyle} className={`font-mono whitespace-nowrap text-sm ${unavailable ? "text-gray-400 line-through" : ""}`}>
+                      {dishPriceLabel(item)}
+                    </span>
+                  )}
+                  {orderMode && !unavailable && !hasVariants(item) && <CartControls item={item} />}
                 </div>
               </div>
               {expandedIndex === index && item.imageUrl && (
@@ -538,6 +558,7 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                         <div className="flex items-center gap-2">
                           <span style={unavailable ? fontStyle : { ...fontStyle, ...colorStyle }} className={unavailable ? "text-gray-400 line-through" : "text-gray-900"}>
                             {item.name}
+                            <AdditiveMarks additives={item.additives} />
                           </span>
                           {unavailable && <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">Nicht verfügbar</span>}
                           {specialDishIds?.has(item.id) && <span className="text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full whitespace-nowrap">🍽️ Heute im Angebot</span>}
@@ -548,15 +569,17 @@ const MenuSection = ({ id, title, menuItems, bgColor, fontColor, menuFont, headi
                             {item.description}
                           </span>
                         )}
+                        <DishTagBadges tags={item.tags} spiceLevel={item.spiceLevel} />
                         <AllergenBadges allergens={item.allergens} />
+                        <Variants item={item} unavailable={unavailable} />
                       </div>
                     </TableCell>
                     <TableCell style={unavailable ? undefined : colorStyle} className={`text-right font-mono whitespace-nowrap align-middle ${rowPadDesktop} w-28 ${unavailable ? "text-gray-400 line-through" : ""}`}>
-                      {parseFloat(item.price || 0).toFixed(2)}€
+                      {dishPriceLabel(item)}
                     </TableCell>
                     {orderMode && (
                       <TableCell className={`align-middle ${rowPadDesktop} w-32`}>
-                        <div className="flex justify-end">{!unavailable && <CartControls item={item} />}</div>
+                        <div className="flex justify-end">{!unavailable && !hasVariants(item) && <CartControls item={item} />}</div>
                       </TableCell>
                     )}
                   </TableRow>
@@ -687,13 +710,13 @@ const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => 
         body: JSON.stringify({
           restaurantId,
           tableNumber,
-          items: items.map((i) => ({ dishId: i.dishId, name: i.name, price: i.price, quantity: i.quantity })),
+          items: items.map((i) => ({ dishId: i.dishId, variantId: i.variantId ?? null, quantity: i.quantity })),
           note: note || null,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok) onSuccess(data.orderId);
-      else alert("Fehler beim Bestellen");
+      else alert(data.message || "Fehler beim Bestellen");
     } finally {
       setLoading(false);
     }
@@ -707,7 +730,7 @@ const OrderModal = ({ cart, tableNumber, restaurantId, onSuccess, onClose }) => 
 
         <ul className="space-y-1 text-sm border rounded-xl p-3 bg-gray-50">
           {items.map((i) => (
-            <li key={i.dishId} className="flex justify-between">
+            <li key={i.key ?? i.dishId} className="flex justify-between">
               <span>
                 {i.quantity}× {i.name}
               </span>
@@ -812,21 +835,34 @@ const MenuClient = ({ serverData }) => {
   const [orderStep, setOrderStep] = useState(null); // null | "confirm" | "qr"
   const [orderId, setOrderId] = useState(null);
 
-  const addToCart = useCallback((dish) => {
+  // Name und Preis hier nur für die Anzeige im Warenkorb — der Server
+  // übernimmt beides ausschließlich aus der DB (api/orders/create).
+  const addToCart = useCallback((dish, variant) => {
+    const key = cartKey(dish.id, variant?.id);
     setCart((prev) => {
-      const existing = prev[dish.id];
-      return { ...prev, [dish.id]: { dishId: dish.id, name: dish.name, price: parseFloat(dish.price), quantity: (existing?.quantity ?? 0) + 1 } };
+      const existing = prev[key];
+      return {
+        ...prev,
+        [key]: {
+          key,
+          dishId: dish.id,
+          variantId: variant?.id ?? null,
+          name: variant ? `${dish.name} (${variant.label})` : dish.name,
+          price: parseFloat(variant ? variant.price : dish.price),
+          quantity: (existing?.quantity ?? 0) + 1,
+        },
+      };
     });
   }, []);
 
-  const removeFromCart = useCallback((dishId) => {
+  const removeFromCart = useCallback((key) => {
     setCart((prev) => {
-      const existing = prev[dishId];
+      const existing = prev[key];
       if (!existing || existing.quantity <= 1) {
-        const { [dishId]: _, ...rest } = prev;
+        const { [key]: _, ...rest } = prev;
         return rest;
       }
-      return { ...prev, [dishId]: { ...existing, quantity: existing.quantity - 1 } };
+      return { ...prev, [key]: { ...existing, quantity: existing.quantity - 1 } };
     });
   }, []);
 
@@ -888,7 +924,7 @@ const MenuClient = ({ serverData }) => {
               <div className="text-center text-gray-500 py-10">Keine Kategorien gefunden</div>
             )}
           </main>
-          <AllergenLegend />
+          <AllergenLegend dishes={categoryGroups.flatMap((g) => (g.categories ?? []).flatMap((c) => c.dishes ?? []))} />
         </>
       )}
 

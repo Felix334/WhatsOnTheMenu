@@ -33,3 +33,19 @@ export const MENU_THEMES = {
     category: { bgColor: "#1F2937", fontColor: "#F9FAFB", borderRadius: "md", elevated: false, leaderDots: true, titleUppercase: false },
   },
 };
+
+// Felder, die ein Theme überschreibt — aus allen Presets gesammelt, damit
+// Schnappschuss (applyTheme) und Rückgängig (undoTheme) automatisch mitwachsen,
+// wenn ein Preset ein neues Feld bekommt.
+const fieldsOf = (level) => [...new Set(Object.values(MENU_THEMES).flatMap((t) => Object.keys(t[level])))];
+
+export const THEME_FIELDS = {
+  menu: fieldsOf("menu"),
+  group: fieldsOf("group"),
+  category: fieldsOf("category"),
+};
+
+/** Nur die Theme-Felder eines Objekts übernehmen (Whitelist für Schnappschuss und Wiederherstellung). */
+export function pickThemeFields(obj, level) {
+  return Object.fromEntries(THEME_FIELDS[level].filter((k) => obj && k in obj).map((k) => [k, obj[k]]));
+}

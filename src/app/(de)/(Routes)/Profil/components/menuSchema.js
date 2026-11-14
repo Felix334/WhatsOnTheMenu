@@ -13,10 +13,6 @@ const menuSchema = z.object({
   ),
 });
 
-const itemSchema = z.object({
-  name: z.string().min(1, "Name erforderlich"),
-  description: z.string().min(5, "Beschreibung erforderlich"),
-  price: z.string().regex(/^\d+(\.\d{1,2})?$/, "Preis muss eine gültige Dezimalzahl mit bis zu 2 Nachkommastellen sein"),
-});
-
-export { menuSchema, itemSchema };
+// Das Schema für "Gericht bearbeiten" liegt in src/lib/schemas/dish.js
+// (gemeinsam mit der API-Route updateDish).
+export { menuSchema };

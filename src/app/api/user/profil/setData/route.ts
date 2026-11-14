@@ -6,6 +6,7 @@ import { Restaurant, User, Menu as PrismaMenu, Category as PrismaCategory, Categ
 import { devLog, devWarn } from "src/lib/logger";
 import { getMenuLimits } from "src/lib/menuLimits";
 import { tierLabel } from "src/lib/tierLabels";
+import { dishExtrasSchema, effectiveDishPrice } from "src/lib/schemas/dish";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,12 @@ interface MenuSectionItem {
   description?: string;
   price?: number | string;
   image?: string;
+  // Optionale Details — kommen beim Duplizieren mit, sonst Standardwerte
+  allergens?: string[];
+  additives?: string[];
+  tags?: string[];
+  spiceLevel?: number;
+  variants?: { label: string; price: number | string }[];
 }
 
 interface MenuSectionEntry {
@@ -88,6 +95,18 @@ export async function POST(req: NextRequest) {
 
     if (parsedData.length === 0) {
       return NextResponse.json({ message: "Keine menuSection-Einträge gefunden" }, { status: 400 });
+    }
+
+    // Details aller Gerichte vorab prüfen — ein ungültiger Eintrag soll nichts
+    // halb gespeichert hinterlassen.
+    for (const entry of parsedData) {
+      const items = Array.isArray(entry.section?.items) ? entry.section.items : [];
+      for (const item of items) {
+        const check = dishExtrasSchema.safeParse(item ?? {});
+        if (!check.success) {
+          return NextResponse.json({ message: check.error.issues[0]?.message ?? "Ungültige Gericht-Details" }, { status: 400 });
+        }
+      }
     }
 
     const userID = session.user.id;
@@ -283,16 +302,31 @@ export async function POST(req: NextRequest) {
           );
         }
 
+        // Oben bereits validiert, parse kann hier nicht mehr werfen.
+        const extras = dishExtrasSchema.parse(item);
+        const position = nextPosition++;
+
         await safeDb(
           () =>
             prisma.dish.create({
               data: {
                 name: item.name,
                 description: item.description ?? null,
-                price,
+                price: effectiveDishPrice(price, extras.variants),
                 imageUrl: item.image ?? "",
-                position: nextPosition++,
+                position,
                 categoryId: category!.id,
+                allergens: extras.allergens,
+                additives: extras.additives,
+                tags: extras.tags,
+                spiceLevel: extras.spiceLevel,
+                variants: {
+                  create: extras.variants.map((v: { label: string; price: number }, index: number) => ({
+                    label: v.label,
+                    price: v.price.toFixed(2),
+                    position: index,
+                  })),
+                },
               },
             }),
           `dish.create (${item.name})`,

@@ -26,7 +26,7 @@ const DENSITY_OPTIONS = [
 
 /* ===================== OPTION MENU ===================== */
 
-const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontColor, setNewFontColor, restaurantID, serverData, allowPremiumColor }) => {
+const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontColor, setNewFontColor, restaurantID, serverData, allowPremiumColor, onPreviewChange, onDesignSaved, onThemeChanged }) => {
   const [localServerData, setLocalServerData] = useState(serverData);
   const [isEditingMenu, setIsEditingMenu] = useState(false);
   const [editedBgColor, setEditedBgColor] = useState(bgColor ?? "");
@@ -36,6 +36,23 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
   const [editedDensity, setEditedDensity] = useState("normal");
   const [pendingTheme, setPendingTheme] = useState(null);
   const [applyingTheme, setApplyingTheme] = useState(false);
+  const [savingMenu, setSavingMenu] = useState(false);
+  const [confirmUndoTheme, setConfirmUndoTheme] = useState(false);
+
+  const hasThemeSnapshot = !!serverData?.userData?.restaurant?.menu?.[0]?.hasThemeSnapshot;
+
+  // Live-Vorschau: während der Bearbeitung zeigt die Karte hinter dem Panel
+  // die ungespeicherten Werte. Beim Beenden (Speichern/Abbrechen) zurück auf null.
+  useEffect(() => {
+    if (!isEditingMenu) return;
+    onPreviewChange?.({
+      bgColor: editedBgColor,
+      fontColor: editedFontColor,
+      font: editedFont,
+      headingFont: editedHeadingFont,
+      density: editedDensity,
+    });
+  }, [isEditingMenu, editedBgColor, editedFontColor, editedFont, editedHeadingFont, editedDensity, onPreviewChange]);
 
   const { data: session } = useSession();
   const userID = session?.user?.id;
@@ -61,29 +78,44 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
   }, [serverData]);
 
   const handleSaveMenu = async () => {
-    const response = await fetch(`/api/user/profil/updateMenu`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        bgColor: editedBgColor,
-        fontColor: editedFontColor,
-        font: editedFont,
-        headingFont: editedHeadingFont,
-        density: editedDensity,
-        restaurantID,
-        userID,
-      }),
-      credentials: "include",
-    });
+    setSavingMenu(true);
+    try {
+      const response = await fetch(`/api/user/profil/updateMenu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bgColor: editedBgColor,
+          fontColor: editedFontColor,
+          font: editedFont,
+          headingFont: editedHeadingFont,
+          density: editedDensity,
+          restaurantID,
+          userID,
+        }),
+        credentials: "include",
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${response.status}`);
+      }
+
       setNewBgColor(editedBgColor);
       setNewFontColor(editedFontColor);
       setIsEditingMenu(false);
+      // Gleiche Normalisierung wie updateMenu: leere Werte = Standard (null)
+      onDesignSaved?.({
+        bgColor: editedBgColor || bgColor,
+        fontColor: editedFontColor || null,
+        font: editedFont,
+        headingFont: editedHeadingFont || null,
+        density: editedDensity || null,
+      });
       toast.success("Design gespeichert!");
-      location.reload();
-    } else {
-      toast.error("Fehler beim Speichern des Designs");
+    } catch (err) {
+      toast.error("Fehler beim Speichern des Designs: " + err.message);
+    } finally {
+      setSavingMenu(false);
     }
   };
 
@@ -95,6 +127,7 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
     setEditedHeadingFont(menu?.headingFont ?? "");
     setEditedDensity(menu?.density || "normal");
     setIsEditingMenu(false);
+    onPreviewChange?.(null);
   };
 
   const applyTheme = async (themeKey) => {
@@ -107,10 +140,37 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
         credentials: "include",
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      toast.success("Theme angewendet!");
-      location.reload();
+      setIsEditingMenu(false);
+      await onThemeChanged?.();
+      toast.success("Theme angewendet!", {
+        action: { label: "Rückgängig", onClick: () => undoTheme() },
+      });
     } catch {
       toast.error("Theme konnte nicht angewendet werden");
+    } finally {
+      setApplyingTheme(false);
+    }
+  };
+
+  const undoTheme = async () => {
+    setApplyingTheme(true);
+    try {
+      const response = await fetch(`/api/user/profil/undoTheme`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restaurantID }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${response.status}`);
+      }
+      setIsEditingMenu(false);
+      await onThemeChanged?.();
+      toast.success("Vorherige Gestaltung wiederhergestellt");
+    } catch (err) {
+      toast.error("Rückgängig fehlgeschlagen: " + err.message);
+    } finally {
       setApplyingTheme(false);
     }
   };
@@ -210,10 +270,15 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
 
             {isEditingMenu ? (
               <>
-                <Button onClick={handleSaveMenu}>Speichern</Button>
-                <Button variant="outline" onClick={handleCancelMenu}>
-                  Abbrechen
-                </Button>
+                <p className="text-xs text-gray-500">Vorschau: Die Karte zeigt deine Änderungen sofort — gespeichert wird erst mit „Speichern“.</p>
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveMenu} disabled={savingMenu}>
+                    {savingMenu ? "Speichert…" : "Speichern"}
+                  </Button>
+                  <Button variant="outline" onClick={handleCancelMenu} disabled={savingMenu}>
+                    Abbrechen
+                  </Button>
+                </div>
               </>
             ) : (
               <Button onClick={() => setIsEditingMenu(true)}>Menü bearbeiten</Button>
@@ -253,18 +318,36 @@ const OptionMenu = ({ openOptions, setOpenOptions, bgColor, setNewBgColor, fontC
                   </button>
                 ))}
               </div>
+              {hasThemeSnapshot && (
+                <Button variant="outline" size="sm" onClick={() => setConfirmUndoTheme(true)} disabled={applyingTheme}>
+                  ↶ Letztes Theme rückgängig machen
+                </Button>
+              )}
             </div>
 
             <ConfirmDialog
               open={pendingTheme !== null}
               onOpenChange={(open) => !open && setPendingTheme(null)}
               title={`Theme „${MENU_THEMES[pendingTheme]?.label ?? ""}“ anwenden?`}
-              description="Das Theme überschreibt Farben, Schriftarten, Ränder und Punktlinien aller Kategorien und Gruppen. Das kann nicht rückgängig gemacht werden."
+              description="Das Theme überschreibt Farben, Schriftarten, Ränder und Punktlinien aller Kategorien und Gruppen. Mit „Letztes Theme rückgängig machen“ holst du die bisherige Gestaltung zurück."
               confirmLabel="Anwenden"
+              destructive={false}
               onConfirm={() => {
                 const themeKey = pendingTheme;
                 setPendingTheme(null);
                 applyTheme(themeKey);
+              }}
+            />
+
+            <ConfirmDialog
+              open={confirmUndoTheme}
+              onOpenChange={setConfirmUndoTheme}
+              title="Letztes Theme rückgängig machen?"
+              description="Farben, Schriftarten, Ränder und Punktlinien werden auf den Stand vor dem letzten Theme zurückgesetzt. Auch Gestaltungsänderungen, die du seitdem gemacht hast, gehen dabei verloren."
+              confirmLabel="Rückgängig machen"
+              onConfirm={() => {
+                setConfirmUndoTheme(false);
+                undoTheme();
               }}
             />
           </div>

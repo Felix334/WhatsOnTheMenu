@@ -16,6 +16,14 @@ import { EdditCategoryMenu } from "./edditCategoryWin";
 import { bgColorClass, bgColorStyle } from "./ColorPicker";
 import { ALLERGENS } from "@/lib/allergens";
 import { RADIUS_CLASS, DENSITY_CLASS } from "./menuStyle";
+import { AdditiveMarks, DishTagBadges, VariantPriceList, dishPriceLabel } from "@/app/components/DishDetails";
+
+/** Trifft die Editor-Suche dieses Gericht? (Name, Beschreibung, Größen) */
+export const dishMatchesSearch = (dish, term) => {
+  const q = term?.trim().toLowerCase();
+  if (!q) return true;
+  return [dish?.name, dish?.description, ...(dish?.variants ?? []).map((v) => v.label)].some((text) => text?.toLowerCase().includes(q));
+};
 
 
 const AllergenBadges = ({ allergens }) => {
@@ -69,6 +77,7 @@ const MenuSection = ({
   positionNum,
   allowPremiumColor,
   allowAvailability,
+  searchTerm = "",
 }) => {
   const [localBorderRadius, setLocalBorderRadius] = useState(borderRadius);
   const [localElevated, setLocalElevated] = useState(elevated ?? true);
@@ -96,8 +105,26 @@ const MenuSection = ({
     setChangedItems({});
   }, [menuItems]);
 
+  // Gestaltung neu übernehmen, wenn sie von außen geändert wurde (Theme
+  // angewendet oder zurückgenommen) — sonst bliebe bis zum Neuladen die alte
+  // Optik stehen. Eigene Änderungen im Kategorie-Dialog laufen über die
+  // lokalen Setter und lösen das nicht aus.
+  useEffect(() => {
+    setLocalBorderRadius(borderRadius);
+    setLocalElevated(elevated ?? true);
+    setLocalBgColor(bgColor);
+    setLocalFontColor(fontColor ?? "");
+    setLocalLeaderDots(leaderDots ?? false);
+    setLocalTitleAlign(titleAlign || "center");
+    setLocalTitleUppercase(titleUppercase ?? false);
+  }, [borderRadius, elevated, bgColor, fontColor, leaderDots, titleAlign, titleUppercase]);
+
   const isCategoryDeleted = deletedCategories.includes(categoryId);
-  const displayItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
+  const allItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
+  const searching = searchTerm.trim().length > 0;
+  // Bei aktiver Suche passt der Kategoriename als Treffer für alle Gerichte darin.
+  const categoryMatches = searching && title?.toLowerCase().includes(searchTerm.trim().toLowerCase());
+  const displayItems = searching && !categoryMatches ? allItems.filter((item) => dishMatchesSearch(item, searchTerm)) : allItems;
 
   const toggleAvailability = async (e, dishId) => {
     e.stopPropagation();
@@ -193,12 +220,15 @@ const MenuSection = ({
     </div>
   );
 
+  // Suche ohne Treffer in dieser Kategorie → ganz ausblenden
+  if (searching && displayItems.length === 0) return null;
+
   return (
     <div className={`${RADIUS_CLASS[localBorderRadius] ?? "rounded-xl"} ${localElevated ? "shadow-lg" : "border border-gray-200"} ${DENSITY_CLASS[density] ?? ""} max-w-7xl h-full max-h-full w-full overflow-hidden ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
       {/* Mobil stehen die Knoepfe ueber dem Titel; ab sm liegen sie wie bisher
           links darueber, damit der Titel mittig bleibt */}
       <div className={`relative flex flex-col-reverse sm:flex-row sm:items-center sm:justify-center gap-3 py-4 sm:py-6 px-3 sm:px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
-        <h3 className={`w-full text-xl sm:text-3xl md:text-4xl font-semibold break-words ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${isCategoryDeleted ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
+        <h3 className={`w-full text-xl sm:text-3xl md:text-4xl font-semibold wrap-break-words ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${isCategoryDeleted ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
           {title}
         </h3>
 
@@ -209,7 +239,7 @@ const MenuSection = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="outline" title="Kategorie duplizieren" onClick={() => onDuplicateCategory({ categoryName: title, groupName, dishes: displayItems })}>
+              <Button size="icon" variant="outline" title="Kategorie duplizieren" onClick={() => onDuplicateCategory({ categoryName: title, groupName, dishes: allItems })}>
                 <Copy className="size-4" />
               </Button>
             </TooltipTrigger>
@@ -235,17 +265,22 @@ const MenuSection = ({
               <div key={item.id ?? index} className={`px-3 py-3 ${isDeleted ? "bg-red-100" : ""}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className={`min-w-0 flex-1 ${isDeleted ? "text-red-600 line-through" : "text-gray-900"}`} style={isDeleted ? {} : fontStyle}>
-                    <p className={`font-serif break-words ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</p>
+                    <p className={`font-serif wrap-break-words ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>
+                      {item.name}
+                      <AdditiveMarks additives={item.additives} />
+                    </p>
                     {item.description && (
-                      <p className="text-sm text-gray-500 break-words" style={isDeleted ? {} : fontStyle}>
+                      <p className="text-sm text-gray-500 wrap-break-words" style={isDeleted ? {} : fontStyle}>
                         {item.description}
                       </p>
                     )}
                     {allowAvailability && stockMap[item.id] === "outOfStock" && <p className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</p>}
+                    <DishTagBadges tags={item.tags} spiceLevel={item.spiceLevel} />
                     <AllergenBadges allergens={item.allergens} />
+                    <VariantPriceList variants={item.variants} />
                   </div>
                   <span className={`shrink-0 font-mono text-sm ${isDeleted ? "text-red-600 line-through" : "text-gray-800"}`} style={isDeleted ? {} : fontStyle}>
-                    {Number(item.price).toFixed(2)}€
+                    {dishPriceLabel(item)}
                   </span>
                 </div>
                 <div className="mt-2">
@@ -298,7 +333,10 @@ const MenuSection = ({
                       <TableCell className={`align-middle ${isDeleted ? "text-red-600 line-through" : "text-gray-900"}`} style={isDeleted ? {} : fontStyle}>
                         <div className="flex flex-col">
                           <div className="flex items-baseline gap-2">
-                            <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>{item.name}</span>
+                            <span className={`font-serif truncate ${stockMap[item.id] === "outOfStock" ? "text-gray-400" : ""}`}>
+                              {item.name}
+                              <AdditiveMarks additives={item.additives} />
+                            </span>
                             {localLeaderDots && <span aria-hidden className="flex-1 min-w-6 border-b border-dotted border-current opacity-40" />}
                           </div>
                           {item.description && (
@@ -307,12 +345,14 @@ const MenuSection = ({
                             </span>
                           )}
                           {allowAvailability && stockMap[item.id] === "outOfStock" && <span className="text-xs font-medium text-red-500 mt-0.5">● Nicht verfügbar</span>}
+                          <DishTagBadges tags={item.tags} spiceLevel={item.spiceLevel} />
                           <AllergenBadges allergens={item.allergens} />
+                          <VariantPriceList variants={item.variants} className="max-w-xs" />
                         </div>
                       </TableCell>
 
-                      <TableCell className={`text-right font-mono align-middle ${isDeleted ? "text-red-600 line-through" : "text-gray-800"}`} style={isDeleted ? {} : fontStyle}>
-                        {Number(item.price).toFixed(2)}€
+                      <TableCell className={`text-right font-mono align-middle whitespace-nowrap ${isDeleted ? "text-red-600 line-through" : "text-gray-800"}`} style={isDeleted ? {} : fontStyle}>
+                        {dishPriceLabel(item)}
                       </TableCell>
                     </TableRow>
                   </Fragment>
@@ -323,7 +363,7 @@ const MenuSection = ({
         </Table>
       </div>
 
-      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={(item) => setChangedItems((prev) => ({ ...prev, [item.id]: item }))} category={title} restaurantId={restaurantId} userID={userID} />
+      <SelectItem open={openItem} onOpenChange={setOpenItem} selectedItem={selectedItem} setChangedItem={(item) => setChangedItems((prev) => ({ ...prev, [item.id]: item }))} restaurantId={restaurantId} />
 
       {/* Bestätigungs-Dialog: Gericht löschen */}
       <ConfirmDialog

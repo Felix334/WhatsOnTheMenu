@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import { toast } from "sonner";
 import { FaPen, FaTrash } from "react-icons/fa";
-import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Globe, Package, Percent, Plus, Printer, Save } from "lucide-react";
+import { ArrowLeft, CalendarDays, ClipboardList, ClipboardPaste, Eye, Globe, Package, Percent, Plus, Printer, Save, Search, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -32,7 +32,8 @@ import { bgColorClass, bgColorStyle } from "./components/ColorPicker";
 import { CalendarWin } from "./components/calendarWin";
 import { InventoryWin } from "./components/inventoryWin";
 import { SubdomainWin, buildSubdomainUrl } from "./components/subdomainWin";
-import { MenuSection } from "./components/menuSection";
+import { ClaimLinkWin } from "./components/claimLinkWin";
+import { MenuSection, dishMatchesSearch } from "./components/menuSection";
 import { BulkImport } from "./components/bulkImport";
 import { BulkPriceDialog } from "./components/bulkPrice";
 import { MoveDishDialog } from "./components/moveDish";
@@ -57,7 +58,21 @@ export default function PageBuilder() {
 
   const [userID, setUserID] = useState("");
 
-  const { serverData, setServerData, refetch, isLoading, restaurantID, bgColor, fontColor, font, headingFont, density, positionNum } = useRestaurantData(userID);
+  const { serverData, setServerData, refetch, isLoading, restaurantID, bgColor: savedBgColor, fontColor: savedFontColor, font: savedFont, headingFont: savedHeadingFont, density: savedDensity, positionNum } = useRestaurantData(userID);
+
+  // Live-Vorschau aus dem Design-Menü (OptionMenu): solange dort bearbeitet
+  // wird, zeigt die Karte die ungespeicherten Werte. null = gespeicherter Stand.
+  const [designPreview, setDesignPreview] = useState(null);
+  const { bgColor, fontColor, font, headingFont, density } = designPreview ?? {
+    bgColor: savedBgColor,
+    fontColor: savedFontColor,
+    font: savedFont,
+    headingFont: savedHeadingFont,
+    density: savedDensity,
+  };
+
+  // Suche im Editor (Name, Beschreibung, Größen, Kategoriename)
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -330,6 +345,19 @@ export default function PageBuilder() {
     return candidate;
   };
 
+  // Alle Angaben eines Gerichts für eine Kopie — setData legt Allergene,
+  // Zusatzstoffe, Merkmale und Größen gleich mit an.
+  const copyDishDetails = (d) => ({
+    name: d.name,
+    description: d.description ?? "",
+    price: Number(d.price ?? 0).toFixed(2),
+    allergens: d.allergens ?? [],
+    additives: d.additives ?? [],
+    tags: d.tags ?? [],
+    spiceLevel: d.spiceLevel ?? 0,
+    variants: (d.variants ?? []).map((v) => ({ label: v.label, price: Number(v.price).toFixed(2) })),
+  });
+
   const duplicateDish = ({ dish, categoryName, groupName }) => {
     if (exeedDishLimit) {
       toast.error(`Gericht-Limit (${Limit.DishLimit}) erreicht`);
@@ -343,13 +371,7 @@ export default function PageBuilder() {
         section: {
           categoryGroup: groupName,
           title: categoryName,
-          items: [
-            {
-              name: `${dish.name} (Kopie)`,
-              description: dish.description ?? "",
-              price: Number(dish.price ?? 0).toFixed(2),
-            },
-          ],
+          items: [{ ...copyDishDetails(dish), name: `${dish.name} (Kopie)` }],
         },
       },
     ]);
@@ -363,11 +385,7 @@ export default function PageBuilder() {
     }
 
     const freeDishSlots = Math.max(0, (Limit.DishLimit ?? 0) - dishCount);
-    const items = (dishes ?? []).slice(0, freeDishSlots).map((d) => ({
-      name: d.name,
-      description: d.description ?? "",
-      price: Number(d.price ?? 0).toFixed(2),
-    }));
+    const items = (dishes ?? []).slice(0, freeDishSlots).map(copyDishDetails);
 
     // Der Name muss neu sein: setData ordnet Kategorien innerhalb einer Gruppe
     // über den Namen zu — ein identischer Name würde das Original befüllen.
@@ -440,6 +458,14 @@ export default function PageBuilder() {
           return {
             ...cat,
             dishes: (cat.dishes ?? []).map((dish) => {
+              // Mit Größen: jede Variante ändern, Gerichtpreis = kleinster Variantenpreis
+              if (dish.variants?.length) {
+                const variants = dish.variants.map((v) => {
+                  const next = applyPriceChange(Number(v.price), mode, value, rounding);
+                  return next === null ? v : { ...v, price: next };
+                });
+                return { ...dish, variants, price: Math.min(...variants.map((v) => Number(v.price))) };
+              }
               const next = applyPriceChange(Number(dish.price), mode, value, rounding);
               return next === null ? dish : { ...dish, price: next };
             }),
@@ -458,6 +484,37 @@ export default function PageBuilder() {
         },
       };
     });
+  };
+
+  // ── Design (OptionMenu) ───────────────────────────────────────────────────
+  // Gespeichertes Design in den geladenen Stand übernehmen — kein Neuladen nötig.
+  const handleDesignSaved = (values) => {
+    setServerData((prev) => {
+      const menu = prev?.userData?.restaurant?.menu?.[0];
+      if (!menu) return prev;
+      return {
+        ...prev,
+        userData: {
+          ...prev.userData,
+          restaurant: {
+            ...prev.userData.restaurant,
+            menu: [{ ...menu, ...values }, ...prev.userData.restaurant.menu.slice(1)],
+          },
+        },
+      };
+    });
+    setDesignPreview(null);
+  };
+
+  // Theme angewendet oder zurückgenommen: betrifft Menü, alle Gruppen und
+  // Kategorien. Lokale Gruppen-Überschreibungen verwerfen und frisch laden.
+  const handleThemeChanged = async () => {
+    setDesignPreview(null);
+    setGroupBorderMap({});
+    setGroupColorMap({});
+    setGroupFontColorMap({});
+    setGroupAlignMap({});
+    await refetch();
   };
 
   const submitData = async () => {
@@ -538,6 +595,15 @@ export default function PageBuilder() {
   const categoryGroups = serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup ?? [];
   const categoryGroupNames = [...new Set([...categoryGroups.map((group) => group.name), "Mittagessen", "Abendessen", "Frühstück", "Snacks", "Getränke"])].filter((name) => name && name.trim());
   const categoryNames = categoryGroups.flatMap((group) => (group.categories ?? []).map((cat) => cat.name)).filter((name) => name && name.trim());
+
+  // Suche: dieselbe Regel wie in MenuSection — ein passender Kategoriename
+  // zeigt die ganze Kategorie, sonst nur passende Gerichte.
+  const searchQuery = searchTerm.trim().toLowerCase();
+  const searching = searchQuery.length > 0;
+  const categoryMatchesSearch = (cat) => cat.name?.toLowerCase().includes(searchQuery);
+  const matchingDishesOf = (cat) => (categoryMatchesSearch(cat) ? (cat.dishes ?? []) : (cat.dishes ?? []).filter((d) => dishMatchesSearch(d, searchTerm)));
+  const groupMatchesSearch = (group) => !searching || (group.categories ?? []).some((cat) => matchingDishesOf(cat).length > 0);
+  const searchMatchCount = searching ? categoryGroups.reduce((n, g) => n + (g.categories ?? []).reduce((m, c) => m + matchingDishesOf(c).length, 0), 0) : 0;
 
   // Bezahlte Tarife — Preis-Massenänderung und Druckansicht. Die eigentliche
   // Durchsetzung passiert serverseitig (api/user/profil/bulkPrice); hier geht
@@ -782,7 +848,20 @@ export default function PageBuilder() {
         <div className="border-t border-gray-100 bg-gray-50/60">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-1.5 flex items-center justify-between gap-3 overflow-x-auto">
             <div className="flex items-center gap-2 shrink-0">
-              <OptionMenu openOptions={openOptions} setOpenOptions={setOpenOptions} bgColor={bgColor} setNewBgColor={setNewBgColor} fontColor={fontColor} setNewFontColor={setNewFontColor} router={router} restaurantID={restaurantID} serverData={serverData} allowPremiumColor={allowPremiumColor} />
+              <OptionMenu
+                openOptions={openOptions}
+                setOpenOptions={setOpenOptions}
+                bgColor={savedBgColor}
+                setNewBgColor={setNewBgColor}
+                fontColor={savedFontColor}
+                setNewFontColor={setNewFontColor}
+                restaurantID={restaurantID}
+                serverData={serverData}
+                allowPremiumColor={allowPremiumColor}
+                onPreviewChange={setDesignPreview}
+                onDesignSaved={handleDesignSaved}
+                onThemeChanged={handleThemeChanged}
+              />
 
               {exeedCatLimit ? (
                 <Tooltip>
@@ -923,6 +1002,7 @@ export default function PageBuilder() {
                   </TooltipContent>
                 </Tooltip>
               )}
+              <ClaimLinkWin />
               <SortComponents
                 componentList={categoryGroups}
                 onSave={(newGroups) =>
@@ -994,7 +1074,7 @@ export default function PageBuilder() {
             <p className="text-xs text-white/60 uppercase tracking-widest">Hintergrundfarbe</p>
             <div className="flex flex-wrap justify-center gap-2">
               {HERO_COLOR_PRESETS.map(({ key, label, gradient }) => (
-                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-gradient-to-br ${gradient} border-4 transition-all ${heroColor === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
+                <button key={key} title={label} onClick={() => setHeroColor(key)} className={`w-8 h-8 rounded-full bg-linear-to-br ${gradient} border-4 transition-all ${heroColor === key ? "border-white scale-110 shadow-lg" : "border-white/30 hover:border-white/70"}`} />
               ))}
               {[
                 { color: "#ffffff", label: "Weiß" },
@@ -1113,8 +1193,26 @@ export default function PageBuilder() {
       <div className={`flex-1 font-sans ${!bgColor ? "bg-amber-50" : ""} ${!fontColor ? "text-gray-900" : ""}`} style={{ ...(bgColor ? { backgroundColor: bgColor } : {}), ...(fontColor ? { color: fontColor } : {}) }}>
         <main className="w-full">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8 space-y-8 sm:space-y-12">
-            {serverData?.userData?.restaurant?.menu?.[0]?.categoryGroup?.length ? (
-              serverData.userData.restaurant.menu[0].categoryGroup.map((group) => (
+            {categoryGroups.length > 0 && (
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative w-full sm:max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none" />
+                  <Input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Gericht oder Kategorie suchen…" className="pl-9 pr-9 bg-white text-gray-900" aria-label="Speisekarte durchsuchen" />
+                  {searching && (
+                    <button type="button" onClick={() => setSearchTerm("")} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-700" aria-label="Suche leeren">
+                      <X className="size-4" />
+                    </button>
+                  )}
+                </div>
+                {searching && (
+                  <span className="text-sm opacity-70">
+                    {searchMatchCount === 0 ? "Keine Treffer" : `${searchMatchCount} ${searchMatchCount === 1 ? "Gericht" : "Gerichte"} gefunden`}
+                  </span>
+                )}
+              </div>
+            )}
+            {categoryGroups.length ? (
+              categoryGroups.filter(groupMatchesSearch).map((group) => (
                 <div key={group.id} className={`${RADIUS_CLASS[groupBorderMap[group.id] ?? group.borderRadius] ?? "rounded-2xl"} shadow-sm p-3 sm:p-6 border border-amber-100 ${bgColorClass(groupColorMap[group.id] ?? group.color) || "bg-white"}`} style={bgColorStyle(groupColorMap[group.id] ?? group.color)}>
                   {/* Gleiche Anordnung wie in der Kategorie-Kopfzeile: gestalten, löschen */}
                   <div className="flex gap-2">
@@ -1187,6 +1285,7 @@ export default function PageBuilder() {
                         positionNum={positionNum}
                         allowPremiumColor={allowPremiumColor}
                         allowAvailability={allowAvailability}
+                        searchTerm={searchTerm}
                       />
                     ))}
                   </div>

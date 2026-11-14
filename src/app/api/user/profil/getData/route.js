@@ -77,6 +77,7 @@ async function main(userId) {
                 density: true,
                 heroColor: true,
                 heroTextColor: true,
+                themeSnapshot: true,
                 createdAt: true,
                 updatedAt: true,
                 // Sortierung auf allen drei Ebenen serverseitig — der Editor
@@ -120,6 +121,10 @@ async function main(userId) {
                             updatedAt: true,
                             stock: true,
                             allergens: true,
+                            additives: true,
+                            tags: true,
+                            spiceLevel: true,
+                            variants: { orderBy: { position: "asc" }, select: { id: true, label: true, price: true, position: true } },
                             reviews: true,
                           },
                         },
@@ -133,6 +138,13 @@ async function main(userId) {
         },
       },
     });
+    // Der Editor braucht nur die Info, ob sich ein Theme zurücknehmen lässt —
+    // nicht den Schnappschuss selbst.
+    for (const menu of userData?.restaurant?.menu ?? []) {
+      menu.hasThemeSnapshot = menu.themeSnapshot != null;
+      delete menu.themeSnapshot;
+    }
+
     devLog("User data found(/profil/getData): ", userData);
     return userData;
   } catch (error) {
