@@ -2,6 +2,7 @@ import { Suspense, cache } from "react";
 import { notFound } from "next/navigation";
 import { getRestaurantMenuDataBySubdomain } from "@/app/api/restaurant/[restaurantID]/menu/data";
 import MenuClient from "../../UnserePartner/Restaurants/Menu/components/MenuClient";
+import { menuMetaDescription } from "../../UnserePartner/Restaurants/Menu/metaDescription";
 
 // Ziel des Middleware-Rewrites für <subdomain>.whatisonmymenu.com.
 // Direkt unter /sub/<subdomain> auf der Hauptdomain leitet die Middleware auf die Subdomain um.
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }) {
   return {
     // absolute: auf der eigenen Subdomain des Restaurants keine Plattform-Marke anhaengen
     title: { absolute: `${data.name} – Speisekarte` },
-    description: data.description || `Digitale Speisekarte von ${data.name} — jetzt ansehen und bestellen.`,
+    description: menuMetaDescription(data),
     // Kanonisch bleibt die Speisekarte auf der Hauptdomain (metadataBase), sonst doppelter Inhalt.
     alternates: {
       canonical: `/UnserePartner/Restaurants/Menu/${encodeURIComponent(data.id)}`,

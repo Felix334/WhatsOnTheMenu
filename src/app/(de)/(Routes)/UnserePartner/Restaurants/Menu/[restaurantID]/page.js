@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getRestaurantMenuData } from "@/app/api/restaurant/[restaurantID]/menu/data";
 import MenuClient from "../components/MenuClient";
+import { menuMetaDescription } from "../metaDescription";
 
 export const revalidate = 300;
 
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }) {
   if (!data) return { title: "Speisekarte", robots: { index: false, follow: false } };
   return {
     title: `${data.name} – Speisekarte`,
-    description: data.description || `Digitale Speisekarte von ${data.name} — jetzt ansehen und bestellen.`,
+    description: menuMetaDescription(data),
     alternates: { canonical },
   };
 }

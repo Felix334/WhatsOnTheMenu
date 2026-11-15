@@ -18,7 +18,8 @@ const de = {
   meta: {
     home: {
       title: "Online Speisekarte erstellen | QR Menü Generator",
-      description: "Erstelle digitale und kostenlose Speisekarten für dein Restaurant. Zeige deinen Kunden mit dem Event-Kalender was ansteht. Einfach, schnell und mobil per QR-Code nutzbar. Direkt im Browser ohne Extra Software",
+      // Max. ~155 Zeichen — laengere Texte schneiden Google/Bing ab, Bing meldet sie als Fehler.
+      description: "Erstelle kostenlos eine digitale Speisekarte für dein Restaurant – mit QR-Code, Event-Kalender und Allergenangaben. Direkt im Browser, ohne App.",
       ogTitle: "Online Speisekarte erstellen",
       ogDescription: "Erstelle digitale Speisekarten und Eventkalender für dein Restaurant.",
     },
