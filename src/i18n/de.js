@@ -34,6 +34,10 @@ const de = {
       title: "Unser Team",
       description: "Hinter WhatIsOnMyMenu steht Gründer Felix Mayer – kein Konzern, keine Hotline. Fragen zu Tarifen oder Ihrer digitalen Speisekarte landen direkt bei ihm.",
     },
+    imprint: {
+      title: "Impressum",
+      description: "Impressum und Anbieterkennzeichnung gemäß § 5 DDG von WhatIsOnMyMenu.com – der Plattform für digitale Speisekarten per QR-Code.",
+    },
   },
 
   banner: {
@@ -406,6 +410,29 @@ const de = {
     legalText: "Anbieterkennzeichnung, Anschrift und Verantwortlicher nach § 18 Abs. 2 MStV stehen im Impressum.",
     imprintLink: "Zum Impressum",
     privacyLink: "Zur Datenschutzerklärung",
+  },
+
+  // Impressum (ImprintPage.js). Name, Anschrift und E-Mail stehen NICHT hier,
+  // sondern einmalig in ImprintPage.js — beide Sprachen zeigen dieselben Daten.
+  imprint: {
+    title: "Impressum",
+    lastUpdated: "Stand",
+    bindingNote: null,
+    providerTitle: "Angaben gemäß § 5 DDG",
+    country: "Deutschland",
+    contactTitle: "Kontakt",
+    emailLabel: "E-Mail",
+    vatTitle: "Umsatzsteuer",
+    vatText: "Kleinunternehmer im Sinne von § 19 UStG. Es wird keine Umsatzsteuer berechnet.",
+    responsibleTitle: "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
+    disputeTitle: "Streitschlichtung",
+    disputeText: "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.",
+    contentLiabilityTitle: "Haftung für Inhalte",
+    contentLiabilityText: "Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.",
+    linkLiabilityTitle: "Haftung für Links",
+    linkLiabilityText: "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.",
+    copyrightTitle: "Urheberrecht",
+    copyrightText: "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.",
   },
 
   // Eingeloggter Personal-Bereich (/staff). Sprache kommt aus User.language,

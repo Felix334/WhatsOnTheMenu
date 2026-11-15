@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import de from "@/i18n/de";
+import { defaultLocale, localizedPath } from "@/i18n/config";
 
-// Die Rechtsseiten (Datenschutz, AGB, Widerruf, Impressum) bleiben bewusst
-// deutsch und liegen weiterhin ohne Sprach-Praefix — es sind Dokumente nach
-// deutschem Recht. Uebersetzt werden nur die Link-Beschriftungen, damit die
-// Navigation in der jeweiligen Sprache lesbar bleibt.
-const FooterPart = ({ t = de.footer }) => {
+// Datenschutz, AGB und Widerruf bleiben bewusst deutsch und liegen ohne
+// Sprach-Praefix — es sind Dokumente nach deutschem Recht. Uebersetzt werden
+// dort nur die Link-Beschriftungen. Das Impressum gibt es zusaetzlich auf
+// Englisch (/en/legal-notice, deutsche Fassung bleibt massgeblich).
+const FooterPart = ({ t = de.footer, locale = defaultLocale }) => {
   const searchParams = useSearchParams();
 
   const queryString = searchParams.toString();
@@ -44,7 +45,7 @@ const FooterPart = ({ t = de.footer }) => {
             <Link className="text-gray-400 text-sm" href={`/Widerruf${suffix}`}>
               {t.withdrawal}
             </Link>
-            <Link className="text-gray-400 text-sm" href={`/Impressum${suffix}`}>
+            <Link className="text-gray-400 text-sm" href={`${localizedPath("/Impressum", locale)}${suffix}`}>
               {t.imprint}
             </Link>
           </div>

@@ -16,6 +16,7 @@ export const LOCALIZED_PATHS = {
   en: {
     "/WieFunktionierts": "/how-it-works",
     "/UnserTeam": "/about-us",
+    "/Impressum": "/legal-notice",
     "/ErstelleRestaurantAccount": "/sign-up",
     "/ErstelleRestaurantAccount/FreeTier": "/sign-up/free",
     "/ErstelleRestaurantAccount/Business": "/sign-up/business",

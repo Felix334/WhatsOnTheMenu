@@ -34,6 +34,10 @@ const en = {
       title: "Our Team",
       description: "WhatIsOnMyMenu is built and run by founder Felix Mayer – no corporation, no call centre. Questions about plans or your digital menu go straight to him.",
     },
+    imprint: {
+      title: "Legal Notice",
+      description: "Legal notice and provider information under § 5 DDG for WhatIsOnMyMenu.com – the platform for QR code menus.",
+    },
   },
 
   // Language suggestion banner. These strings are shown in the TARGET language
@@ -413,9 +417,32 @@ const en = {
     email: "support@whatisonmymenu.com",
     phone: "+49 1577 0426034",
     legalTitle: "Legal",
-    legalText: "Provider details, postal address and the person responsible under § 18(2) MStV are listed in the imprint (in German).",
-    imprintLink: "View imprint",
+    legalText: "Provider details, postal address and the person responsible under § 18(2) MStV are listed in the legal notice.",
+    imprintLink: "View legal notice",
     privacyLink: "View privacy policy",
+  },
+
+  // Legal notice (ImprintPage.js). Name, address and e-mail are NOT here but
+  // defined once in ImprintPage.js, so both languages show identical data.
+  imprint: {
+    title: "Legal Notice",
+    lastUpdated: "Last updated",
+    bindingNote: "This English version is provided for convenience only. The German version (Impressum) is legally binding.",
+    providerTitle: "Information pursuant to § 5 DDG (German Digital Services Act)",
+    country: "Germany",
+    contactTitle: "Contact",
+    emailLabel: "E-mail",
+    vatTitle: "VAT",
+    vatText: "Small business within the meaning of § 19 UStG (German VAT Act). No VAT is charged.",
+    responsibleTitle: "Responsible for content pursuant to § 18(2) MStV (German Interstate Media Treaty)",
+    disputeTitle: "Dispute resolution",
+    disputeText: "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.",
+    contentLiabilityTitle: "Liability for content",
+    contentLiabilityText: "As a service provider, we are responsible for our own content on these pages in accordance with § 7(1) DDG and general law. However, under §§ 8 to 10 DDG we are not obliged to monitor third-party information transmitted or stored, or to investigate circumstances that indicate unlawful activity.",
+    linkLiabilityTitle: "Liability for links",
+    linkLiabilityText: "Our website contains links to external third-party websites over whose content we have no control. We therefore cannot accept any liability for this external content. The respective provider or operator of the linked pages is always responsible for their content.",
+    copyrightTitle: "Copyright",
+    copyrightText: "The content and works created by the site operator on these pages are subject to German copyright law. Reproduction, editing, distribution and any kind of use beyond the limits of copyright law require the written consent of the respective author or creator.",
   },
 
   // Signed-in staff area (/staff). The language comes from User.language,

@@ -19,6 +19,7 @@ const TRANSLATED_PAGES = [
   { path: "/pricing", lastModified: "2026-10-22", changeFrequency: "monthly", priority: 0.9 },
   { path: "/WieFunktionierts", lastModified: "2026-09-20", changeFrequency: "monthly", priority: 0.8 },
   { path: "/UnserTeam", lastModified: "2026-11-11", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/Impressum", lastModified: "2026-11-15", changeFrequency: "yearly", priority: 0.3 },
 ];
 
 // Nur auf Deutsch vorhanden: Rechtsseiten (Dokumente nach deutschem Recht).
@@ -27,7 +28,6 @@ const TRANSLATED_PAGES = [
 const GERMAN_ONLY_PAGES = [
   { path: "/AGBs", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
   { path: "/privacy", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
-  { path: "/Impressum", lastModified: "2026-11-11", changeFrequency: "yearly", priority: 0.3 },
   { path: "/Widerruf", lastModified: "2026-09-20", changeFrequency: "yearly", priority: 0.3 },
 ];
 

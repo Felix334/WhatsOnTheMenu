@@ -3,6 +3,7 @@ import { Mail, Phone, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PublicHeader from "./PublicHeader";
+import { localizedPath } from "@/i18n";
 
 // Über-uns-Seite.
 //
@@ -67,9 +68,9 @@ export default function AboutPage({ dict, locale }) {
           <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">{t.legalTitle}</h2>
           <p className="text-gray-500 mb-6">{t.legalText}</p>
           <div className="flex flex-col sm:flex-row gap-3">
-            {/* Ohne Sprach-Praefix: die Rechtsseiten gibt es nur auf Deutsch. */}
+            {/* Impressum gibt es uebersetzt, die Datenschutzerklaerung nur auf Deutsch. */}
             <Button asChild variant="outline">
-              <Link href="/Impressum">
+              <Link href={localizedPath("/Impressum", locale)}>
                 {t.imprintLink} <ArrowRight className="h-4 w-4 ml-1" />
               </Link>
             </Button>
