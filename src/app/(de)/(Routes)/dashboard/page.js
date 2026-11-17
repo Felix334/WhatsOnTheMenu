@@ -863,17 +863,19 @@ export default function PageBuilder() {
 
       <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
         {/* Zeile 1: Navigation */}
+        {/* Schmal: nur der Titel darf schrumpfen (truncate) bzw. verschwindet
+            ganz — Zurück-Button und Aktionen behalten ihre Größe (shrink-0). */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <Button variant="ghost" size="sm" onClick={goBackBtn} style={{ fontFamily: font }}>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Button variant="ghost" size="sm" onClick={goBackBtn} style={{ fontFamily: font }} aria-label={t.common.back} className="shrink-0">
               <ArrowLeft className="size-4" />
               <span className="hidden sm:inline">{t.common.back}</span>
             </Button>
-            <Separator orientation="vertical" className="h-5" />
-            <span className="text-sm font-semibold text-gray-900 truncate">{tp.title}</span>
+            <Separator orientation="vertical" className="h-5 shrink-0 hidden min-[420px]:block" />
+            <span className="text-sm font-semibold text-gray-900 truncate hidden min-[420px]:inline">{tp.title}</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <UiLanguageSwitcher />
             {isPaidTier ? (
               <Button asChild variant="outline" size="sm">
