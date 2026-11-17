@@ -14,7 +14,11 @@ const PLAN_FEATURES = {
   premium: ["Up to 50 categories", "Up to 300 dishes", "Everything in Plus", "Event calendar (100 entries, 1 year ahead)", "Staff management with roles", "Table ordering", "Sold-out indicators", "Inventory & suppliers", "Custom colours for the header too"],
 };
 
+import dashboard from "./dashboard.en";
+
 const en = {
+  dashboard,
+
   meta: {
     home: {
       title: "QR Code Menu Maker | Free Digital Menus for Restaurants",
@@ -85,6 +89,50 @@ const en = {
     settings: "Settings",
     logout: "Log out",
     roles: { Admin: "Admin", Owner: "Restaurant owner", Staff: "Staff member" },
+  },
+
+  // Account page (/account, components/AccountPage.js).
+  account: {
+    metaTitle: "My account",
+    loading: "Loading…",
+    signInFirst: "Please sign in.",
+    avatarAlt: "Profile picture",
+    detailsTitle: "Account details",
+    name: "Name",
+    email: "Email",
+    role: "Role",
+    subscription: "Plan",
+    subscriptionStatus: "Plan status",
+    restaurant: "Restaurant",
+    memberSince: "Member since",
+    roles: {
+      Admin: "Administrator",
+      Owner: "Restaurant owner",
+      Staff: "Staff member",
+      Manager: "Manager",
+      Executive: "Executive",
+      User: "User",
+    },
+    // Stripe subscription statuses; unknown values are shown as they are.
+    subscriptionStatuses: {
+      active: "Active",
+      trialing: "Trial",
+      past_due: "Payment overdue",
+      canceled: "Cancelled",
+      unpaid: "Unpaid",
+      incomplete: "Incomplete",
+    },
+    deleteTitle: "Delete account",
+    deleteHintOwner: "Deleting your account also removes your restaurant with all its data and cancels any running subscription.",
+    deleteHint: "You can permanently delete your account here.",
+    deleteButton: "Delete account",
+    deleting: "Deleting…",
+    confirmTitle: "Really delete your account?",
+    confirmWithRestaurant: "Your account AND your restaurant (including menu, dishes, orders and staff) will be permanently deleted. An active subscription is cancelled automatically. This cannot be undone.",
+    confirmWithoutRestaurant: "Your account will be permanently deleted. This cannot be undone.",
+    confirmButton: "Delete permanently",
+    deleteSuccess: "Account deleted.",
+    deleteError: "Could not delete the account.",
   },
 
   nav: {
@@ -214,19 +262,57 @@ const en = {
     },
   },
 
-  // Pricing overview for the translated pages.
+  // Pricing page with checkout (components/PricingPlans.js).
   //
-  // The German /pricing page carries the actual checkout, including a consent
-  // statement written under German law (Widerrufsbelehrung, AGB). That text is
-  // deliberately NOT translated — an English rendering of it would carry a
-  // different legal meaning. The translated page therefore presents the plans
-  // and hands over to the German checkout for the contract itself.
-  pricingOverview: {
-    title: "Pricing",
-    subtitle: "Start free and upgrade when your menu grows. Cancel any month.",
-    checkoutNote: "Checkout and the subscription terms are handled in German — WhatIsOnMyMenu is operated from Germany and the contract is governed by German law.",
-    cta: "Continue to checkout",
-    freeCta: "Start for free",
+  // The consent statement mirrors the German one sentence by sentence. Terms
+  // (AGB) and withdrawal policy exist only in German and are governed by German
+  // law — bindingNote says so right inside the checkbox.
+  // "{plan}" is replaced with the tier's display name (Plus / Premium).
+  pricingPage: {
+    eyebrow: "Pricing",
+    title: "Choose your plan",
+    subtitle: "Start free and switch any time. No hidden costs.",
+    free: {
+      eyebrow: "Free",
+      description: "Perfect for trying it out",
+      price: "€0",
+    },
+    professional: {
+      badge: "⭐ Recommended",
+      eyebrow: "Most popular",
+      description: "Every feature for your restaurant",
+    },
+    business: {
+      eyebrow: "For growing menus",
+      description: "More categories, more dishes and your own subdomain",
+      price: "€7.99",
+    },
+    alreadyActive: "Already active",
+    start: "Get started",
+    activePlan: "Active plan ✓",
+    comingSoon: "Coming soon",
+    redirecting: "Redirecting…",
+    switchPlan: "Switch to this plan",
+    subscribe: "Subscribe to {plan}",
+    dialogTitle: "Restaurant details for {plan}",
+    dialogDescription: "Your restaurant is created automatically once payment is complete.",
+    countryHint: "Determines the VAT on your invoice.",
+    cancel: "Cancel",
+    processing: "Processing…",
+    pay: "Pay with Stripe",
+    currentPlan: "Current plan:",
+    portalError: "Could not open the Stripe portal",
+    noCheckoutUrl: "No checkout URL received",
+    checkoutFailed: "Checkout failed",
+    consent: {
+      before: "I confirm that I am ",
+      strong: "acting as a business",
+      after: ". I expressly request that the service begins immediately and acknowledge that any right of withdrawal expires once the contract has been fully performed. This is subject to the",
+      terms: "Terms",
+      and: "and the",
+      withdrawal: "withdrawal policy",
+      bindingNote: "The linked documents are in German and governed by German law; the German wording is legally binding.",
+    },
   },
 
   howItWorks: {
@@ -508,6 +594,8 @@ const en = {
       allAvailable: "All available",
       allSoldOut: "All sold out",
       noDishes: "No dishes found on the menu.",
+      countAvailable: "{n} available",
+      countUnavailable: "{n} sold out",
     },
     calendar: {
       title: "Offers & events",
@@ -522,6 +610,7 @@ const en = {
       typeAktion: "Offer",
       typeEvent: "Event",
       typeTagesgericht: "Dish of the day",
+      newEntry: "+ New entry",
     },
   },
 

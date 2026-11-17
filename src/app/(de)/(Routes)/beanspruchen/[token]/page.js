@@ -40,7 +40,7 @@ export default function ClaimPage() {
       // JWT neu laden, damit Rolle "Owner" und restaurantId in der Session stehen
       await update();
       toast.success(`${data.restaurantName} gehört jetzt dir!`);
-      router.replace("/Profil");
+      router.replace("/dashboard");
     } catch (err) {
       toast.error(err.message);
       setClaiming(false);

@@ -88,7 +88,7 @@ const Profile = ({ t = de.profileMenu, locale = "de" }) => {
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={`/Konto?${queryString}`}>
+            <Link href={`${localizedPath("/Konto", locale)}?${queryString}`}>
               <UserRound className="size-4" />
               {t.account}
             </Link>
@@ -96,7 +96,7 @@ const Profile = ({ t = de.profileMenu, locale = "de" }) => {
 
           {isTeamMember && (
             <DropdownMenuItem asChild>
-              <Link href={`/Profil?${queryString}`} prefetch={false}>
+              <Link href={`/dashboard?${queryString}`} prefetch={false}>
                 <LayoutDashboard className="size-4" />
                 {t.dashboard}
               </Link>

@@ -1,12 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-import { LOCALIZED_PATHS } from "./src/i18n/slugs.mjs";
-
-// [{ locale, neutral: "/WieFunktionierts", localized: "/how-it-works" }, ...]
-const localizedPaths = Object.entries(LOCALIZED_PATHS).flatMap(([locale, paths]) =>
-  Object.entries(paths).map(([neutral, localized]) => ({ locale, neutral, localized }))
-);
-
 const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -57,24 +50,26 @@ const nextConfig = {
     ];
   },
 
-  // Alte Pfade mit deutschem Namen (/en/WieFunktionierts) dauerhaft auf den
-  // uebersetzten Pfad umleiten — Google uebernimmt so die bereits gecrawlte URL.
-  // Query-Strings reicht Next automatisch durch.
-  async redirects() {
-    return localizedPaths.map(({ locale, neutral, localized }) => ({
-      source: `/${locale}${neutral}`,
-      destination: `/${locale}${localized}`,
-      permanent: true,
-    }));
-  },
+  // Sprach-Rewrites und -Weiterleitungen (/how-it-works -> /en/WieFunktionierts,
+  // /en/pricing -> /pricing, ...) macht die Middleware ueber resolveLocaleRoute
+  // aus src/i18n/config.js — nicht hier. Die Standardsprache laeuft ohne
+  // Praefix, das laesst sich mit statischen Regeln nicht sauber abbilden.
 
-  // Uebersetzter Pfad -> bestehender Seitenordner unter (intl)/[locale]/.
-  // Redirects werden nur fuer die eingehende URL ausgewertet, daher keine Schleife.
-  async rewrites() {
-    return localizedPaths.map(({ locale, neutral, localized }) => ({
-      source: `/${locale}${localized}`,
-      destination: `/${locale}${neutral}`,
-    }));
+  // Umbenannte Dashboard-Pfade (deutsch -> englisch). Alte Links und
+  // Lesezeichen landen per 308 auf dem neuen Pfad; Query-Strings (restaurantID)
+  // reicht Next automatisch durch. Jedes Ziel muss hinter der Rollenpruefung
+  // der Middleware liegen (/staff bzw. /dashboard).
+  // Reihenfolge: spezielle Pfade vor der Sammelregel /Profil/:path*, und
+  // direkt aufs Endziel — keine Weiterleitungsketten.
+  async redirects() {
+    return [
+      { source: "/staff/bestellungen", destination: "/staff/orders", permanent: true },
+      { source: "/Profil/Bestellungen", destination: "/dashboard/orders", permanent: true },
+      { source: "/Profil/Drucken", destination: "/dashboard/print", permanent: true },
+      { source: "/Profil/QRBuilder", destination: "/dashboard/qr-codes", permanent: true },
+      { source: "/Profil", destination: "/dashboard", permanent: true },
+      { source: "/Profil/:path*", destination: "/dashboard/:path*", permanent: true },
+    ];
   },
 };
 

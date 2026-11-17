@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { ROOT_DOMAIN, SUBDOMAIN_PATTERN, RESERVED_SUBDOMAINS, subdomainFromHostname } from "@/lib/schemas/subdomain";
+import { resolveLocaleRoute } from "@/i18n/config";
 
 // Host der Hauptseite (siehe metadataBase in den Root-Layouts)
 const MAIN_HOST = process.env.NODE_ENV === "production" ? `www.${ROOT_DOMAIN}` : ROOT_DOMAIN;
@@ -46,8 +47,23 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  // ── Sprachen: Englisch ohne Praefix, Deutsch unter /de ────────────────────────
+  // Betrifft nur die uebersetzten oeffentlichen Seiten (TRANSLATED_PATHS) —
+  // keine davon ist geschuetzt, daher hier vor den Rollenpruefungen.
+  if (!pathname.startsWith("/api/")) {
+    const route = resolveLocaleRoute(pathname);
+    if (route) {
+      const url = req.nextUrl.clone();
+      url.pathname = route.rewrite ?? route.redirect;
+      return route.rewrite ? NextResponse.rewrite(url) : NextResponse.redirect(url, 308);
+    }
+  }
+
   const isAdmin = pathname.startsWith("/Admin") || pathname.startsWith("/api/Admin") || pathname.startsWith("/api/restaurant/Admin");
-  const isProfil = pathname.startsWith("/Profil");
+  // Owner-Dashboard. /Profil ist der alte Pfad (leitet in next.config.mjs auf
+  // /dashboard um) — bleibt hier trotzdem drin, damit eine vergessene oder
+  // entfernte Weiterleitung nie einen ungeschützten Pfad öffnet.
+  const isProfil = pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname.startsWith("/Profil");
   const isStaffArea = pathname.startsWith("/staff") || pathname.startsWith("/settings");
 
   // Token nur dort lesen, wo es gebraucht wird; die Middleware läuft jetzt auf allen Seiten.
@@ -63,7 +79,7 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // /Profil — nur Owner
+  // /dashboard (früher /Profil) — nur Owner
   if (isProfil && token?.role !== "Owner") {
     return NextResponse.redirect(new URL("/", req.url));
   }

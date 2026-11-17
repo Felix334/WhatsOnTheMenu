@@ -14,7 +14,11 @@ const PLAN_FEATURES = {
   premium: ["Bis zu 50 Kategorien", "Bis zu 300 Gerichte", "Alles aus Plus", "Event-Kalender (100 Einträge, 1 Jahr im Voraus)", "Personalverwaltung mit Rollen", "Bestellsystem für Tische", "Verfügbarkeit von Gerichten (ausverkauft)", "Inventar & Lieferanten", "Freie Farbwahl auch im Kopfbereich"],
 };
 
+import dashboard from "./dashboard.de";
+
 const de = {
+  dashboard,
+
   meta: {
     home: {
       title: "Online Speisekarte erstellen | QR Menü Generator",
@@ -83,6 +87,50 @@ const de = {
     settings: "Einstellungen",
     logout: "Abmelden",
     roles: { Admin: "Admin", Owner: "Restaurant-Besitzer", Staff: "Angestellter" },
+  },
+
+  // Kontoseite (/de/Konto, components/AccountPage.js).
+  account: {
+    metaTitle: "Mein Konto",
+    loading: "Lädt…",
+    signInFirst: "Bitte melde dich an.",
+    avatarAlt: "Profilbild",
+    detailsTitle: "Konto-Daten",
+    name: "Name",
+    email: "E-Mail",
+    role: "Rolle",
+    subscription: "Abo",
+    subscriptionStatus: "Abo-Status",
+    restaurant: "Restaurant",
+    memberSince: "Mitglied seit",
+    roles: {
+      Admin: "Administrator",
+      Owner: "Restaurant-Besitzer",
+      Staff: "Mitarbeiter",
+      Manager: "Manager",
+      Executive: "Executive",
+      User: "Nutzer",
+    },
+    // Stripe-Abo-Status; unbekannte Werte werden unveraendert angezeigt.
+    subscriptionStatuses: {
+      active: "Aktiv",
+      trialing: "Testphase",
+      past_due: "Zahlung überfällig",
+      canceled: "Gekündigt",
+      unpaid: "Unbezahlt",
+      incomplete: "Unvollständig",
+    },
+    deleteTitle: "Account löschen",
+    deleteHintOwner: "Beim Löschen deines Accounts wird auch dein Restaurant mit allen Daten entfernt und ein laufendes Abonnement gekündigt.",
+    deleteHint: "Hier kannst du deinen Account unwiderruflich löschen.",
+    deleteButton: "Account löschen",
+    deleting: "Wird gelöscht…",
+    confirmTitle: "Account wirklich löschen?",
+    confirmWithRestaurant: "Dein Account UND dein Restaurant (inkl. Menü, Gerichte, Bestellungen und Mitarbeiter) werden unwiderruflich gelöscht. Ein aktives Abonnement wird automatisch gekündigt. Diese Aktion kann nicht rückgängig gemacht werden.",
+    confirmWithoutRestaurant: "Dein Account wird unwiderruflich gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+    confirmButton: "Endgültig löschen",
+    deleteSuccess: "Account erfolgreich gelöscht.",
+    deleteError: "Fehler beim Löschen des Accounts.",
   },
 
   nav: {
@@ -212,12 +260,55 @@ const de = {
     },
   },
 
-  pricingOverview: {
-    title: "Preise",
-    subtitle: "Kostenlos starten und upgraden, wenn die Karte wächst. Monatlich kündbar.",
-    checkoutNote: "Checkout und Vertragsbedingungen laufen auf Deutsch.",
-    cta: "Weiter zum Checkout",
-    freeCta: "Kostenlos starten",
+  // Tarifseite mit Checkout (components/PricingPlans.js).
+  // "{plan}" wird durch den Anzeigenamen des Tarifs ersetzt (Plus / Premium).
+  // Der Zustimmungstext ist die verbindliche Fassung — die englische in en.js
+  // folgt ihm Satz fuer Satz. Bei Aenderungen beide nachziehen.
+  pricingPage: {
+    eyebrow: "Preise",
+    title: "Wähle deinen Tarif",
+    subtitle: "Starte kostenlos und wechsle jederzeit. Keine versteckten Kosten.",
+    free: {
+      eyebrow: "Kostenlos",
+      description: "Perfekt zum Ausprobieren",
+      price: "0 €",
+    },
+    professional: {
+      badge: "⭐ Empfohlen",
+      eyebrow: "Beliebteste Wahl",
+      description: "Alle Funktionen für Ihren Betrieb",
+    },
+    business: {
+      eyebrow: "Für wachsende Karten",
+      description: "Mehr Kategorien, Gerichte und eigene Subdomain",
+      price: "7,99 €",
+    },
+    alreadyActive: "Bereits aktiv",
+    start: "Jetzt starten",
+    activePlan: "Aktiver Plan ✓",
+    comingSoon: "Bald verfügbar",
+    redirecting: "Weiterleiten...",
+    switchPlan: "Zu diesem Plan wechseln",
+    subscribe: "Jetzt {plan} abonnieren",
+    dialogTitle: "Restaurant-Details für {plan}",
+    dialogDescription: "Nach Zahlung wird dein Restaurant automatisch erstellt.",
+    countryHint: "Bestimmt die Umsatzsteuer auf Ihrer Rechnung.",
+    cancel: "Abbrechen",
+    processing: "Verarbeite...",
+    pay: "Mit Stripe bezahlen",
+    currentPlan: "Aktueller Tarif:",
+    portalError: "Stripe-Portal konnte nicht geöffnet werden",
+    noCheckoutUrl: "Keine Checkout-URL erhalten",
+    checkoutFailed: "Checkout fehlgeschlagen",
+    consent: {
+      before: "Ich bestätige, dass ich als ",
+      strong: "Unternehmer/Gewerbetreibender",
+      after: " handle. Ich verlange ausdrücklich, dass die Leistung sofort beginnt, und nehme zur Kenntnis, dass ein etwaiges Widerrufsrecht mit vollständiger Vertragserfüllung erlischt. Es gelten die",
+      terms: "AGB",
+      and: "und die",
+      withdrawal: "Widerrufsbelehrung",
+      bindingNote: "",
+    },
   },
 
   howItWorks: {
@@ -496,6 +587,8 @@ const de = {
       allAvailable: "Alle verfügbar",
       allSoldOut: "Alle ausverkauft",
       noDishes: "Keine Gerichte im Menü gefunden.",
+      countAvailable: "{n} verfügbar",
+      countUnavailable: "{n} nicht verfügbar",
     },
     calendar: {
       title: "Aktionen & Events",
@@ -510,6 +603,7 @@ const de = {
       typeAktion: "Aktion",
       typeEvent: "Event",
       typeTagesgericht: "Tagesgericht",
+      newEntry: "+ Neuer Eintrag",
     },
   },
 

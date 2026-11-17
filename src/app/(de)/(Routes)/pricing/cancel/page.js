@@ -26,13 +26,13 @@ function CancelContent() {
                 : "Etwas ist schiefgelaufen. Versuche es erneut."}
             </p>
             <div className="space-y-3">
-              <Button onClick={() => router.push("/pricing")} size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+              <Button onClick={() => router.push("/de/pricing")} size="lg" className="w-full bg-amber-500 hover:bg-amber-600 text-white">
                 Erneut versuchen
               </Button>
-              <Button variant="outline" onClick={() => router.push("/ErstelleRestaurantAccount/FreeTier")} className="w-full border-amber-300 text-amber-700 hover:bg-amber-50">
+              <Button variant="outline" onClick={() => router.push("/de/ErstelleRestaurantAccount/FreeTier")} className="w-full border-amber-300 text-amber-700 hover:bg-amber-50">
                 Kostenlos starten
               </Button>
-              <Button variant="link" onClick={() => router.push("/Profil")} className="text-gray-400">
+              <Button variant="link" onClick={() => router.push("/dashboard")} className="text-gray-400">
                 Zum Profil
               </Button>
             </div>

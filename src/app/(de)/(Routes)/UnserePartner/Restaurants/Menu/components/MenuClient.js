@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { bgColorClass, bgColorStyle } from "./colorPicker";
-import { GOOGLE_FONTS_URL } from "@/app/(de)/(Routes)/Profil/components/fontList";
+import { GOOGLE_FONTS_URL } from "@/app/(de)/(Routes)/dashboard/components/fontList";
 import Link from "next/link";
 import { ALLERGENS } from "@/lib/allergens";
 import { AdditiveLegend, AdditiveMarks, DishTagBadges, VariantPriceList, dishPriceLabel } from "@/app/components/DishDetails";
+import { MenuBackgroundImage } from "@/app/components/MenuBackgroundImage";
 
 // Warenkorb-Schlüssel: Gericht + gewählte Größe (eine Cola 0,3 l und eine
 // Cola 0,5 l sind zwei Positionen)
@@ -881,7 +882,8 @@ const MenuClient = ({ serverData }) => {
   const restaurantId = serverData?.id;
 
   return (
-    <div className={`min-h-screen flex flex-col text-gray-900 font-sans ${bgColor ? bgColorClass(bgColor) : "bg-amber-50"}`} style={{ ...bgColorStyle(bgColor), fontFamily: menuFont || undefined }}>
+    <div className={`min-h-screen flex flex-col isolate text-gray-900 font-sans ${bgColor ? bgColorClass(bgColor) : "bg-amber-50"}`} style={{ ...bgColorStyle(bgColor), fontFamily: menuFont || undefined }}>
+      <MenuBackgroundImage url={menuEntry?.bgImageUrl} />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       {menuFont && <link href={GOOGLE_FONTS_URL} rel="stylesheet" />}

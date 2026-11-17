@@ -2,13 +2,13 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import de from "@/i18n/de";
-import { defaultLocale, localizedPath } from "@/i18n/config";
+import { localizedPath } from "@/i18n/config";
 
 // Datenschutz, AGB und Widerruf bleiben bewusst deutsch und liegen ohne
 // Sprach-Praefix — es sind Dokumente nach deutschem Recht. Uebersetzt werden
 // dort nur die Link-Beschriftungen. Das Impressum gibt es zusaetzlich auf
-// Englisch (/en/legal-notice, deutsche Fassung bleibt massgeblich).
-const FooterPart = ({ t = de.footer, locale = defaultLocale }) => {
+// Englisch (/legal-notice, deutsche Fassung /de/Impressum bleibt massgeblich).
+const FooterPart = ({ t = de.footer, locale = "de" }) => {
   const searchParams = useSearchParams();
 
   const queryString = searchParams.toString();

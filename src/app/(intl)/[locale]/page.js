@@ -1,7 +1,7 @@
 import HomePage from "@/app/components/HomePage";
-import { getDictionary, buildAlternates, ogLocales } from "@/i18n";
+import { getDictionary, buildAlternates, ogLocales, localizedPath } from "@/i18n";
 
-// Uebersetzte Startseite: /en, spaeter /fr, /es ...
+// Startseite aller Sprachen: / (Englisch, intern /en), /de, spaeter /fr ...
 // Gleiches Markup wie die deutsche Fassung, nur ein anderes Woerterbuch.
 
 export async function generateMetadata({ params }) {
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: t.meta.home.ogTitle,
       description: t.meta.home.ogDescription,
-      url: `/${locale}`,
+      url: localizedPath("/", locale),
       siteName: "WhatIsOnMyMenu",
       locale: ogLocales[locale],
       type: "website",

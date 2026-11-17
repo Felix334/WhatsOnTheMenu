@@ -99,7 +99,7 @@ function StaffSection() {
           <h2 className="text-base font-semibold">Mitarbeiter</h2>
           <p className="text-sm text-gray-500">
             Die Personalverwaltung mit Rollen gibt es im {TIER_LABELS.Professional}-Tarif.{" "}
-            <Link href="/pricing" className="underline font-medium">
+            <Link href="/de/pricing" className="underline font-medium">
               Tarife ansehen
             </Link>
           </p>
@@ -245,7 +245,7 @@ function SubscriptionSection() {
       <Card>
         <CardContent className="pt-6">
           <p className="text-sm text-gray-500 mb-4">Du hast noch kein aktives Abonnement.</p>
-          <Button asChild><Link href="/pricing">Tarife ansehen</Link></Button>
+          <Button asChild><Link href="/de/pricing">Tarife ansehen</Link></Button>
         </CardContent>
       </Card>
     );

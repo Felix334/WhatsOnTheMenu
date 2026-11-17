@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "src/lib/prisma";
 import { getToken } from "next-auth/jwt";
 import { devLog } from "src/lib/logger";
+import { storagePublicUrl } from "src/lib/supabase";
+import { MENU_IMAGE_BUCKET } from "src/lib/schemas/menuImage";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +79,7 @@ async function main(userId) {
                 density: true,
                 heroColor: true,
                 heroTextColor: true,
+                bgImage: true,
                 themeSnapshot: true,
                 createdAt: true,
                 updatedAt: true,
@@ -143,6 +146,9 @@ async function main(userId) {
     for (const menu of userData?.restaurant?.menu ?? []) {
       menu.hasThemeSnapshot = menu.themeSnapshot != null;
       delete menu.themeSnapshot;
+      // Der Client bekommt nur die fertige URL, nicht den Speicherpfad.
+      menu.bgImageUrl = storagePublicUrl(MENU_IMAGE_BUCKET, menu.bgImage);
+      delete menu.bgImage;
     }
 
     devLog("User data found(/profil/getData): ", userData);

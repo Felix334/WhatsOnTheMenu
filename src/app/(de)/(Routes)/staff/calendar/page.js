@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useUiLanguage } from "@/app/components/useUiLanguage";
 import { DynamicLink, DynamicLinkButton } from "@/app/components/DynamicLink";
+import UiLanguageSwitcher from "@/app/components/UiLanguageSwitcher";
 
 // Schluessel sind DB-Werte und bleiben; nur die Beschriftung wechselt.
 const typeLabels = (tk) => ({ promotion: tk.typeAktion, event: tk.typeEvent, specialDish: tk.typeTagesgericht });
@@ -139,6 +140,7 @@ function CalendarContent() {
             ← {tc.back}
           </DynamicLink>
           <h1 className="text-xl font-bold text-gray-900">{tk.title}</h1>
+          <UiLanguageSwitcher className="ml-auto" />
         </div>
         {form ? (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
@@ -201,7 +203,7 @@ function CalendarContent() {
           </div>
         ) : (
           <button onClick={() => setForm({ ...EMPTY_FORM })} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl px-4 py-3 text-sm transition-colors">
-            + Neuer Eintrag
+            {tk.newEntry}
           </button>
         )}
 

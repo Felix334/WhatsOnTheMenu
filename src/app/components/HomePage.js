@@ -37,7 +37,7 @@ function AuthErrorToast({ t, locale, onAuthError }) {
     if (!authError) return;
     toast.error(authError === "OAuthAccountNotLinked" ? t.auth.accountNotLinked : t.auth.signInFailed);
     onAuthError();
-    router.replace(locale === "de" ? "/" : `/${locale}`, { scroll: false });
+    router.replace(localizedPath("/", locale), { scroll: false });
   }, [searchParams, router, t, locale, onAuthError]);
 
   return null;
@@ -180,7 +180,7 @@ function HomeContent({ t, locale }) {
                         {status === "authenticated" && userID ? (
                           <div>
                             <Button variant="ghost" asChild>
-                              <Link href={{ pathname: "/Profil", query: { ...router.queryString } }}>{t.nav.profile}</Link>
+                              <Link href={{ pathname: "/dashboard", query: { ...router.queryString } }}>{t.nav.profile}</Link>
                             </Button>
                           </div>
                         ) : (

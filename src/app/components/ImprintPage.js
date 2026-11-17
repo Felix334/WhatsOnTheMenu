@@ -1,4 +1,4 @@
-// Impressum (/Impressum, /en/legal-notice).
+// Impressum (/legal-notice Englisch, /de/Impressum Deutsch).
 //
 // Die Pflichtangaben (Name, Anschrift, E-Mail) stehen NUR hier in PROVIDER.
 // Beide Sprachfassungen rendern dieselben Daten, damit sie sich nie

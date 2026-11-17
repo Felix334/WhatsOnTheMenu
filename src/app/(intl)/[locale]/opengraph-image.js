@@ -1,5 +1,5 @@
 import { renderOgImage } from "@/app/components/ogImage";
-import { getDictionary, prefixedLocales } from "@/i18n";
+import { getDictionary, locales } from "@/i18n";
 
 // Vorschaubild der uebersetzten Seiten — Text kommt aus dem Woerterbuch der
 // jeweiligen Sprache.
@@ -8,7 +8,7 @@ import { getDictionary, prefixedLocales } from "@/i18n";
 // nicht. Ohne sie wuerde das PNG bei jedem Abruf neu gerendert (Serverlast),
 // so entsteht es einmal pro Sprache beim Build.
 export function generateStaticParams() {
-  return prefixedLocales.map((locale) => ({ locale }));
+  return locales.map((locale) => ({ locale }));
 }
 
 export const alt = "WhatIsOnMyMenu – QR code menus for restaurants";

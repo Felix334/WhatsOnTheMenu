@@ -7,7 +7,7 @@ import { ADDITIVES, additiveNumbers, getDishTagByKey } from "@/lib/dishInfo";
 const formatPrice = (value) => `${Number(value ?? 0).toFixed(2)}€`;
 
 /** Merkmal-Chips + Schärfe, z. B. "🌱 Vegan  🌶️🌶️" */
-export const DishTagBadges = ({ tags, spiceLevel, className = "" }) => {
+export const DishTagBadges = ({ tags, spiceLevel, className = "", locale = "de" }) => {
   const known = (tags ?? []).map(getDishTagByKey).filter(Boolean);
   if (known.length === 0 && !(spiceLevel > 0)) return null;
   return (
@@ -15,11 +15,11 @@ export const DishTagBadges = ({ tags, spiceLevel, className = "" }) => {
       {known.map((t) => (
         <span key={t.key} className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-medium px-2 py-0.5">
           <span aria-hidden>{t.icon}</span>
-          {t.name}
+          {locale === "de" ? t.name : (t.nameEn ?? t.name)}
         </span>
       ))}
       {spiceLevel > 0 && (
-        <span className="text-xs" title={`Schärfe ${spiceLevel} von 3`} aria-label={`Schärfe ${spiceLevel} von 3`}>
+        <span className="text-xs" title={locale === "de" ? `Schärfe ${spiceLevel} von 3` : `Spiciness ${spiceLevel} of 3`} aria-label={locale === "de" ? `Schärfe ${spiceLevel} von 3` : `Spiciness ${spiceLevel} of 3`}>
           {"🌶️".repeat(spiceLevel)}
         </span>
       )}
@@ -28,21 +28,21 @@ export const DishTagBadges = ({ tags, spiceLevel, className = "" }) => {
 };
 
 /** Hochgestellte Zusatzstoff-Nummern hinter dem Gerichtnamen, z. B. "Cola ¹ ¹¹" */
-export const AdditiveMarks = ({ additives }) => {
+export const AdditiveMarks = ({ additives, locale = "de" }) => {
   const numbers = additiveNumbers(additives);
   if (numbers.length === 0) return null;
   return (
-    <sup className="ml-0.5 text-[10px] font-medium opacity-70" title={numbers.map((n) => ADDITIVES.find((a) => a.id === n)?.name).join(", ")}>
+    <sup className="ml-0.5 text-[10px] font-medium opacity-70" title={numbers.map((n) => { const a = ADDITIVES.find((x) => x.id === n); return locale === "de" ? a?.name : (a?.nameEn ?? a?.name); }).join(", ")}>
       {numbers.join(",")}
     </sup>
   );
 };
 
-/** "ab 2.50€" bei Varianten, sonst der normale Preis */
-export const dishPriceLabel = (dish) => {
+/** "ab 2.50€" / "from 2.50€" bei Varianten, sonst der normale Preis */
+export const dishPriceLabel = (dish, locale = "de") => {
   if (dish?.variants?.length) {
     const min = Math.min(...dish.variants.map((v) => Number(v.price)));
-    return `ab ${formatPrice(min)}`;
+    return `${locale === "de" ? "ab" : "from"} ${formatPrice(min)}`;
   }
   return formatPrice(dish?.price);
 };
@@ -69,14 +69,14 @@ export const VariantPriceList = ({ variants, style, className = "", renderAction
 };
 
 /** Legende nur der Zusatzstoffe, die in `dishes` vorkommen. null, wenn keine. */
-export const AdditiveLegend = ({ dishes, className = "" }) => {
+export const AdditiveLegend = ({ dishes, className = "", locale = "de" }) => {
   const used = new Set((dishes ?? []).flatMap((d) => d.additives ?? []));
   const entries = ADDITIVES.filter((a) => used.has(a.key));
   if (entries.length === 0) return null;
   return (
     <div className={className}>
-      <p className="font-semibold mb-1">Zusatzstoffe</p>
-      <p>{entries.map((a) => `${a.id} = ${a.name}`).join(" · ")}</p>
+      <p className="font-semibold mb-1">{locale === "de" ? "Zusatzstoffe" : "Additives"}</p>
+      <p>{entries.map((a) => `${a.id} = ${locale === "de" ? a.name : (a.nameEn ?? a.name)}`).join(" · ")}</p>
     </div>
   );
 };

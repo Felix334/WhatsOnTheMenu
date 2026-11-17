@@ -147,7 +147,7 @@ export default function RestaurantSignupForm({ t, locale }) {
 
       // JWT auffrischen (role → Owner, subscription → FreeTier) und ins Profil weiterleiten
       await update();
-      router.push(`/Profil?userID=${session.user.id}`);
+      router.push(`/dashboard?userID=${session.user.id}`);
     } catch (err) {
       if (err instanceof z.ZodError) {
         const fieldErrors = {};

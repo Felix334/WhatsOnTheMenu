@@ -5,6 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useUiLanguage } from "@/app/components/useUiLanguage";
 import { DynamicLink } from "@/app/components/DynamicLink";
+import UiLanguageSwitcher from "@/app/components/UiLanguageSwitcher";
+import { fmt } from "@/i18n/format";
+import { localizedPath } from "@/i18n/config";
 
 function AvailabilityContent() {
   const { t } = useUiLanguage();
@@ -146,16 +149,17 @@ function AvailabilityContent() {
             href="/staff"
             className="p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-500"
           >
-            ← Zurück
+            ← {tc.back}
           </DynamicLink>
           <div>
             <h1 className="text-xl font-bold text-gray-900">{ta.title}</h1>
             <p className="text-sm text-gray-500">
-              <span className="text-green-600 font-medium">{availableCount} verfügbar</span>
+              <span className="text-green-600 font-medium">{fmt(ta.countAvailable, { n: availableCount })}</span>
               {" · "}
-              <span className="text-red-500 font-medium">{unavailableCount} nicht verfügbar</span>
+              <span className="text-red-500 font-medium">{fmt(ta.countUnavailable, { n: unavailableCount })}</span>
             </p>
           </div>
+          <UiLanguageSwitcher className="ml-auto" />
         </div>
 
         {/* Schnellauswahl */}
@@ -263,7 +267,7 @@ function AvailabilityContent() {
 
 export default function AvailabilityPage() {
   const { data: session, status } = useSession();
-  const { t } = useUiLanguage();
+  const { t, locale } = useUiLanguage();
   const tc = t.staff.common;
   const ta = t.staff.availability;
 
@@ -282,7 +286,7 @@ export default function AvailabilityPage() {
           <p className="text-4xl">🔒</p>
           <h2 className="text-xl font-bold text-gray-900">{tc.proRequired}</h2>
           <p className="text-gray-500 text-sm">{ta.proHint}</p>
-          <a href="/pricing" className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
+          <a href={localizedPath("/pricing", locale)} className="inline-block bg-gray-900 hover:bg-gray-700 text-white font-semibold text-sm px-6 py-2.5 rounded-xl transition-colors">
             {tc.upgradeNow}
           </a>
         </div>

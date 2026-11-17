@@ -229,6 +229,9 @@ model Menu {
   density       String?
   heroColor     String?
   heroTextColor String?
+  /// Pfad des Hintergrundbilds im Supabase-Bucket "menu-images" (nicht die URL),
+  /// z. B. restaurants/<restaurantId>/background/<uuid>.webp. Regeln: src/lib/schemas/menuImage.js
+  bgImage       String?
   /// Gestaltung vor dem zuletzt angewendeten Theme (Menü, Gruppen, Kategorien),
   /// damit sich das Theme rückgängig machen lässt. null = nichts rückgängig zu machen.
   themeSnapshot Json?

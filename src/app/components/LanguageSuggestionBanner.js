@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { locales, localizedPath, stripLocale, xDefaultLocale } from "@/i18n/config";
+import { isTranslatedPath, locales, localizedPath, stripLocale, xDefaultLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 
 const STORAGE_KEY = "wiomm.langBannerDismissed";
@@ -35,6 +35,10 @@ export default function LanguageSuggestionBanner({ locale }) {
     }
     if (dismissed) return;
 
+    // Dashboards, Rechtsseiten & Co. gibt es nur auf Deutsch — dort gaebe es
+    // keine andere Fassung, auf die der Hinweis zeigen koennte.
+    if (!isTranslatedPath(stripLocale(pathname))) return;
+
     const browserLang = (navigator.language || "").split("-")[0].toLowerCase();
     if (!browserLang || browserLang === locale) return;
 
@@ -43,7 +47,7 @@ export default function LanguageSuggestionBanner({ locale }) {
     const suggestion = locales.includes(browserLang) ? browserLang : locale === xDefaultLocale ? null : xDefaultLocale;
 
     if (suggestion && suggestion !== locale) setTarget(suggestion);
-  }, [locale]);
+  }, [locale, pathname]);
 
   if (!target) return null;
 

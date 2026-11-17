@@ -5,17 +5,18 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Providers from "../../components/Providers.js";
 import LanguageSuggestionBanner from "../../components/LanguageSuggestionBanner";
-import { prefixedLocales, ogLocales } from "@/i18n/config";
+import { locales, ogLocales } from "@/i18n/config";
 
-// Root-Layout aller uebersetzten Sprachen.
+// Root-Layout aller uebersetzten oeffentlichen Seiten — in JEDER Sprache.
 //
 // (intl) ist eine Route-Gruppe (kein URL-Segment), [locale] dagegen erzeugt das
-// Praefix: /en/pricing, /fr/pricing, ... Alle Sprachen teilen sich diesen einen
-// Seitenbaum — eine neue Sprache braucht nur einen Eintrag in
-// src/i18n/config.js und eine Woerterbuch-Datei, keine einzige neue Seite.
+// Praefix: /de/pricing, /fr/pricing, ... Englisch liegt intern ebenfalls hier
+// (/en/pricing), wird aber praefixlos ausgeliefert: die Middleware schreibt
+// /pricing auf /en/pricing um (resolveLocaleRoute in src/i18n/config.js).
+// Eine neue Sprache braucht nur einen Eintrag in src/i18n/config.js und eine
+// Woerterbuch-Datei, keine einzige neue Seite.
 //
-// Deutsch laeuft bewusst NICHT hier durch, sondern praefixlos ueber (de) auf
-// den bereits indexierten URLs.
+// Nicht uebersetzte Seiten (Dashboards, Rechtsseiten) laufen ueber (de).
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +28,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Praerendert /en, /fr, ... beim Build. Google bekommt fertiges HTML statt
+// Praerendert /en (= /), /de, ... beim Build. Google bekommt fertiges HTML statt
 // einer leeren Huelle, die erst per JavaScript befuellt wird.
 export function generateStaticParams() {
-  return prefixedLocales.map((locale) => ({ locale }));
+  return locales.map((locale) => ({ locale }));
 }
 
 // Nur die oben erzeugten Sprachen werden ausgeliefert. Alles andere — etwa ein
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }) {
   return {
     metadataBase: new URL("https://www.whatisonmymenu.com"),
     title: {
-      default: "WhatIsOnMyMenu – QR Code Menus for Restaurants",
+      default: locale === "de" ? "WhatIsOnMyMenu – Digitale Speisekarte per QR-Code" : "WhatIsOnMyMenu – QR Code Menus for Restaurants",
       template: "%s | WhatIsOnMyMenu",
     },
     openGraph: {

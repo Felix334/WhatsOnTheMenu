@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { SUBDOMAIN_SUBSCRIPTIONS } from "@/lib/schemas/subdomain";
+import { BG_IMAGE_SUBSCRIPTIONS, MENU_IMAGE_BUCKET } from "@/lib/schemas/menuImage";
+import { storagePublicUrl } from "@/lib/supabase";
 
 export async function getRestaurantMenuData(restaurantID) {
   const restaurant = await prisma.restaurant.findUnique({
@@ -25,6 +27,7 @@ export async function getRestaurantMenuData(restaurantID) {
           density: true,
           heroColor: true,
           heroTextColor: true,
+          bgImage: true,
           createdAt: true,
           updatedAt: true,
           categoryGroup: {
@@ -112,7 +115,13 @@ export async function getRestaurantMenuData(restaurantID) {
 
   if (!restaurant) return null;
 
-  const menu = restaurant.menu ?? [];
+  // Hintergrundbild nur zeigen, solange der Tarif es erlaubt; nach außen nur die
+  // fertige URL, nicht den Speicherpfad.
+  const showBgImage = BG_IMAGE_SUBSCRIPTIONS.includes(restaurant.owner.subscription);
+  const menu = (restaurant.menu ?? []).map(({ bgImage, ...m }) => ({
+    ...m,
+    bgImageUrl: showBgImage ? storagePublicUrl(MENU_IMAGE_BUCKET, bgImage) : null,
+  }));
 
   const response = {
     id: restaurant.id,

@@ -11,10 +11,13 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /protecting/
 Disallow: /Admin/
-Disallow: /Profil/
+Disallow: /dashboard
+Disallow: /Profil
 Disallow: /staff/
 Disallow: /settings/
-Disallow: /Konto/
+Disallow: /Konto
+Disallow: /de/Konto
+Disallow: /account
 Disallow: /orders/
 Disallow: /ErstelleRestaurantAccount/
 Disallow: /pricing/success

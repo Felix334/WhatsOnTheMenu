@@ -70,7 +70,7 @@ function StaffDashboardContent() {
                 <span className="text-sm font-semibold px-3 py-1 rounded-full border bg-green-100 text-green-800 border-green-200">{roleLabels.owner}</span>
               </div>
               <div className="space-y-2">
-                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                <Link href={{ pathname: "/staff/orders", query: { restaurantID: restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>{td.orders}</span>
                 </Link>
@@ -93,7 +93,7 @@ function StaffDashboardContent() {
                 <span className={`text-sm font-semibold px-3 py-1 rounded-full border ${ROLE_COLORS[m.role] ?? ""}`}>{roleLabels[m.role] ?? m.role}</span>
               </div>
               <div className="space-y-2">
-                <Link href={{ pathname: "/staff/bestellungen", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
+                <Link href={{ pathname: "/staff/orders", query: { restaurantID: m.restaurantId, userID: userID } }} className="flex items-center gap-3 w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold rounded-xl px-4 py-3 transition-colors">
                   <span className="text-xl">🍽️</span>
                   <span>{td.orders}</span>
                 </Link>

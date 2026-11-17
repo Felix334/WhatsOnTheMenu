@@ -2,6 +2,8 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { removeStorageFolder } from "@/lib/supabase";
+import { MENU_IMAGE_BUCKET, bgImageFolder } from "@/lib/schemas/menuImage";
 
 export async function DELETE(request, { params }) {
   const { id } = await params;
@@ -63,6 +65,13 @@ export async function DELETE(request, { params }) {
           user.stripeCustomerId
         );
       }
+    }
+
+    // Hochgeladene Bilder des Restaurants mitlöschen (DSGVO). Fehler werden nur
+    // geloggt — das Konto soll trotzdem gelöscht werden.
+    const restaurant = await prisma.restaurant.findUnique({ where: { ownerId: id }, select: { id: true } });
+    if (restaurant) {
+      await removeStorageFolder(MENU_IMAGE_BUCKET, bgImageFolder(restaurant.id));
     }
 
     await prisma.user.delete({ where: { id } });

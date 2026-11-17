@@ -7,6 +7,8 @@ export const MENU_THEMES = {
   elegant: {
     label: "Elegant",
     description: "Serifen-Titel, Punktlinien, viel Weißraum",
+    labelEn: "Elegant",
+    descriptionEn: "Serif titles, dotted lines, lots of white space",
     menu: { bgColor: "#FFFFFF", font: "Lato", headingFont: "Playfair Display", density: "airy" },
     group: { color: "#FFFFFF", fontColor: "#1F2937", borderRadius: "sm" },
     category: { bgColor: "#FFFFFF", fontColor: "#1F2937", borderRadius: "sm", elevated: false, leaderDots: true, titleUppercase: true },
@@ -14,6 +16,8 @@ export const MENU_THEMES = {
   rustikal: {
     label: "Rustikal",
     description: "Warme Töne, klassische Speisekarten-Optik",
+    labelEn: "Rustic",
+    descriptionEn: "Warm tones, classic menu look",
     menu: { bgColor: "#FAF3E0", font: "Open Sans", headingFont: "Merriweather", density: "normal" },
     group: { color: "#FFF8EC", fontColor: "#4A3728", borderRadius: "md" },
     category: { bgColor: "#FFFDF7", fontColor: "#4A3728", borderRadius: "md", elevated: true, leaderDots: true, titleUppercase: false },
@@ -21,6 +25,8 @@ export const MENU_THEMES = {
   modern: {
     label: "Modern",
     description: "Klare Flächen, kompakte Zeilen, runde Karten",
+    labelEn: "Modern",
+    descriptionEn: "Clean surfaces, compact rows, rounded cards",
     menu: { bgColor: "#F8F9FA", font: "Inter", headingFont: "Montserrat", density: "compact" },
     group: { color: "#FFFFFF", fontColor: "#111827", borderRadius: "xl" },
     category: { bgColor: "#FFFFFF", fontColor: "#111827", borderRadius: "xl", elevated: true, leaderDots: false, titleUppercase: true },
@@ -28,6 +34,8 @@ export const MENU_THEMES = {
   dunkel: {
     label: "Dunkel",
     description: "Dunkler Hintergrund, helle Schrift",
+    labelEn: "Dark",
+    descriptionEn: "Dark background, light text",
     menu: { bgColor: "#111827", font: "Inter", headingFont: "Poppins", density: "normal" },
     group: { color: "#1F2937", fontColor: "#F9FAFB", borderRadius: "md" },
     category: { bgColor: "#1F2937", fontColor: "#F9FAFB", borderRadius: "md", elevated: false, leaderDots: true, titleUppercase: false },
