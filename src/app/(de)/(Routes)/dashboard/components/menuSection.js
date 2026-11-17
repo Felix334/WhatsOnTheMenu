@@ -73,6 +73,7 @@ const MenuSection = ({
   onDuplicateDish,
   onDuplicateCategory,
   onRequestMoveDish,
+  onCategoryRenamed,
   restaurantId,
   userID,
   positionNum,
@@ -90,6 +91,9 @@ const MenuSection = ({
   const [localLeaderDots, setLocalLeaderDots] = useState(leaderDots ?? false);
   const [localTitleAlign, setLocalTitleAlign] = useState(titleAlign || "center");
   const [localTitleUppercase, setLocalTitleUppercase] = useState(titleUppercase ?? false);
+  // Überschrift: sofort nach dem Speichern im Dialog anzeigen (optimistisch),
+  // bei einem Fehler setzt der Dialog sie zurück.
+  const [localTitle, setLocalTitle] = useState(title);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [openItem, setOpenItem] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -123,11 +127,15 @@ const MenuSection = ({
     setLocalTitleUppercase(titleUppercase ?? false);
   }, [borderRadius, elevated, bgColor, fontColor, leaderDots, titleAlign, titleUppercase]);
 
+  useEffect(() => {
+    setLocalTitle(title);
+  }, [title]);
+
   const isCategoryDeleted = deletedCategories.includes(categoryId);
   const allItems = (menuItems ?? []).map((item) => (changedItems[item.id] ? { ...item, ...changedItems[item.id] } : item));
   const searching = searchTerm.trim().length > 0;
   // Bei aktiver Suche passt der Kategoriename als Treffer für alle Gerichte darin.
-  const categoryMatches = searching && title?.toLowerCase().includes(searchTerm.trim().toLowerCase());
+  const categoryMatches = searching && localTitle?.toLowerCase().includes(searchTerm.trim().toLowerCase());
   const displayItems = searching && !categoryMatches ? allItems.filter((item) => dishMatchesSearch(item, searchTerm)) : allItems;
 
   const toggleAvailability = async (e, dishId) => {
@@ -180,7 +188,7 @@ const MenuSection = ({
         title={tm.duplicateDish}
         onClick={(e) => {
           e.stopPropagation();
-          onDuplicateDish({ dish: item, categoryName: title, groupName });
+          onDuplicateDish({ dish: item, categoryName: localTitle, groupName });
         }}
       >
         <Copy className="size-4" />
@@ -233,7 +241,7 @@ const MenuSection = ({
           links darueber, damit der Titel mittig bleibt */}
       <div className={`relative flex flex-col-reverse sm:flex-row sm:items-center sm:justify-center gap-3 py-4 sm:py-6 px-3 sm:px-4 border-b ${bgColorClass(localBgColor)}`} style={bgColorStyle(localBgColor)}>
         <h3 className={`w-full text-xl sm:text-3xl md:text-4xl font-semibold wrap-break-words ${localTitleUppercase ? "uppercase tracking-widest" : ""} ${isCategoryDeleted ? "text-red-600 line-through" : ""}`} style={{ ...fontStyle, textAlign: localTitleAlign, ...(headingFont ? { fontFamily: headingFont } : {}) }}>
-          {title}
+          {localTitle}
         </h3>
 
         <div className="flex gap-2 sm:absolute sm:left-4 sm:top-1/2 sm:-translate-y-1/2">
@@ -243,7 +251,7 @@ const MenuSection = ({
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="outline" title={tm.duplicateCategory} onClick={() => onDuplicateCategory({ categoryName: title, groupName, dishes: allItems })}>
+              <Button size="icon" variant="outline" title={tm.duplicateCategory} onClick={() => onDuplicateCategory({ categoryName: localTitle, groupName, dishes: allItems })}>
                 <Copy className="size-4" />
               </Button>
             </TooltipTrigger>
@@ -399,7 +407,7 @@ const MenuSection = ({
         open={openCategoryMenu}
         onOpenChange={setOpenCategoryMenu}
         selectedCategory={{
-          name: title,
+          name: localTitle,
           position: 0,
           color: localBgColor,
           fontColor: localFontColor,
@@ -418,7 +426,11 @@ const MenuSection = ({
         onLeaderDotsChange={setLocalLeaderDots}
         onTitleAlignChange={setLocalTitleAlign}
         onTitleUppercaseChange={setLocalTitleUppercase}
-        category={title}
+        onNameChange={setLocalTitle}
+        onSaved={(changes) => {
+          if ("name" in changes) onCategoryRenamed?.(categoryId, changes.name);
+        }}
+        category={localTitle}
         restaurantId={restaurantId}
         userID={userID}
         categoryId={categoryId}

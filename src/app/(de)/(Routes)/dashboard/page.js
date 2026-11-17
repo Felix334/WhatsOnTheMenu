@@ -521,6 +521,31 @@ export default function PageBuilder() {
     });
   };
 
+  // ── Kategorie umbenannt (Dialog hat bereits gespeichert) ────────────────────
+  // Geladenen Stand nachziehen: Kopieren, Suche und die Namensvorschläge im
+  // "Hinzufügen"-Dialog arbeiten mit dem Kategorienamen — setData ordnet
+  // Kategorien über den Namen zu, ein veralteter Name legte eine neue an.
+  const handleCategoryRenamed = (categoryId, name) => {
+    setServerData((prev) => {
+      const menu = prev?.userData?.restaurant?.menu?.[0];
+      if (!menu) return prev;
+      const categoryGroup = menu.categoryGroup.map((group) => ({
+        ...group,
+        categories: (group.categories ?? []).map((cat) => (cat.id === categoryId ? { ...cat, name } : cat)),
+      }));
+      return {
+        ...prev,
+        userData: {
+          ...prev.userData,
+          restaurant: {
+            ...prev.userData.restaurant,
+            menu: [{ ...menu, categoryGroup }, ...prev.userData.restaurant.menu.slice(1)],
+          },
+        },
+      };
+    });
+  };
+
   // ── Design (OptionMenu) ───────────────────────────────────────────────────
   // Gespeichertes Design in den geladenen Stand übernehmen — kein Neuladen nötig.
   const handleDesignSaved = (values) => {
@@ -1125,7 +1150,7 @@ export default function PageBuilder() {
         {isEditingHero ? (
           <div className="flex flex-col items-center gap-3 max-w-lg mx-auto mt-1">
             <input value={heroName} onChange={(e) => setHeroName(e.target.value)} style={{ color: heroTextColor }} className="text-2xl font-serif font-bold text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder={tp.restaurantNamePlaceholder} />
-            <input value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} style={{ color: heroTextColor }} className="text-sm text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder={tp.heroDescriptionPlaceholder} />
+            <input value={heroDescription} onChange={(e) => setHeroDescription(e.target.value)} style={{ color: heroTextColor }} className="text-base sm:text-lg text-center bg-white/20 backdrop-blur placeholder-white/50 border border-white/40 rounded-xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-white/60" placeholder={tp.heroDescriptionPlaceholder} />
 
             {/* Hintergrundfarbe */}
             <p className="text-xs text-white/60 uppercase tracking-widest">{tp.bgColor}</p>
@@ -1193,7 +1218,7 @@ export default function PageBuilder() {
               {heroName || serverData?.userData?.restaurant?.name || "Restaurant"}
             </h1>
             {heroDescription && (
-              <p className="mt-3 text-sm max-w-md mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>
+              <p className="mt-3 text-base sm:text-lg max-w-lg mx-auto" style={{ color: heroTextColor, opacity: 0.85 }}>
                 {heroDescription}
               </p>
             )}
@@ -1299,6 +1324,7 @@ export default function PageBuilder() {
                         onDuplicateDish={duplicateDish}
                         onDuplicateCategory={duplicateCategory}
                         onRequestMoveDish={setMoveTarget}
+                        onCategoryRenamed={handleCategoryRenamed}
                         restaurantId={restaurantID}
                         userID={userID}
                         positionNum={positionNum}

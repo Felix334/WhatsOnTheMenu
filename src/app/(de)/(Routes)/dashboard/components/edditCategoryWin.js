@@ -26,7 +26,7 @@ const TITLE_ALIGN_OPTIONS = [
   { value: "right" },
 ];
 
-const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, onFontColorChange, onLeaderDotsChange, onTitleAlignChange, onTitleUppercaseChange, category, restaurantId, allowPremiumColor }) => {
+const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCategory, onBorderRadiusChange, onColorChange, onElevatedChange, onFontColorChange, onLeaderDotsChange, onTitleAlignChange, onTitleUppercaseChange, onNameChange, onSaved, category, restaurantId, allowPremiumColor }) => {
   const { t: uiDict } = useUiLanguage();
   const t = uiDict.dashboard;
   const tc = t.categoryEdit;
@@ -74,7 +74,10 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
 
     // Nur geänderte Felder sammeln
     const changes = {};
-    if (data.name !== initName) changes.name = data.name;
+    // Leerer Name wird ignoriert statt gespeichert — eine Kategorie ohne
+    // Überschrift wäre in der Karte nicht mehr anklickbar.
+    const name = (data.name ?? "").trim();
+    if (name && name !== initName) changes.name = name;
     if (color !== initColor) changes.color = color || null;
     if (fontColor !== initFontColor) changes.fontColor = fontColor || null;
     if (borderRadius !== initBorderRadius) changes.borderRadius = borderRadius;
@@ -89,6 +92,7 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
     }
 
     // Optimistisches Update nur für geänderte Felder
+    if ("name" in changes) onNameChange?.(name);
     if ("borderRadius" in changes) onBorderRadiusChange?.(borderRadius);
     if ("color" in changes) onColorChange?.(color);
     if ("elevated" in changes) onElevatedChange?.(elevated);
@@ -116,10 +120,12 @@ const EdditCategoryMenu = ({ open, onOpenChange, selectedCategory, setChangedCat
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       toast.success(tc.saved);
+      onSaved?.(changes);
       setChangedCategory((prev) => [...prev, { id: selectedCategory?.id, ...changes }]);
       onOpenChange(false);
     } catch (error) {
       // Optimistisches Update zurücksetzen
+      if ("name" in changes) onNameChange?.(initName);
       if ("borderRadius" in changes) onBorderRadiusChange?.(initBorderRadius);
       if ("color" in changes) onColorChange?.(initColor);
       if ("elevated" in changes) onElevatedChange?.(initElevated);
